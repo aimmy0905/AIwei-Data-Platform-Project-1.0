@@ -6,7 +6,7 @@
     <!-- 侧边栏头部 -->
     <div class="sidebar__header">
       <div class="sidebar__logo">
-        <img src="/favicon.ico" alt="Logo" class="sidebar__logo-img" />
+        <img src="/LOGO-new.webp" alt="Logo" class="sidebar__logo-img" />
         <transition name="fade">
           <span v-show="!collapsed" class="sidebar__logo-text">
             艾维数据平台
@@ -162,10 +162,7 @@ const getUserAvatarUrl = (): string => {
 }
 
 .sidebar__logo-img {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--border-radius-sm);
-  flex-shrink: 0;
+  display: none;
 }
 
 .sidebar__logo-text {

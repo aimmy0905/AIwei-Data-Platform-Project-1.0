@@ -5,7 +5,7 @@
       <div class="login-brand">
         <div class="login-brand__content">
           <div class="login-brand__logo">
-            <img src="/favicon.ico" alt="Logo" class="login-brand__logo-img" />
+            <img src="/LOGO-new.webp" alt="Logo" class="login-brand__logo-img" />
             <h1 class="login-brand__title">艾维数据平台</h1>
           </div>
           <p class="login-brand__subtitle">
@@ -352,15 +352,18 @@ onMounted(() => {
 
 .login-brand__logo {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
   margin-bottom: var(--spacing-xl);
+  text-align: center;
 }
 
 .login-brand__logo-img {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--border-radius-md);
+  width: 120px;
+  height: auto;
+  max-height: 120px;
+  object-fit: contain;
 }
 
 .login-brand__title {

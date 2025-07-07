@@ -7,7 +7,7 @@
           <span>返回登录</span>
         </router-link>
         <div class="logo">
-          <img src="/favicon.ico" alt="Logo" class="logo-img" />
+          <img src="/LOGO-new.webp" alt="Logo" class="logo-img" />
           <h1 class="logo-text">艾维数据平台</h1>
         </div>
       </div>
@@ -515,16 +515,19 @@ onUnmounted(() => {
 
 .logo {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-xl);
+  text-align: center;
 }
 
 .logo-img {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--border-radius-md);
+  width: 80px;
+  height: auto;
+  max-height: 80px;
+  object-fit: contain;
 }
 
 .logo-text {
