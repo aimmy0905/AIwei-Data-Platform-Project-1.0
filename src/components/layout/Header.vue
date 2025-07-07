@@ -112,7 +112,7 @@
           :class="{ 'header__user-btn--active': showUserMenu }"
         >
           <img 
-            :src="userAvatar || '/avatars/default.png'" 
+            :src="getUserAvatarUrl()" 
             :alt="userName"
             class="header__user-avatar"
           />
@@ -125,7 +125,7 @@
           <div v-show="showUserMenu" class="header__user-panel">
             <div class="header__user-info">
               <img 
-                :src="userAvatar || '/avatars/default.png'" 
+                :src="getUserAvatarUrl()" 
                 :alt="userName"
                 class="header__user-info-avatar"
               />
@@ -312,6 +312,26 @@ const formatTime = (time: string): string => {
   if (hours > 0) return `${hours}小时前`
   if (minutes > 0) return `${minutes}分钟前`
   return '刚刚'
+}
+
+const getUserAvatarUrl = (): string => {
+  // 如果用户有自定义头像，使用自定义头像
+  if (userAvatar.value) {
+    return userAvatar.value
+  }
+  
+  // 根据用户角色返回对应的头像
+  const role = user.value?.role || 'default'
+  const roleAvatarMap: Record<string, string> = {
+    admin: '/avatars/admin.svg',
+    manager: '/avatars/manager.svg',
+    staff: '/avatars/staff.svg',
+    finance: '/avatars/finance.svg',
+    superAdmin: '/avatars/admin.svg',
+    sales: '/avatars/staff.svg'
+  }
+  
+  return roleAvatarMap[role] || '/avatars/default.svg'
 }
 
 // 点击外部关闭下拉菜单

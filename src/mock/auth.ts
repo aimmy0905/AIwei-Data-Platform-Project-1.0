@@ -9,7 +9,7 @@ export const mockUsers: User[] = [
     phone: '138****1234',
     role: 'superAdmin',
     department: '管理层',
-    avatar: '/avatars/admin.png',
+    avatar: '/avatars/admin.svg',
     lastLoginTime: '2025-01-07 14:30:00',
     status: 'active'
   },
@@ -20,7 +20,7 @@ export const mockUsers: User[] = [
     phone: '139****5678',
     role: 'manager',
     department: '运营部',
-    avatar: '/avatars/manager.png',
+    avatar: '/avatars/manager.svg',
     lastLoginTime: '2025-01-07 09:15:00',
     status: 'active'
   },
@@ -31,7 +31,7 @@ export const mockUsers: User[] = [
     phone: '136****9012',
     role: 'staff',
     department: '销售部',
-    avatar: '/avatars/staff.png',
+    avatar: '/avatars/staff.svg',
     lastLoginTime: '2025-01-06 18:20:00',
     status: 'active'
   },
@@ -42,7 +42,7 @@ export const mockUsers: User[] = [
     phone: '137****3456',
     role: 'finance',
     department: '财务部',
-    avatar: '/avatars/finance.png',
+    avatar: '/avatars/finance.svg',
     lastLoginTime: '2025-01-06 16:45:00',
     status: 'active'
   },
@@ -53,7 +53,7 @@ export const mockUsers: User[] = [
     phone: '135****7890',
     role: 'sales',
     department: '销售部',
-    avatar: '/avatars/sales.png',
+    avatar: '/avatars/staff.svg',
     lastLoginTime: '2025-01-05 20:10:00',
     status: 'active'
   }

@@ -40,7 +40,7 @@
     <div class="sidebar__footer">
       <div class="sidebar__user" v-if="user">
         <img 
-          :src="userAvatar || '/avatars/default.png'" 
+          :src="getUserAvatarUrl()" 
           :alt="userName"
           class="sidebar__user-avatar"
         />
@@ -102,6 +102,26 @@ const getRoleText = (role: string): string => {
     sales: '销售人员'
   }
   return roleMap[role] || role
+}
+
+const getUserAvatarUrl = (): string => {
+  // 如果用户有自定义头像，使用自定义头像
+  if (userAvatar.value) {
+    return userAvatar.value
+  }
+  
+  // 根据用户角色返回对应的头像
+  const role = user.value?.role || 'default'
+  const roleAvatarMap: Record<string, string> = {
+    admin: '/avatars/admin.svg',
+    manager: '/avatars/manager.svg',
+    staff: '/avatars/staff.svg',
+    finance: '/avatars/finance.svg',
+    superAdmin: '/avatars/admin.svg',
+    sales: '/avatars/staff.svg'
+  }
+  
+  return roleAvatarMap[role] || '/avatars/default.svg'
 }
 </script>
 
