@@ -1,8 +1,15 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
+import { StagewiseToolbar } from '@stagewise/toolbar-vue'
+import VuePlugin from '@stagewise-plugins/vue'
 </script>
 
 <template>
+  <StagewiseToolbar 
+    :config="{ 
+      plugins: [VuePlugin] 
+    }" 
+  />
   <RouterView />
 </template>
 
