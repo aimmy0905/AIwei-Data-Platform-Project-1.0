@@ -1,5 +1,5 @@
 <template>
-  <header class="header">
+  <header class="header" :class="{ 'header--collapsed': collapsed }">
     <div class="header__left">
       <!-- 移动端菜单按钮 -->
       <button 
@@ -217,6 +217,7 @@ const userAvatar = computed(() => authStore.userAvatar)
 const breadcrumb = computed(() => menuStore.getBreadcrumb)
 const currentTheme = computed(() => themeMode.value)
 const unreadCount = computed(() => recentAlerts.value.filter(a => !a.isRead).length)
+const collapsed = computed(() => menuStore.collapsed)
 
 // 图标映射
 const iconMap = {

@@ -41,10 +41,16 @@
             </div>
           </div>
           <div class="chart-container">
-            <div class="chart-placeholder">
+            <LineChart
+              v-if="chartData && revenueChartData"
+              :data="revenueChartData"
+              height="300px"
+              :smooth="true"
+              :show-legend="false"
+            />
+            <div v-else class="chart-placeholder">
               <BarChart3 :size="48" />
-              <span>收入趋势图表</span>
-              <p>显示过去{{ activePeriod }}的收入变化趋势</p>
+              <span>加载中...</span>
             </div>
           </div>
         </div>
@@ -54,10 +60,16 @@
             <h3>渠道分布</h3>
           </div>
           <div class="chart-container">
-            <div class="chart-placeholder">
+            <PieChartComponent
+              v-if="chartData && channelChartData"
+              :data="channelChartData"
+              height="300px"
+              :show-legend="true"
+              :donut="false"
+            />
+            <div v-else class="chart-placeholder">
               <PieChart :size="48" />
-              <span>渠道分布饼图</span>
-              <p>展示各个流量渠道的收入占比</p>
+              <span>加载中...</span>
             </div>
           </div>
         </div>
@@ -158,6 +170,8 @@ import {
   Clock
 } from 'lucide-vue-next'
 import { mockGetDashboardData } from '@/mock'
+import LineChart from '@/components/charts/LineChart.vue'
+import PieChartComponent from '@/components/charts/PieChart.vue'
 import type { Customer, Alert } from '@/types'
 
 // 响应式数据
@@ -165,6 +179,7 @@ const activePeriod = ref('7天')
 const loading = ref(false)
 const topCustomers = ref<Customer[]>([])
 const recentAlerts = ref<Alert[]>([])
+const chartData = ref<unknown>(null)
 
 const periods = ['7天', '30天', '90天', '1年']
 
@@ -210,6 +225,33 @@ const quickStats = ref([
 
 // 计算属性
 const unreadCount = computed(() => recentAlerts.value.filter(a => !a.isRead).length)
+
+// 收入趋势图表数据
+const revenueChartData = computed(() => {
+  if (!chartData.value) return null
+  
+  const data = chartData.value.revenue
+  return {
+    labels: data.labels,
+    datasets: [{
+      label: data.datasets[0].label,
+      data: data.datasets[0].data,
+      color: data.datasets[0].borderColor
+    }]
+  }
+})
+
+// 渠道分布图表数据
+const channelChartData = computed(() => {
+  if (!chartData.value) return null
+  
+  const data = chartData.value.channels
+  return data.labels.map((label: string, index: number) => ({
+    name: label,
+    value: data.datasets[0].data[index],
+    color: data.datasets[0].backgroundColor[index]
+  }))
+})
 
 // 图标映射
 const iconMap = {
@@ -280,6 +322,7 @@ const loadDashboardData = async () => {
     if (response.success && response.data) {
       topCustomers.value = response.data.customers.slice(0, 5)
       recentAlerts.value = response.data.alerts.slice(0, 4)
+      chartData.value = response.data.chartData
     }
   } catch (error) {
     console.error('加载数据失败:', error)

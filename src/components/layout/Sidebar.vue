@@ -18,8 +18,8 @@
         @click="toggleCollapse"
         :title="collapsed ? '展开菜单' : '折叠菜单'"
       >
-        <Menu v-if="collapsed" :size="20" />
-        <X v-else :size="20" />
+        <ChevronRight v-if="collapsed" :size="20" />
+        <ChevronLeft v-else :size="20" />
       </button>
     </div>
 
@@ -58,7 +58,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { Menu, X } from 'lucide-vue-next'
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { useMenuStore } from '@/stores/menu'
 import SidebarMenuItem from './SidebarMenuItem.vue'
