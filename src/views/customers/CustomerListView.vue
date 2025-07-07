@@ -6,7 +6,10 @@
         <p class="page-description">管理和分析您的客户数据，优化客户关系</p>
       </div>
       <div class="page-header__actions">
-        <button class="action-btn action-btn--secondary">
+        <button 
+          class="action-btn action-btn--secondary"
+          @click="showExportModal = true"
+        >
           <Download :size="16" />
           导出数据
         </button>
@@ -334,7 +337,10 @@
           <Mail :size="16" />
           发送邮件
         </button>
-        <button class="bulk-btn">
+        <button 
+          class="bulk-btn"
+          @click="showExportModal = true"
+        >
           <Download :size="16" />
           导出选中
         </button>
@@ -350,6 +356,21 @@
       <Loader :size="48" class="loading-spinner" />
       <span>加载客户数据中...</span>
     </div>
+
+    <!-- 导出弹窗 -->
+    <ExportModal
+      :visible="showExportModal"
+      :data="customers"
+      :filtered-data="filteredCustomers"
+      :selected-data="selectedCustomersData"
+      :columns="exportColumns"
+      :total-count="customers.length"
+      :filtered-count="filteredCustomers.length"
+      :selected-count="selectedCustomers.length"
+      default-filename="customers"
+      @close="showExportModal = false"
+      @export="handleExportComplete"
+    />
   </div>
 </template>
 
@@ -363,7 +384,10 @@ import {
 import { mockGetCustomers } from '@/mock'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FilterPanel from '@/components/common/FilterPanel.vue'
+import ExportModal from '@/components/common/ExportModal.vue'
+import { formatters } from '@/utils/export'
 import type { Customer } from '@/types'
+import type { ExportColumn } from '@/utils/export'
 
 // 响应式数据
 const loading = ref(true)
@@ -376,6 +400,7 @@ const selectedCustomers = ref<number[]>([])
 const selectAll = ref(false)
 const currentPage = ref(1)
 const pageSize = ref(10)
+const showExportModal = ref(false)
 
 const filters = reactive({
   dateRange: '',
@@ -572,6 +597,61 @@ const customerStats = computed(() => {
   return { total, active, totalRevenue, avgROI }
 })
 
+const selectedCustomersData = computed(() => {
+  return customers.value.filter(customer => selectedCustomers.value.includes(customer.id))
+})
+
+const exportColumns: ExportColumn[] = [
+  {
+    key: 'name',
+    label: '客户名称'
+  },
+  {
+    key: 'website',
+    label: '网站地址'
+  },
+  {
+    key: 'industry',
+    label: '行业'
+  },
+  {
+    key: 'revenue',
+    label: '收入',
+    formatter: formatters.currency
+  },
+  {
+    key: 'roi',
+    label: 'ROI',
+    formatter: (value) => typeof value === 'number' ? `${value}x` : String(value || '')
+  },
+  {
+    key: 'status',
+    label: '状态',
+    formatter: (value) => {
+      const statusMap = {
+        active: '活跃',
+        inactive: '非活跃',
+        suspended: '暂停'
+      }
+      return statusMap[value as keyof typeof statusMap] || String(value || '')
+    }
+  },
+  {
+    key: 'manager',
+    label: '负责人'
+  },
+  {
+    key: 'createdAt',
+    label: '创建时间',
+    formatter: formatters.date
+  },
+  {
+    key: 'lastUpdated',
+    label: '最后更新',
+    formatter: formatters.date
+  }
+]
+
 // 方法
 const formatNumber = (num: number): string => {
   if (num >= 1000000) {
@@ -682,6 +762,22 @@ const viewCustomer = (customer: Customer) => {
 
 const showCustomerMenu = (customer: Customer) => {
   console.log('显示客户菜单:', customer.name)
+}
+
+const handleExportComplete = (exportData: {
+  format: string
+  data: Record<string, unknown>[]
+  columns: ExportColumn[]
+  options: Record<string, unknown>
+}) => {
+  console.log('导出完成:', {
+    format: exportData.format,
+    recordCount: exportData.data.length,
+    columnCount: exportData.columns.length
+  })
+  
+  // 这里可以添加导出完成后的处理逻辑
+  // 例如：记录导出日志、显示成功消息等
 }
 
 // 加载数据
@@ -1411,25 +1507,75 @@ onMounted(() => {
   .page-header {
     flex-direction: column;
     align-items: stretch;
+    gap: var(--spacing-lg);
+  }
+  
+  .page-header__actions {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .action-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .search-filter-section {
+    gap: var(--spacing-md);
+  }
+  
+  .search-section {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .customer-search {
+    max-width: none;
   }
   
   .customer-stats {
     grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+  
+  .stat-card {
+    padding: var(--spacing-md);
   }
   
   .table-header {
     flex-direction: column;
     align-items: stretch;
     gap: var(--spacing-sm);
+    padding: var(--spacing-md);
   }
   
   .table-controls {
     flex-direction: column;
     align-items: stretch;
+    gap: var(--spacing-sm);
+  }
+  
+  .view-options {
+    align-self: center;
   }
   
   .customer-grid {
     grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+  }
+  
+  .customer-card {
+    padding: var(--spacing-md);
+  }
+  
+  .customer-table {
+    font-size: var(--font-size-sm);
+  }
+  
+  .customer-table th,
+  .customer-table td {
+    padding: var(--spacing-sm);
   }
   
   .bulk-actions {
@@ -1439,16 +1585,94 @@ onMounted(() => {
     flex-direction: column;
     align-items: stretch;
     gap: var(--spacing-md);
+    padding: var(--spacing-md);
   }
   
   .bulk-actions__buttons {
     justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .bulk-action-btn {
+    flex: 1;
+    min-width: 120px;
   }
   
   .pagination-section {
     flex-direction: column;
     align-items: stretch;
     text-align: center;
+    gap: var(--spacing-sm);
+  }
+  
+  .pagination-controls {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .pagination-numbers {
+    order: 2;
+    justify-content: center;
+  }
+  
+  .pagination-btn {
+    min-width: 80px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .stat-card {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+  }
+  
+  .stat-icon {
+    align-self: center;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .stat-value {
+    font-size: var(--font-size-xl);
+  }
+  
+  .customer-card {
+    padding: var(--spacing-sm);
+  }
+  
+  .customer-table {
+    font-size: var(--font-size-xs);
+  }
+  
+  .customer-table th,
+  .customer-table td {
+    padding: var(--spacing-xs);
+  }
+  
+  .table-actions {
+    gap: var(--spacing-xs);
+  }
+  
+  .action-btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+  }
+  
+  .bulk-action-btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+  }
+  
+  .pagination-number {
+    width: 28px;
+    height: 28px;
+    font-size: var(--font-size-xs);
   }
 }
 </style>

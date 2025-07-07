@@ -87,13 +87,14 @@ const chartOption = computed(() => {
         type: 'shadow'
       },
       formatter: (params: unknown[]) => {
-        let tooltip = `<div style="margin-bottom: 8px; font-weight: 600;">${params[0].axisValue}</div>`
-        params.forEach((param) => {
+        const paramArray = params as Array<{ axisValue: string; color: string; seriesName: string; value: unknown }>
+        let tooltip = `<div style="margin-bottom: 8px; font-weight: 600;">${paramArray[0]?.axisValue || ''}</div>`
+        paramArray.forEach((param) => {
           tooltip += `
             <div style="display: flex; align-items: center; margin-bottom: 4px;">
               <span style="display: inline-block; width: 10px; height: 10px; background: ${param.color}; margin-right: 8px; border-radius: 2px;"></span>
               <span style="margin-right: 16px;">${param.seriesName}:</span>
-              <span style="font-weight: 600;">${formatValue(param.value)}</span>
+              <span style="font-weight: 600;">${formatValue(param.value as number)}</span>
             </div>
           `
         })

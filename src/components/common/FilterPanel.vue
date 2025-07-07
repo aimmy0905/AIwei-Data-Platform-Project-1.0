@@ -529,24 +529,123 @@ const applyFilters = () => {
 }
 
 /* 响应式设计 */
+@media (max-width: 1024px) {
+  .checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+  }
+}
+
 @media (max-width: 768px) {
   .filter-panel__header {
     padding: var(--spacing-sm) var(--spacing-md);
+    flex-wrap: wrap;
+  }
+  
+  .filter-title {
+    flex: 1;
+  }
+  
+  .filter-actions {
+    flex-wrap: wrap;
   }
   
   .filter-panel__content {
     padding: var(--spacing-md);
+    gap: var(--spacing-md);
+  }
+  
+  .filter-group {
+    gap: var(--spacing-xs);
+  }
+  
+  .filter-label {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+  }
+  
+  .filter-select,
+  .filter-input {
+    height: 40px;
+    font-size: var(--font-size-sm);
   }
   
   .custom-date-range,
   .amount-filter {
     flex-direction: column;
     align-items: stretch;
+    gap: var(--spacing-xs);
   }
   
   .date-separator,
   .amount-separator {
     text-align: center;
+    padding: var(--spacing-xs) 0;
+  }
+  
+  .checkbox-group {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xs);
+  }
+  
+  .filter-checkbox {
+    padding: var(--spacing-xs);
+    border-radius: var(--border-radius-sm);
+    transition: background-color var(--duration-fast);
+  }
+  
+  .filter-checkbox:hover {
+    background: var(--color-background);
+  }
+  
+  .filter-footer {
+    padding-top: var(--spacing-sm);
+  }
+  
+  .filter-apply {
+    height: 44px;
+    font-size: var(--font-size-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-panel__header {
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+  
+  .filter-title h3 {
+    font-size: var(--font-size-sm);
+  }
+  
+  .filter-clear,
+  .filter-toggle {
+    padding: var(--spacing-xs);
+    font-size: var(--font-size-xs);
+  }
+  
+  .filter-panel__content {
+    padding: var(--spacing-sm);
+  }
+  
+  .filter-select,
+  .filter-input {
+    height: 36px;
+    padding: 0 var(--spacing-xs);
+  }
+  
+  .checkbox-input {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .checkbox-text {
+    font-size: var(--font-size-sm);
+  }
+  
+  .filter-apply {
+    height: 40px;
+    font-size: var(--font-size-sm);
   }
 }
 </style>

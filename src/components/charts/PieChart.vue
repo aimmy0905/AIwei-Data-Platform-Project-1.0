@@ -80,12 +80,13 @@ const chartOption = computed(() => {
         color: colors.textPrimary
       },
       formatter: (params: unknown) => {
-        const percentage = params.percent || 0
+        const param = params as { percent: number; color: string; name: string; value: unknown }
+        const percentage = param.percent || 0
         return `
           <div style="display: flex; align-items: center; margin-bottom: 4px;">
-            <span style="display: inline-block; width: 10px; height: 10px; background: ${params.color}; margin-right: 8px; border-radius: 50%;"></span>
-            <span style="margin-right: 16px;">${params.name}:</span>
-            <span style="font-weight: 600;">${formatValue(params.value)} (${percentage}%)</span>
+            <span style="display: inline-block; width: 10px; height: 10px; background: ${param.color}; margin-right: 8px; border-radius: 50%;"></span>
+            <span style="margin-right: 16px;">${param.name}:</span>
+            <span style="font-weight: 600;">${formatValue(param.value as number)} (${percentage}%)</span>
           </div>
         `
       }

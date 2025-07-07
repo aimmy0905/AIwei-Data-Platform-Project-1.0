@@ -288,8 +288,10 @@ const highlightMatch = (text: string): string => {
 /* 响应式设计 */
 @media (max-width: 768px) {
   .search-input__field {
-    height: 36px;
+    height: 40px;
     padding-left: 40px;
+    padding-right: 40px;
+    font-size: var(--font-size-md);
   }
   
   .search-input__icon {
@@ -299,10 +301,75 @@ const highlightMatch = (text: string): string => {
   .search-input__clear,
   .search-input__button {
     right: var(--spacing-sm);
+    width: 28px;
+    height: 28px;
   }
   
   .search-input__button {
-    right: calc(var(--spacing-sm) + 28px);
+    right: calc(var(--spacing-sm) + 32px);
+  }
+  
+  .search-suggestions {
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-xl);
+  }
+  
+  .search-suggestion {
+    padding: var(--spacing-md);
+    font-size: var(--font-size-md);
+  }
+  
+  .suggestion-icon {
+    flex-shrink: 0;
+  }
+  
+  .suggestion-text {
+    font-size: var(--font-size-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .search-input__field {
+    height: 44px;
+    padding-left: 44px;
+    padding-right: 44px;
+    font-size: var(--font-size-md);
+    border-width: 2px;
+  }
+  
+  .search-input__icon {
+    left: var(--spacing-md);
+  }
+  
+  .search-input__clear,
+  .search-input__button {
+    right: var(--spacing-md);
+    width: 32px;
+    height: 32px;
+  }
+  
+  .search-input__button {
+    right: calc(var(--spacing-md) + 36px);
+  }
+  
+  .search-input__field:focus {
+    box-shadow: 0 0 0 4px var(--color-primary-light);
+  }
+  
+  .search-suggestions {
+    max-height: 250px;
+    margin-top: var(--spacing-sm);
+  }
+  
+  .search-suggestion {
+    padding: var(--spacing-lg) var(--spacing-md);
+    font-size: var(--font-size-md);
+    min-height: 48px;
+  }
+  
+  .suggestion-text :deep(mark) {
+    padding: var(--spacing-xs);
+    border-radius: var(--border-radius-xs);
   }
 }
 </style>

@@ -1,8 +1,10 @@
 <template>
   <div class="channel-data-view">
     <div class="page-header">
-      <h1 class="page-title">渠道数据分析</h1>
-      <p class="page-description">深入分析各个渠道的表现，优化投放策略</p>
+      <div class="page-header__content">
+        <h1 class="page-title">渠道数据分析</h1>
+        <p class="page-description">深入分析各个渠道的表现，优化投放策略</p>
+      </div>
       <div class="page-actions">
         <button 
           v-for="period in periods" 
@@ -241,11 +243,16 @@ import BarChart from '@/components/charts/BarChart.vue'
 import AreaChart from '@/components/charts/AreaChart.vue'
 import type { Channel } from '@/types'
 
+// 扩展的Channel接口，包含颜色属性
+interface ChannelWithColor extends Channel {
+  color: string
+}
+
 // 响应式数据
 const loading = ref(true)
 const activePeriod = ref('30天')
 const revenueChartType = ref('pie')
-const channelStats = ref<Channel[]>([])
+const channelStats = ref<ChannelWithColor[]>([])
 
 const periods = ['7天', '30天', '90天', '1年']
 
@@ -376,7 +383,7 @@ const loadChannelData = async () => {
   try {
     const response = await mockGetChannels()
     if (response.success && response.data) {
-      channelStats.value = response.data.map(channel => ({
+      channelStats.value = response.data.map((channel): ChannelWithColor => ({
         ...channel,
         color: getChannelColor(channel.type)
       }))
@@ -400,12 +407,15 @@ onMounted(() => {
 }
 
 .page-header {
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  flex-wrap: wrap;
   gap: var(--spacing-md);
+}
+
+.page-header__content {
+  flex: 1;
 }
 
 .page-title {

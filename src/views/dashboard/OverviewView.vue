@@ -179,7 +179,7 @@ const activePeriod = ref('7天')
 const loading = ref(false)
 const topCustomers = ref<Customer[]>([])
 const recentAlerts = ref<Alert[]>([])
-const chartData = ref<unknown>(null)
+const chartData = ref<any>(null)
 
 const periods = ['7天', '30天', '90天', '1年']
 
