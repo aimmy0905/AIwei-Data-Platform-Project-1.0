@@ -1,0 +1,181 @@
+/* 主题CSS变量定义 */
+:root {
+  /* 主色调 */
+  --color-primary: #1890ff;
+  --color-primary-hover: #40a9ff;
+  --color-primary-active: #096dd9;
+  --color-primary-light: rgba(24, 144, 255, 0.1);
+  
+  /* 辅助色 */
+  --color-secondary: #f5f5f5;
+  --color-success: #52c41a;
+  --color-warning: #faad14;
+  --color-error: #f5222d;
+  --color-info: #1890ff;
+  
+  /* 文本色 */
+  --color-text-primary: #262626;
+  --color-text-secondary: #8c8c8c;
+  --color-text-disabled: #bfbfbf;
+  --color-text-inverse: #ffffff;
+  
+  /* 背景色 */
+  --color-background: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-overlay: rgba(0, 0, 0, 0.45);
+  
+  /* 边框色 */
+  --color-border: #d9d9d9;
+  --color-border-light: #f0f0f0;
+  --color-border-dark: #434343;
+  
+  /* 阴影 */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.16);
+  
+  /* 圆角 */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  
+  /* 间距 */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  
+  /* 字体大小 */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 30px;
+  
+  /* 字体粗细 */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* 行高 */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  
+  /* Z-index层级 */
+  --z-dropdown: 1000;
+  --z-sticky: 1010;
+  --z-fixed: 1020;
+  --z-modal-backdrop: 1030;
+  --z-modal: 1040;
+  --z-popover: 1050;
+  --z-tooltip: 1060;
+  
+  /* 动画时长 */
+  --duration-fast: 0.15s;
+  --duration-normal: 0.25s;
+  --duration-slow: 0.35s;
+  
+  /* 侧边栏宽度 */
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 80px;
+  
+  /* 头部高度 */
+  --header-height: 64px;
+}
+
+/* 深色主题 */
+[data-theme="dark"] {
+  --color-primary: #1890ff;
+  --color-primary-hover: #40a9ff;
+  --color-primary-active: #096dd9;
+  --color-primary-light: rgba(24, 144, 255, 0.15);
+  
+  --color-secondary: #1f1f1f;
+  --color-success: #52c41a;
+  --color-warning: #faad14;
+  --color-error: #f5222d;
+  --color-info: #1890ff;
+  
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #a6a6a6;
+  --color-text-disabled: #595959;
+  --color-text-inverse: #262626;
+  
+  --color-background: #141414;
+  --color-surface: #1f1f1f;
+  --color-overlay: rgba(0, 0, 0, 0.65);
+  
+  --color-border: #303030;
+  --color-border-light: #262626;
+  --color-border-dark: #434343;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.6);
+}
+
+/* 自定义主题色彩 */
+[data-theme-color="green"] {
+  --color-primary: #52c41a;
+  --color-primary-hover: #73d13d;
+  --color-primary-active: #389e0d;
+}
+
+[data-theme-color="purple"] {
+  --color-primary: #722ed1;
+  --color-primary-hover: #9254de;
+  --color-primary-active: #531dab;
+}
+
+[data-theme-color="orange"] {
+  --color-primary: #fa8c16;
+  --color-primary-hover: #ffa940;
+  --color-primary-active: #d46b08;
+}
+
+[data-theme-color="red"] {
+  --color-primary: #f5222d;
+  --color-primary-hover: #ff4d4f;
+  --color-primary-active: #cf1322;
+}
+
+[data-theme-color="cyan"] {
+  --color-primary: #13c2c2;
+  --color-primary-hover: #36cfc9;
+  --color-primary-active: #08979c;
+}
+
+/* 通用工具类 */
+.theme-transition {
+  transition: background-color var(--duration-normal), 
+              color var(--duration-normal), 
+              border-color var(--duration-normal);
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--border-radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}

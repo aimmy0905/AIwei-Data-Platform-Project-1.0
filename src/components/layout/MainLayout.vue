@@ -1,0 +1,259 @@
+<template>
+  <div class="main-layout" :class="{ 'main-layout--collapsed': collapsed }">
+    <!-- 侧边栏 -->
+    <Sidebar />
+    
+    <!-- 主内容区域 -->
+    <div class="main-layout__content">
+      <!-- 头部导航 -->
+      <Header />
+      
+      <!-- 页面内容 -->
+      <main class="main-layout__main">
+        <div class="main-layout__container">
+          <!-- 路由视图 -->
+          <router-view v-slot="{ Component, route }">
+            <Transition name="page" mode="out-in">
+              <component :is="Component" :key="route.fullPath" />
+            </Transition>
+          </router-view>
+        </div>
+      </main>
+      
+      <!-- 底部 -->
+      <footer class="main-layout__footer">
+        <div class="main-layout__footer-content">
+          <span>&copy; 2025 艾维数据平台. All rights reserved.</span>
+          <div class="main-layout__footer-links">
+            <a href="#" class="main-layout__footer-link">帮助中心</a>
+            <a href="#" class="main-layout__footer-link">联系我们</a>
+            <a href="#" class="main-layout__footer-link">隐私政策</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <!-- 移动端遮罩层 -->
+    <div 
+      v-if="showMobileOverlay"
+      class="main-layout__overlay"
+      @click="closeMobileMenu"
+    ></div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+import Sidebar from './Sidebar.vue'
+import Header from './Header.vue'
+import { useAuthStore } from '@/stores/auth'
+import { useMenuStore } from '@/stores/menu'
+import { initTheme } from '@/assets/theme'
+
+// 组合式API
+const router = useRouter()
+const authStore = useAuthStore()
+const menuStore = useMenuStore()
+
+// 计算属性
+const collapsed = computed(() => menuStore.collapsed)
+const showMobileOverlay = computed(() => {
+  return window.innerWidth <= 768 && !collapsed.value
+})
+
+// 方法
+const closeMobileMenu = () => {
+  if (window.innerWidth <= 768) {
+    menuStore.toggleCollapse()
+  }
+}
+
+const handleResize = () => {
+  // 响应式处理
+  if (window.innerWidth <= 768) {
+    // 移动端默认折叠侧边栏
+    if (!collapsed.value) {
+      menuStore.toggleCollapse()
+    }
+  }
+}
+
+// 生命周期
+onMounted(async () => {
+  // 初始化主题
+  initTheme()
+  
+  // 初始化认证状态
+  await authStore.initAuth()
+  
+  // 如果已登录，加载菜单
+  if (authStore.isAuthenticated && authStore.userRole) {
+    await menuStore.loadMenu(authStore.userRole)
+    
+    // 根据当前路由设置活跃菜单
+    const currentPath = router.currentRoute.value.path
+    menuStore.setActiveMenuByPath(currentPath)
+  }
+  
+  // 监听窗口大小变化
+  window.addEventListener('resize', handleResize)
+  
+  // 监听路由变化
+  router.afterEach((to) => {
+    menuStore.setActiveMenuByPath(to.path)
+  })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
+</script>
+
+<style scoped>
+.main-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-background);
+}
+
+.main-layout__content {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  transition: margin-left var(--duration-normal);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-layout--collapsed .main-layout__content {
+  margin-left: var(--sidebar-collapsed-width);
+}
+
+.main-layout__main {
+  flex: 1;
+  margin-top: var(--header-height);
+  padding: var(--spacing-lg);
+  overflow-x: auto;
+}
+
+.main-layout__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.main-layout__footer {
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border-light);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-top: auto;
+}
+
+.main-layout__footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.main-layout__footer-links {
+  display: flex;
+  gap: var(--spacing-lg);
+}
+
+.main-layout__footer-link {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color var(--duration-fast);
+}
+
+.main-layout__footer-link:hover {
+  color: var(--color-primary);
+}
+
+.main-layout__overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--color-overlay);
+  z-index: var(--z-modal-backdrop);
+  opacity: 0;
+  animation: fadeIn var(--duration-normal) forwards;
+}
+
+/* 页面切换动画 */
+.page-enter-active,
+.page-leave-active {
+  transition: all var(--duration-normal);
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+/* 遮罩层淡入动画 */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .main-layout__content {
+    margin-left: 0;
+  }
+  
+  .main-layout--collapsed .main-layout__content {
+    margin-left: 0;
+  }
+  
+  .main-layout__main {
+    padding: var(--spacing-md);
+  }
+  
+  .main-layout__footer-content {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+  }
+  
+  .main-layout__footer-links {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-layout__main {
+    padding: var(--spacing-sm);
+  }
+  
+  .main-layout__footer-links {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+}
+
+/* 打印样式 */
+@media print {
+  .main-layout__content {
+    margin-left: 0;
+  }
+  
+  .main-layout__footer {
+    display: none;
+  }
+}
+</style>
