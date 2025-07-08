@@ -401,7 +401,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
 import { 
   BarChart3, 
   PieChart, 
@@ -417,18 +416,15 @@ import {
   Clock,
   MousePointer,
   ShoppingCart,
-  Megaphone
+  Calendar
 } from 'lucide-vue-next'
 import { mockGetDashboardData } from '@/mock'
 import LineChart from '@/components/charts/LineChart.vue'
 import PieChartComponent from '@/components/charts/PieChart.vue'
 import type { Customer, Alert, Channel, Campaign, ProductSales, WebsiteData } from '@/types'
-import { useAuthStore } from '@/stores/auth'
 import { useMenuStore } from '@/stores/menu'
 
 // 组合式API
-const router = useRouter()
-const authStore = useAuthStore()
 const menuStore = useMenuStore()
 
 // 滚动监听相关
@@ -441,7 +437,7 @@ const dashboardSections = [
   { id: 'customer-goals', name: '客户目标', icon: 'Target' },
   { id: 'website-data', name: '网站数据', icon: 'Globe' },
   { id: 'channel-data', name: '渠道数据', icon: 'TrendingUp' },
-  { id: 'campaign-data', name: '活动数据', icon: 'Megaphone' },
+  { id: 'campaign-data', name: '活动数据', icon: 'Calendar' },
   { id: 'product-sales', name: '产品销售', icon: 'Package' }
 ]
 
@@ -465,7 +461,24 @@ const websiteData = ref<WebsiteData>({
   returningUsers: 0,
   bounceRate: 0
 })
-const chartData = ref<any>(null)
+interface ChartDataset {
+  label: string
+  data: number[]
+  borderColor?: string
+  backgroundColor?: string | string[]
+}
+
+interface ChartData {
+  labels: string[]
+  datasets: ChartDataset[]
+}
+
+interface DashboardChartData {
+  revenue: ChartData
+  channels: ChartData
+}
+
+const chartData = ref<DashboardChartData | null>(null)
 
 const periods = ['7天', '30天', '90天', '1年']
 
@@ -509,8 +522,7 @@ const quickStats = ref([
   }
 ])
 
-// 计算属性
-const unreadCount = computed(() => recentAlerts.value.filter(a => !a.isRead).length)
+// 计算属性 - unreadCount 被移除因为不需要在这个组件中使用
 
 // 收入趋势图表数据
 const revenueChartData = computed(() => {
@@ -544,7 +556,12 @@ const iconMap = {
   DollarSign,
   Users,
   Target,
-  Globe
+  Globe,
+  BarChart3,
+  AlertTriangle,
+  TrendingUp,
+  Calendar,
+  Package
 }
 
 const alertIconMap = {
@@ -660,23 +677,27 @@ const setupScrollObserver = () => {
   // 创建 Intersection Observer 来监听section的可见性
   sectionObserver.value = new IntersectionObserver(
     (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const sectionId = entry.target.id
-          if (sectionId && activeSection.value !== sectionId) {
-            activeSection.value = sectionId
-            // 更新侧边栏活跃状态
-            updateSidebarActiveState(sectionId)
-            // 更新面包屑
-            updateBreadcrumb(sectionId)
-          }
-        }
+      // 找到最可见的section（intersectionRatio最大的）
+      const mostVisibleEntry = entries.reduce((prev, current) => {
+        return (current.intersectionRatio > prev.intersectionRatio) ? current : prev
       })
+      
+      if (mostVisibleEntry.isIntersecting) {
+        const sectionId = mostVisibleEntry.target.id
+        if (sectionId && activeSection.value !== sectionId) {
+          console.log('Section changed:', activeSection.value, '->', sectionId)
+          activeSection.value = sectionId
+          // 更新侧边栏活跃状态
+          updateSidebarActiveState(sectionId)
+          // 更新面包屑
+          updateBreadcrumb(sectionId)
+        }
+      }
     },
     {
       root: null,
-      rootMargin: '-20% 0px -60% 0px', // 当section进入视口上方20%到40%的区域时触发
-      threshold: 0.1
+      rootMargin: '-10% 0px -70% 0px', // 优化边界设置，提高检测精度
+      threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0] // 多个阈值获得更精确的intersectionRatio
     }
   )
 
@@ -693,12 +714,16 @@ const setupScrollObserver = () => {
 
 // 更新侧边栏活跃状态
 const updateSidebarActiveState = (sectionId: string) => {
-  // 构建路径格式以匹配侧边栏菜单
-  const menuPath = `/dashboard/${sectionId}`
-  const menuItem = dashboardSections.find(s => s.id === sectionId)
-  if (menuItem) {
-    // 创建一个虚拟的菜单项来更新活跃状态
-    menuStore.setActiveMenu(`dashboard-${sectionId}`)
+  // 根据sectionId构建菜单ID，匹配菜单配置中的ID格式
+  const menuId = `dashboard-${sectionId}`
+  console.log('Updating sidebar active state for section:', sectionId, 'menuId:', menuId)
+  
+  // 使用menuStore的setActiveMenu方法更新活跃菜单
+  menuStore.setActiveMenu(menuId)
+  
+  // 确保父级菜单（数据看板）也是展开的
+  if (!menuStore.isMenuOpen('dashboard')) {
+    menuStore.toggleSubmenu('dashboard')
   }
 }
 
@@ -727,13 +752,38 @@ const scrollToSection = (sectionId: string) => {
       block: 'start',
       inline: 'nearest'
     })
+    // 手动设置活跃section，确保同步
+    activeSection.value = sectionId
+    updateSidebarActiveState(sectionId)
+    updateBreadcrumb(sectionId)
   }
+}
+
+// 暴露给全局使用（如果需要）
+defineExpose({
+  scrollToSection
+})
+
+// 初始化菜单状态
+const initializeMenuState = () => {
+  // 设置初始活跃菜单为预警提醒
+  const initialMenuId = 'dashboard-alerts'
+  menuStore.setActiveMenu(initialMenuId)
+  
+  // 确保数据看板父级菜单是展开的
+  if (!menuStore.isMenuOpen('dashboard')) {
+    menuStore.toggleSubmenu('dashboard')
+  }
+  
+  // 设置初始面包屑
+  updateBreadcrumb('alerts')
 }
 
 // 生命周期
 onMounted(() => {
   loadDashboardData()
   setupScrollObserver()
+  initializeMenuState()
 })
 
 onUnmounted(() => {

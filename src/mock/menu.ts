@@ -8,42 +8,42 @@ export const mockMenuItems: MenuItem[] = [
     icon: 'BarChart3',
     children: [
       {
-        id: 'overview',
-        name: '概览看板',
-        icon: 'PieChart',
-        path: '/dashboard/overview',
+        id: 'dashboard-alerts',
+        name: '预警提醒',
+        icon: 'AlertTriangle',
+        path: '/dashboard/alerts',
         roles: ['superAdmin', 'manager', 'staff', 'finance', 'sales']
       },
       {
-        id: 'customer-goals',
+        id: 'dashboard-customer-goals',
         name: '客户目标',
         icon: 'Target',
         path: '/dashboard/customer-goals',
         roles: ['superAdmin', 'manager', 'staff', 'sales']
       },
       {
-        id: 'website-data',
+        id: 'dashboard-website-data',
         name: '网站数据',
         icon: 'Globe',
         path: '/dashboard/website-data',
         roles: ['superAdmin', 'manager', 'staff']
       },
       {
-        id: 'channel-data',
+        id: 'dashboard-channel-data',
         name: '渠道数据',
         icon: 'TrendingUp',
         path: '/dashboard/channel-data',
         roles: ['superAdmin', 'manager', 'staff']
       },
       {
-        id: 'campaign-data',
+        id: 'dashboard-campaign-data',
         name: '活动数据',
         icon: 'Calendar',
         path: '/dashboard/campaign-data',
         roles: ['superAdmin', 'manager', 'staff']
       },
       {
-        id: 'product-sales',
+        id: 'dashboard-product-sales',
         name: '产品销售',
         icon: 'Package',
         path: '/dashboard/product-sales',

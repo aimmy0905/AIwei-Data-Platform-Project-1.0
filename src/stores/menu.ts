@@ -119,6 +119,15 @@ export const useMenuStore = defineStore('menu', () => {
     const menu = findMenuByPath(visibleMenuItems.value, path)
     if (menu) {
       setActiveMenu(menu.id)
+    } else {
+      // 如果找不到对应的菜单，尝试处理dashboard的section路径
+      if (path.startsWith('/dashboard') || path === '/dashboard') {
+        // 默认设置为第一个dashboard子菜单
+        const dashboardMenu = findMenuById(visibleMenuItems.value, 'dashboard')
+        if (dashboardMenu?.children && dashboardMenu.children.length > 0) {
+          setActiveMenu(dashboardMenu.children[0].id)
+        }
+      }
     }
   }
 
