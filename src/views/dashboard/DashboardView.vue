@@ -1,7 +1,41 @@
 <template>
   <div class="dashboard-view">
-    <!-- 概览部分 -->
-    <section id="overview" class="dashboard-section">
+    <!-- 预警提醒部分 -->
+    <section id="alerts" class="dashboard-section" v-if="recentAlerts.length > 0">
+      <div class="section-header">
+        <h2 class="section-title">预警提醒</h2>
+        <p class="section-description">系统预警和重要提醒</p>
+      </div>
+
+      <div class="alerts-content">
+        <div class="alerts-list">
+          <div 
+            v-for="alert in recentAlerts" 
+            :key="alert.id"
+            class="alert-item"
+            :class="[
+              `alert-item--${alert.level}`,
+              { 'alert-item--unread': !alert.isRead }
+            ]"
+          >
+            <div class="alert-icon">
+              <component :is="getAlertIcon(alert.type)" :size="20" />
+            </div>
+            <div class="alert-content">
+              <div class="alert-title">{{ alert.title }}</div>
+              <div class="alert-message">{{ alert.message }}</div>
+              <div class="alert-meta">
+                <span class="alert-customer">{{ alert.customerName }}</span>
+                <span class="alert-time">{{ formatTime(alert.createdAt) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 客户目标部分 -->
+    <section id="customer-goals" class="dashboard-section">
       <div class="section-header">
         <h2 class="section-title">概览看板</h2>
         <p class="section-description">欢迎使用艾维数据平台，以下是您的数据概览</p>
@@ -122,6 +156,24 @@
       </div>
 
       <div class="website-data-content">
+        <!-- 快速统计卡片 -->
+        <div class="stats-grid">
+          <div class="stat-card" v-for="stat in quickStats" :key="stat.title">
+            <div class="stat-card__icon" :style="{ color: stat.color }">
+              <component :is="getIcon(stat.icon)" :size="24" />
+            </div>
+            <div class="stat-card__content">
+              <div class="stat-card__title">{{ stat.title }}</div>
+              <div class="stat-card__value">{{ stat.value }}</div>
+              <div class="stat-card__change" :class="stat.changeClass">
+                <component :is="stat.trend === 'up' ? TrendingUp : TrendingDown" :size="16" />
+                <span>{{ stat.change }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 网站统计网格 -->
         <div class="website-stats-grid">
           <div class="website-stat-card">
             <div class="stat-icon">
@@ -156,6 +208,58 @@
               <div class="stat-title">平均订单价值</div>
               <div class="stat-value">${{ websiteData.averageOrderValue.toFixed(2) }}</div>
               <div class="stat-detail">总订单: {{ websiteData.orders }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-card__header">
+              <h3>收入趋势</h3>
+              <div class="chart-actions">
+                <button 
+                  v-for="period in periods" 
+                  :key="period"
+                  class="period-btn"
+                  :class="{ 'period-btn--active': activePeriod === period }"
+                  @click="activePeriod = period"
+                >
+                  {{ period }}
+                </button>
+              </div>
+            </div>
+            <div class="chart-container">
+              <LineChart
+                v-if="chartData && revenueChartData"
+                :data="revenueChartData"
+                height="300px"
+                :smooth="true"
+                :show-legend="false"
+              />
+              <div v-else class="chart-placeholder">
+                <BarChart3 :size="48" />
+                <span>加载中...</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-card__header">
+              <h3>渠道分布</h3>
+            </div>
+            <div class="chart-container">
+              <PieChartComponent
+                v-if="chartData && channelChartData"
+                :data="channelChartData"
+                height="300px"
+                :show-legend="true"
+                :donut="false"
+              />
+              <div v-else class="chart-placeholder">
+                <PieChart :size="48" />
+                <span>加载中...</span>
+              </div>
             </div>
           </div>
         </div>
@@ -292,45 +396,12 @@
         </div>
       </div>
     </section>
-
-    <!-- 预警提醒部分 -->
-    <section id="alerts" class="dashboard-section" v-if="recentAlerts.length > 0">
-      <div class="section-header">
-        <h2 class="section-title">预警提醒</h2>
-        <p class="section-description">系统预警和重要提醒</p>
-      </div>
-
-      <div class="alerts-content">
-        <div class="alerts-list">
-          <div 
-            v-for="alert in recentAlerts" 
-            :key="alert.id"
-            class="alert-item"
-            :class="[
-              `alert-item--${alert.level}`,
-              { 'alert-item--unread': !alert.isRead }
-            ]"
-          >
-            <div class="alert-icon">
-              <component :is="getAlertIcon(alert.type)" :size="20" />
-            </div>
-            <div class="alert-content">
-              <div class="alert-title">{{ alert.title }}</div>
-              <div class="alert-message">{{ alert.message }}</div>
-              <div class="alert-meta">
-                <span class="alert-customer">{{ alert.customerName }}</span>
-                <span class="alert-time">{{ formatTime(alert.createdAt) }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
 import { 
   BarChart3, 
   PieChart, 
@@ -345,12 +416,34 @@ import {
   CreditCard,
   Clock,
   MousePointer,
-  ShoppingCart
+  ShoppingCart,
+  Megaphone
 } from 'lucide-vue-next'
 import { mockGetDashboardData } from '@/mock'
 import LineChart from '@/components/charts/LineChart.vue'
 import PieChartComponent from '@/components/charts/PieChart.vue'
 import type { Customer, Alert, Channel, Campaign, ProductSales, WebsiteData } from '@/types'
+import { useAuthStore } from '@/stores/auth'
+import { useMenuStore } from '@/stores/menu'
+
+// 组合式API
+const router = useRouter()
+const authStore = useAuthStore()
+const menuStore = useMenuStore()
+
+// 滚动监听相关
+const activeSection = ref('alerts')
+const sectionObserver = ref<IntersectionObserver | null>(null)
+
+// 定义所有section的配置（按照设计文档顺序）
+const dashboardSections = [
+  { id: 'alerts', name: '预警提醒', icon: 'AlertTriangle' },
+  { id: 'customer-goals', name: '客户目标', icon: 'Target' },
+  { id: 'website-data', name: '网站数据', icon: 'Globe' },
+  { id: 'channel-data', name: '渠道数据', icon: 'TrendingUp' },
+  { id: 'campaign-data', name: '活动数据', icon: 'Megaphone' },
+  { id: 'product-sales', name: '产品销售', icon: 'Package' }
+]
 
 // 响应式数据
 const activePeriod = ref('7天')
@@ -562,9 +655,91 @@ const loadDashboardData = async () => {
   }
 }
 
+// 滚动监听函数
+const setupScrollObserver = () => {
+  // 创建 Intersection Observer 来监听section的可见性
+  sectionObserver.value = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const sectionId = entry.target.id
+          if (sectionId && activeSection.value !== sectionId) {
+            activeSection.value = sectionId
+            // 更新侧边栏活跃状态
+            updateSidebarActiveState(sectionId)
+            // 更新面包屑
+            updateBreadcrumb(sectionId)
+          }
+        }
+      })
+    },
+    {
+      root: null,
+      rootMargin: '-20% 0px -60% 0px', // 当section进入视口上方20%到40%的区域时触发
+      threshold: 0.1
+    }
+  )
+
+  // 观察所有section元素
+  nextTick(() => {
+    dashboardSections.forEach(section => {
+      const element = document.getElementById(section.id)
+      if (element && sectionObserver.value) {
+        sectionObserver.value.observe(element)
+      }
+    })
+  })
+}
+
+// 更新侧边栏活跃状态
+const updateSidebarActiveState = (sectionId: string) => {
+  // 构建路径格式以匹配侧边栏菜单
+  const menuPath = `/dashboard/${sectionId}`
+  const menuItem = dashboardSections.find(s => s.id === sectionId)
+  if (menuItem) {
+    // 创建一个虚拟的菜单项来更新活跃状态
+    menuStore.setActiveMenu(`dashboard-${sectionId}`)
+  }
+}
+
+// 更新面包屑
+const updateBreadcrumb = (sectionId: string) => {
+  const section = dashboardSections.find(s => s.id === sectionId)
+  if (section) {
+    // 动态更新面包屑数据
+    const breadcrumbData = [
+      { id: 'dashboard', name: '数据看板', icon: 'BarChart3', path: '/dashboard' },
+      { id: `dashboard-${sectionId}`, name: section.name, icon: section.icon, path: `/dashboard#${sectionId}` }
+    ]
+    // 使用 menu store 的动态面包屑功能
+    menuStore.setDynamicBreadcrumb(breadcrumbData)
+    // 更新页面标题
+    document.title = `${section.name} - 艾维数据平台`
+  }
+}
+
+// 平滑滚动到指定section
+const scrollToSection = (sectionId: string) => {
+  const element = document.getElementById(sectionId)
+  if (element) {
+    element.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start',
+      inline: 'nearest'
+    })
+  }
+}
+
 // 生命周期
 onMounted(() => {
   loadDashboardData()
+  setupScrollObserver()
+})
+
+onUnmounted(() => {
+  if (sectionObserver.value) {
+    sectionObserver.value.disconnect()
+  }
 })
 </script>
 

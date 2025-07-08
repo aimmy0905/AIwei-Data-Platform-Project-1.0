@@ -147,8 +147,16 @@ export const useMenuStore = defineStore('menu', () => {
     return activeMenuId.value === menuId
   }
 
+  // 动态面包屑数据
+  const dynamicBreadcrumb = ref<MenuItem[]>([])
+
   // 获取面包屑导航
   const getBreadcrumb = computed(() => {
+    // 如果有动态面包屑数据，优先使用
+    if (dynamicBreadcrumb.value.length > 0) {
+      return dynamicBreadcrumb.value
+    }
+    
     if (!activeMenuId.value) return []
     
     const path = getMenuPath(menuItems.value, activeMenuId.value)
@@ -176,6 +184,16 @@ export const useMenuStore = defineStore('menu', () => {
     clearBadge(menuItems.value)
   }
 
+  // 设置动态面包屑
+  const setDynamicBreadcrumb = (breadcrumb: MenuItem[]) => {
+    dynamicBreadcrumb.value = breadcrumb
+  }
+
+  // 清除动态面包屑
+  const clearDynamicBreadcrumb = () => {
+    dynamicBreadcrumb.value = []
+  }
+
   return {
     // 状态
     menuItems,
@@ -199,6 +217,8 @@ export const useMenuStore = defineStore('menu', () => {
     isMenuActive,
     findMenuByPath,
     getMenuWithBadge,
-    clearAllBadges
+    clearAllBadges,
+    setDynamicBreadcrumb,
+    clearDynamicBreadcrumb
   }
 })
