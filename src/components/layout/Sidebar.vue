@@ -81,10 +81,30 @@ const toggleCollapse = () => {
   menuStore.toggleCollapse()
 }
 
-const handleMenuSelect = (item: MenuItem) => {
+const handleMenuSelect = async (item: MenuItem) => {
   if (item.path) {
-    router.push({ name: getRouteNameFromPath(item.path) })
-    menuStore.setActiveMenu(item.id)
+    // 如果是数据看板的子菜单，使用锚点跳转
+    if (item.path.startsWith('/dashboard/')) {
+      const sectionId = item.path.replace('/dashboard/', '')
+      
+      // 先确保导航到数据看板页面
+      if (router.currentRoute.value.name !== 'dashboard') {
+        await router.push({ name: 'dashboard' })
+        // 等待页面渲染完成
+        await new Promise(resolve => setTimeout(resolve, 100))
+      }
+      
+      // 然后滚动到对应的锚点
+      const element = document.getElementById(sectionId)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        menuStore.setActiveMenu(item.id)
+      }
+    } else {
+      // 其他菜单使用路由跳转
+      router.push({ name: getRouteNameFromPath(item.path) })
+      menuStore.setActiveMenu(item.id)
+    }
   }
 }
 

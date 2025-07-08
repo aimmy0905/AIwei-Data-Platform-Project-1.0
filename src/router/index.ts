@@ -31,34 +31,9 @@ const router = createRouter({
       meta: { requiresAuth: true },
       children: [
         {
-          path: 'overview',
-          name: 'dashboard-overview',
-          component: () => import('@/views/dashboard/OverviewView.vue')
-        },
-        {
-          path: 'customer-goals',
-          name: 'dashboard-customer-goals',
-          component: () => import('@/views/dashboard/CustomerGoalsView.vue')
-        },
-        {
-          path: 'website-data',
-          name: 'dashboard-website-data',
-          component: () => import('@/views/dashboard/WebsiteDataView.vue')
-        },
-        {
-          path: 'channel-data',
-          name: 'dashboard-channel-data',
-          component: () => import('@/views/dashboard/ChannelDataView.vue')
-        },
-        {
-          path: 'campaign-data',
-          name: 'dashboard-campaign-data',
-          component: () => import('@/views/dashboard/CampaignDataView.vue')
-        },
-        {
-          path: 'product-sales',
-          name: 'dashboard-product-sales',
-          component: () => import('@/views/dashboard/ProductSalesView.vue')
+          path: '',
+          name: 'dashboard',
+          component: () => import('@/views/dashboard/DashboardView.vue')
         }
       ]
     },
@@ -124,7 +99,7 @@ router.beforeEach(async (to, from, next) => {
     next({ name: 'login' })
   } else if (requiresGuest && isAuthenticated) {
     // 需要游客身份但已登录，跳转到数据看板
-    next({ name: 'dashboard-overview' })
+    next({ name: 'dashboard' })
   } else {
     next()
   }
