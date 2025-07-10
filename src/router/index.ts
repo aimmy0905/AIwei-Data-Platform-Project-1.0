@@ -23,7 +23,7 @@ const router = createRouter({
         }
       ]
     },
-    
+
     // 主应用路由
     {
       path: '/dashboard',
@@ -34,10 +34,70 @@ const router = createRouter({
           path: '',
           name: 'dashboard',
           component: () => import('@/views/dashboard/DashboardView.vue')
+        },
+        {
+          path: 'influencer-data',
+          name: 'influencer-data',
+          component: () => import('@/views/dashboard/KOLDataView.vue')
+        },
+        {
+          path: 'regional-market',
+          name: 'regional-market',
+          component: () => import('@/views/dashboard/MarketDataView.vue')
+        },
+        {
+          path: 'page-performance',
+          name: 'page-performance',
+          component: () => import('@/views/dashboard/PagePerformanceView.vue')
+        },
+        {
+          path: 'competitor-analysis',
+          name: 'competitor-analysis',
+          component: () => import('@/views/dashboard/CompetitorView.vue')
+        },
+        {
+          path: 'ad-platform-overview',
+          name: 'ad-platform-overview',
+          component: () => import('@/views/dashboard/AdPlatformOverviewView.vue')
+        },
+        {
+          path: 'meta-dashboard',
+          name: 'meta-dashboard',
+          component: () => import('@/views/dashboard/MetaDashboardView.vue')
+        },
+        {
+          path: 'google-dashboard',
+          name: 'google-dashboard',
+          component: () => import('@/views/dashboard/GoogleDashboardView.vue')
+        },
+        {
+          path: 'bing-dashboard',
+          name: 'bing-dashboard',
+          component: () => import('@/views/dashboard/BingDashboardView.vue')
+        },
+        {
+          path: 'criteo-dashboard',
+          name: 'criteo-dashboard',
+          component: () => import('@/views/dashboard/CriteoDashboardView.vue')
+        },
+        {
+          path: 'data-export',
+          name: 'data-export',
+          component: () => import('@/views/dashboard/DataExportView.vue')
+        },
+        {
+          path: 'custom-metrics',
+          name: 'custom-metrics',
+          component: () => import('@/views/dashboard/CustomMetricsView.vue')
+        },
+        {
+          path: 'customer-goals',
+          name: 'customer-goals',
+          component: () => import('@/views/dashboard/CustomerGoalsView.vue')
         }
       ]
     },
-    
+
     // 客户管理路由
     {
       path: '/customers',
@@ -51,7 +111,7 @@ const router = createRouter({
         }
       ]
     },
-    
+
     // 系统设置路由
     {
       path: '/settings',
@@ -65,13 +125,13 @@ const router = createRouter({
         }
       ]
     },
-    
+
     // 根路径重定向到登录页
     {
       path: '/',
       redirect: { name: 'login' }
     },
-    
+
     // 捕获所有未匹配的路由
     {
       path: '/:pathMatch(.*)*',
@@ -84,16 +144,16 @@ const router = createRouter({
 // 路由守卫
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
-  
+
   // 等待认证状态初始化
   if (!authStore.user && localStorage.getItem('auth_token')) {
     await authStore.initAuth()
   }
-  
+
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
   const requiresGuest = to.matched.some(record => record.meta.requiresGuest)
   const isAuthenticated = authStore.isAuthenticated
-  
+
   if (requiresAuth && !isAuthenticated) {
     // 需要认证但未登录，跳转到登录页
     next({ name: 'login' })

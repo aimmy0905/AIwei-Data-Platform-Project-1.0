@@ -1,359 +1,240 @@
 <template>
   <div class="dashboard-view">
-    <!-- 预警提醒部分 -->
-    <section id="alerts" class="dashboard-section" v-if="recentAlerts.length > 0">
-      <div class="section-header">
-        <h2 class="section-title">预警提醒</h2>
-        <p class="section-description">系统预警和重要提醒</p>
-      </div>
+    <!-- 筛选组件 -->
+    <div class="dashboard-filter-sticky">
+      <DashboardFilter
+        :customer-options="customers"
+        @filter-apply="handleFilterApply"
+        @filter-change="handleFilterChange"
+        @filter-reset="handleFilterReset"
+      />
+    </div>
 
-      <div class="alerts-content">
-        <div class="alerts-list">
-          <div 
-            v-for="alert in recentAlerts" 
-            :key="alert.id"
-            class="alert-item"
-            :class="[
-              `alert-item--${alert.level}`,
-              { 'alert-item--unread': !alert.isRead }
-            ]"
-          >
-            <div class="alert-icon">
-              <component :is="getAlertIcon(alert.type)" :size="20" />
-            </div>
-            <div class="alert-content">
-              <div class="alert-title">{{ alert.title }}</div>
-              <div class="alert-message">{{ alert.message }}</div>
-              <div class="alert-meta">
-                <span class="alert-customer">{{ alert.customerName }}</span>
-                <span class="alert-time">{{ formatTime(alert.createdAt) }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 客户目标部分 -->
-    <section id="customer-goals" class="dashboard-section">
-      <div class="section-header">
-        <h2 class="section-title">概览看板</h2>
-        <p class="section-description">欢迎使用艾维数据平台，以下是您的数据概览</p>
-      </div>
-
-      <div class="overview-content">
-        <!-- 快速统计卡片 -->
-        <div class="stats-grid">
-          <div class="stat-card" v-for="stat in quickStats" :key="stat.title">
-            <div class="stat-card__icon" :style="{ color: stat.color }">
-              <component :is="getIcon(stat.icon)" :size="24" />
-            </div>
-            <div class="stat-card__content">
-              <div class="stat-card__title">{{ stat.title }}</div>
-              <div class="stat-card__value">{{ stat.value }}</div>
-              <div class="stat-card__change" :class="stat.changeClass">
-                <component :is="stat.trend === 'up' ? TrendingUp : TrendingDown" :size="16" />
-                <span>{{ stat.change }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 图表区域 -->
-        <div class="charts-grid">
-          <div class="chart-card">
-            <div class="chart-card__header">
-              <h3>收入趋势</h3>
-              <div class="chart-actions">
-                <button 
-                  v-for="period in periods" 
-                  :key="period"
-                  class="period-btn"
-                  :class="{ 'period-btn--active': activePeriod === period }"
-                  @click="activePeriod = period"
-                >
-                  {{ period }}
-                </button>
-              </div>
-            </div>
-            <div class="chart-container">
-              <LineChart
-                v-if="chartData && revenueChartData"
-                :data="revenueChartData"
-                height="300px"
-                :smooth="true"
-                :show-legend="false"
-              />
-              <div v-else class="chart-placeholder">
-                <BarChart3 :size="48" />
-                <span>加载中...</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="chart-card">
-            <div class="chart-card__header">
-              <h3>渠道分布</h3>
-            </div>
-            <div class="chart-container">
-              <PieChartComponent
-                v-if="chartData && channelChartData"
-                :data="channelChartData"
-                height="300px"
-                :show-legend="true"
-                :donut="false"
-              />
-              <div v-else class="chart-placeholder">
-                <PieChart :size="48" />
-                <span>加载中...</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- 仪表板内容 -->
+    <div class="dashboard-content">
+      <!-- 预警提醒部分 -->
+      <section id="alerts" class="dashboard-section">
+      <AlertPanel
+        :alerts="recentAlerts"
+        :loading="loading"
+        @mark-as-read="handleMarkAsRead"
+        @mark-all-as-read="handleMarkAllAsRead"
+        @dismiss-alert="handleDismissAlert"
+        @quick-action="handleQuickAction"
+      />
     </section>
 
     <!-- 客户目标部分 -->
     <section id="customer-goals" class="dashboard-section">
       <div class="section-header">
         <h2 class="section-title">客户目标</h2>
-        <p class="section-description">客户设定的目标和完成情况</p>
+        <p class="section-description">项目的各个目标完成情况</p>
       </div>
 
       <div class="customer-goals-content">
-        <div class="goals-grid">
-          <div v-for="customer in topCustomers" :key="customer.id" class="goal-card">
-            <div class="goal-card__header">
-              <h4>{{ customer.name }}</h4>
-              <span class="goal-card__industry">{{ customer.industry }}</span>
+        <!-- 目标筛选标签页 -->
+        <div class="goals-tabs">
+          <button
+            v-for="tab in goalTabs"
+            :key="tab.id"
+            :class="['tab-button', { active: activeGoalTab === tab.id }]"
+            @click="activeGoalTab = tab.id"
+          >
+            {{ tab.name }}
+          </button>
+        </div>
+
+        <!-- 目标汇总卡片 -->
+        <div class="goals-summary">
+          <div class="summary-card">
+            <div class="summary-icon">
+              <Target :size="24" />
             </div>
-            <div class="goal-card__progress">
-              <div class="progress-item">
-                <span class="progress-label">目标收入</span>
-                <div class="progress-bar">
-                  <div class="progress-fill" :style="{ width: getGoalProgress(customer.revenue) + '%' }"></div>
-                </div>
-                <span class="progress-value">${{ formatNumber(customer.revenue) }}</span>
-              </div>
-              <div class="progress-item">
-                <span class="progress-label">ROI 目标</span>
-                <div class="progress-bar">
-                  <div class="progress-fill" :style="{ width: Math.min(customer.roi * 20, 100) + '%' }"></div>
-                </div>
-                <span class="progress-value">{{ customer.roi.toFixed(1) }}x</span>
-              </div>
+            <div class="summary-content">
+              <div class="summary-value">{{ goalSummary.totalGoals }}</div>
+              <div class="summary-label">总目标数</div>
             </div>
           </div>
+          <div class="summary-card">
+            <div class="summary-icon">
+              <Play :size="24" />
+            </div>
+            <div class="summary-content">
+              <div class="summary-value">{{ goalSummary.activeGoals }}</div>
+              <div class="summary-label">进行中</div>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-icon">
+              <div class="progress-circle">
+                <span>{{ goalSummary.averageSalesProgress }}%</span>
+              </div>
+            </div>
+            <div class="summary-content">
+              <div class="summary-value">{{ goalSummary.averageSalesProgress }}%</div>
+              <div class="summary-label">平均销售完成率</div>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-icon">
+              <div class="progress-circle">
+                <span>{{ goalSummary.averageROIProgress }}%</span>
+              </div>
+            </div>
+            <div class="summary-content">
+              <div class="summary-value">{{ goalSummary.averageROIProgress }}%</div>
+              <div class="summary-label">平均ROI完成率</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 目标列表 -->
+        <div class="goals-grid">
+          <div v-for="goal in filteredGoals" :key="goal.id" class="goal-card">
+            <div class="goal-card__header">
+              <div class="goal-info">
+                <h4>{{ goal.projectName }}</h4>
+                <span class="goal-customer">{{ goal.customerName }}</span>
+                <span class="goal-period">{{ goal.goalPeriod }}</span>
+              </div>
+              <div class="goal-status">
+                <span class="status-badge" :class="`status-${goal.status}`">
+                  {{ getGoalStatusText(goal.status) }}
+                </span>
+              </div>
+            </div>
+
+            <div class="goal-card__content">
+              <!-- 销售目标 -->
+              <div class="goal-metric">
+                <div class="metric-header">
+                  <span class="metric-label">销售目标</span>
+                  <span class="metric-progress">{{ goal.salesProgress }}%</span>
+                </div>
+                <div class="metric-values">
+                  <span class="metric-actual">${{ formatNumber(goal.salesActual) }}</span>
+                  <span class="metric-target">/ ${{ formatNumber(goal.salesTarget) }}</span>
+                </div>
+                <div class="progress-bar">
+                  <div
+                    class="progress-fill"
+                    :class="getProgressClass(goal.salesProgress)"
+                    :style="{ width: Math.min(goal.salesProgress, 100) + '%' }"
+                  ></div>
+                </div>
+              </div>
+
+              <!-- 成本目标 -->
+              <div class="goal-metric">
+                <div class="metric-header">
+                  <span class="metric-label">成本目标</span>
+                  <span class="metric-progress">{{ goal.costProgress }}%</span>
+                </div>
+                <div class="metric-values">
+                  <span class="metric-actual">${{ formatNumber(goal.costActual) }}</span>
+                  <span class="metric-target">/ ${{ formatNumber(goal.costTarget) }}</span>
+                </div>
+                <div class="progress-bar">
+                  <div
+                    class="progress-fill"
+                    :class="getProgressClass(goal.costProgress)"
+                    :style="{ width: Math.min(goal.costProgress, 100) + '%' }"
+                  ></div>
+                </div>
+              </div>
+
+              <!-- ROI目标 -->
+              <div class="goal-metric">
+                <div class="metric-header">
+                  <span class="metric-label">ROI目标</span>
+                  <span class="metric-progress">{{ goal.roiProgress }}%</span>
+                </div>
+                <div class="metric-values">
+                  <span class="metric-actual">{{ goal.roiActual.toFixed(2) }}x</span>
+                  <span class="metric-target">/ {{ goal.roiTarget.toFixed(2) }}x</span>
+                </div>
+                <div class="progress-bar">
+                  <div
+                    class="progress-fill"
+                    :class="getProgressClass(goal.roiProgress)"
+                    :style="{ width: Math.min(goal.roiProgress, 100) + '%' }"
+                  ></div>
+                </div>
+              </div>
+
+              <!-- 利润目标 (如果有) -->
+              <div v-if="goal.profitTarget" class="goal-metric">
+                <div class="metric-header">
+                  <span class="metric-label">利润目标</span>
+                  <span class="metric-progress">{{ goal.profitProgress }}%</span>
+                </div>
+                <div class="metric-values">
+                  <span class="metric-actual">${{ formatNumber(goal.profitActual || 0) }}</span>
+                  <span class="metric-target">/ ${{ formatNumber(goal.profitTarget) }}</span>
+                </div>
+                <div class="progress-bar">
+                  <div
+                    class="progress-fill"
+                    :class="getProgressClass(goal.profitProgress || 0)"
+                    :style="{ width: Math.min(goal.profitProgress || 0, 100) + '%' }"
+                  ></div>
+                </div>
+              </div>
+
+              <!-- 用户目标 (如果有) -->
+              <div v-if="goal.userTarget" class="goal-metric">
+                <div class="metric-header">
+                  <span class="metric-label">用户目标</span>
+                  <span class="metric-progress">{{ goal.userProgress }}%</span>
+                </div>
+                <div class="metric-values">
+                  <span class="metric-actual">{{ formatNumber(goal.userActual || 0) }}</span>
+                  <span class="metric-target">/ {{ formatNumber(goal.userTarget) }}</span>
+                </div>
+                <div class="progress-bar">
+                  <div
+                    class="progress-fill"
+                    :class="getProgressClass(goal.userProgress || 0)"
+                    :style="{ width: Math.min(goal.userProgress || 0, 100) + '%' }"
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="goal-card__footer">
+              <span class="goal-period-info">{{ goal.startDate }} - {{ goal.endDate }}</span>
+              <button class="detail-button" @click="viewGoalDetails(goal.id)">
+                查看详情
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 空状态 -->
+        <div v-if="filteredGoals.length === 0" class="empty-state">
+          <Target :size="64" class="empty-icon" />
+          <h3>暂无{{ getGoalTypeText(activeGoalTab) }}目标</h3>
+          <p>当前筛选条件下没有找到相关目标数据</p>
         </div>
       </div>
     </section>
 
     <!-- 网站数据部分 -->
     <section id="website-data" class="dashboard-section">
-      <div class="section-header">
-        <h2 class="section-title">网站数据</h2>
-        <p class="section-description">网站访问和用户行为数据</p>
-      </div>
-
-      <div class="website-data-content">
-        <!-- 快速统计卡片 -->
-        <div class="stats-grid">
-          <div class="stat-card" v-for="stat in quickStats" :key="stat.title">
-            <div class="stat-card__icon" :style="{ color: stat.color }">
-              <component :is="getIcon(stat.icon)" :size="24" />
-            </div>
-            <div class="stat-card__content">
-              <div class="stat-card__title">{{ stat.title }}</div>
-              <div class="stat-card__value">{{ stat.value }}</div>
-              <div class="stat-card__change" :class="stat.changeClass">
-                <component :is="stat.trend === 'up' ? TrendingUp : TrendingDown" :size="16" />
-                <span>{{ stat.change }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 网站统计网格 -->
-        <div class="website-stats-grid">
-          <div class="website-stat-card">
-            <div class="stat-icon">
-              <Users :size="24" />
-            </div>
-            <div class="stat-content">
-              <div class="stat-title">总访问量</div>
-              <div class="stat-value">{{ formatNumber(websiteData.visitors) }}</div>
-              <div class="stat-detail">
-                新用户: {{ formatNumber(websiteData.newUsers) }} | 
-                回访: {{ formatNumber(websiteData.returningUsers) }}
-              </div>
-            </div>
-          </div>
-          
-          <div class="website-stat-card">
-            <div class="stat-icon">
-              <MousePointer :size="24" />
-            </div>
-            <div class="stat-content">
-              <div class="stat-title">转化率</div>
-              <div class="stat-value">{{ websiteData.conversionRate }}%</div>
-              <div class="stat-detail">跳出率: {{ websiteData.bounceRate }}%</div>
-            </div>
-          </div>
-          
-          <div class="website-stat-card">
-            <div class="stat-icon">
-              <ShoppingCart :size="24" />
-            </div>
-            <div class="stat-content">
-              <div class="stat-title">平均订单价值</div>
-              <div class="stat-value">${{ websiteData.averageOrderValue.toFixed(2) }}</div>
-              <div class="stat-detail">总订单: {{ websiteData.orders }}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 图表区域 -->
-        <div class="charts-grid">
-          <div class="chart-card">
-            <div class="chart-card__header">
-              <h3>收入趋势</h3>
-              <div class="chart-actions">
-                <button 
-                  v-for="period in periods" 
-                  :key="period"
-                  class="period-btn"
-                  :class="{ 'period-btn--active': activePeriod === period }"
-                  @click="activePeriod = period"
-                >
-                  {{ period }}
-                </button>
-              </div>
-            </div>
-            <div class="chart-container">
-              <LineChart
-                v-if="chartData && revenueChartData"
-                :data="revenueChartData"
-                height="300px"
-                :smooth="true"
-                :show-legend="false"
-              />
-              <div v-else class="chart-placeholder">
-                <BarChart3 :size="48" />
-                <span>加载中...</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="chart-card">
-            <div class="chart-card__header">
-              <h3>渠道分布</h3>
-            </div>
-            <div class="chart-container">
-              <PieChartComponent
-                v-if="chartData && channelChartData"
-                :data="channelChartData"
-                height="300px"
-                :show-legend="true"
-                :donut="false"
-              />
-              <div v-else class="chart-placeholder">
-                <PieChart :size="48" />
-                <span>加载中...</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <WebsiteDataPanel
+        :data="websiteData"
+        :loading="loading"
+      />
     </section>
 
     <!-- 渠道数据部分 -->
     <section id="channel-data" class="dashboard-section">
-      <div class="section-header">
-        <h2 class="section-title">渠道数据</h2>
-        <p class="section-description">各渠道的表现和投资回报</p>
-      </div>
-
-      <div class="channel-data-content">
-        <div class="channel-table">
-          <div class="table-header">
-            <div class="table-cell">渠道</div>
-            <div class="table-cell">收入</div>
-            <div class="table-cell">用户数</div>
-            <div class="table-cell">会话</div>
-            <div class="table-cell">转化率</div>
-            <div class="table-cell">ROI</div>
-          </div>
-          <div v-for="channel in channels" :key="channel.id" class="table-row">
-            <div class="table-cell">
-              <div class="channel-info">
-                <div class="channel-name">{{ channel.name }}</div>
-                <div class="channel-type">{{ getChannelTypeText(channel.type) }}</div>
-              </div>
-            </div>
-            <div class="table-cell">
-              <span class="revenue-value">${{ formatNumber(channel.revenue) }}</span>
-            </div>
-            <div class="table-cell">{{ formatNumber(channel.users) }}</div>
-            <div class="table-cell">{{ formatNumber(channel.sessions) }}</div>
-            <div class="table-cell">{{ channel.conversionRate }}%</div>
-            <div class="table-cell">
-              <span class="roi-value" :class="getRoiClass(channel.roi)">
-                {{ channel.roi > 0 ? channel.roi.toFixed(1) + 'x' : 'N/A' }}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ChannelDataPanel />
     </section>
 
     <!-- 活动数据部分 -->
     <section id="campaign-data" class="dashboard-section">
-      <div class="section-header">
-        <h2 class="section-title">活动数据</h2>
-        <p class="section-description">营销活动的表现和效果</p>
-      </div>
-
-      <div class="campaign-data-content">
-        <div class="campaign-grid">
-          <div v-for="campaign in campaigns" :key="campaign.id" class="campaign-card">
-            <div class="campaign-card__header">
-              <div class="campaign-info">
-                <h4>{{ campaign.name }}</h4>
-                <span class="campaign-type">{{ getCampaignTypeText(campaign.type) }}</span>
-              </div>
-              <span class="campaign-status" :class="`status--${campaign.status}`">
-                {{ getCampaignStatusText(campaign.status) }}
-              </span>
-            </div>
-            <div class="campaign-card__content">
-              <div class="campaign-stats">
-                <div class="campaign-stat">
-                  <span class="stat-label">预算</span>
-                  <span class="stat-value">${{ formatNumber(campaign.budget) }}</span>
-                </div>
-                <div class="campaign-stat">
-                  <span class="stat-label">已花费</span>
-                  <span class="stat-value">${{ formatNumber(campaign.spent) }}</span>
-                </div>
-                <div class="campaign-stat">
-                  <span class="stat-label">收入</span>
-                  <span class="stat-value">${{ formatNumber(campaign.revenue) }}</span>
-                </div>
-                <div class="campaign-stat">
-                  <span class="stat-label">ROI</span>
-                  <span class="stat-value">{{ campaign.roi.toFixed(1) }}x</span>
-                </div>
-              </div>
-              <div class="campaign-progress">
-                <div class="progress-bar">
-                  <div class="progress-fill" :style="{ width: (campaign.spent / campaign.budget * 100) + '%' }"></div>
-                </div>
-                <span class="progress-text">{{ (campaign.spent / campaign.budget * 100).toFixed(1) }}% 已使用</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <CampaignDataPanel />
     </section>
 
     <!-- 产品销售部分 -->
@@ -363,48 +244,43 @@
         <p class="section-description">各产品的销售情况和库存状态</p>
       </div>
 
-      <div class="product-sales-content">
-        <div class="product-grid">
-          <div v-for="product in productSales" :key="product.id" class="product-card">
-            <div class="product-card__image">
-              <img :src="product.image" :alt="product.name" />
-            </div>
-            <div class="product-card__content">
-              <div class="product-info">
-                <h4>{{ product.name }}</h4>
-                <span class="product-category">{{ product.category }}</span>
-                <span class="product-price">${{ product.price }}</span>
-              </div>
-              <div class="product-stats">
-                <div class="product-stat">
-                  <span class="stat-label">销量</span>
-                  <span class="stat-value">{{ product.soldQuantity }}</span>
-                </div>
-                <div class="product-stat">
-                  <span class="stat-label">收入</span>
-                  <span class="stat-value">${{ formatNumber(product.revenue) }}</span>
-                </div>
-                <div class="product-stat">
-                  <span class="stat-label">库存</span>
-                  <span class="stat-value" :class="getStockClass(product.stock)">
-                    {{ product.stock }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ProductSalesPanel />
     </section>
+
+    <!-- 红人数据部分 -->
+    <section id="kol-data" class="dashboard-section">
+      <KOLDataPanel />
+    </section>
+
+    <!-- 地区市场部分 -->
+    <section id="market-data" class="dashboard-section">
+      <MarketDataPanel />
+    </section>
+
+    <!-- 页面表现部分 -->
+    <section id="page-performance" class="dashboard-section">
+      <PagePerformancePanel />
+    </section>
+
+    <!-- 竞品分析部分 -->
+    <section id="competitor-analysis" class="dashboard-section">
+      <CompetitorPanel />
+    </section>
+
+    <!-- 广告数据部分 -->
+    <section id="ad-platform-overview" class="dashboard-section">
+      <AdPlatformOverviewPanel />
+    </section>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
-import { 
-  BarChart3, 
-  PieChart, 
-  TrendingUp, 
+import {
+  BarChart3,
+  PieChart,
+  TrendingUp,
   TrendingDown,
   DollarSign,
   Users,
@@ -416,12 +292,24 @@ import {
   Clock,
   MousePointer,
   ShoppingCart,
-  Calendar
+  Calendar,
+  Play
 } from 'lucide-vue-next'
-import { mockGetDashboardData } from '@/mock'
+import { mockGetDashboardData, mockGetCustomers } from '@/mock'
 import LineChart from '@/components/charts/LineChart.vue'
 import PieChartComponent from '@/components/charts/PieChart.vue'
-import type { Customer, Alert, Channel, Campaign, ProductSales, WebsiteData } from '@/types'
+import DashboardFilter from '@/components/common/DashboardFilter.vue'
+import AlertPanel from '@/components/common/AlertPanel.vue'
+import WebsiteDataPanel from '@/components/dashboard/WebsiteDataPanel.vue'
+import ChannelDataPanel from '@/components/dashboard/ChannelDataPanel.vue'
+import CampaignDataPanel from '@/components/dashboard/CampaignDataPanel.vue'
+import ProductSalesPanel from '@/components/dashboard/ProductSalesPanel.vue'
+import KOLDataPanel from '@/components/dashboard/KOLDataPanel.vue'
+import MarketDataPanel from '@/components/dashboard/MarketDataPanel.vue'
+import PagePerformancePanel from '@/components/dashboard/PagePerformancePanel.vue'
+import CompetitorPanel from '@/components/dashboard/CompetitorPanel.vue'
+import AdPlatformOverviewPanel from '@/components/dashboard/AdPlatformOverviewPanel.vue'
+import type { Customer, Alert, Channel, Campaign, ProductSales, WebsiteData, CustomerGoal, CustomerGoalSummary } from '@/types'
 import { useMenuStore } from '@/stores/menu'
 
 // 组合式API
@@ -438,28 +326,98 @@ const dashboardSections = [
   { id: 'website-data', name: '网站数据', icon: 'Globe' },
   { id: 'channel-data', name: '渠道数据', icon: 'TrendingUp' },
   { id: 'campaign-data', name: '活动数据', icon: 'Calendar' },
-  { id: 'product-sales', name: '产品销售', icon: 'Package' }
+  { id: 'product-sales', name: '产品销售', icon: 'Package' },
+  { id: 'kol-data', name: '红人数据', icon: 'Users' },
+  { id: 'market-data', name: '地区市场', icon: 'Globe' },
+  { id: 'page-performance', name: '页面表现', icon: 'TrendingUp' },
+  { id: 'competitor-analysis', name: '竞品分析', icon: 'BarChart3' },
+  { id: 'ad-platform-overview', name: '广告数据', icon: 'DollarSign' }
 ]
 
 // 响应式数据
 const activePeriod = ref('7天')
 const loading = ref(false)
+const customers = ref<Customer[]>([])
 const topCustomers = ref<Customer[]>([])
 const recentAlerts = ref<Alert[]>([])
 const channels = ref<Channel[]>([])
 const campaigns = ref<Campaign[]>([])
 const productSales = ref<ProductSales[]>([])
+
+// 客户目标相关数据
+const customerGoals = ref<CustomerGoal[]>([])
+const goalSummary = ref<CustomerGoalSummary>({
+  totalGoals: 0,
+  activeGoals: 0,
+  completedGoals: 0,
+  averageSalesProgress: 0,
+  averageROIProgress: 0,
+  totalSalesTarget: 0,
+  totalSalesActual: 0,
+  totalCostTarget: 0,
+  totalCostActual: 0,
+  bestPerformingProject: '',
+  worstPerformingProject: ''
+})
+const activeGoalTab = ref('monthly')
+
+// 目标筛选标签页
+const goalTabs = [
+  { id: 'monthly', name: '月度目标' },
+  { id: 'quarterly', name: '季度目标' },
+  { id: 'yearly', name: '年度目标' }
+]
+
 const websiteData = ref<WebsiteData>({
+  // 结果指标
   totalSales: 0,
   totalCost: 0,
   roi: 0,
-  orders: 0,
+  averageOrderItems: 0,
+  orderConversionCost: 0,
   averageOrderValue: 0,
   conversionRate: 0,
+  storeVisits: 0,
+  userVisitCost: 0,
+
+  // 订单指标
+  orders: 0,
+  orderItemsPerOrder: 0,
+  ordersPerCustomer: 0,
+  returningCustomerOrders: 0,
+  newCustomerOrders: 0,
+
+  // 用户指标
   visitors: 0,
+  visits: 0,
   newUsers: 0,
   returningUsers: 0,
-  bounceRate: 0
+  addToCartVisits: 0,
+  reachCheckoutVisits: 0,
+  completeCheckoutVisits: 0,
+  completedCheckoutVisits: 0,
+  averageVisitDuration: 0,
+  bounceCount: 0,
+  bounceRate: 0,
+
+  // 用户漏斗
+  addToCartRate: 0,
+  checkoutCompletionRate: 0,
+  checkoutConversionRate: 0,
+
+  // 退货指标
+  returns: 0,
+  returnAmount: 0,
+  returnRate: 0,
+  returnSalesRatio: 0,
+
+  // 库存指标
+  dailySoldUnits: 0,
+  remainingStockDays: 0,
+  inStockDays: 0,
+  outOfStockDays: 0,
+  averageStockDays: 0,
+  sellThroughRate: 0
 })
 interface ChartDataset {
   label: string
@@ -524,10 +482,15 @@ const quickStats = ref([
 
 // 计算属性 - unreadCount 被移除因为不需要在这个组件中使用
 
+// 根据当前标签页筛选目标
+const filteredGoals = computed(() => {
+  return customerGoals.value.filter(goal => goal.goalType === activeGoalTab.value)
+})
+
 // 收入趋势图表数据
 const revenueChartData = computed(() => {
   if (!chartData.value) return null
-  
+
   const data = chartData.value.revenue
   return {
     labels: data.labels,
@@ -542,12 +505,12 @@ const revenueChartData = computed(() => {
 // 渠道分布图表数据
 const channelChartData = computed(() => {
   if (!chartData.value) return null
-  
+
   const data = chartData.value.channels
   return data.labels.map((label: string, index: number) => ({
     name: label,
     value: data.datasets[0].data[index],
-    color: data.datasets[0].backgroundColor[index]
+    color: data.datasets[0].backgroundColor?.[index] || '#1890ff'
   }))
 })
 
@@ -639,16 +602,166 @@ const getCampaignStatusText = (status: string): string => {
   return statusMap[status as keyof typeof statusMap] || status
 }
 
+// 客户目标相关方法
+const getGoalStatusText = (status: string): string => {
+  const statusMap = {
+    active: '进行中',
+    completed: '已完成',
+    paused: '已暂停',
+    cancelled: '已取消'
+  }
+  return statusMap[status as keyof typeof statusMap] || status
+}
+
+const getProgressClass = (progress: number): string => {
+  if (progress >= 100) return 'progress-excellent'
+  if (progress >= 80) return 'progress-good'
+  if (progress >= 60) return 'progress-fair'
+  return 'progress-poor'
+}
+
+const getGoalTypeText = (type: string): string => {
+  const typeMap = {
+    monthly: '月度',
+    quarterly: '季度',
+    yearly: '年度'
+  }
+  return typeMap[type as keyof typeof typeMap] || type
+}
+
+const viewGoalDetails = (goalId: number) => {
+  console.log('查看目标详情:', goalId)
+  // 这里可以跳转到目标详情页面或打开详情弹窗
+}
+
 const formatTime = (time: string): string => {
   const now = new Date()
   const alertTime = new Date(time)
   const diff = now.getTime() - alertTime.getTime()
   const hours = Math.floor(diff / 3600000)
   const days = Math.floor(diff / 86400000)
-  
+
   if (days > 0) return `${days}天前`
   if (hours > 0) return `${hours}小时前`
   return '刚刚'
+}
+
+// 筛选相关方法
+const handleFilterApply = (filters: any) => {
+  console.log('应用筛选:', filters)
+  // 根据筛选条件重新加载数据
+  loadDashboardData()
+}
+
+const handleFilterChange = (filters: any) => {
+  console.log('筛选条件变化:', filters)
+  // 可以在这里实时更新数据或做其他处理
+}
+
+const handleFilterReset = () => {
+  console.log('重置筛选条件')
+  // 重置筛选条件后重新加载数据
+  loadDashboardData()
+}
+
+// 加载客户数据
+const loadCustomers = async () => {
+  try {
+    const response = await mockGetCustomers()
+    if (response.success && response.data) {
+      customers.value = response.data
+    }
+  } catch (error) {
+    console.error('加载客户数据失败:', error)
+  }
+}
+
+// 加载客户目标数据
+const loadCustomerGoals = async () => {
+  try {
+    // 动态导入mock函数
+    const { mockGetCustomerGoals, mockGetCustomerGoalSummary } = await import('@/mock/dashboard')
+
+    const [goalsResponse, summaryResponse] = await Promise.all([
+      mockGetCustomerGoals(),
+      mockGetCustomerGoalSummary()
+    ])
+
+    if (goalsResponse.success && goalsResponse.data) {
+      customerGoals.value = goalsResponse.data
+    }
+
+    if (summaryResponse.success && summaryResponse.data) {
+      goalSummary.value = summaryResponse.data
+    }
+  } catch (error) {
+    console.error('加载客户目标数据失败:', error)
+  }
+}
+
+// 预警相关方法
+const handleMarkAsRead = async (alertId: number) => {
+  try {
+    // 调用API标记为已读
+    console.log('标记预警为已读:', alertId)
+    // 更新本地状态
+    const alert = recentAlerts.value.find(a => a.id === alertId)
+    if (alert) {
+      alert.isRead = true
+    }
+  } catch (error) {
+    console.error('标记预警失败:', error)
+  }
+}
+
+const handleMarkAllAsRead = async () => {
+  try {
+    console.log('标记所有预警为已读')
+    // 更新本地状态
+    recentAlerts.value.forEach(alert => {
+      alert.isRead = true
+    })
+  } catch (error) {
+    console.error('标记所有预警失败:', error)
+  }
+}
+
+const handleDismissAlert = async (alertId: number) => {
+  try {
+    console.log('忽略预警:', alertId)
+    // 从列表中移除
+    const index = recentAlerts.value.findIndex(a => a.id === alertId)
+    if (index > -1) {
+      recentAlerts.value.splice(index, 1)
+    }
+  } catch (error) {
+    console.error('忽略预警失败:', error)
+  }
+}
+
+const handleQuickAction = async (alert: any, action: string) => {
+  try {
+    console.log('执行快捷操作:', action, alert)
+
+    switch (action) {
+      case 'recharge':
+        // 跳转到充值页面或弹出充值弹窗
+        alert('充值功能开发中...')
+        break
+      case 'renew':
+        // 跳转到续约页面或弹出续约弹窗
+        alert('续约功能开发中...')
+        break
+      case 'restock':
+        // 跳转到补货页面或弹出补货弹窗
+        alert('补货功能开发中...')
+        break
+      default:
+        console.warn('未知的快捷操作:', action)
+    }
+  } catch (error) {
+    console.error('执行快捷操作失败:', error)
+  }
 }
 
 // 加载数据
@@ -681,7 +794,7 @@ const setupScrollObserver = () => {
       const mostVisibleEntry = entries.reduce((prev, current) => {
         return (current.intersectionRatio > prev.intersectionRatio) ? current : prev
       })
-      
+
       if (mostVisibleEntry.isIntersecting) {
         const sectionId = mostVisibleEntry.target.id
         if (sectionId && activeSection.value !== sectionId) {
@@ -717,10 +830,10 @@ const updateSidebarActiveState = (sectionId: string) => {
   // 根据sectionId构建菜单ID，匹配菜单配置中的ID格式
   const menuId = `dashboard-${sectionId}`
   console.log('Updating sidebar active state for section:', sectionId, 'menuId:', menuId)
-  
+
   // 使用menuStore的setActiveMenu方法更新活跃菜单
   menuStore.setActiveMenu(menuId)
-  
+
   // 确保父级菜单（数据看板）也是展开的
   if (!menuStore.isMenuOpen('dashboard')) {
     menuStore.toggleSubmenu('dashboard')
@@ -747,8 +860,8 @@ const updateBreadcrumb = (sectionId: string) => {
 const scrollToSection = (sectionId: string) => {
   const element = document.getElementById(sectionId)
   if (element) {
-    element.scrollIntoView({ 
-      behavior: 'smooth', 
+    element.scrollIntoView({
+      behavior: 'smooth',
       block: 'start',
       inline: 'nearest'
     })
@@ -769,19 +882,21 @@ const initializeMenuState = () => {
   // 设置初始活跃菜单为预警提醒
   const initialMenuId = 'dashboard-alerts'
   menuStore.setActiveMenu(initialMenuId)
-  
+
   // 确保数据看板父级菜单是展开的
   if (!menuStore.isMenuOpen('dashboard')) {
     menuStore.toggleSubmenu('dashboard')
   }
-  
+
   // 设置初始面包屑
   updateBreadcrumb('alerts')
 }
 
 // 生命周期
 onMounted(() => {
+  loadCustomers()
   loadDashboardData()
+  loadCustomerGoals()
   setupScrollObserver()
   initializeMenuState()
 })
@@ -796,6 +911,38 @@ onUnmounted(() => {
 <style scoped>
 .dashboard-view {
   padding: 0;
+}
+
+.dashboard-filter-sticky {
+  position: fixed;
+  top: var(--header-height, 60px);
+  left: var(--sidebar-width, 250px);
+  right: 0;
+  z-index: 1000;
+  background: white;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: left var(--duration-normal);
+}
+
+.main-layout--collapsed .dashboard-filter-sticky {
+  left: var(--sidebar-collapsed-width, 70px);
+}
+
+.dashboard-content {
+  padding-top: 140px; /* 给筛选器留出足够空间 */
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .dashboard-filter-sticky {
+    left: 0;
+    right: 0;
+  }
+
+  .main-layout--collapsed .dashboard-filter-sticky {
+    left: 0;
+  }
 }
 
 .dashboard-section {
@@ -967,10 +1114,95 @@ onUnmounted(() => {
 }
 
 /* 客户目标样式 */
+.goals-tabs {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-xl);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tab-button {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: none;
+  background: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all var(--duration-fast);
+}
+
+.tab-button:hover {
+  color: var(--color-primary);
+}
+
+.tab-button.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.goals-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.summary-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.summary-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--color-primary-light);
+  border-radius: var(--border-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+}
+
+.progress-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.summary-content {
+  flex: 1;
+}
+
+.summary-value {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.summary-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
 .goals-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: var(--spacing-lg);
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: var(--spacing-xl);
 }
 
 .goal-card {
@@ -978,50 +1210,124 @@ onUnmounted(() => {
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-lg);
   padding: var(--spacing-lg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all var(--duration-fast);
+}
+
+.goal-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .goal-card__header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
 }
 
-.goal-card__header h4 {
+.goal-info h4 {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
-  margin: 0;
+  margin: 0 0 var(--spacing-xs) 0;
 }
 
-.goal-card__industry {
+.goal-customer {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
-  background: var(--color-background);
+  margin-right: var(--spacing-sm);
+}
+
+.goal-period {
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--border-radius-sm);
 }
 
-.goal-card__progress {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.progress-item {
+.goal-status {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
 }
 
-.progress-label {
+.status-badge {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.status-active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-completed {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.status-paused {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.goal-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.goal-metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.metric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metric-label {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
-  min-width: 80px;
+  font-weight: var(--font-weight-medium);
+}
+
+.metric-progress {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.metric-values {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.metric-actual {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.metric-target {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
 }
 
 .progress-bar {
-  flex: 1;
   height: 8px;
   background: var(--color-background);
   border-radius: var(--border-radius-sm);
@@ -1030,17 +1336,77 @@ onUnmounted(() => {
 
 .progress-fill {
   height: 100%;
-  background: var(--color-primary);
   border-radius: var(--border-radius-sm);
   transition: width var(--duration-normal);
 }
 
-.progress-value {
+.progress-excellent {
+  background: #22c55e;
+}
+
+.progress-good {
+  background: #3b82f6;
+}
+
+.progress-fair {
+  background: #f59e0b;
+}
+
+.progress-poor {
+  background: #ef4444;
+}
+
+.goal-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.goal-period-info {
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.detail-button {
+  padding: var(--spacing-xs) var(--spacing-md);
+  border: 1px solid var(--color-primary);
+  background: white;
+  color: var(--color-primary);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+
+.detail-button:hover {
+  background: var(--color-primary);
+  color: white;
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-3xl) var(--spacing-xl);
+  color: var(--color-text-secondary);
+}
+
+.empty-icon {
+  margin-bottom: var(--spacing-lg);
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
-  min-width: 80px;
-  text-align: right;
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.empty-state p {
+  margin: 0;
+  color: var(--color-text-secondary);
 }
 
 /* 网站数据样式 */
@@ -1162,19 +1528,19 @@ onUnmounted(() => {
   border-radius: var(--border-radius-sm);
 }
 
-.roi-excellent { 
+.roi-excellent {
   background: rgba(82, 196, 26, 0.1);
   color: var(--color-success);
 }
-.roi-good { 
+.roi-good {
   background: rgba(24, 144, 255, 0.1);
   color: var(--color-info);
 }
-.roi-fair { 
+.roi-fair {
   background: rgba(250, 173, 20, 0.1);
   color: var(--color-warning);
 }
-.roi-poor { 
+.roi-poor {
   background: rgba(245, 34, 45, 0.1);
   color: var(--color-error);
 }
@@ -1473,33 +1839,33 @@ onUnmounted(() => {
   .stats-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .charts-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .goals-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .website-stats-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .table-header,
   .table-row {
     grid-template-columns: 1fr;
     gap: var(--spacing-sm);
   }
-  
+
   .channel-table .table-cell:not(:first-child) {
     display: none;
   }
-  
+
   .campaign-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .product-grid {
     grid-template-columns: 1fr;
   }

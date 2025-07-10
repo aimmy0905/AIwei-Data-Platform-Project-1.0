@@ -110,8 +110,8 @@
                 />
                 <span class="form-checkbox-text">记住密码</span>
               </label>
-              <router-link 
-                :to="{ name: 'forgot-password' }" 
+              <router-link
+                :to="{ name: 'forgot-password' }"
                 class="form-link"
               >
                 忘记密码？
@@ -161,12 +161,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { 
-  User, 
-  Lock, 
-  Eye, 
-  EyeOff, 
-  Loader, 
+import {
+  User,
+  Lock,
+  Eye,
+  EyeOff,
+  Loader,
   AlertCircle,
   BarChart3,
   Shield,
@@ -203,7 +203,7 @@ const demoAccounts = [
 
 // 计算属性
 const isFormValid = computed(() => {
-  return formData.value.username.length >= 3 && 
+  return formData.value.username.length >= 3 &&
          formData.value.password.length >= 6 &&
          Object.keys(errors.value).length === 0
 })
@@ -247,7 +247,7 @@ const handleLogin = async () => {
   // 验证表单
   validateUsername()
   validatePassword()
-  
+
   if (!isFormValid.value) {
     return
   }
@@ -257,7 +257,7 @@ const handleLogin = async () => {
 
   try {
     const response = await authStore.login(formData.value)
-    
+
     if (response.success) {
       // 登录成功，跳转到数据看板
       await router.push({ name: 'dashboard-overview' })
@@ -286,7 +286,7 @@ const fillDemoAccount = (account: { username: string; password: string }) => {
 onMounted(() => {
   // 初始化主题
   initTheme()
-  
+
   // 如果已经登录，直接跳转到数据看板
   if (authStore.isAuthenticated) {
     router.push({ name: 'dashboard-overview' })
@@ -677,11 +677,11 @@ onMounted(() => {
     max-width: 900px;
     grid-template-columns: 1fr 1fr;
   }
-  
+
   .login-brand__content {
     max-width: 350px;
   }
-  
+
   .login-brand__features {
     gap: var(--spacing-md);
   }
@@ -691,34 +691,34 @@ onMounted(() => {
   .login-view {
     padding: var(--spacing-md);
   }
-  
+
   .login-container {
     grid-template-columns: 1fr;
     max-width: 450px;
     min-height: 600px;
   }
-  
+
   .login-brand {
     padding: var(--spacing-lg);
   }
-  
+
   .login-brand__content {
     max-width: 100%;
   }
-  
+
   .login-brand__features {
     display: none;
   }
-  
+
   .login-form-section {
     padding: var(--spacing-lg);
   }
-  
+
   .demo-accounts__list {
     grid-template-columns: repeat(2, 1fr);
     gap: var(--spacing-xs);
   }
-  
+
   .demo-account {
     min-height: 45px;
     padding: var(--spacing-xs);
@@ -729,42 +729,42 @@ onMounted(() => {
   .login-view {
     padding: var(--spacing-sm);
   }
-  
+
   .login-container {
     max-width: 100%;
     min-height: 500px;
   }
-  
+
   .login-brand {
     padding: var(--spacing-md);
   }
-  
+
   .login-form-section {
     padding: var(--spacing-md);
   }
-  
+
   .login-brand__title {
     font-size: var(--font-size-xl);
   }
-  
+
   .login-brand__subtitle {
     font-size: var(--font-size-md);
   }
-  
+
   .demo-accounts__list {
     grid-template-columns: 1fr 1fr;
     max-height: 100px;
   }
-  
+
   .demo-account {
     min-height: 40px;
     font-size: 10px;
   }
-  
+
   .demo-account__username {
     font-size: 10px;
   }
-  
+
   .demo-account__role {
     font-size: 9px;
   }

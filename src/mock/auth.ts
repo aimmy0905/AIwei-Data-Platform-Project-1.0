@@ -67,7 +67,7 @@ export const mockLogin = (form: LoginForm): Promise<ApiResponse<{ user: User; to
   return new Promise((resolve) => {
     setTimeout(() => {
       const { username, password } = form
-      
+
       // 检查账号锁定状态
       const attempt = loginAttempts.get(username)
       if (attempt && attempt.lockTime && Date.now() < attempt.lockTime) {
@@ -78,14 +78,14 @@ export const mockLogin = (form: LoginForm): Promise<ApiResponse<{ user: User; to
         })
         return
       }
-      
+
       // 验证用户名密码
       const user = mockUsers.find(u => u.username === username)
       if (!user || !validatePassword(username, password)) {
         // 记录失败次数
         const current = loginAttempts.get(username) || { count: 0 }
         current.count++
-        
+
         if (current.count >= 5) {
           // 锁定30分钟
           current.lockTime = Date.now() + 30 * 60 * 1000
@@ -105,13 +105,13 @@ export const mockLogin = (form: LoginForm): Promise<ApiResponse<{ user: User; to
         }
         return
       }
-      
+
       // 登录成功，清除失败记录
       loginAttempts.delete(username)
-      
+
       // 生成mock token
       const token = `mock_token_${user.id}_${Date.now()}`
-      
+
       resolve({
         success: true,
         data: {
@@ -152,13 +152,13 @@ export const mockForgotPassword = (username: string): Promise<ApiResponse<{ meth
         })
         return
       }
-      
+
       // 模拟发送验证码
       const method = user.phone ? 'sms' : 'email'
-      const target = user.phone ? 
-        user.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : 
+      const target = user.phone ?
+        user.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') :
         user.email?.replace(/(\w{2})\w+(@\w+)/, '$1****$2')
-      
+
       resolve({
         success: true,
         data: {
@@ -184,7 +184,7 @@ export const mockVerifyCode = (username: string, code: string): Promise<ApiRespo
         })
         return
       }
-      
+
       resolve({
         success: true,
         data: {
@@ -209,7 +209,7 @@ export const mockResetPassword = (resetToken: string, newPassword: string): Prom
         })
         return
       }
-      
+
       if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(newPassword)) {
         resolve({
           success: false,
@@ -218,7 +218,7 @@ export const mockResetPassword = (resetToken: string, newPassword: string): Prom
         })
         return
       }
-      
+
       resolve({
         success: true,
         message: '密码重置成功，请使用新密码登录'
@@ -234,7 +234,7 @@ export const mockGetUserInfo = (token: string): Promise<ApiResponse<User>> => {
       // 从token中解析用户ID（演示用）
       const userId = parseInt(token.split('_')[2])
       const user = mockUsers.find(u => u.id === userId)
-      
+
       if (!user) {
         resolve({
           success: false,
@@ -243,7 +243,7 @@ export const mockGetUserInfo = (token: string): Promise<ApiResponse<User>> => {
         })
         return
       }
-      
+
       resolve({
         success: true,
         data: user

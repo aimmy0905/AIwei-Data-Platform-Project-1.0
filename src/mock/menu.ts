@@ -83,31 +83,60 @@ export const mockMenuItems: MenuItem[] = [
         icon: 'Megaphone',
         children: [
           {
-            id: 'meta-ads',
+            id: 'ad-platform-overview',
+            name: '全平台概览',
+            icon: 'BarChart',
+            path: '/dashboard/ad-platform-overview',
+            roles: ['superAdmin', 'manager', 'staff']
+          },
+          {
+            id: 'meta-dashboard',
             name: 'Meta数据',
             icon: 'Facebook',
-            path: '/dashboard/ad-data/meta',
+            path: '/dashboard/meta-dashboard',
             roles: ['superAdmin', 'manager', 'staff']
           },
           {
-            id: 'google-ads',
+            id: 'google-dashboard',
             name: 'Google数据',
             icon: 'Chrome',
-            path: '/dashboard/ad-data/google',
+            path: '/dashboard/google-dashboard',
             roles: ['superAdmin', 'manager', 'staff']
           },
           {
-            id: 'criteo-ads',
-            name: 'Criteo数据',
-            icon: 'Monitor',
-            path: '/dashboard/ad-data/criteo',
-            roles: ['superAdmin', 'manager', 'staff']
-          },
-          {
-            id: 'bing-ads',
+            id: 'bing-dashboard',
             name: 'Bing数据',
             icon: 'Search',
-            path: '/dashboard/ad-data/bing',
+            path: '/dashboard/bing-dashboard',
+            roles: ['superAdmin', 'manager', 'staff']
+          },
+          {
+            id: 'criteo-dashboard',
+            name: 'Criteo数据',
+            icon: 'Monitor',
+            path: '/dashboard/criteo-dashboard',
+            roles: ['superAdmin', 'manager', 'staff']
+          }
+        ],
+        roles: ['superAdmin', 'manager', 'staff']
+      },
+      {
+        id: 'data-tools',
+        name: '数据工具',
+        icon: 'Tool',
+        children: [
+          {
+            id: 'data-export',
+            name: '数据导出',
+            icon: 'Download',
+            path: '/dashboard/data-export',
+            roles: ['superAdmin', 'manager', 'staff']
+          },
+          {
+            id: 'custom-metrics',
+            name: '自定义指标',
+            icon: 'Settings',
+            path: '/dashboard/custom-metrics',
             roles: ['superAdmin', 'manager', 'staff']
           }
         ],

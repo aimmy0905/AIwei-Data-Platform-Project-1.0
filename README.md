@@ -1,39 +1,272 @@
-# aiwei-vue
+# 艾维数据平台 (AIwei Data Platform)
 
-This template should help get you started developing with Vue 3 in Vite.
+艾维数据平台是一个专为海外Shopify网站代运营团队设计的综合性数据分析管理工具。平台提供全面的数据看板、多渠道广告数据分析、业绩管理和客户管理功能。
 
-## Recommended IDE Setup
+## 🚀 项目特点
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- **现代化技术栈**：基于 Vue 3 + TypeScript + Vite 构建
+- **响应式设计**：完美适配桌面端和移动端
+- **多主题支持**：内置明暗主题切换
+- **模块化架构**：清晰的组件结构和状态管理
+- **完整的用户体系**：包含认证、权限管理和多角色支持
 
-## Type Support for `.vue` Imports in TS
+## 🛠️ 技术栈
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- **前端框架**：Vue 3 (Composition API)
+- **开发语言**：TypeScript
+- **构建工具**：Vite
+- **状态管理**：Pinia
+- **路由管理**：Vue Router
+- **图表库**：Chart.js
+- **样式处理**：CSS Variables + Scoped CSS
+- **代码规范**：ESLint + Prettier
 
-## Customize configuration
+## 📦 功能模块
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+### Phase 1 - 基础功能 ✅
+- **基础筛选功能**：客户选择、时间范围设置、对比功能
+- **预警提醒模块**：账户余额、服务预期、价格变动、缺货提醒
+- **网站数据增强**：订单指标、用户指标、用户漏斗、退货指标、库存指标
+- **自定义数据维度**：支持多维度数据查看和分析
 
-## Project Setup
+### Phase 2 - 数据模块增强 ✅
+- **渠道数据模块**：总数据、单个渠道详情、自定义维度
+- **活动数据模块**：活动详情、单日数据表、全部活动入口
+- **产品销售数据**：销量排名、产品指标、流量指标
 
+### Phase 3 - 高级分析 ✅
+- **红人及帖子数据**：KOL数据分析和帖子表现追踪
+- **国家/地区市场数据**：全球市场表现分析
+- **页面表现模块**：网站页面性能监控
+- **竞品情况模块**：竞争对手数据分析
+
+### Phase 4 - 广告数据平台 ✅
+- **全平台广告数据**：汇总所有广告平台数据
+- **Meta数据看板**：Facebook/Instagram广告数据分析
+- **Google数据看板**：Google Ads数据分析
+- **Bing数据看板**：Microsoft Advertising数据分析
+- **Criteo数据看板**：Criteo广告数据分析
+
+### Phase 5 - 数据工具 ✅
+- **数据导出功能**：支持Excel、CSV、PDF多种格式导出
+- **报告生成系统**：自动生成数据概览、表现分析、对比分析报告
+- **自定义指标设置**：创建和管理自定义数据指标
+- **指标模板库**：预设常用指标模板（ROI、转化率、客单价等）
+
+## 🎯 核心特色
+
+### 1. 全平台广告数据整合
+- 支持Meta、Google、Bing、Criteo等主流广告平台
+- 统一的数据指标和分析维度
+- 实时数据同步和预警提醒
+
+### 2. 智能数据分析
+- 自动识别数据异常和趋势变化
+- 多维度数据对比和分析
+- 智能预警和提醒系统
+
+### 3. 灵活的数据导出
+- 支持多种数据格式导出
+- 自定义导出字段和时间范围
+- 自动化报告生成
+
+### 4. 可扩展的指标体系
+- 自定义指标创建和管理
+- 丰富的预设指标模板
+- 灵活的计算规则配置
+
+## 🚀 快速开始
+
+### 环境要求
+- Node.js >= 16.0.0
+- npm >= 7.0.0
+
+### 安装依赖
 ```sh
-pnpm install
+npm install
 ```
 
-### Compile and Hot-Reload for Development
-
+### 启动开发服务器
 ```sh
-pnpm dev
+npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
-
+### 构建生产版本
 ```sh
-pnpm build
+npm run build
 ```
 
-### Lint with [ESLint](https://eslint.org/)
-
+### 代码检查
 ```sh
-pnpm lint
+npm run lint
 ```
+
+## 📁 项目结构
+
+```
+src/
+├── components/          # 组件库
+│   ├── common/         # 通用组件
+│   ├── dashboard/      # 看板组件
+│   └── layout/         # 布局组件
+├── views/              # 页面视图
+│   ├── auth/          # 认证页面
+│   ├── dashboard/     # 看板页面
+│   ├── customers/     # 客户管理
+│   └── settings/      # 系统设置
+├── stores/            # 状态管理
+├── router/            # 路由配置
+├── mock/              # 模拟数据
+├── types/             # 类型定义
+├── utils/             # 工具函数
+└── assets/            # 静态资源
+```
+
+## 🔧 开发指南
+
+### 组件开发
+- 使用 Vue 3 Composition API
+- 遵循 TypeScript 类型约束
+- 采用 Scoped CSS 样式隔离
+
+### 状态管理
+- 使用 Pinia 进行状态管理
+- 按功能模块划分 Store
+- 支持状态持久化
+
+### 路由管理
+- 基于 Vue Router 4
+- 支持路由守卫和权限控制
+- 动态路由加载
+
+## 📊 数据看板功能
+
+### 网站数据分析
+- 收入、订单、用户等核心指标
+- 用户行为漏斗分析
+- 退货率和库存监控
+
+### 广告数据分析
+- 多平台广告数据整合
+- ROAS、CPC、CTR等关键指标
+- 广告表现趋势分析
+
+### 市场数据分析
+- 全球市场表现监控
+- 地区销售数据对比
+- 竞品情况分析
+
+## 🎨 主题定制
+
+平台支持明暗主题切换，可通过以下方式自定义主题：
+
+1. 修改 `src/assets/styles/themes/` 目录下的主题文件
+2. 使用 CSS Variables 定义颜色和样式
+3. 通过主题切换组件动态切换
+
+## 📱 响应式设计
+
+- 桌面端：>=1200px
+- 平板端：768px-1199px  
+- 移动端：<768px
+
+## 🔐 权限管理
+
+### 用户角色
+- **超级管理员**：完整系统权限
+- **管理员**：业务管理权限
+- **员工**：日常操作权限
+- **财务**：财务数据权限
+- **销售**：销售数据权限
+
+### 权限控制
+- 基于角色的菜单显示
+- 页面级权限控制
+- 接口级权限验证
+
+## 🔄 数据流程
+
+1. **数据采集**：从各广告平台和网站获取数据
+2. **数据处理**：清洗、转换和聚合数据
+3. **数据存储**：存储到数据库中
+4. **数据展示**：通过看板和报表展示
+5. **数据导出**：支持多种格式导出
+
+## 🚀 部署指南
+
+### 开发环境
+```sh
+npm run dev
+```
+
+### 生产环境
+```sh
+npm run build
+npm run preview
+```
+
+### Docker部署
+```dockerfile
+FROM node:16-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "run", "preview"]
+```
+
+## 📈 性能优化
+
+- 组件懒加载
+- 图片压缩优化
+- 代码分割
+- 缓存策略
+- 请求优化
+
+## 🐛 问题排查
+
+### 常见问题
+1. **TypeScript编译错误**：检查类型定义文件
+2. **组件导入错误**：确认组件路径正确
+3. **样式不生效**：检查CSS作用域
+4. **数据不显示**：检查Mock数据配置
+
+### 调试工具
+- Vue DevTools
+- Browser DevTools
+- TypeScript Language Server
+
+## 📝 更新日志
+
+### v1.0.0 (2025-01-09)
+- ✅ 完成Phase 1-5全部功能开发
+- ✅ 实现完整的数据看板体系
+- ✅ 支持多平台广告数据分析
+- ✅ 添加数据导出和报告功能
+- ✅ 实现自定义指标设置
+- ✅ 完善用户权限管理
+- ✅ 优化响应式设计
+
+## 🤝 贡献指南
+
+1. Fork 项目
+2. 创建特性分支
+3. 提交更改
+4. 推送到分支
+5. 创建 Pull Request
+
+## 📄 许可证
+
+MIT License
+
+## 📞 联系我们
+
+- 项目地址：[GitHub Repository]
+- 技术支持：[Support Email]
+- 文档地址：[Documentation URL]
+
+---
+
+**艾维数据平台** - 让数据分析更简单，让业务决策更智能！

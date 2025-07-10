@@ -274,7 +274,7 @@ export const getMenuByRole = (role: UserRole): MenuItem[] => {
       return true
     })
   }
-  
+
   return filterMenu(JSON.parse(JSON.stringify(mockMenuItems)))
 }
 

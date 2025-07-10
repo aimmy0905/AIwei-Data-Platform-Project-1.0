@@ -31,13 +31,28 @@ export interface Customer {
   manager: string
   createdAt: string
   lastUpdated: string
+  projects?: Project[]
+  assignedTo?: string
+}
+
+// 项目类型
+export interface Project {
+  id: string
+  name: string
+  customerId: number
+  status: 'active' | 'completed' | 'paused'
+  startDate: string
+  endDate?: string
+  budget: number
+  revenue: number
+  roi: number
 }
 
 // 渠道数据类型
 export interface Channel {
   id: number
   name: string
-  type: 'google' | 'facebook' | 'direct' | 'email' | 'criteo' | 'bing'
+  type: 'google' | 'facebook' | 'direct' | 'email' | 'criteo' | 'bing' | 'pinterest' | 'organic' | 'display'
   revenue: number
   users: number
   sessions: number
@@ -46,18 +61,117 @@ export interface Channel {
   roi: number
 }
 
+// 扩展的渠道数据类型
+export interface ChannelData {
+  id: number
+  name: string
+  type: 'google' | 'facebook' | 'direct' | 'email' | 'criteo' | 'bing' | 'pinterest' | 'organic' | 'display'
+
+  // 维度信息
+  sessionSourceMedium: string // 会话来源/媒介
+  firstUserSourceMedium: string // 首次用户来源/媒介
+  sessionCampaign: string // 会话广告系列
+  firstUserCampaign: string // 首次用户广告系列
+
+  // 结果指标
+  totalRevenue: number // 总收入
+  totalUsers: number // 总用户数
+  averagePurchaseRevenue: number // 平均购买收入
+  transactions: number // 交易次数
+  userConversionRate: number // 用户转化率
+  bounceRate: number // 跳出率
+
+  // 过程指标
+  addToCarts: number // 添加到购物车次数
+  checkouts: number // 开始结账次数
+  itemAddToCartsRate: number // 商品添加至购物车率
+  itemCheckoutsRate: number // 商品结账率
+
+  // 用户指标
+  sessions: number // 会话数
+  newUsers: number // 新用户数
+  returningUsers: number // 回访用户数
+  averagePurchaseRevenuePerUser: number // 每用户平均购买收入
+  averageOrdersPerCustomer: number // 平均每位客户订单数
+
+  // 时间数据
+  date?: string
+  period?: string
+}
+
+// 渠道数据汇总
+export interface ChannelSummary {
+  totalRevenue: number
+  totalUsers: number
+  totalSessions: number
+  averageConversionRate: number
+  totalCost: number
+  averageROI: number
+  topPerformingChannel: string
+  channelCount: number
+}
+
+// 渠道数据维度选择
+export interface ChannelDimension {
+  id: string
+  name: string
+  category: 'dimension' | 'result' | 'process' | 'user'
+  description: string
+  format: 'number' | 'currency' | 'percentage' | 'string'
+  selected: boolean
+}
+
 // 网站数据类型
 export interface WebsiteData {
+  // 结果指标
   totalSales: number
   totalCost: number
   roi: number
-  orders: number
+  averageOrderItems: number // AOI - 订单的平均产品数量
+  orderConversionCost: number // 订单转化成本
   averageOrderValue: number
   conversionRate: number
+  storeVisits: number // 商店访问次数
+  userVisitCost: number // 用户访问成本
+
+  // 订单指标
+  orders: number
+  orderItemsPerOrder: number // 每笔订单的订购数量
+  ordersPerCustomer: number // 每位客户的订单数
+  returningCustomerOrders: number // 订单数(回头客)
+  newCustomerOrders: number // 订单数(新客户)
+
+  // 用户指标
   visitors: number
+  visits: number // 访问次数
   newUsers: number
   returningUsers: number
+  addToCartVisits: number // 加购访问次数
+  reachCheckoutVisits: number // 到达结账页面的访问次数
+  completeCheckoutVisits: number // 到达并完成结账的访问次数
+  completedCheckoutVisits: number // 完成结账的访问次数
+  averageVisitDuration: number // 平均访问持续时间(秒)
+  bounceCount: number // 跳出量
   bounceRate: number
+
+  // 用户漏斗
+  addToCartRate: number // 加购率
+  checkoutCompletionRate: number // 完成结账率
+  checkoutConversionRate: number // 结账转化率
+
+  // 退货指标
+  returns: number // 退货数
+  returnAmount: number // 退货金额
+  returnRate: number // 退货数量比例
+  returnSalesRatio: number // 退货销售额占比
+
+  // 库存指标
+  dailySoldUnits: number // 每日售出库存单位数
+  remainingStockDays: number // 剩余库存天数
+  inStockDays: number // 有货的天数
+  outOfStockDays: number // 缺货的天数
+  averageStockDays: number // 在库天数
+  sellThroughRate: number // 售罄率
 }
 
 // 活动数据类型
@@ -77,6 +191,94 @@ export interface Campaign {
   conversions: number
 }
 
+// 扩展的活动数据类型
+export interface CampaignData {
+  id: number
+  name: string
+  type: 'promotion' | 'acquisition' | 'seasonal' | 'branding' | 'retargeting'
+  status: 'draft' | 'active' | 'paused' | 'completed'
+  stage: 'preparation' | 'warmup' | 'official' | 'ended'
+  targetMarket: string
+  content: string
+  channels: string[]
+  startDate: string
+  endDate: string
+
+  // 基础数据
+  budget: number
+  spent: number
+  revenue: number
+  roi: number
+
+  // 详细指标
+  totalSales: number
+  totalCost: number
+  userCount: number
+  conversionRate: number
+  averageOrderValue: number
+  orderCount: number
+  returnRate: number
+  returnAmount: number
+
+  // 广告数据
+  adSpend: number
+  adRevenue: number
+  adROI: number
+  adRevenueRatio: number
+
+  // 平台数据
+  googleSpend?: number
+  googleRevenue?: number
+  googleROI?: number
+  facebookSpend?: number
+  facebookRevenue?: number
+  facebookROI?: number
+  bingSpend?: number
+  bingRevenue?: number
+  bingROI?: number
+  criteoSpend?: number
+  criteoRevenue?: number
+  criteoROI?: number
+}
+
+// 活动单日数据
+export interface CampaignDailyData {
+  date: string
+  campaignId: number
+
+  // 整站数据
+  totalRevenue: number
+  totalAdSpend: number
+  totalROI: number
+  orderCount: number
+  averageOrderValue: number
+
+  // 广告数据
+  adRevenue: number
+  adROI: number
+  adRevenueRatio: number
+
+  // 平台明细
+  platforms: {
+    google: { spend: number; revenue: number; roi: number }
+    facebook: { spend: number; revenue: number; roi: number }
+    bing: { spend: number; revenue: number; roi: number }
+    criteo: { spend: number; revenue: number; roi: number }
+  }
+}
+
+// 活动汇总数据
+export interface CampaignSummary {
+  totalCampaigns: number
+  activeCampaigns: number
+  totalBudget: number
+  totalSpent: number
+  totalRevenue: number
+  averageROI: number
+  topPerformingCampaign: string
+  totalConversions: number
+}
+
 // 产品销售类型
 export interface ProductSales {
   id: number
@@ -88,6 +290,70 @@ export interface ProductSales {
   profit: number
   stock: number
   image?: string
+}
+
+// 扩展的产品销售数据类型
+export interface ProductSalesData {
+  id: number
+  sku: string
+  name: string
+  category: string
+  price: number
+
+  // 销量排名数据
+  grossSales: number // 毛销售额
+  totalSales: number // 总销售额
+  salesRatio: number // 销售额占比
+  netSoldQuantity: number // 净售出商品数
+  averageOrderAmount: number // 平均订单金额
+  quantityPerOrder: number // 每笔订单的订购数量
+  refundAmount: number // 退款金额
+  refundQuantity: number // 退款数量
+  stockStatus: 'in_stock' | 'low_stock' | 'out_of_stock' // 库存状态
+  stockoutLoss: number // 因缺货导致销售额损失
+
+  // 流量指标
+  visitors: number // 在线商店访客数
+  visits: number // 访问次数
+  newUsers: number // 新用户数
+  returningUsers: number // 回访用户数
+  addToCartVisits: number // 加购访问次数
+  checkoutVisits: number // 到达结账页面的访问次数
+
+  // 转化率指标
+  addToCartRate: number // 加购转化率
+  checkoutRate: number // 结账转化率
+  purchaseRate: number // 购买转化率
+
+  // 其他指标
+  viewToCartRate: number // 浏览到加购转化率
+  cartToCheckoutRate: number // 加购到结账转化率
+  averageViewTime: number // 平均浏览时间
+  bounceRate: number // 跳出率
+
+  // 时间数据
+  lastUpdated: string
+}
+
+// 产品销售排名类型
+export interface ProductRanking {
+  type: 'category' | 'sku'
+  products: ProductSalesData[]
+  totalProducts: number
+  totalRevenue: number
+  averageOrderValue: number
+}
+
+// 产品销售汇总
+export interface ProductSalesSummary {
+  totalProducts: number
+  totalRevenue: number
+  totalOrders: number
+  averageOrderValue: number
+  topSellingProduct: string
+  topCategory: string
+  totalRefunds: number
+  averageConversionRate: number
 }
 
 // 部门类型
@@ -196,4 +462,944 @@ export interface FilterOptions {
   }
   status?: string
   keyword?: string
+}
+
+// 红人(KOL)数据类型
+export interface KOLData {
+  id: number
+  name: string
+  platform: 'instagram' | 'tiktok' | 'youtube' | 'facebook' | 'twitter' | 'weibo'
+  avatar: string
+  verified: boolean
+
+  // 基本信息
+  category: string // 分类：时尚、美妆、科技、生活等
+  location: string // 地区
+  language: string // 主要语言
+
+  // 粉丝数据
+  followers: number // 粉丝数
+  followersGrowth: number // 粉丝增长率
+  avgViews: number // 平均观看量
+  avgLikes: number // 平均点赞数
+  avgComments: number // 平均评论数
+  avgShares: number // 平均分享数
+
+  // 互动数据
+  engagementRate: number // 互动率
+  reachRate: number // 触达率
+  impressions: number // 展现量
+
+  // 合作数据
+  collaborationCount: number // 合作次数
+  totalSpent: number // 总投入
+  totalRevenue: number // 总收入
+  roi: number // ROI
+
+  // 内容数据
+  postsCount: number // 帖子数量
+  videosCount: number // 视频数量
+  storiesCount: number // 故事数量
+
+  // 状态
+  status: 'active' | 'inactive' | 'pending' | 'blacklisted'
+  lastActiveDate: string
+  joinDate: string
+}
+
+// 帖子数据类型
+export interface PostData {
+  id: number
+  kolId: number
+  kolName: string
+  kolAvatar: string
+  platform: 'instagram' | 'tiktok' | 'youtube' | 'facebook' | 'twitter' | 'weibo'
+
+  // 基本信息
+  title: string
+  content: string
+  type: 'image' | 'video' | 'story' | 'reel' | 'live'
+  thumbnail: string
+  url: string
+
+  // 发布信息
+  publishDate: string
+  status: 'published' | 'scheduled' | 'draft' | 'deleted'
+
+  // 互动数据
+  views: number
+  likes: number
+  comments: number
+  shares: number
+  saves: number
+
+  // 计算指标
+  engagementRate: number
+  reachRate: number
+  impressions: number
+
+  // 商业数据
+  isSponsored: boolean
+  campaignId?: number
+  campaignName?: string
+  cost: number
+  revenue: number
+  conversions: number
+  clicks: number
+  ctr: number // 点击率
+
+  // 内容标签
+  hashtags: string[]
+  mentions: string[]
+
+  // 地理数据
+  topCountries: { country: string; percentage: number }[]
+  topCities: { city: string; percentage: number }[]
+
+  // 受众数据
+  audienceAge: { range: string; percentage: number }[]
+  audienceGender: { gender: string; percentage: number }[]
+}
+
+// 红人汇总数据
+export interface KOLSummary {
+  totalKOLs: number
+  activeKOLs: number
+  totalFollowers: number
+  totalPosts: number
+  totalSpent: number
+  totalRevenue: number
+  averageROI: number
+  averageEngagementRate: number
+  topPerformingKOL: string
+  topPerformingPost: string
+  totalImpressions: number
+  totalReach: number
+}
+
+// 帖子汇总数据
+export interface PostSummary {
+  totalPosts: number
+  publishedPosts: number
+  totalViews: number
+  totalLikes: number
+  totalComments: number
+  totalShares: number
+  averageEngagementRate: number
+  topPerformingPost: string
+  totalImpressions: number
+  totalReach: number
+  totalConversions: number
+  averageCTR: number
+}
+
+// 红人筛选条件
+export interface KOLFilter {
+  platform?: string
+  category?: string
+  location?: string
+  minFollowers?: number
+  maxFollowers?: number
+  minEngagementRate?: number
+  maxEngagementRate?: number
+  status?: string
+  dateRange?: {
+    start: string
+    end: string
+  }
+}
+
+// 帖子筛选条件
+export interface PostFilter {
+  platform?: string
+  type?: string
+  kolId?: number
+  campaignId?: number
+  status?: string
+  dateRange?: {
+    start: string
+    end: string
+  }
+  minViews?: number
+  maxViews?: number
+  minEngagementRate?: number
+  maxEngagementRate?: number
+}
+
+// 红人排名数据
+export interface KOLRanking {
+  type: 'followers' | 'engagement' | 'roi' | 'revenue'
+  kols: KOLData[]
+  totalCount: number
+  averageValue: number
+}
+
+// 帖子排名数据
+export interface PostRanking {
+  type: 'views' | 'engagement' | 'conversions' | 'revenue'
+  posts: PostData[]
+  totalCount: number
+  averageValue: number
+}
+
+// 国家/地区市场数据类型
+export interface CountryMarketData {
+  id: number
+  country: string
+  countryCode: string
+  region: string
+  continent: string
+
+  // 基础数据
+  totalSales: number
+  totalOrders: number
+  totalUsers: number
+  totalSessions: number
+
+  // 计算指标
+  salesRatio: number // 销售额占比
+  orderRatio: number // 订单占比
+  userRatio: number // 用户占比
+  sessionRatio: number // 会话占比
+  averageOrderValue: number // 平均订单价值
+  conversionRate: number // 转化率
+
+  // 用户行为
+  averageSessionDuration: number // 平均会话时长
+  bounceRate: number // 跳出率
+  pagesPerSession: number // 每次会话页面数
+
+  // 增长数据
+  salesGrowth: number // 销售增长率
+  userGrowth: number // 用户增长率
+  orderGrowth: number // 订单增长率
+
+  // 时间数据
+  lastUpdated: string
+}
+
+// 地区市场汇总数据
+export interface MarketSummary {
+  totalCountries: number
+  totalRegions: number
+  totalSales: number
+  totalOrders: number
+  totalUsers: number
+  topPerformingCountry: string
+  topPerformingRegion: string
+  averageOrderValue: number
+  averageConversionRate: number
+  topCountriesByRevenue: CountryMarketData[]
+  revenueDistribution: { region: string; revenue: number; percentage: number }[]
+}
+
+// 地区市场筛选条件
+export interface MarketFilter {
+  region?: string
+  continent?: string
+  country?: string
+  minSales?: number
+  maxSales?: number
+  minOrders?: number
+  maxOrders?: number
+  minUsers?: number
+  maxUsers?: number
+  sortBy?: 'sales' | 'orders' | 'users' | 'conversionRate' | 'aov'
+  sortOrder?: 'asc' | 'desc'
+  dateRange?: {
+    start: string
+    end: string
+  }
+}
+
+// 地区市场排名数据
+export interface MarketRanking {
+  type: 'sales' | 'orders' | 'users' | 'conversionRate' | 'aov'
+  countries: CountryMarketData[]
+  totalCount: number
+  averageValue: number
+}
+
+// 地区市场趋势数据
+export interface MarketTrend {
+  country: string
+  period: string
+  sales: number
+  orders: number
+  users: number
+  conversionRate: number
+  averageOrderValue: number
+}
+
+// 页面表现数据类型
+export interface PagePerformanceData {
+  id: number
+  pageName: string // 落地页面名称
+  pageUrl: string // 页面URL
+  pageType: 'home' | 'category' | 'product' | 'checkout' | 'cart' | 'search' | 'blog' | 'contact' | 'about' | 'other'
+  pageCategory: string // 页面类别内容（首页、类目页、详情页等）
+  productType?: string // 产品类型
+
+  // 结果指标
+  users: number // 用户数
+  newUsers: number // 新用户数
+  userCost: number // 用户成本
+  conversionRate: number // 转化率
+  revenue: number // 销售额
+  usersRatio: number // 用户数占比
+  revenueRatio: number // 销售额占比
+  bounceRate: number // 跳出率
+
+  // 过程指标
+  addToCartCount: number // 加购数
+  addToCartRate: number // 加购率
+  checkoutPageViews: number // 支付页面浏览量
+  checkoutConversionRate: number // 支付页面转化率
+  averageSessionDuration: number // 平均会话时长(秒)
+  averageTimeOnPage: number // 页面停留时间(秒)
+  averageLoadTime: number // 页面加载时间(毫秒)
+
+  // 其他指标
+  pageViews: number // 页面浏览量
+  uniquePageViews: number // 独特页面浏览量
+  entrances: number // 入口次数
+  exits: number // 退出次数
+  exitRate: number // 退出率
+  clickThroughRate: number // 点击率
+
+  // 时间数据
+  date?: string
+  lastUpdated: string
+}
+
+// 页面表现汇总数据
+export interface PagePerformanceSummary {
+  totalPages: number
+  totalPageViews: number
+  totalUsers: number
+  totalRevenue: number
+  averageConversionRate: number
+  averageBounceRate: number
+  averageTimeOnPage: number
+  averageLoadTime: number
+  topPerformingPage: string
+  topRevenueGenerator: string
+  totalAddToCarts: number
+  averageAddToCartRate: number
+}
+
+// 页面表现筛选条件
+export interface PagePerformanceFilter {
+  pageType?: string
+  pageCategory?: string
+  productType?: string
+  minUsers?: number
+  maxUsers?: number
+  minRevenue?: number
+  maxRevenue?: number
+  minConversionRate?: number
+  maxConversionRate?: number
+  sortBy?: 'users' | 'revenue' | 'conversionRate' | 'bounceRate' | 'addToCartRate'
+  sortOrder?: 'asc' | 'desc'
+  dateRange?: {
+    start: string
+    end: string
+  }
+}
+
+// 页面表现排名数据
+export interface PagePerformanceRanking {
+  type: 'users' | 'revenue' | 'conversionRate' | 'bounceRate' | 'addToCartRate'
+  pages: PagePerformanceData[]
+  totalCount: number
+  averageValue: number
+}
+
+// 竞品数据类型
+export interface CompetitorData {
+  id: number
+  name: string // 竞品名称
+  website: string // 网址
+  industry: string // 行业
+  description?: string // 描述
+
+  // 活动信息
+  currentCampaign?: string // 活动内容
+  campaignStartDate?: string // 活动开始时间
+  campaignEndDate?: string // 活动结束时间
+  campaignType?: 'promotion' | 'seasonal' | 'product_launch' | 'brand_awareness' | 'other'
+
+  // 监控数据
+  priceRange?: string // 价格范围
+  mainProducts?: string[] // 主要产品
+  targetMarkets?: string[] // 目标市场
+  marketingChannels?: string[] // 营销渠道
+
+  // 分析数据
+  estimatedTraffic?: number // 预估流量
+  socialMediaFollowers?: {
+    platform: string
+    followers: number
+  }[]
+  keywordRanking?: {
+    keyword: string
+    position: number
+  }[]
+
+  // 状态
+  status: 'monitoring' | 'paused' | 'inactive'
+  addedDate: string
+  lastUpdated: string
+  addedBy: string
+}
+
+// 竞品汇总数据
+export interface CompetitorSummary {
+  totalCompetitors: number
+  activeCompetitors: number
+  totalCampaigns: number
+  activeCampaigns: number
+  topCompetitor: string
+  mostActiveCompetitor: string
+  averageTraffic: number
+  topKeywords: string[]
+}
+
+// 竞品筛选条件
+export interface CompetitorFilter {
+  industry?: string
+  status?: string
+  campaignType?: string
+  hasActiveCampaign?: boolean
+  targetMarket?: string
+  marketingChannel?: string
+  keyword?: string
+  sortBy?: 'name' | 'traffic' | 'followers' | 'lastUpdated'
+  sortOrder?: 'asc' | 'desc'
+  dateRange?: {
+    start: string
+    end: string
+  }
+}
+
+// 竞品排名数据
+export interface CompetitorRanking {
+  type: 'traffic' | 'followers' | 'keywords' | 'campaigns'
+  competitors: CompetitorData[]
+  totalCount: number
+  averageValue: number
+}
+
+// 广告平台类型
+export type AdPlatform = 'google' | 'meta' | 'bing' | 'criteo'
+
+// 全平台广告数据类型
+export interface AdPlatformData {
+  id: number
+  platform: AdPlatform
+  accountName: string // 账户名称
+  accountId: string // 账户ID
+  status: 'active' | 'paused' | 'limited' | 'suspended'
+
+  // 基础数据
+  spend: number // 花费
+  spendRatio: number // 花费占比
+  revenue: number // 购物收入
+  roas: number // 广告投资回报率
+  purchases: number // 购物数
+  cpa: number // 每次获取成本
+  averagePurchaseValue: number // 平均购物转化价值
+  conversionRate: number // 转化率
+
+  // 展示数据
+  impressions: number // 展示次数
+  cpm: number // 千次展示成本
+  reach?: number // 覆盖人数
+  frequency?: number // 频次
+
+  // 点击数据
+  clicks: number // 点击量
+  ctr: number // 点击率
+  cpc: number // 单次点击成本
+  uniqueClicks?: number // 独特点击量
+
+  // 视频数据（如适用）
+  videoViews?: number // 观看次数
+  videoViewRate?: number // 视频观看率
+  averageViewDuration?: number // 平均观看时长
+
+  // 时间数据
+  date?: string
+  lastUpdated: string
+}
+
+// 全平台广告汇总数据
+export interface AdPlatformSummary {
+  totalPlatforms: number
+  activePlatforms: number
+  totalSpend: number
+  totalRevenue: number
+  averageROAS: number
+  totalImpressions: number
+  totalClicks: number
+  averageCTR: number
+  averageCPC: number
+  topPerformingPlatform: string
+  platformDistribution: { platform: string; spend: number; revenue: number; percentage: number }[]
+}
+
+// Meta广告数据类型
+export interface MetaAdData {
+  id: number
+  accountId: string
+  accountName: string
+  campaignId?: string
+  campaignName?: string
+  adSetId?: string
+  adSetName?: string
+  adId?: string
+  adName?: string
+
+  // 基础数据
+  spend: number // 已花费金额
+  revenue: number // 广告收入
+  roas: number // ROAS
+  aov: number // 平均订单价值
+  purchases: number // 购物次数
+  purchaseValue: number // 购物转化价值
+  averagePurchaseValue: number // 平均购物转化价值
+
+  // 转化数据
+  conversionRate: number // 转化率
+  costPerPurchase: number // 转化成本
+  addToCarts: number // 加购次数
+  addToCartRate: number // 加购率
+  costPerAddToCart: number // 加购成本
+  checkoutsInitiated: number // 发起结账次数
+  checkoutRate: number // 结账率
+
+  // 曝光层数据
+  impressions: number // 展示次数
+  reach: number // 覆盖人数
+  frequency: number // 频次
+  cpm: number // 千次展示费用
+
+  // 点击数据
+  clicks: number // 点击量
+  ctr: number // 点击率
+  cpc: number // 单次点击费用
+  linkClicks: number // 链接点击量
+  linkCTR: number // 链接点击率
+  costPerLinkClick: number // 单次链接点击费用
+
+  // 互动数据
+  postEngagement?: number // 帖文互动
+  costPerPostEngagement?: number // 单次帖文互动费用
+  likes?: number // 点赞数
+  costPerLike?: number // 单次点赞费用
+  comments?: number // 评论数
+  shares?: number // 分享数
+
+  // 视频数据
+  videoViews?: number // 视频播放量
+  averageVideoPlayTime?: number // 视频平均播放时长
+  videoPlays3s?: number // 播放视频达3秒的次数
+  costPerVideoPlay3s?: number // 播放视频达3秒的单次费用
+  thruPlays?: number // ThruPlay次数
+  costPerThruPlay?: number // 单次ThruPlay费用
+  videoPlays25?: number // 视频播放进度达25%的次数
+  videoPlays50?: number // 视频播放进度达50%的次数
+  videoPlays75?: number // 视频播放进度达75%的次数
+  videoPlays95?: number // 视频播放进度达95%的次数
+  videoPlays100?: number // 视频播放进度达100%的次数
+
+  // 落地页数据
+  landingPageViews?: number // 落地页浏览量
+  costPerLandingPageView?: number // 单次落地页浏览费用
+  contentViews?: number // 内容查看次数
+  costPerContentView?: number // 单次内容查看费用
+
+  // 时间数据
+  date?: string
+  lastUpdated: string
+}
+
+// Meta广告目标类型
+export type MetaAdObjective = 'conversion' | 'traffic' | 'brand_awareness' | 'engagement' | 'video_views'
+
+// Meta广告目标数据
+export interface MetaAdObjectiveData {
+  objective: MetaAdObjective
+  spend: number
+  spendRatio: number
+  revenue: number
+  revenueRatio: number
+  roas: number
+  impressions: number
+  clicks: number
+  ctr: number
+  conversions: number
+  conversionRate: number
+}
+
+// Meta受众类型
+export type MetaAudienceType = 'interest' | 'lookalike' | 'custom' | 'remarketing' | 'asc'
+
+// Meta受众数据
+export interface MetaAudienceData {
+  audienceType: MetaAudienceType
+  audienceName: string
+  spend: number
+  revenue: number
+  roas: number
+  purchases: number
+  aov: number
+  conversionRate: number
+  costPerPurchase: number
+  addToCartRate: number
+  costPerAddToCart: number
+  users: number
+  ctr: number
+  cpc: number
+  cpm: number
+}
+
+// Meta版位类型
+export type MetaPlacementType = 'facebook' | 'instagram' | 'audience_network' | 'messenger' | 'unknown'
+
+// Meta版位数据
+export interface MetaPlacementData {
+  placement: MetaPlacementType
+  spend: number
+  revenue: number
+  roas: number
+  conversionRate: number
+  addToCartRate: number
+  ctr: number
+  users: number
+  cpc: number
+  cpm: number
+}
+
+// Meta用户画像数据
+export interface MetaDemographicData {
+  dimension: 'age' | 'gender' | 'device' | 'platform' | 'region'
+  value: string // 具体的维度值，如 "25-34", "male", "mobile", etc.
+  spend: number
+  revenue: number
+  aov: number
+  roas: number
+  purchases: number
+  conversionRate: number
+  costPerPurchase: number
+  addToCartRate: number
+  costPerAddToCart: number
+  users: number
+  ctr: number
+  cpm: number
+}
+
+// Meta素材数据
+export interface MetaCreativeData {
+  id: number
+  type: 'image' | 'video' | 'carousel' | 'collection'
+  name: string
+  preview: string // 素材预览URL
+  landingPage: string
+  spend: number
+  revenue: number
+  aov: number
+  roas: number
+  purchases: number
+  conversionRate: number
+  costPerPurchase: number
+  addToCartRate: number
+  costPerAddToCart: number
+  users: number
+  ctr: number
+  cpm: number
+  status: 'active' | 'paused' | 'archived'
+  createdDate: string
+  lastUpdated: string
+}
+
+// Google广告数据类型
+export interface GoogleAdData {
+  id: number
+  accountId: string
+  accountName: string
+  campaignId?: string
+  campaignName?: string
+  adGroupId?: string
+  adGroupName?: string
+  adId?: string
+  adName?: string
+
+  // 基础数据
+  cost: number // 费用
+  revenue: number // 收入
+  roas: number // ROAS
+  conversions: number // 转化次数
+  conversionValue: number // 转化价值
+  costPerConversion: number // 每次转化费用
+  conversionRate: number // 转化率
+
+  // 展示数据
+  impressions: number // 展示次数
+  cpm: number // 千次展示费用
+  impressionShare?: number // 展示份额
+
+  // 点击数据
+  clicks: number // 点击次数
+  ctr: number // 点击率
+  cpc: number // 每次点击费用
+  avgPosition?: number // 平均排名
+
+  // 购物数据（适用于购物广告）
+  shoppingImpressions?: number // 购物展示次数
+  shoppingClicks?: number // 购物点击次数
+  shoppingCTR?: number // 购物点击率
+  shoppingCPC?: number // 购物每次点击费用
+
+  // 质量得分
+  qualityScore?: number // 质量得分
+  expectedCTR?: string // 预期点击率
+  adRelevance?: string // 广告相关性
+  landingPageExperience?: string // 着陆页体验
+
+  // 时间数据
+  date?: string
+  lastUpdated: string
+}
+
+// Google广告类型
+export type GoogleAdType = 'search' | 'display' | 'shopping' | 'video' | 'app' | 'smart'
+
+// Google广告类型数据
+export interface GoogleAdTypeData {
+  adType: GoogleAdType
+  cost: number
+  costRatio: number
+  revenue: number
+  revenueRatio: number
+  roas: number
+  impressions: number
+  clicks: number
+  ctr: number
+  conversions: number
+  conversionRate: number
+}
+
+// Criteo广告数据类型
+export interface CriteoAdData {
+  id: number
+  accountId: string
+  accountName: string
+  campaignId?: string
+  campaignName?: string
+
+  // 基础数据
+  cost: number // 费用
+  revenue: number // 收入
+  roas: number // ROAS
+  orders: number // 订单数
+  orderValue: number // 订单价值
+  costPerOrder: number // 每订单费用
+
+  // 展示数据
+  impressions: number // 展示次数
+  cpm: number // 千次展示费用
+  reach?: number // 覆盖人数
+
+  // 点击数据
+  clicks: number // 点击次数
+  ctr: number // 点击率
+  cpc: number // 每次点击费用
+
+  // 版位数据
+  displayImpressions?: number // 展示广告展示次数
+  displayClicks?: number // 展示广告点击次数
+  displayCTR?: number // 展示广告点击率
+  displayCPC?: number // 展示广告每次点击费用
+
+  // 时间数据
+  date?: string
+  lastUpdated: string
+}
+
+// Criteo版位类型
+export type CriteoPlacementType = 'display' | 'native' | 'video' | 'app'
+
+// Criteo版位数据
+export interface CriteoPlacementData {
+  placement: CriteoPlacementType
+  cost: number
+  revenue: number
+  roas: number
+  impressions: number
+  clicks: number
+  ctr: number
+  orders: number
+  orderValue: number
+  costPerOrder: number
+}
+
+// Bing广告数据类型
+export interface BingAdData {
+  id: number
+  accountId: string
+  accountName: string
+  campaignId?: string
+  campaignName?: string
+  adGroupId?: string
+  adGroupName?: string
+  adId?: string
+  adName?: string
+
+  // 基础数据
+  spend: number // 花费
+  revenue: number // 收入
+  roas: number // ROAS
+  conversions: number // 转化次数
+  conversionValue: number // 转化价值
+  costPerConversion: number // 每次转化费用
+  conversionRate: number // 转化率
+
+  // 展示数据
+  impressions: number // 展示次数
+  cpm: number // 千次展示费用
+  impressionShare?: number // 展示份额
+
+  // 点击数据
+  clicks: number // 点击次数
+  ctr: number // 点击率
+  cpc: number // 每次点击费用
+  avgPosition?: number // 平均排名
+
+  // 质量得分
+  qualityScore?: number // 质量得分
+  keywordRelevance?: number // 关键词相关性
+  landingPageRelevance?: number // 着陆页相关性
+  landingPageUserExperience?: number // 着陆页用户体验
+
+  // 时间数据
+  date?: string
+  lastUpdated: string
+}
+
+// 广告数据筛选条件
+export interface AdDataFilter {
+  platform?: AdPlatform
+  accountId?: string
+  campaignId?: string
+  adSetId?: string
+  adId?: string
+  dateRange?: {
+    start: string
+    end: string
+  }
+  minSpend?: number
+  maxSpend?: number
+  minROAS?: number
+  maxROAS?: number
+  sortBy?: 'spend' | 'revenue' | 'roas' | 'ctr' | 'conversions'
+  sortOrder?: 'asc' | 'desc'
+}
+
+// 广告数据趋势
+export interface AdDataTrend {
+  date: string
+  platform: AdPlatform
+  spend: number
+  revenue: number
+  roas: number
+  impressions: number
+  clicks: number
+  ctr: number
+  conversions: number
+  conversionRate: number
+}
+
+// 客户目标相关类型
+export interface CustomerGoal {
+  id: number
+  customerId: number
+  customerName: string
+  projectId: string
+  projectName: string
+  goalType: 'monthly' | 'quarterly' | 'yearly'
+  goalPeriod: string // 目标周期，如 "2025-01", "2025-Q1", "2025"
+
+  // 目标值
+  salesTarget: number // 销售目标
+  costTarget: number // 成本目标
+  roiTarget: number // ROI目标
+  profitTarget?: number // 利润目标
+  userTarget?: number // 用户数目标
+
+  // 实际完成值
+  salesActual: number // 实际销售额
+  costActual: number // 实际成本
+  roiActual: number // 实际ROI
+  profitActual?: number // 实际利润
+  userActual?: number // 实际用户数
+
+  // 完成率
+  salesProgress: number // 销售完成率 (0-100)
+  costProgress: number // 成本完成率 (0-100)
+  roiProgress: number // ROI完成率 (0-100)
+  profitProgress?: number // 利润完成率 (0-100)
+  userProgress?: number // 用户完成率 (0-100)
+
+  // 状态
+  status: 'active' | 'completed' | 'paused' | 'cancelled'
+
+  // 时间信息
+  startDate: string
+  endDate: string
+  createdAt: string
+  createdBy: string
+  lastUpdated: string
+
+  // 备注
+  notes?: string
+}
+
+export interface CustomerGoalSummary {
+  totalGoals: number
+  activeGoals: number
+  completedGoals: number
+  averageSalesProgress: number
+  averageROIProgress: number
+  totalSalesTarget: number
+  totalSalesActual: number
+  totalCostTarget: number
+  totalCostActual: number
+  bestPerformingProject: string
+  worstPerformingProject: string
+}
+
+export interface CustomerGoalFilter {
+  goalType?: 'monthly' | 'quarterly' | 'yearly'
+  customerId?: number
+  projectId?: string
+  status?: string
+  goalPeriod?: string
+  dateRange?: {
+    start: string
+    end: string
+  }
+  minSalesTarget?: number
+  maxSalesTarget?: number
+  minProgress?: number
+  maxProgress?: number
+  sortBy?: 'salesTarget' | 'salesProgress' | 'roiTarget' | 'roiProgress' | 'startDate'
+  sortOrder?: 'asc' | 'desc'
+}
+
+export interface CustomerGoalRanking {
+  type: 'salesTarget' | 'salesProgress' | 'roiTarget' | 'roiProgress'
+  goals: CustomerGoal[]
+  totalCount: number
+  averageValue: number
 }
