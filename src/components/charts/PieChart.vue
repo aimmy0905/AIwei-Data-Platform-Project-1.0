@@ -1,7 +1,7 @@
 <template>
   <div class="pie-chart">
-    <v-chart 
-      :option="chartOption" 
+    <v-chart
+      :option="chartOption"
       :style="{ height: height, width: '100%' }"
       autoresize
       @click="handleClick"
@@ -60,7 +60,7 @@ const emit = defineEmits<{
 // 计算图表配置
 const chartOption = computed(() => {
   const colors = currentColors.value
-  
+
   return {
     title: props.title ? {
       text: props.title,
@@ -71,7 +71,7 @@ const chartOption = computed(() => {
         fontWeight: 600
       }
     } : undefined,
-    
+
     tooltip: {
       trigger: 'item',
       backgroundColor: colors.surface,
@@ -91,7 +91,7 @@ const chartOption = computed(() => {
         `
       }
     },
-    
+
     legend: props.showLegend ? {
       orient: 'vertical',
       right: 10,
@@ -100,14 +100,14 @@ const chartOption = computed(() => {
         color: colors.textSecondary
       }
     } : { show: false },
-    
+
     series: [
       {
         type: 'pie',
-        radius: props.donut 
+        radius: props.donut
           ? (Array.isArray(props.radius) ? props.radius : ['40%', props.radius])
           : props.radius,
-        center: ['40%', '50%'],
+        center: ['50%', '50%'],
         data: props.data.map((item, index) => ({
           ...item,
           itemStyle: {

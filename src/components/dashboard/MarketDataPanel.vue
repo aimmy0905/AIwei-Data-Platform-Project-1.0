@@ -1,110 +1,57 @@
 <template>
-  <div class="market-data-panel">
+    <div class="market-data-panel">
     <div class="section-header">
       <h2 class="section-title">地区市场数据</h2>
       <p class="section-description">全球市场表现分析和地区销售数据对比</p>
     </div>
 
     <div class="panel-content">
-      <!-- 全球概览统计 -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <Globe />
-          </div>
-          <div class="stat-content">
-            <h3>覆盖国家/地区</h3>
-            <div class="stat-value">{{ stats.totalRegions }}</div>
-            <div class="stat-change positive">+{{ stats.regionGrowth }}%</div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">
-            <TrendingUp />
-          </div>
-          <div class="stat-content">
-            <h3>全球总收入</h3>
-            <div class="stat-value">${{ formatNumber(stats.totalRevenue) }}</div>
-            <div class="stat-change positive">+{{ stats.revenueGrowth }}%</div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">
-            <Users />
-          </div>
-          <div class="stat-content">
-            <h3>全球用户</h3>
-            <div class="stat-value">{{ formatNumber(stats.totalUsers) }}</div>
-            <div class="stat-change positive">+{{ stats.userGrowth }}%</div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">
-            <ShoppingCart />
-          </div>
-          <div class="stat-content">
-            <h3>平均客单价</h3>
-            <div class="stat-value">${{ stats.avgOrderValue }}</div>
-            <div class="stat-change positive">+{{ stats.aovGrowth }}%</div>
-          </div>
-        </div>
-      </div>
-
       <!-- 地区表现排行 -->
       <div class="ranking-section">
-        <div class="section-header">
-          <h3>地区表现排行</h3>
-          <div class="view-toggle">
-            <button
-              v-for="view in viewOptions"
-              :key="view.value"
-              :class="['toggle-btn', { active: activeView === view.value }]"
-              @click="activeView = view.value"
-            >
-              {{ view.label }}
-            </button>
-          </div>
-        </div>
 
         <div class="ranking-table">
-          <div class="table-header">
-            <div class="rank-col">排名</div>
-            <div class="region-col">国家/地区</div>
-            <div class="revenue-col">收入</div>
-            <div class="users-col">用户数</div>
-            <div class="orders-col">订单数</div>
-            <div class="aov-col">客单价</div>
-            <div class="growth-col">增长率</div>
-          </div>
-          <div class="table-body">
-            <div
-              v-for="(region, index) in topRegions"
-              :key="region.id"
-              class="table-row"
-            >
-              <div class="rank-col">
-                <span class="rank-badge" :class="getRankClass(index + 1)">{{ index + 1 }}</span>
-              </div>
-              <div class="region-col">
-                <div class="region-info">
-                  <img :src="region.flag" :alt="region.name" class="flag">
-                  <div>
-                    <div class="name">{{ region.name }}</div>
-                    <div class="code">{{ region.code }}</div>
+          <div class="table-content">
+            <div class="table-header">
+              <div class="country-col">国家</div>
+              <div class="revenue-col">销售额</div>
+              <div class="revenue-ratio-col">销售额占比</div>
+              <div class="visits-col">访问量</div>
+              <div class="visits-ratio-col">访问量占比</div>
+              <div class="new-users-col">新用户数</div>
+              <div class="conversion-col">转化率</div>
+              <div class="add-cart-col">加购数</div>
+              <div class="add-cart-rate-col">加购率</div>
+              <div class="checkout-col">发起结账数</div>
+              <div class="checkout-rate-col">发起结账率</div>
+              <div class="avg-duration-col">平均停留时长</div>
+              <div class="avg-pages-col">平均访问页数</div>
+              <div class="bounce-rate-col">跳出率</div>
+            </div>
+            <div class="table-body">
+              <div
+                v-for="(region, index) in topRegions"
+                :key="region.id"
+                class="table-row"
+              >
+                <div class="country-col">
+                  <div class="region-info">
+                    <img :src="region.flag" :alt="region.name" class="flag">
+                    <span class="name">{{ region.name }}</span>
                   </div>
                 </div>
-              </div>
-              <div class="revenue-col">${{ formatNumber(region.revenue) }}</div>
-              <div class="users-col">{{ formatNumber(region.users) }}</div>
-              <div class="orders-col">{{ formatNumber(region.orders) }}</div>
-              <div class="aov-col">${{ region.avgOrderValue }}</div>
-              <div class="growth-col">
-                <span class="growth-value" :class="getGrowthClass(region.growth)">
-                  {{ region.growth > 0 ? '+' : '' }}{{ region.growth }}%
-                </span>
+                <div class="revenue-col">${{ formatNumber(region.revenue) }}</div>
+                <div class="revenue-ratio-col">{{ region.revenueRatio }}%</div>
+                <div class="visits-col">{{ formatNumber(region.visits) }}</div>
+                <div class="visits-ratio-col">{{ region.visitsRatio }}%</div>
+                <div class="new-users-col">{{ formatNumber(region.newUsers) }}</div>
+                <div class="conversion-col">{{ region.conversionRate }}%</div>
+                <div class="add-cart-col">{{ formatNumber(region.addToCart) }}</div>
+                <div class="add-cart-rate-col">{{ region.addToCartRate }}%</div>
+                <div class="checkout-col">{{ formatNumber(region.checkoutInitiated) }}</div>
+                <div class="checkout-rate-col">{{ region.checkoutRate }}%</div>
+                <div class="avg-duration-col">{{ region.avgDuration }}</div>
+                <div class="avg-pages-col">{{ region.avgPages }}</div>
+                <div class="bounce-rate-col">{{ region.bounceRate }}%</div>
               </div>
             </div>
           </div>
@@ -112,57 +59,59 @@
       </div>
 
       <!-- 地区分布图表 -->
-      <div class="chart-section">
-        <h3>收入地区分布</h3>
-        <div class="chart-container">
-          <div class="chart-wrapper">
-            <PieChart :data="regionChartData" />
-          </div>
-          <div class="chart-legend">
-            <div
-              v-for="item in regionChartData"
-              :key="item.name"
-              class="legend-item"
-            >
-              <div class="legend-color" :style="{ backgroundColor: item.color }"></div>
-              <span class="legend-label">{{ item.name }}</span>
-              <span class="legend-value">${{ formatNumber(item.value) }}</span>
+      <div class="charts-section">
+        <div class="chart-section chart-section-1">
+          <h3>销售额地区分布</h3>
+          <div class="chart-container">
+            <div class="chart-wrapper">
+              <PieChart
+                :data="regionChartData"
+                height="300px"
+                :show-legend="false"
+                :donut="false"
+              />
+            </div>
+            <div class="chart-legend">
+              <div
+                v-for="item in regionChartData"
+                :key="item.name"
+                class="legend-item"
+              >
+                <div class="legend-color" :style="{ backgroundColor: item.color }"></div>
+                <span class="legend-label">{{ item.name }}</span>
+                <span class="legend-value">${{ formatNumber(item.value) }}</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- 时间趋势分析 -->
-      <div class="trend-section">
-        <h3>地区收入趋势</h3>
-        <div class="trend-chart">
-          <LineChart :data="trendChartData" />
-        </div>
-      </div>
-
-      <!-- 市场洞察 -->
-      <div class="insights-section">
-        <h3>市场洞察</h3>
-        <div class="insights-grid">
-          <div
-            v-for="insight in marketInsights"
-            :key="insight.id"
-            class="insight-card"
-          >
-            <div class="insight-icon" :class="insight.type">
-              <component :is="getInsightIcon(insight.type)" />
+        <div class="chart-section chart-section-2">
+          <h3>用户量地区分布</h3>
+          <div class="chart-container">
+            <div class="chart-wrapper">
+              <PieChart
+                :data="userChartData"
+                height="300px"
+                :show-legend="false"
+                :donut="false"
+              />
             </div>
-            <div class="insight-content">
-              <h4>{{ insight.title }}</h4>
-              <p>{{ insight.description }}</p>
-              <div class="insight-metrics">
-                <span class="metric">{{ insight.metric }}</span>
-                <span class="impact" :class="insight.impact">{{ insight.impactText }}</span>
+            <div class="chart-legend">
+              <div
+                v-for="item in userChartData"
+                :key="item.name"
+                class="legend-item"
+              >
+                <div class="legend-color" :style="{ backgroundColor: item.color }"></div>
+                <span class="legend-label">{{ item.name }}</span>
+                <span class="legend-value">{{ formatNumber(item.value) }}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+
     </div>
   </div>
 </template>
@@ -191,10 +140,18 @@ interface Region {
   code: string
   flag: string
   revenue: number
-  users: number
-  orders: number
-  avgOrderValue: number
-  growth: number
+  revenueRatio: number
+  visits: number
+  visitsRatio: number
+  newUsers: number
+  conversionRate: number
+  addToCart: number
+  addToCartRate: number
+  checkoutInitiated: number
+  checkoutRate: number
+  avgDuration: string
+  avgPages: number
+  bounceRate: number
 }
 
 interface MarketInsight {
@@ -237,78 +194,134 @@ const topRegions = ref<Region[]>([
     id: '1',
     name: '美国',
     code: 'US',
-    flag: '/flags/us.png',
+    flag: 'https://flagcdn.com/w20/us.png',
     revenue: 1250000,
-    users: 125000,
-    orders: 15600,
-    avgOrderValue: 95,
-    growth: 12
+    revenueRatio: 45.2,
+    visits: 125000,
+    visitsRatio: 42.8,
+    newUsers: 85000,
+    conversionRate: 3.2,
+    addToCart: 12800,
+    addToCartRate: 10.2,
+    checkoutInitiated: 8500,
+    checkoutRate: 6.8,
+    avgDuration: '2m 35s',
+    avgPages: 4.2,
+    bounceRate: 35.8
   },
   {
     id: '2',
     name: '英国',
     code: 'UK',
-    flag: '/flags/uk.png',
+    flag: 'https://flagcdn.com/w20/gb.png',
     revenue: 680000,
-    users: 78000,
-    orders: 9200,
-    avgOrderValue: 87,
-    growth: 18
+    revenueRatio: 23.6,
+    visits: 78000,
+    visitsRatio: 26.7,
+    newUsers: 52000,
+    conversionRate: 2.8,
+    addToCart: 7200,
+    addToCartRate: 9.2,
+    checkoutInitiated: 4800,
+    checkoutRate: 6.2,
+    avgDuration: '2m 18s',
+    avgPages: 3.8,
+    bounceRate: 42.1
   },
   {
     id: '3',
     name: '加拿大',
     code: 'CA',
-    flag: '/flags/ca.png',
+    flag: 'https://flagcdn.com/w20/ca.png',
     revenue: 450000,
-    users: 52000,
-    orders: 6100,
-    avgOrderValue: 92,
-    growth: 15
+    revenueRatio: 18.1,
+    visits: 65000,
+    visitsRatio: 22.3,
+    newUsers: 41000,
+    conversionRate: 2.5,
+    addToCart: 5850,
+    addToCartRate: 9.0,
+    checkoutInitiated: 3900,
+    checkoutRate: 6.0,
+    avgDuration: '2m 12s',
+    avgPages: 3.5,
+    bounceRate: 38.9
   },
   {
     id: '4',
     name: '澳大利亚',
     code: 'AU',
-    flag: '/flags/au.png',
+    flag: 'https://flagcdn.com/w20/au.png',
     revenue: 380000,
-    users: 45000,
-    orders: 5200,
-    avgOrderValue: 85,
-    growth: 10
+    revenueRatio: 13.2,
+    visits: 45000,
+    visitsRatio: 15.4,
+    newUsers: 28000,
+    conversionRate: 2.9,
+    addToCart: 4050,
+    addToCartRate: 9.0,
+    checkoutInitiated: 2700,
+    checkoutRate: 6.0,
+    avgDuration: '2m 28s',
+    avgPages: 4.0,
+    bounceRate: 33.7
   },
   {
     id: '5',
     name: '德国',
     code: 'DE',
-    flag: '/flags/de.png',
+    flag: 'https://flagcdn.com/w20/de.png',
     revenue: 320000,
-    users: 38000,
-    orders: 4800,
-    avgOrderValue: 78,
-    growth: 8
+    revenueRatio: 10.1,
+    visits: 38000,
+    visitsRatio: 13.0,
+    newUsers: 22000,
+    conversionRate: 2.2,
+    addToCart: 3040,
+    addToCartRate: 8.0,
+    checkoutInitiated: 1900,
+    checkoutRate: 5.0,
+    avgDuration: '1m 58s',
+    avgPages: 3.2,
+    bounceRate: 45.3
   },
   {
     id: '6',
     name: '法国',
     code: 'FR',
-    flag: '/flags/fr.png',
+    flag: 'https://flagcdn.com/w20/fr.png',
     revenue: 280000,
-    users: 32000,
-    orders: 4200,
-    avgOrderValue: 82,
-    growth: 6
+    revenueRatio: 8.5,
+    visits: 32000,
+    visitsRatio: 11.0,
+    newUsers: 19000,
+    conversionRate: 2.1,
+    addToCart: 2560,
+    addToCartRate: 8.0,
+    checkoutInitiated: 1600,
+    checkoutRate: 5.0,
+    avgDuration: '1m 52s',
+    avgPages: 3.0,
+    bounceRate: 48.2
   },
   {
     id: '7',
     name: '日本',
     code: 'JP',
-    flag: '/flags/jp.png',
+    flag: 'https://flagcdn.com/w20/jp.png',
     revenue: 240000,
-    users: 28000,
-    orders: 3600,
-    avgOrderValue: 88,
-    growth: -2
+    revenueRatio: 7.3,
+    visits: 28000,
+    visitsRatio: 9.6,
+    newUsers: 16000,
+    conversionRate: 1.9,
+    addToCart: 2240,
+    addToCartRate: 8.0,
+    checkoutInitiated: 1400,
+    checkoutRate: 5.0,
+    avgDuration: '1m 45s',
+    avgPages: 2.8,
+    bounceRate: 52.1
   }
 ])
 
@@ -357,6 +370,15 @@ const regionChartData = computed<ChartData[]>(() => {
   return topRegions.value.slice(0, 7).map((region, index) => ({
     name: region.name,
     value: region.revenue,
+    color: colors[index]
+  }))
+})
+
+const userChartData = computed<ChartData[]>(() => {
+  const colors = ['#1890ff', '#52c41a', '#fa8c16', '#722ed1', '#eb2f96', '#13c2c2', '#faad14']
+  return topRegions.value.slice(0, 7).map((region, index) => ({
+    name: region.name,
+    value: region.visits,
     color: colors[index]
   }))
 })
@@ -417,26 +439,36 @@ onMounted(() => {
 
 <style scoped>
 .market-data-panel {
-  padding: 24px;
-  background: var(--color-background);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: auto !important;
+  min-height: 200px;
 }
 
 .section-header {
-  margin-bottom: 24px;
+  padding: 24px;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .section-title {
   font-size: 24px;
   font-weight: 600;
-  color: var(--color-text);
+  color: #1f2937;
   margin: 0 0 8px 0;
 }
 
 .section-description {
-  color: var(--color-text-secondary);
+  color: #6b7280;
   margin: 0;
+}
+
+.panel-content {
+  padding: 24px;
 }
 
 .stats-grid {
@@ -529,29 +561,46 @@ onMounted(() => {
 }
 
 .ranking-table {
-  background: var(--color-background-soft);
+  background: white;
   border-radius: 8px;
-  overflow: hidden;
+  overflow-x: auto;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.table-content {
+  min-width: 1200px;
 }
 
 .table-header {
   display: grid;
-  grid-template-columns: 60px 1fr 120px 100px 100px 100px 100px;
-  gap: 16px;
-  padding: 16px;
-  background: var(--color-background-mute);
+  grid-template-columns: 120px 100px 80px 100px 80px 100px 80px 100px 80px 100px 80px 120px 80px 80px;
+  gap: 8px;
+  padding: 16px 12px;
+  background: #f8fafc;
   font-weight: 600;
-  color: var(--color-text-secondary);
-  font-size: 14px;
+  color: #64748b;
+  font-size: 12px;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .table-row {
   display: grid;
-  grid-template-columns: 60px 1fr 120px 100px 100px 100px 100px;
-  gap: 16px;
-  padding: 16px;
-  border-top: 1px solid var(--color-border);
+  grid-template-columns: 120px 100px 80px 100px 80px 100px 80px 100px 80px 100px 80px 120px 80px 80px;
+  gap: 8px;
+  padding: 16px 12px;
+  border-bottom: 1px solid #f1f5f9;
   align-items: center;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+
+.table-row:hover {
+  background-color: #f8fafc;
+}
+
+.table-row:last-child {
+  border-bottom: none;
 }
 
 .rank-badge {
@@ -574,24 +623,43 @@ onMounted(() => {
 .region-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .flag {
-  width: 24px;
-  height: 16px;
+  width: 20px;
+  height: 14px;
   border-radius: 2px;
   object-fit: cover;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .name {
   font-weight: 500;
   color: var(--color-text);
+  font-size: 12px;
 }
 
-.code {
-  font-size: 12px;
-  color: var(--color-text-secondary);
+.country-col {
+  min-width: 0;
+}
+
+.revenue-col,
+.revenue-ratio-col,
+.visits-col,
+.visits-ratio-col,
+.new-users-col,
+.conversion-col,
+.add-cart-col,
+.add-cart-rate-col,
+.checkout-col,
+.checkout-rate-col,
+.avg-duration-col,
+.avg-pages-col,
+.bounce-rate-col {
+  text-align: right;
+  font-weight: 500;
 }
 
 .growth-value.growth-excellent { color: var(--color-success); }
@@ -599,8 +667,41 @@ onMounted(() => {
 .growth-value.growth-positive { color: var(--color-info); }
 .growth-value.growth-negative { color: var(--color-danger); }
 
-.chart-section {
+.charts-section {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 24px;
   margin-bottom: 32px;
+}
+
+@media (max-width: 1024px) {
+  .charts-section {
+    grid-template-columns: 1fr !important;
+    gap: 20px;
+  }
+}
+
+.chart-section {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-height: 400px;
+  display: flex !important;
+  flex-direction: column;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.chart-section-1 {
+  background: #f0f9ff !important;
+  border: 2px solid #3b82f6 !important;
+}
+
+.chart-section-2 {
+  background: #f0fdf4 !important;
+  border: 2px solid #10b981 !important;
 }
 
 .chart-section h3 {
@@ -608,46 +709,91 @@ onMounted(() => {
   font-weight: 600;
   color: var(--color-text);
   margin: 0 0 16px 0;
+  text-align: center;
 }
 
 .chart-container {
   display: flex;
-  gap: 32px;
+  flex-direction: column;
+  gap: 16px;
   align-items: center;
+  flex: 1;
 }
 
 .chart-wrapper {
-  flex: 1;
-  max-width: 400px;
+  width: 100%;
+  max-width: 320px;
+  height: 300px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-background-soft);
+  border-top: 3px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .chart-legend {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
+  width: 100%;
+  max-width: 320px;
+  margin-top: 8px;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.legend-item:hover {
+  background-color: var(--color-background-soft);
 }
 
 .legend-color {
   width: 12px;
   height: 12px;
-  border-radius: 2px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .legend-label {
   flex: 1;
   color: var(--color-text);
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .legend-value {
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-text-secondary);
+  font-size: 13px;
 }
 
 .trend-section {
@@ -666,6 +812,13 @@ onMounted(() => {
   border-radius: 8px;
   padding: 16px;
   height: 300px;
+  overflow: hidden;
+  position: relative;
+}
+
+.insights-section {
+  margin-top: 40px;
+  clear: both;
 }
 
 .insights-section h3 {
@@ -757,10 +910,13 @@ onMounted(() => {
     grid-template-columns: 1fr;
   }
 
+  .ranking-table {
+    overflow-x: auto;
+  }
+
   .table-header,
   .table-row {
-    grid-template-columns: 1fr;
-    gap: 8px;
+    min-width: 1200px;
   }
 
   .chart-container {
