@@ -5,68 +5,7 @@
       <p class="panel-description">查看各流量渠道的表现数据和详细分析</p>
     </div>
 
-    <!-- 数据汇总卡片 -->
-    <div class="summary-cards">
-      <div class="summary-card">
-        <div class="card-icon">
-          <DollarSign :size="24" />
-        </div>
-        <div class="card-content">
-          <div class="card-title">总收入</div>
-          <div class="card-value">${{ formatNumber(channelSummary.totalRevenue) }}</div>
-        </div>
-      </div>
 
-      <div class="summary-card">
-        <div class="card-icon">
-          <Users :size="24" />
-        </div>
-        <div class="card-content">
-          <div class="card-title">总用户数</div>
-          <div class="card-value">{{ formatNumber(channelSummary.totalUsers) }}</div>
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="card-icon">
-          <MousePointer :size="24" />
-        </div>
-        <div class="card-content">
-          <div class="card-title">总会话数</div>
-          <div class="card-value">{{ formatNumber(channelSummary.totalSessions) }}</div>
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="card-icon">
-          <Target :size="24" />
-        </div>
-        <div class="card-content">
-          <div class="card-title">平均转化率</div>
-          <div class="card-value">{{ channelSummary.averageConversionRate }}%</div>
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="card-icon">
-          <TrendingUp :size="24" />
-        </div>
-        <div class="card-content">
-          <div class="card-title">平均ROI</div>
-          <div class="card-value">{{ channelSummary.averageROI }}x</div>
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="card-icon">
-          <Award :size="24" />
-        </div>
-        <div class="card-content">
-          <div class="card-title">最佳渠道</div>
-          <div class="card-value">{{ channelSummary.topPerformingChannel }}</div>
-        </div>
-      </div>
-    </div>
 
     <!-- 渠道数据标签页 -->
     <div class="channel-tabs">
@@ -96,183 +35,50 @@
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>渠道名称</th>
-                  <th>会话来源/媒介</th>
-                  <th>总收入</th>
-                  <th>总用户数</th>
-                  <th>交易次数</th>
-                  <th>用户转化率</th>
-                  <th>会话数</th>
-                  <th>跳出率</th>
-                  <th>操作</th>
+                  <th>Session source / medium</th>
+                  <th>用户数</th>
+                  <th>新用户数</th>
+                  <th>订单数</th>
+                  <th>转化率</th>
+                  <th>销售额</th>
+                  <th>用户数占比</th>
+                  <th>销售额占比</th>
                 </tr>
               </thead>
               <tbody>
+                <!-- 汇总行 -->
+                <tr class="summary-row">
+                  <td><strong>汇总</strong></td>
+                  <td><strong>{{ formatNumber(channelSummary.totalUsers) }}</strong></td>
+                  <td><strong>{{ formatNumber(getTotalNewUsers()) }}</strong></td>
+                  <td><strong>{{ formatNumber(getTotalTransactions()) }}</strong></td>
+                  <td class="percentage"><strong>{{ channelSummary.averageConversionRate }}%</strong></td>
+                  <td class="currency"><strong>${{ formatNumber(channelSummary.totalRevenue) }}</strong></td>
+                  <td class="percentage"><strong>100%</strong></td>
+                  <td class="percentage"><strong>100%</strong></td>
+                </tr>
+                <!-- 单个渠道数据 -->
                 <tr v-for="channel in channelData" :key="channel.id">
                   <td>
                     <div class="channel-name">
                       <div class="channel-icon" :class="`channel-${channel.type}`"></div>
-                      {{ channel.name }}
+                      {{ channel.sessionSourceMedium }}
                     </div>
                   </td>
-                  <td>{{ channel.sessionSourceMedium }}</td>
-                  <td class="currency">${{ formatNumber(channel.totalRevenue) }}</td>
                   <td>{{ formatNumber(channel.totalUsers) }}</td>
+                  <td>{{ formatNumber(channel.newUsers) }}</td>
                   <td>{{ formatNumber(channel.transactions) }}</td>
                   <td class="percentage">{{ channel.userConversionRate }}%</td>
-                  <td>{{ formatNumber(channel.sessions) }}</td>
-                  <td class="percentage">{{ channel.bounceRate }}%</td>
-                  <td>
-                    <button
-                      class="detail-button"
-                      @click="viewChannelDetails(channel.id)"
-                    >
-                      查看详情
-                    </button>
-                  </td>
+                  <td class="currency">${{ formatNumber(channel.totalRevenue) }}</td>
+                  <td class="percentage">{{ getUserPercentage(channel.totalUsers) }}%</td>
+                  <td class="percentage">{{ getSalesPercentage(channel.totalRevenue) }}%</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        <!-- 单个渠道详情标签页 -->
-        <div v-else-if="activeTab === 'details'" class="tab-pane">
-          <div v-if="selectedChannel" class="channel-details">
-            <div class="detail-header">
-              <h3>{{ selectedChannel.name }} - 详细数据</h3>
-              <button class="back-button" @click="activeTab = 'summary'">
-                <ArrowLeft :size="16" />
-                返回总览
-              </button>
-            </div>
 
-            <div class="detail-sections">
-              <!-- 结果指标 -->
-              <div class="detail-section">
-                <h4>结果指标</h4>
-                <div class="metrics-grid">
-                  <div class="metric-card">
-                    <div class="metric-label">总收入</div>
-                    <div class="metric-value">${{ formatNumber(selectedChannel.totalRevenue) }}</div>
-                  </div>
-                  <div class="metric-card">
-                    <div class="metric-label">总用户数</div>
-                    <div class="metric-value">{{ formatNumber(selectedChannel.totalUsers) }}</div>
-                  </div>
-                  <div class="metric-card">
-                    <div class="metric-label">平均购买收入</div>
-                    <div class="metric-value">${{ selectedChannel.averagePurchaseRevenue }}</div>
-                  </div>
-                  <div class="metric-card">
-                    <div class="metric-label">交易次数</div>
-                    <div class="metric-value">{{ formatNumber(selectedChannel.transactions) }}</div>
-                  </div>
-                  <div class="metric-card">
-                    <div class="metric-label">用户转化率</div>
-                    <div class="metric-value">{{ selectedChannel.userConversionRate }}%</div>
-                  </div>
-                  <div class="metric-card">
-                    <div class="metric-label">跳出率</div>
-                    <div class="metric-value">{{ selectedChannel.bounceRate }}%</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 过程指标 -->
-              <div class="detail-section">
-                <h4>过程指标</h4>
-                <div class="metrics-grid">
-                  <div class="metric-card">
-                    <div class="metric-label">添加到购物车次数</div>
-                    <div class="metric-value">{{ formatNumber(selectedChannel.addToCarts) }}</div>
-                  </div>
-                  <div class="metric-card">
-                    <div class="metric-label">开始结账次数</div>
-                    <div class="metric-value">{{ formatNumber(selectedChannel.checkouts) }}</div>
-                  </div>
-                  <div class="metric-card">
-                    <div class="metric-label">商品添加至购物车率</div>
-                    <div class="metric-value">{{ selectedChannel.itemAddToCartsRate }}%</div>
-                  </div>
-                  <div class="metric-card">
-                    <div class="metric-label">商品结账率</div>
-                    <div class="metric-value">{{ selectedChannel.itemCheckoutsRate }}%</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 用户指标 -->
-              <div class="detail-section">
-                <h4>用户指标</h4>
-                <div class="metrics-grid">
-                  <div class="metric-card">
-                    <div class="metric-label">会话数</div>
-                    <div class="metric-value">{{ formatNumber(selectedChannel.sessions) }}</div>
-                  </div>
-                  <div class="metric-card">
-                    <div class="metric-label">新用户数</div>
-                    <div class="metric-value">{{ formatNumber(selectedChannel.newUsers) }}</div>
-                  </div>
-                  <div class="metric-card">
-                    <div class="metric-label">回访用户数</div>
-                    <div class="metric-value">{{ formatNumber(selectedChannel.returningUsers) }}</div>
-                  </div>
-                  <div class="metric-card">
-                    <div class="metric-label">每用户平均购买收入</div>
-                    <div class="metric-value">${{ selectedChannel.averagePurchaseRevenuePerUser }}</div>
-                  </div>
-                  <div class="metric-card">
-                    <div class="metric-label">平均每位客户订单数</div>
-                    <div class="metric-value">{{ selectedChannel.averageOrdersPerCustomer }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div v-else class="no-selection">
-            <FileText :size="48" />
-            <p>请从总数据中选择一个渠道查看详情</p>
-          </div>
-        </div>
-
-        <!-- 自定义数据视图 -->
-        <div v-else-if="activeTab === 'custom'" class="tab-pane">
-          <div v-if="customData.length > 0" class="custom-data-view">
-            <div class="custom-header">
-              <h3>自定义数据视图</h3>
-              <button class="edit-button" @click="showCustomDimensionModal = true">
-                <Edit :size="16" />
-                编辑维度
-              </button>
-            </div>
-
-            <div class="custom-table-container">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>渠道名称</th>
-                    <th v-for="dimension in selectedDimensions" :key="dimension.id">
-                      {{ dimension.name }}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="item in customData" :key="item.id">
-                    <td>{{ item.name }}</td>
-                    <td v-for="dimension in selectedDimensions" :key="dimension.id">
-                      {{ formatValue(item[dimension.id], dimension.format) }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div v-else class="no-custom-data">
-            <Settings :size="48" />
-            <p>请点击"自定义维度"按钮选择要查看的数据维度</p>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -359,9 +165,7 @@ const loading = ref(false)
 
 // 标签页配置
 const tabs = [
-  { id: 'summary', name: '总数据', icon: BarChart3 },
-  { id: 'details', name: '渠道详情', icon: FileText },
-  { id: 'custom', name: '自定义视图', icon: Settings }
+  { id: 'summary', name: '总数据', icon: BarChart3 }
 ]
 
 // 计算属性
@@ -472,6 +276,30 @@ const applyCustomDimensions = async () => {
   }
 }
 
+const getTotalTransactions = (): number => {
+  return channelData.value.reduce((total, channel) => total + channel.transactions, 0)
+}
+
+const getAverageBounceRate = (): number => {
+  if (channelData.value.length === 0) return 0
+  const totalBounceRate = channelData.value.reduce((total, channel) => total + channel.bounceRate, 0)
+  return Math.round((totalBounceRate / channelData.value.length) * 100) / 100
+}
+
+const getTotalNewUsers = (): number => {
+  return channelData.value.reduce((total, channel) => total + channel.newUsers, 0)
+}
+
+const getUserPercentage = (userCount: number): number => {
+  if (channelSummary.value.totalUsers === 0) return 0
+  return Math.round((userCount / channelSummary.value.totalUsers) * 10000) / 100
+}
+
+const getSalesPercentage = (revenue: number): number => {
+  if (channelSummary.value.totalRevenue === 0) return 0
+  return Math.round((revenue / channelSummary.value.totalRevenue) * 10000) / 100
+}
+
 // 生命周期
 onMounted(() => {
   loadChannelData()
@@ -554,6 +382,7 @@ onMounted(() => {
 .tab-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 24px;
   border-bottom: 1px solid #e5e7eb;
   background: white;
@@ -969,5 +798,19 @@ onMounted(() => {
     width: 95%;
     max-height: 90vh;
   }
+}
+
+.summary-row {
+  background: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.summary-row td {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.channel-other {
+  background: #6b7280;
 }
 </style>

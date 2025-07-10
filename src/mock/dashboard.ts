@@ -1,4 +1,4 @@
-import type { Customer, Project, Channel, ChannelData, ChannelSummary, ChannelDimension, WebsiteData, Campaign, CampaignData, CampaignDailyData, CampaignSummary, ProductSales, ProductSalesData, ProductRanking, ProductSalesSummary, KOLData, PostData, KOLSummary, PostSummary, CountryMarketData, MarketSummary, MarketTrend, PagePerformanceData, PagePerformanceSummary, CompetitorData, CompetitorSummary, AdPlatformData, AdPlatformSummary, MetaAdData, MetaAdObjectiveData, MetaAudienceData, MetaPlacementData, MetaDemographicData, MetaCreativeData, GoogleAdData, GoogleAdTypeData, CriteoAdData, CriteoPlacementData, BingAdData, Alert, ChartData, ApiResponse, CustomerGoal, CustomerGoalSummary, CustomerGoalFilter } from '@/types'
+import type { Customer, Project, Channel, ChannelData, ChannelSummary, ChannelDimension, WebsiteData, WebsiteDataComparison, PeriodComparison, ComparisonPeriod, Campaign, CampaignData, CampaignDailyData, CampaignSummary, ProductSales, ProductSalesData, ProductRanking, ProductSalesSummary, KOLData, PostData, KOLSummary, PostSummary, CountryMarketData, MarketSummary, MarketTrend, PagePerformanceData, PagePerformanceSummary, CompetitorData, CompetitorSummary, AdPlatformData, AdPlatformSummary, MetaAdData, MetaAdObjectiveData, MetaAudienceData, MetaPlacementData, MetaDemographicData, MetaCreativeData, GoogleAdData, GoogleAdTypeData, CriteoAdData, CriteoPlacementData, BingAdData, Alert, ChartData, ApiResponse, CustomerGoal, CustomerGoalSummary, CustomerGoalFilter } from '@/types'
 
 // Mock客户数据
 export const mockCustomers: Customer[] = [
@@ -463,19 +463,49 @@ export const mockChannelData: ChannelData[] = [
     returningUsers: 4640,
     averagePurchaseRevenuePerUser: 11.72,
     averageOrdersPerCustomer: 2.07
+  },
+  {
+    id: 8,
+    name: '其他',
+    type: 'other',
+    sessionSourceMedium: '其他',
+    firstUserSourceMedium: '其他',
+    sessionCampaign: '(not set)',
+    firstUserCampaign: '(not set)',
+
+    // 结果指标
+    totalRevenue: 25000,
+    totalUsers: 3200,
+    averagePurchaseRevenue: 125.0,
+    transactions: 200,
+    userConversionRate: 6.25,
+    bounceRate: 38.7,
+
+    // 过程指标
+    addToCarts: 320,
+    checkouts: 240,
+    itemAddToCartsRate: 4.8,
+    itemCheckoutsRate: 75.0,
+
+    // 用户指标
+    sessions: 8000,
+    newUsers: 2240,
+    returningUsers: 960,
+    averagePurchaseRevenuePerUser: 7.81,
+    averageOrdersPerCustomer: 1.56
   }
 ]
 
 // Mock渠道数据汇总
 export const mockChannelSummary: ChannelSummary = {
-  totalRevenue: 703000,
-  totalUsers: 68100,
-  totalSessions: 162500,
-  averageConversionRate: 7.2,
-  totalCost: 138000,
-  averageROI: 5.1,
+  totalRevenue: 728000,
+  totalUsers: 71300,
+  totalSessions: 170500,
+  averageConversionRate: 7.1,
+  totalCost: 145000,
+  averageROI: 5.0,
   topPerformingChannel: 'Google / CPC',
-  channelCount: 7
+  channelCount: 8
 }
 
 // Mock渠道数据维度配置
@@ -692,6 +722,252 @@ export const mockWebsiteData: WebsiteData = {
   outOfStockDays: 2, // 缺货的天数
   averageStockDays: 32, // 在库天数
   sellThroughRate: 78.5 // 售罄率
+}
+
+// 生成历史数据的辅助函数
+function generateVariation(baseValue: number, variationPercent: number): number {
+  const variation = (Math.random() - 0.5) * 2 * variationPercent / 100
+  return Math.max(0, baseValue * (1 + variation))
+}
+
+// 生成上月数据
+export const mockWebsiteDataPreviousMonth: WebsiteData = {
+  // 结果指标 (上月数据，略低于当前)
+  totalSales: generateVariation(mockWebsiteData.totalSales, 15), // 1,062,500
+  totalCost: generateVariation(mockWebsiteData.totalCost, 12), // 253,800
+  roi: generateVariation(mockWebsiteData.roi, 8), // 4.18
+  averageOrderItems: generateVariation(mockWebsiteData.averageOrderItems, 5), // 2.19
+  orderConversionCost: generateVariation(mockWebsiteData.orderConversionCost, 10), // 81.43
+  averageOrderValue: generateVariation(mockWebsiteData.averageOrderValue, 8), // 299.51
+  conversionRate: generateVariation(mockWebsiteData.conversionRate, 12), // 2.82
+  storeVisits: generateVariation(mockWebsiteData.storeVisits, 18), // 102,500
+  userVisitCost: generateVariation(mockWebsiteData.userVisitCost, 15), // 2.48
+
+  // 订单指标
+  orders: generateVariation(mockWebsiteData.orders, 20), // 3,157
+  orderItemsPerOrder: generateVariation(mockWebsiteData.orderItemsPerOrder, 5), // 2.19
+  ordersPerCustomer: generateVariation(mockWebsiteData.ordersPerCustomer, 8), // 1.66
+  returningCustomerOrders: generateVariation(mockWebsiteData.returningCustomerOrders, 15), // 1,309
+  newCustomerOrders: generateVariation(mockWebsiteData.newCustomerOrders, 25), // 1,848
+
+  // 用户指标
+  visitors: generateVariation(mockWebsiteData.visitors, 18), // 102,500
+  visits: generateVariation(mockWebsiteData.visits, 20), // 148,000
+  newUsers: generateVariation(mockWebsiteData.newUsers, 22), // 35,100
+  returningUsers: generateVariation(mockWebsiteData.returningUsers, 15), // 68,000
+  addToCartVisits: generateVariation(mockWebsiteData.addToCartVisits, 25), // 16,875
+  reachCheckoutVisits: generateVariation(mockWebsiteData.reachCheckoutVisits, 30), // 6,125
+  completeCheckoutVisits: generateVariation(mockWebsiteData.completeCheckoutVisits, 28), // 2,940
+  completedCheckoutVisits: generateVariation(mockWebsiteData.completedCheckoutVisits, 20), // 3,080
+  averageVisitDuration: generateVariation(mockWebsiteData.averageVisitDuration, 10), // 220
+  bounceCount: generateVariation(mockWebsiteData.bounceCount, 15), // 37,825
+  bounceRate: generateVariation(mockWebsiteData.bounceRate, 8), // 38.2
+
+  // 用户漏斗
+  addToCartRate: generateVariation(mockWebsiteData.addToCartRate, 15), // 11.4
+  checkoutCompletionRate: generateVariation(mockWebsiteData.checkoutCompletionRate, 20), // 1.99
+  checkoutConversionRate: generateVariation(mockWebsiteData.checkoutConversionRate, 12), // 48.0
+
+  // 退货指标
+  returns: generateVariation(mockWebsiteData.returns, 25), // 139
+  returnAmount: generateVariation(mockWebsiteData.returnAmount, 30), // 19,950
+  returnRate: generateVariation(mockWebsiteData.returnRate, 20), // 4.4
+  returnSalesRatio: generateVariation(mockWebsiteData.returnSalesRatio, 25), // 1.88
+
+  // 库存指标
+  dailySoldUnits: generateVariation(mockWebsiteData.dailySoldUnits, 15), // 106
+  remainingStockDays: generateVariation(mockWebsiteData.remainingStockDays, 20), // 36
+  inStockDays: generateVariation(mockWebsiteData.inStockDays, 10), // 25
+  outOfStockDays: generateVariation(mockWebsiteData.outOfStockDays, 50), // 3
+  averageStockDays: generateVariation(mockWebsiteData.averageStockDays, 12), // 28
+  sellThroughRate: generateVariation(mockWebsiteData.sellThroughRate, 8) // 72.3
+}
+
+// 生成上季度数据
+export const mockWebsiteDataPreviousQuarter: WebsiteData = {
+  // 结果指标 (上季度数据，明显低于当前)
+  totalSales: generateVariation(mockWebsiteData.totalSales, 25), // 937,500
+  totalCost: generateVariation(mockWebsiteData.totalCost, 20), // 228,000
+  roi: generateVariation(mockWebsiteData.roi, 15), // 3.74
+  averageOrderItems: generateVariation(mockWebsiteData.averageOrderItems, 8), // 2.12
+  orderConversionCost: generateVariation(mockWebsiteData.orderConversionCost, 18), // 88.84
+  averageOrderValue: generateVariation(mockWebsiteData.averageOrderValue, 12), // 285.31
+  conversionRate: generateVariation(mockWebsiteData.conversionRate, 20), // 2.56
+  storeVisits: generateVariation(mockWebsiteData.storeVisits, 30), // 87,500
+  userVisitCost: generateVariation(mockWebsiteData.userVisitCost, 25), // 2.85
+
+  // 订单指标
+  orders: generateVariation(mockWebsiteData.orders, 35), // 2,502
+  orderItemsPerOrder: generateVariation(mockWebsiteData.orderItemsPerOrder, 8), // 2.12
+  ordersPerCustomer: generateVariation(mockWebsiteData.ordersPerCustomer, 12), // 1.59
+  returningCustomerOrders: generateVariation(mockWebsiteData.returningCustomerOrders, 25), // 1,155
+  newCustomerOrders: generateVariation(mockWebsiteData.newCustomerOrders, 40), // 1,347
+
+  // 用户指标
+  visitors: generateVariation(mockWebsiteData.visitors, 30), // 87,500
+  visits: generateVariation(mockWebsiteData.visits, 35), // 120,250
+  newUsers: generateVariation(mockWebsiteData.newUsers, 40), // 27,000
+  returningUsers: generateVariation(mockWebsiteData.returningUsers, 25), // 60,000
+  addToCartVisits: generateVariation(mockWebsiteData.addToCartVisits, 40), // 13,500
+  reachCheckoutVisits: generateVariation(mockWebsiteData.reachCheckoutVisits, 45), // 4,812
+  completeCheckoutVisits: generateVariation(mockWebsiteData.completeCheckoutVisits, 40), // 2,520
+  completedCheckoutVisits: generateVariation(mockWebsiteData.completedCheckoutVisits, 35), // 2,502
+  averageVisitDuration: generateVariation(mockWebsiteData.averageVisitDuration, 15), // 208
+  bounceCount: generateVariation(mockWebsiteData.bounceCount, 25), // 33,375
+  bounceRate: generateVariation(mockWebsiteData.bounceRate, 12), // 39.8
+
+  // 用户漏斗
+  addToCartRate: generateVariation(mockWebsiteData.addToCartRate, 25), // 9.15
+  checkoutCompletionRate: generateVariation(mockWebsiteData.checkoutCompletionRate, 30), // 1.61
+  checkoutConversionRate: generateVariation(mockWebsiteData.checkoutConversionRate, 20), // 38.4
+
+  // 退货指标
+  returns: generateVariation(mockWebsiteData.returns, 35), // 120
+  returnAmount: generateVariation(mockWebsiteData.returnAmount, 40), // 17,100
+  returnRate: generateVariation(mockWebsiteData.returnRate, 30), // 3.36
+  returnSalesRatio: generateVariation(mockWebsiteData.returnSalesRatio, 35), // 1.50
+
+  // 库存指标
+  dailySoldUnits: generateVariation(mockWebsiteData.dailySoldUnits, 25), // 93
+  remainingStockDays: generateVariation(mockWebsiteData.remainingStockDays, 30), // 31
+  inStockDays: generateVariation(mockWebsiteData.inStockDays, 15), // 24
+  outOfStockDays: generateVariation(mockWebsiteData.outOfStockDays, 100), // 4
+  averageStockDays: generateVariation(mockWebsiteData.averageStockDays, 20), // 26
+  sellThroughRate: generateVariation(mockWebsiteData.sellThroughRate, 15) // 66.7
+}
+
+// 计算期间比较数据的辅助函数
+function calculatePeriodComparison(current: number, previous: number): PeriodComparison {
+  const change = current - previous
+  const changePercent = previous !== 0 ? (change / previous) * 100 : 0
+
+  let trend: 'up' | 'down' | 'neutral' = 'neutral'
+  if (Math.abs(changePercent) > 0.5) { // 变化超过0.5%才显示趋势
+    trend = changePercent > 0 ? 'up' : 'down'
+  }
+
+  return {
+    current,
+    previous,
+    change,
+    changePercent,
+    trend
+  }
+}
+
+// 生成月度比较数据
+export function generateMoMComparison(): WebsiteDataComparison {
+  return {
+    // 结果指标比较
+    totalSales: calculatePeriodComparison(mockWebsiteData.totalSales, mockWebsiteDataPreviousMonth.totalSales),
+    totalCost: calculatePeriodComparison(mockWebsiteData.totalCost, mockWebsiteDataPreviousMonth.totalCost),
+    roi: calculatePeriodComparison(mockWebsiteData.roi, mockWebsiteDataPreviousMonth.roi),
+    averageOrderItems: calculatePeriodComparison(mockWebsiteData.averageOrderItems, mockWebsiteDataPreviousMonth.averageOrderItems),
+    orderConversionCost: calculatePeriodComparison(mockWebsiteData.orderConversionCost, mockWebsiteDataPreviousMonth.orderConversionCost),
+    averageOrderValue: calculatePeriodComparison(mockWebsiteData.averageOrderValue, mockWebsiteDataPreviousMonth.averageOrderValue),
+    conversionRate: calculatePeriodComparison(mockWebsiteData.conversionRate, mockWebsiteDataPreviousMonth.conversionRate),
+    storeVisits: calculatePeriodComparison(mockWebsiteData.storeVisits, mockWebsiteDataPreviousMonth.storeVisits),
+    userVisitCost: calculatePeriodComparison(mockWebsiteData.userVisitCost, mockWebsiteDataPreviousMonth.userVisitCost),
+
+    // 订单指标比较
+    orders: calculatePeriodComparison(mockWebsiteData.orders, mockWebsiteDataPreviousMonth.orders),
+    orderItemsPerOrder: calculatePeriodComparison(mockWebsiteData.orderItemsPerOrder, mockWebsiteDataPreviousMonth.orderItemsPerOrder),
+    ordersPerCustomer: calculatePeriodComparison(mockWebsiteData.ordersPerCustomer, mockWebsiteDataPreviousMonth.ordersPerCustomer),
+    returningCustomerOrders: calculatePeriodComparison(mockWebsiteData.returningCustomerOrders, mockWebsiteDataPreviousMonth.returningCustomerOrders),
+    newCustomerOrders: calculatePeriodComparison(mockWebsiteData.newCustomerOrders, mockWebsiteDataPreviousMonth.newCustomerOrders),
+
+    // 用户指标比较
+    visitors: calculatePeriodComparison(mockWebsiteData.visitors, mockWebsiteDataPreviousMonth.visitors),
+    visits: calculatePeriodComparison(mockWebsiteData.visits, mockWebsiteDataPreviousMonth.visits),
+    newUsers: calculatePeriodComparison(mockWebsiteData.newUsers, mockWebsiteDataPreviousMonth.newUsers),
+    returningUsers: calculatePeriodComparison(mockWebsiteData.returningUsers, mockWebsiteDataPreviousMonth.returningUsers),
+    addToCartVisits: calculatePeriodComparison(mockWebsiteData.addToCartVisits, mockWebsiteDataPreviousMonth.addToCartVisits),
+    reachCheckoutVisits: calculatePeriodComparison(mockWebsiteData.reachCheckoutVisits, mockWebsiteDataPreviousMonth.reachCheckoutVisits),
+    completeCheckoutVisits: calculatePeriodComparison(mockWebsiteData.completeCheckoutVisits, mockWebsiteDataPreviousMonth.completeCheckoutVisits),
+    completedCheckoutVisits: calculatePeriodComparison(mockWebsiteData.completedCheckoutVisits, mockWebsiteDataPreviousMonth.completedCheckoutVisits),
+    averageVisitDuration: calculatePeriodComparison(mockWebsiteData.averageVisitDuration, mockWebsiteDataPreviousMonth.averageVisitDuration),
+    bounceCount: calculatePeriodComparison(mockWebsiteData.bounceCount, mockWebsiteDataPreviousMonth.bounceCount),
+    bounceRate: calculatePeriodComparison(mockWebsiteData.bounceRate, mockWebsiteDataPreviousMonth.bounceRate),
+
+    // 用户漏斗比较
+    addToCartRate: calculatePeriodComparison(mockWebsiteData.addToCartRate, mockWebsiteDataPreviousMonth.addToCartRate),
+    checkoutCompletionRate: calculatePeriodComparison(mockWebsiteData.checkoutCompletionRate, mockWebsiteDataPreviousMonth.checkoutCompletionRate),
+    checkoutConversionRate: calculatePeriodComparison(mockWebsiteData.checkoutConversionRate, mockWebsiteDataPreviousMonth.checkoutConversionRate),
+
+    // 退货指标比较
+    returns: calculatePeriodComparison(mockWebsiteData.returns, mockWebsiteDataPreviousMonth.returns),
+    returnAmount: calculatePeriodComparison(mockWebsiteData.returnAmount, mockWebsiteDataPreviousMonth.returnAmount),
+    returnRate: calculatePeriodComparison(mockWebsiteData.returnRate, mockWebsiteDataPreviousMonth.returnRate),
+    returnSalesRatio: calculatePeriodComparison(mockWebsiteData.returnSalesRatio, mockWebsiteDataPreviousMonth.returnSalesRatio),
+
+    // 库存指标比较
+    dailySoldUnits: calculatePeriodComparison(mockWebsiteData.dailySoldUnits, mockWebsiteDataPreviousMonth.dailySoldUnits),
+    remainingStockDays: calculatePeriodComparison(mockWebsiteData.remainingStockDays, mockWebsiteDataPreviousMonth.remainingStockDays),
+    inStockDays: calculatePeriodComparison(mockWebsiteData.inStockDays, mockWebsiteDataPreviousMonth.inStockDays),
+    outOfStockDays: calculatePeriodComparison(mockWebsiteData.outOfStockDays, mockWebsiteDataPreviousMonth.outOfStockDays),
+    averageStockDays: calculatePeriodComparison(mockWebsiteData.averageStockDays, mockWebsiteDataPreviousMonth.averageStockDays),
+    sellThroughRate: calculatePeriodComparison(mockWebsiteData.sellThroughRate, mockWebsiteDataPreviousMonth.sellThroughRate)
+  }
+}
+
+// 生成季度比较数据
+export function generateQoQComparison(): WebsiteDataComparison {
+  return {
+    // 结果指标比较
+    totalSales: calculatePeriodComparison(mockWebsiteData.totalSales, mockWebsiteDataPreviousQuarter.totalSales),
+    totalCost: calculatePeriodComparison(mockWebsiteData.totalCost, mockWebsiteDataPreviousQuarter.totalCost),
+    roi: calculatePeriodComparison(mockWebsiteData.roi, mockWebsiteDataPreviousQuarter.roi),
+    averageOrderItems: calculatePeriodComparison(mockWebsiteData.averageOrderItems, mockWebsiteDataPreviousQuarter.averageOrderItems),
+    orderConversionCost: calculatePeriodComparison(mockWebsiteData.orderConversionCost, mockWebsiteDataPreviousQuarter.orderConversionCost),
+    averageOrderValue: calculatePeriodComparison(mockWebsiteData.averageOrderValue, mockWebsiteDataPreviousQuarter.averageOrderValue),
+    conversionRate: calculatePeriodComparison(mockWebsiteData.conversionRate, mockWebsiteDataPreviousQuarter.conversionRate),
+    storeVisits: calculatePeriodComparison(mockWebsiteData.storeVisits, mockWebsiteDataPreviousQuarter.storeVisits),
+    userVisitCost: calculatePeriodComparison(mockWebsiteData.userVisitCost, mockWebsiteDataPreviousQuarter.userVisitCost),
+
+    // 订单指标比较
+    orders: calculatePeriodComparison(mockWebsiteData.orders, mockWebsiteDataPreviousQuarter.orders),
+    orderItemsPerOrder: calculatePeriodComparison(mockWebsiteData.orderItemsPerOrder, mockWebsiteDataPreviousQuarter.orderItemsPerOrder),
+    ordersPerCustomer: calculatePeriodComparison(mockWebsiteData.ordersPerCustomer, mockWebsiteDataPreviousQuarter.ordersPerCustomer),
+    returningCustomerOrders: calculatePeriodComparison(mockWebsiteData.returningCustomerOrders, mockWebsiteDataPreviousQuarter.returningCustomerOrders),
+    newCustomerOrders: calculatePeriodComparison(mockWebsiteData.newCustomerOrders, mockWebsiteDataPreviousQuarter.newCustomerOrders),
+
+    // 用户指标比较
+    visitors: calculatePeriodComparison(mockWebsiteData.visitors, mockWebsiteDataPreviousQuarter.visitors),
+    visits: calculatePeriodComparison(mockWebsiteData.visits, mockWebsiteDataPreviousQuarter.visits),
+    newUsers: calculatePeriodComparison(mockWebsiteData.newUsers, mockWebsiteDataPreviousQuarter.newUsers),
+    returningUsers: calculatePeriodComparison(mockWebsiteData.returningUsers, mockWebsiteDataPreviousQuarter.returningUsers),
+    addToCartVisits: calculatePeriodComparison(mockWebsiteData.addToCartVisits, mockWebsiteDataPreviousQuarter.addToCartVisits),
+    reachCheckoutVisits: calculatePeriodComparison(mockWebsiteData.reachCheckoutVisits, mockWebsiteDataPreviousQuarter.reachCheckoutVisits),
+    completeCheckoutVisits: calculatePeriodComparison(mockWebsiteData.completeCheckoutVisits, mockWebsiteDataPreviousQuarter.completeCheckoutVisits),
+    completedCheckoutVisits: calculatePeriodComparison(mockWebsiteData.completedCheckoutVisits, mockWebsiteDataPreviousQuarter.completedCheckoutVisits),
+    averageVisitDuration: calculatePeriodComparison(mockWebsiteData.averageVisitDuration, mockWebsiteDataPreviousQuarter.averageVisitDuration),
+    bounceCount: calculatePeriodComparison(mockWebsiteData.bounceCount, mockWebsiteDataPreviousQuarter.bounceCount),
+    bounceRate: calculatePeriodComparison(mockWebsiteData.bounceRate, mockWebsiteDataPreviousQuarter.bounceRate),
+
+    // 用户漏斗比较
+    addToCartRate: calculatePeriodComparison(mockWebsiteData.addToCartRate, mockWebsiteDataPreviousQuarter.addToCartRate),
+    checkoutCompletionRate: calculatePeriodComparison(mockWebsiteData.checkoutCompletionRate, mockWebsiteDataPreviousQuarter.checkoutCompletionRate),
+    checkoutConversionRate: calculatePeriodComparison(mockWebsiteData.checkoutConversionRate, mockWebsiteDataPreviousQuarter.checkoutConversionRate),
+
+    // 退货指标比较
+    returns: calculatePeriodComparison(mockWebsiteData.returns, mockWebsiteDataPreviousQuarter.returns),
+    returnAmount: calculatePeriodComparison(mockWebsiteData.returnAmount, mockWebsiteDataPreviousQuarter.returnAmount),
+    returnRate: calculatePeriodComparison(mockWebsiteData.returnRate, mockWebsiteDataPreviousQuarter.returnRate),
+    returnSalesRatio: calculatePeriodComparison(mockWebsiteData.returnSalesRatio, mockWebsiteDataPreviousQuarter.returnSalesRatio),
+
+    // 库存指标比较
+    dailySoldUnits: calculatePeriodComparison(mockWebsiteData.dailySoldUnits, mockWebsiteDataPreviousQuarter.dailySoldUnits),
+    remainingStockDays: calculatePeriodComparison(mockWebsiteData.remainingStockDays, mockWebsiteDataPreviousQuarter.remainingStockDays),
+    inStockDays: calculatePeriodComparison(mockWebsiteData.inStockDays, mockWebsiteDataPreviousQuarter.inStockDays),
+    outOfStockDays: calculatePeriodComparison(mockWebsiteData.outOfStockDays, mockWebsiteDataPreviousQuarter.outOfStockDays),
+    averageStockDays: calculatePeriodComparison(mockWebsiteData.averageStockDays, mockWebsiteDataPreviousQuarter.averageStockDays),
+    sellThroughRate: calculatePeriodComparison(mockWebsiteData.sellThroughRate, mockWebsiteDataPreviousQuarter.sellThroughRate)
+  }
+}
+
+// 获取比较数据的函数
+export function getWebsiteDataComparison(period: ComparisonPeriod = 'mom'): WebsiteDataComparison {
+  return period === 'mom' ? generateMoMComparison() : generateQoQComparison()
 }
 
 // Mock活动数据

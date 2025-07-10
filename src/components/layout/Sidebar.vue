@@ -1,5 +1,5 @@
 <template>
-  <aside 
+  <aside
     class="sidebar"
     :class="{ 'sidebar--collapsed': collapsed }"
   >
@@ -13,7 +13,7 @@
           </span>
         </transition>
       </div>
-      <button 
+      <button
         class="sidebar__toggle"
         @click="toggleCollapse"
         :title="collapsed ? '展开菜单' : '折叠菜单'"
@@ -39,8 +39,8 @@
     <!-- 侧边栏底部 -->
     <div class="sidebar__footer">
       <div class="sidebar__user" v-if="user">
-        <img 
-          :src="getUserAvatarUrl()" 
+        <img
+          :src="getUserAvatarUrl()"
           :alt="userName"
           class="sidebar__user-avatar"
         />
@@ -86,25 +86,49 @@ const handleMenuSelect = async (item: MenuItem) => {
     // 如果是数据看板的子菜单，使用锚点跳转
     if (item.path.startsWith('/dashboard/')) {
       const sectionId = item.path.replace('/dashboard/', '')
-      
+
       // 先确保导航到数据看板页面
       if (router.currentRoute.value.name !== 'dashboard') {
         await router.push({ name: 'dashboard' })
         // 等待页面渲染完成
-        await new Promise(resolve => setTimeout(resolve, 100))
+        await new Promise(resolve => setTimeout(resolve, 200))
       }
-      
-      // 然后滚动到对应的锚点
-      const element = document.getElementById(sectionId)
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        menuStore.setActiveMenu(item.id)
-      }
+
+      // 然后滚动到对应的锚点，使用改进的滚动方法
+      await scrollToSectionWithOffset(sectionId)
+      menuStore.setActiveMenu(item.id)
     } else {
       // 其他菜单使用路由跳转
       router.push({ name: getRouteNameFromPath(item.path) })
       menuStore.setActiveMenu(item.id)
     }
+  }
+}
+
+// 改进的滚动方法，考虑所有固定元素的高度
+const scrollToSectionWithOffset = async (sectionId: string) => {
+  const element = document.getElementById(sectionId)
+  if (element) {
+    const headerHeight = 60 // 头部高度
+    const filterHeight = 80 // 筛选器高度
+    const subNavHeight = 60 // 子菜单导航高度
+    const offset = headerHeight + filterHeight + subNavHeight + 20 // 额外间距
+
+    const elementPosition = element.offsetTop - offset
+
+    window.scrollTo({
+      top: Math.max(0, elementPosition),
+      behavior: 'smooth'
+    })
+
+    // 等待滚动完成后触发子菜单导航的状态更新
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    // 手动触发section change事件来同步子菜单导航
+    const event = new CustomEvent('dashboard-section-change', {
+      detail: { sectionId }
+    })
+    window.dispatchEvent(event)
   }
 }
 
@@ -129,7 +153,7 @@ const getUserAvatarUrl = (): string => {
   if (userAvatar.value) {
     return userAvatar.value
   }
-  
+
   // 根据用户角色返回对应的头像
   const role = user.value?.role || 'default'
   const roleAvatarMap: Record<string, string> = {
@@ -140,7 +164,7 @@ const getUserAvatarUrl = (): string => {
     superAdmin: '/avatars/admin.svg',
     sales: '/avatars/staff.svg'
   }
-  
+
   return roleAvatarMap[role] || '/avatars/default.svg'
 }
 </script>
@@ -289,7 +313,7 @@ const getUserAvatarUrl = (): string => {
     transform: translateX(-100%);
     transition: transform var(--duration-normal);
   }
-  
+
   .sidebar.sidebar--mobile-open {
     transform: translateX(0);
   }

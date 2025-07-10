@@ -50,17 +50,17 @@ export const mockMenuItems: MenuItem[] = [
         roles: ['superAdmin', 'manager', 'staff', 'sales']
       },
       {
-        id: 'influencer-data',
+        id: 'dashboard-kol-data',
         name: '红人数据',
         icon: 'Users',
-        path: '/dashboard/influencer-data',
+        path: '/dashboard/kol-data',
         roles: ['superAdmin', 'manager', 'staff']
       },
       {
-        id: 'regional-market',
+        id: 'dashboard-market-data',
         name: '地区市场',
         icon: 'MapPin',
-        path: '/dashboard/regional-market',
+        path: '/dashboard/market-data',
         roles: ['superAdmin', 'manager', 'staff']
       },
       {

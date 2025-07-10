@@ -13,20 +13,9 @@
             <Users />
           </div>
           <div class="stat-content">
-            <h3>活跃红人</h3>
-            <div class="stat-value">{{ stats.activeInfluencers }}</div>
+            <h3>红人总数</h3>
+            <div class="stat-value">{{ stats.totalInfluencers }}</div>
             <div class="stat-change positive">+{{ stats.influencerGrowth }}%</div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">
-            <FileText />
-          </div>
-          <div class="stat-content">
-            <h3>本月帖子</h3>
-            <div class="stat-value">{{ stats.monthlyPosts }}</div>
-            <div class="stat-change positive">+{{ stats.postGrowth }}%</div>
           </div>
         </div>
 
@@ -35,9 +24,31 @@
             <Eye />
           </div>
           <div class="stat-content">
-            <h3>总曝光量</h3>
+            <h3>总观看量</h3>
             <div class="stat-value">{{ formatNumber(stats.totalViews) }}</div>
             <div class="stat-change positive">+{{ stats.viewGrowth }}%</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <MessageCircle />
+          </div>
+          <div class="stat-content">
+            <h3>评论数</h3>
+            <div class="stat-value">{{ formatNumber(stats.totalComments) }}</div>
+            <div class="stat-change positive">+{{ stats.commentGrowth }}%</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <ThumbsUp />
+          </div>
+          <div class="stat-content">
+            <h3>点赞数</h3>
+            <div class="stat-value">{{ formatNumber(stats.totalLikes) }}</div>
+            <div class="stat-change positive">+{{ stats.likeGrowth }}%</div>
           </div>
         </div>
 
@@ -46,264 +57,139 @@
             <Heart />
           </div>
           <div class="stat-content">
-            <h3>平均互动率</h3>
+            <h3>互动率</h3>
             <div class="stat-value">{{ stats.avgEngagementRate }}%</div>
             <div class="stat-change positive">+{{ stats.engagementGrowth }}%</div>
           </div>
         </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <FileText />
+          </div>
+          <div class="stat-content">
+            <h3>提及内容总数</h3>
+            <div class="stat-value">{{ stats.totalMentions }}</div>
+            <div class="stat-change positive">+{{ stats.mentionGrowth }}%</div>
+          </div>
+        </div>
       </div>
 
-      <!-- 红人排行榜 -->
-      <div class="ranking-section">
-        <h3>红人表现排行</h3>
-        <div class="ranking-table">
-          <div class="table-header">
-            <div class="rank-col">排名</div>
-            <div class="name-col">红人</div>
-            <div class="platform-col">平台</div>
-            <div class="posts-col">帖子数</div>
-            <div class="views-col">曝光量</div>
-            <div class="engagement-col">互动率</div>
-            <div class="roi-col">ROI</div>
+      <!-- 帖子数据 -->
+      <div class="posts-data-section">
+        <h3>帖子数据</h3>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <FileText />
+            </div>
+            <div class="stat-content">
+              <h3>发帖总数</h3>
+              <div class="stat-value">{{ formatNumber(postStats.totalPosts) }}</div>
+              <div class="stat-change positive">+{{ postStats.postGrowth }}%</div>
+            </div>
           </div>
-          <div class="table-body">
-            <div
-              v-for="(influencer, index) in topInfluencers"
-              :key="influencer.id"
-              class="table-row"
-            >
-              <div class="rank-col">
-                <span class="rank-badge" :class="getRankClass(index + 1)">{{ index + 1 }}</span>
-              </div>
-              <div class="name-col">
-                <div class="influencer-info">
-                  <img :src="influencer.avatar" :alt="influencer.name" class="avatar">
-                  <div>
-                    <div class="name">{{ influencer.name }}</div>
-                    <div class="followers">{{ formatNumber(influencer.followers) }} 粉丝</div>
-                  </div>
-                </div>
-              </div>
-              <div class="platform-col">
-                <span class="platform-badge" :class="influencer.platform">{{ influencer.platform }}</span>
-              </div>
-              <div class="posts-col">{{ influencer.posts }}</div>
-              <div class="views-col">{{ formatNumber(influencer.views) }}</div>
-              <div class="engagement-col">{{ influencer.engagementRate }}%</div>
-              <div class="roi-col">
-                <span class="roi-value" :class="getRoiClass(influencer.roi)">{{ influencer.roi }}x</span>
-              </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">
+              <MessageCircle />
+            </div>
+            <div class="stat-content">
+              <h3>评论数</h3>
+              <div class="stat-value">{{ formatNumber(postStats.postComments) }}</div>
+              <div class="stat-change positive">+{{ postStats.postCommentGrowth }}%</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">
+              <ThumbsUp />
+            </div>
+            <div class="stat-content">
+              <h3>点赞数</h3>
+              <div class="stat-value">{{ formatNumber(postStats.postLikes) }}</div>
+              <div class="stat-change positive">+{{ postStats.postLikeGrowth }}%</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">
+              <Heart />
+            </div>
+            <div class="stat-content">
+              <h3>互动率</h3>
+              <div class="stat-value">{{ postStats.postEngagementRate }}%</div>
+              <div class="stat-change positive">+{{ postStats.postEngagementGrowth }}%</div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 帖子表现分析 -->
-      <div class="posts-section">
-        <h3>帖子表现分析</h3>
-        <div class="posts-grid">
-          <div
-            v-for="post in topPosts"
-            :key="post.id"
-            class="post-card"
-          >
-            <div class="post-image">
-              <img :src="post.image" :alt="post.title">
-            </div>
-            <div class="post-content">
-              <h4>{{ post.title }}</h4>
-              <div class="post-meta">
-                <span class="author">{{ post.author }}</span>
-                <span class="platform">{{ post.platform }}</span>
-                <span class="date">{{ formatDate(post.date) }}</span>
-              </div>
-              <div class="post-stats">
-                <div class="stat-item">
-                  <Eye class="stat-icon" />
-                  <span>{{ formatNumber(post.views) }}</span>
-                </div>
-                <div class="stat-item">
-                  <Heart class="stat-icon" />
-                  <span>{{ formatNumber(post.likes) }}</span>
-                </div>
-                <div class="stat-item">
-                  <MessageCircle class="stat-icon" />
-                  <span>{{ formatNumber(post.comments) }}</span>
-                </div>
-                <div class="stat-item">
-                  <Share class="stat-icon" />
-                  <span>{{ formatNumber(post.shares) }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Users, FileText, Eye, Heart, MessageCircle, Share } from 'lucide-vue-next'
+import { Users, FileText, Eye, Heart, MessageCircle, ThumbsUp } from 'lucide-vue-next'
 
 // 定义数据类型
 interface InfluencerStats {
-  activeInfluencers: number
+  totalInfluencers: number
   influencerGrowth: number
-  monthlyPosts: number
-  postGrowth: number
   totalViews: number
   viewGrowth: number
+  totalComments: number
+  commentGrowth: number
+  totalLikes: number
+  likeGrowth: number
   avgEngagementRate: number
   engagementGrowth: number
+  totalMentions: number
+  mentionGrowth: number
 }
 
-interface Influencer {
-  id: string
-  name: string
-  avatar: string
-  platform: string
-  followers: number
-  posts: number
-  views: number
-  engagementRate: number
-  roi: number
+interface PostStats {
+  totalPosts: number
+  postGrowth: number
+  postComments: number
+  postCommentGrowth: number
+  postLikes: number
+  postLikeGrowth: number
+  postEngagementRate: number
+  postEngagementGrowth: number
 }
 
-interface Post {
-  id: string
-  title: string
-  author: string
-  platform: string
-  image: string
-  date: string
-  views: number
-  likes: number
-  comments: number
-  shares: number
-}
+
 
 // 响应式数据
 const stats = ref<InfluencerStats>({
-  activeInfluencers: 48,
+  totalInfluencers: 48,
   influencerGrowth: 12,
-  monthlyPosts: 156,
-  postGrowth: 8,
   totalViews: 2450000,
   viewGrowth: 15,
+  totalComments: 18500,
+  commentGrowth: 8,
+  totalLikes: 125000,
+  likeGrowth: 12,
   avgEngagementRate: 4.2,
-  engagementGrowth: 3
+  engagementGrowth: 3,
+  totalMentions: 320,
+  mentionGrowth: 15
 })
 
-const topInfluencers = ref<Influencer[]>([
-  {
-    id: '1',
-    name: 'Sarah Johnson',
-    avatar: '/avatars/influencer1.jpg',
-    platform: 'Instagram',
-    followers: 125000,
-    posts: 12,
-    views: 450000,
-    engagementRate: 5.8,
-    roi: 4.2
-  },
-  {
-    id: '2',
-    name: 'Mike Chen',
-    avatar: '/avatars/influencer2.jpg',
-    platform: 'TikTok',
-    followers: 89000,
-    posts: 8,
-    views: 320000,
-    engagementRate: 6.2,
-    roi: 3.8
-  },
-  {
-    id: '3',
-    name: 'Emma Davis',
-    avatar: '/avatars/influencer3.jpg',
-    platform: 'YouTube',
-    followers: 67000,
-    posts: 5,
-    views: 280000,
-    engagementRate: 4.5,
-    roi: 3.5
-  },
-  {
-    id: '4',
-    name: 'Alex Wilson',
-    avatar: '/avatars/influencer4.jpg',
-    platform: 'Instagram',
-    followers: 45000,
-    posts: 15,
-    views: 180000,
-    engagementRate: 4.8,
-    roi: 3.2
-  },
-  {
-    id: '5',
-    name: 'Lisa Zhang',
-    avatar: '/avatars/influencer5.jpg',
-    platform: 'TikTok',
-    followers: 38000,
-    posts: 10,
-    views: 150000,
-    engagementRate: 5.5,
-    roi: 2.9
-  }
-])
+const postStats = ref<PostStats>({
+  totalPosts: 1240,
+  postGrowth: 18,
+  postComments: 8650,
+  postCommentGrowth: 12,
+  postLikes: 45200,
+  postLikeGrowth: 15,
+  postEngagementRate: 5.8,
+  postEngagementGrowth: 7
+})
 
-const topPosts = ref<Post[]>([
-  {
-    id: '1',
-    title: '夏季新品推荐 - 清爽护肤套装',
-    author: 'Sarah Johnson',
-    platform: 'Instagram',
-    image: '/posts/post1.jpg',
-    date: '2024-01-15',
-    views: 85000,
-    likes: 4200,
-    comments: 320,
-    shares: 180
-  },
-  {
-    id: '2',
-    title: '健身达人的日常 - 蛋白粉测评',
-    author: 'Mike Chen',
-    platform: 'TikTok',
-    image: '/posts/post2.jpg',
-    date: '2024-01-14',
-    views: 72000,
-    likes: 3800,
-    comments: 280,
-    shares: 150
-  },
-  {
-    id: '3',
-    title: '居家好物分享 - 提升生活品质',
-    author: 'Emma Davis',
-    platform: 'YouTube',
-    image: '/posts/post3.jpg',
-    date: '2024-01-13',
-    views: 65000,
-    likes: 3200,
-    comments: 240,
-    shares: 120
-  },
-  {
-    id: '4',
-    title: '时尚穿搭 - 春季搭配指南',
-    author: 'Alex Wilson',
-    platform: 'Instagram',
-    image: '/posts/post4.jpg',
-    date: '2024-01-12',
-    views: 58000,
-    likes: 2900,
-    comments: 190,
-    shares: 95
-  }
-])
+
 
 // 工具函数
 const formatNumber = (num: number): string => {
@@ -315,27 +201,7 @@ const formatNumber = (num: number): string => {
   return num.toString()
 }
 
-const formatDate = (dateString: string): string => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN', {
-    month: 'short',
-    day: 'numeric'
-  })
-}
 
-const getRankClass = (rank: number): string => {
-  if (rank === 1) return 'rank-first'
-  if (rank === 2) return 'rank-second'
-  if (rank === 3) return 'rank-third'
-  return 'rank-default'
-}
-
-const getRoiClass = (roi: number): string => {
-  if (roi >= 4) return 'roi-excellent'
-  if (roi >= 3) return 'roi-good'
-  if (roi >= 2) return 'roi-fair'
-  return 'roi-poor'
-}
 
 onMounted(() => {
   // 组件挂载时加载数据
@@ -346,9 +212,16 @@ onMounted(() => {
 <style scoped>
 .kol-data-panel {
   padding: 24px;
-  background: var(--color-background);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.kol-data-panel:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
 }
 
 .section-header {
@@ -375,12 +248,20 @@ onMounted(() => {
 }
 
 .stat-card {
-  background: var(--color-background-soft);
-  border-radius: 8px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
   padding: 20px;
   display: flex;
   align-items: center;
   gap: 16px;
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  transform: translateY(-1px);
 }
 
 .stat-icon {
@@ -417,6 +298,17 @@ onMounted(() => {
   color: var(--color-success);
 }
 
+.posts-data-section {
+  margin-top: 32px;
+}
+
+.posts-data-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 16px 0;
+}
+
 .ranking-section {
   margin-bottom: 32px;
 }
@@ -429,9 +321,11 @@ onMounted(() => {
 }
 
 .ranking-table {
-  background: var(--color-background-soft);
-  border-radius: 8px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .table-header {
@@ -525,9 +419,17 @@ onMounted(() => {
 }
 
 .post-card {
-  background: var(--color-background-soft);
-  border-radius: 8px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.post-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
 }
 
 .post-image {

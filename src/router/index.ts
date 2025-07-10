@@ -98,6 +98,21 @@ const router = createRouter({
       ]
     },
 
+    // 活动详情路由
+    {
+      path: '/campaign/:id',
+      name: 'campaign-details',
+      component: () => import('@/components/layout/MainLayout.vue'),
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          name: 'campaign-details-view',
+          component: () => import('@/views/campaign/CampaignDetailsView.vue')
+        }
+      ]
+    },
+
     // 客户管理路由
     {
       path: '/customers',

@@ -65,7 +65,7 @@ export interface Channel {
 export interface ChannelData {
   id: number
   name: string
-  type: 'google' | 'facebook' | 'direct' | 'email' | 'criteo' | 'bing' | 'pinterest' | 'organic' | 'display'
+  type: 'google' | 'facebook' | 'direct' | 'email' | 'criteo' | 'bing' | 'pinterest' | 'organic' | 'display' | 'other'
 
   // 维度信息
   sessionSourceMedium: string // 会话来源/媒介
@@ -121,6 +121,18 @@ export interface ChannelDimension {
   selected: boolean
 }
 
+// 期间比较数据类型
+export interface PeriodComparison {
+  current: number
+  previous: number
+  change: number // 绝对变化
+  changePercent: number // 百分比变化
+  trend: 'up' | 'down' | 'neutral' // 趋势方向
+}
+
+// 比较期间类型
+export type ComparisonPeriod = 'mom' | 'qoq' // Month-over-Month, Quarter-over-Quarter
+
 // 网站数据类型
 export interface WebsiteData {
   // 结果指标
@@ -172,6 +184,59 @@ export interface WebsiteData {
   outOfStockDays: number // 缺货的天数
   averageStockDays: number // 在库天数
   sellThroughRate: number // 售罄率
+}
+
+// 网站数据比较类型
+export interface WebsiteDataComparison {
+  // 结果指标比较
+  totalSales: PeriodComparison
+  totalCost: PeriodComparison
+  roi: PeriodComparison
+  averageOrderItems: PeriodComparison
+  orderConversionCost: PeriodComparison
+  averageOrderValue: PeriodComparison
+  conversionRate: PeriodComparison
+  storeVisits: PeriodComparison
+  userVisitCost: PeriodComparison
+
+  // 订单指标比较
+  orders: PeriodComparison
+  orderItemsPerOrder: PeriodComparison
+  ordersPerCustomer: PeriodComparison
+  returningCustomerOrders: PeriodComparison
+  newCustomerOrders: PeriodComparison
+
+  // 用户指标比较
+  visitors: PeriodComparison
+  visits: PeriodComparison
+  newUsers: PeriodComparison
+  returningUsers: PeriodComparison
+  addToCartVisits: PeriodComparison
+  reachCheckoutVisits: PeriodComparison
+  completeCheckoutVisits: PeriodComparison
+  completedCheckoutVisits: PeriodComparison
+  averageVisitDuration: PeriodComparison
+  bounceCount: PeriodComparison
+  bounceRate: PeriodComparison
+
+  // 用户漏斗比较
+  addToCartRate: PeriodComparison
+  checkoutCompletionRate: PeriodComparison
+  checkoutConversionRate: PeriodComparison
+
+  // 退货指标比较
+  returns: PeriodComparison
+  returnAmount: PeriodComparison
+  returnRate: PeriodComparison
+  returnSalesRatio: PeriodComparison
+
+  // 库存指标比较
+  dailySoldUnits: PeriodComparison
+  remainingStockDays: PeriodComparison
+  inStockDays: PeriodComparison
+  outOfStockDays: PeriodComparison
+  averageStockDays: PeriodComparison
+  sellThroughRate: PeriodComparison
 }
 
 // 活动数据类型

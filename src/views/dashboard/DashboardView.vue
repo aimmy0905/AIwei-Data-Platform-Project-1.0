@@ -10,6 +10,12 @@
       />
     </div>
 
+    <!-- 子菜单导航 -->
+    <DashboardSubNav
+      :sections="dashboardSections"
+      @section-change="handleSectionChange"
+    />
+
     <!-- 仪表板内容 -->
     <div class="dashboard-content">
       <!-- 预警提醒部分 -->
@@ -26,196 +32,14 @@
 
     <!-- 客户目标部分 -->
     <section id="customer-goals" class="dashboard-section">
-      <div class="section-header">
-        <h2 class="section-title">客户目标</h2>
-        <p class="section-description">项目的各个目标完成情况</p>
-      </div>
-
-      <div class="customer-goals-content">
-        <!-- 目标筛选标签页 -->
-        <div class="goals-tabs">
-          <button
-            v-for="tab in goalTabs"
-            :key="tab.id"
-            :class="['tab-button', { active: activeGoalTab === tab.id }]"
-            @click="activeGoalTab = tab.id"
-          >
-            {{ tab.name }}
-          </button>
+      <div class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">客户目标</h2>
+          <p class="section-description">网站的各个目标完成情况</p>
         </div>
 
-        <!-- 目标汇总卡片 -->
-        <div class="goals-summary">
-          <div class="summary-card">
-            <div class="summary-icon">
-              <Target :size="24" />
-            </div>
-            <div class="summary-content">
-              <div class="summary-value">{{ goalSummary.totalGoals }}</div>
-              <div class="summary-label">总目标数</div>
-            </div>
-          </div>
-          <div class="summary-card">
-            <div class="summary-icon">
-              <Play :size="24" />
-            </div>
-            <div class="summary-content">
-              <div class="summary-value">{{ goalSummary.activeGoals }}</div>
-              <div class="summary-label">进行中</div>
-            </div>
-          </div>
-          <div class="summary-card">
-            <div class="summary-icon">
-              <div class="progress-circle">
-                <span>{{ goalSummary.averageSalesProgress }}%</span>
-              </div>
-            </div>
-            <div class="summary-content">
-              <div class="summary-value">{{ goalSummary.averageSalesProgress }}%</div>
-              <div class="summary-label">平均销售完成率</div>
-            </div>
-          </div>
-          <div class="summary-card">
-            <div class="summary-icon">
-              <div class="progress-circle">
-                <span>{{ goalSummary.averageROIProgress }}%</span>
-              </div>
-            </div>
-            <div class="summary-content">
-              <div class="summary-value">{{ goalSummary.averageROIProgress }}%</div>
-              <div class="summary-label">平均ROI完成率</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 目标列表 -->
-        <div class="goals-grid">
-          <div v-for="goal in filteredGoals" :key="goal.id" class="goal-card">
-            <div class="goal-card__header">
-              <div class="goal-info">
-                <h4>{{ goal.projectName }}</h4>
-                <span class="goal-customer">{{ goal.customerName }}</span>
-                <span class="goal-period">{{ goal.goalPeriod }}</span>
-              </div>
-              <div class="goal-status">
-                <span class="status-badge" :class="`status-${goal.status}`">
-                  {{ getGoalStatusText(goal.status) }}
-                </span>
-              </div>
-            </div>
-
-            <div class="goal-card__content">
-              <!-- 销售目标 -->
-              <div class="goal-metric">
-                <div class="metric-header">
-                  <span class="metric-label">销售目标</span>
-                  <span class="metric-progress">{{ goal.salesProgress }}%</span>
-                </div>
-                <div class="metric-values">
-                  <span class="metric-actual">${{ formatNumber(goal.salesActual) }}</span>
-                  <span class="metric-target">/ ${{ formatNumber(goal.salesTarget) }}</span>
-                </div>
-                <div class="progress-bar">
-                  <div
-                    class="progress-fill"
-                    :class="getProgressClass(goal.salesProgress)"
-                    :style="{ width: Math.min(goal.salesProgress, 100) + '%' }"
-                  ></div>
-                </div>
-              </div>
-
-              <!-- 成本目标 -->
-              <div class="goal-metric">
-                <div class="metric-header">
-                  <span class="metric-label">成本目标</span>
-                  <span class="metric-progress">{{ goal.costProgress }}%</span>
-                </div>
-                <div class="metric-values">
-                  <span class="metric-actual">${{ formatNumber(goal.costActual) }}</span>
-                  <span class="metric-target">/ ${{ formatNumber(goal.costTarget) }}</span>
-                </div>
-                <div class="progress-bar">
-                  <div
-                    class="progress-fill"
-                    :class="getProgressClass(goal.costProgress)"
-                    :style="{ width: Math.min(goal.costProgress, 100) + '%' }"
-                  ></div>
-                </div>
-              </div>
-
-              <!-- ROI目标 -->
-              <div class="goal-metric">
-                <div class="metric-header">
-                  <span class="metric-label">ROI目标</span>
-                  <span class="metric-progress">{{ goal.roiProgress }}%</span>
-                </div>
-                <div class="metric-values">
-                  <span class="metric-actual">{{ goal.roiActual.toFixed(2) }}x</span>
-                  <span class="metric-target">/ {{ goal.roiTarget.toFixed(2) }}x</span>
-                </div>
-                <div class="progress-bar">
-                  <div
-                    class="progress-fill"
-                    :class="getProgressClass(goal.roiProgress)"
-                    :style="{ width: Math.min(goal.roiProgress, 100) + '%' }"
-                  ></div>
-                </div>
-              </div>
-
-              <!-- 利润目标 (如果有) -->
-              <div v-if="goal.profitTarget" class="goal-metric">
-                <div class="metric-header">
-                  <span class="metric-label">利润目标</span>
-                  <span class="metric-progress">{{ goal.profitProgress }}%</span>
-                </div>
-                <div class="metric-values">
-                  <span class="metric-actual">${{ formatNumber(goal.profitActual || 0) }}</span>
-                  <span class="metric-target">/ ${{ formatNumber(goal.profitTarget) }}</span>
-                </div>
-                <div class="progress-bar">
-                  <div
-                    class="progress-fill"
-                    :class="getProgressClass(goal.profitProgress || 0)"
-                    :style="{ width: Math.min(goal.profitProgress || 0, 100) + '%' }"
-                  ></div>
-                </div>
-              </div>
-
-              <!-- 用户目标 (如果有) -->
-              <div v-if="goal.userTarget" class="goal-metric">
-                <div class="metric-header">
-                  <span class="metric-label">用户目标</span>
-                  <span class="metric-progress">{{ goal.userProgress }}%</span>
-                </div>
-                <div class="metric-values">
-                  <span class="metric-actual">{{ formatNumber(goal.userActual || 0) }}</span>
-                  <span class="metric-target">/ {{ formatNumber(goal.userTarget) }}</span>
-                </div>
-                <div class="progress-bar">
-                  <div
-                    class="progress-fill"
-                    :class="getProgressClass(goal.userProgress || 0)"
-                    :style="{ width: Math.min(goal.userProgress || 0, 100) + '%' }"
-                  ></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="goal-card__footer">
-              <span class="goal-period-info">{{ goal.startDate }} - {{ goal.endDate }}</span>
-              <button class="detail-button" @click="viewGoalDetails(goal.id)">
-                查看详情
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- 空状态 -->
-        <div v-if="filteredGoals.length === 0" class="empty-state">
-          <Target :size="64" class="empty-icon" />
-          <h3>暂无{{ getGoalTypeText(activeGoalTab) }}目标</h3>
-          <p>当前筛选条件下没有找到相关目标数据</p>
-        </div>
+        <!-- 使用共享的客户目标模块 -->
+        <CustomerGoalsModule />
       </div>
     </section>
 
@@ -239,11 +63,6 @@
 
     <!-- 产品销售部分 -->
     <section id="product-sales" class="dashboard-section">
-      <div class="section-header">
-        <h2 class="section-title">产品销售</h2>
-        <p class="section-description">各产品的销售情况和库存状态</p>
-      </div>
-
       <ProductSalesPanel />
     </section>
 
@@ -279,9 +98,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import {
   BarChart3,
-  PieChart,
   TrendingUp,
-  TrendingDown,
   DollarSign,
   Users,
   Target,
@@ -290,16 +107,15 @@ import {
   Package,
   CreditCard,
   Clock,
-  MousePointer,
-  ShoppingCart,
-  Calendar,
-  Play
+  Calendar
 } from 'lucide-vue-next'
 import { mockGetDashboardData, mockGetCustomers } from '@/mock'
 import LineChart from '@/components/charts/LineChart.vue'
 import PieChartComponent from '@/components/charts/PieChart.vue'
 import DashboardFilter from '@/components/common/DashboardFilter.vue'
 import AlertPanel from '@/components/common/AlertPanel.vue'
+import DashboardSubNav from '@/components/dashboard/DashboardSubNav.vue'
+import CustomerGoalsModule from '@/components/dashboard/CustomerGoalsModule.vue'
 import WebsiteDataPanel from '@/components/dashboard/WebsiteDataPanel.vue'
 import ChannelDataPanel from '@/components/dashboard/ChannelDataPanel.vue'
 import CampaignDataPanel from '@/components/dashboard/CampaignDataPanel.vue'
@@ -309,7 +125,7 @@ import MarketDataPanel from '@/components/dashboard/MarketDataPanel.vue'
 import PagePerformancePanel from '@/components/dashboard/PagePerformancePanel.vue'
 import CompetitorPanel from '@/components/dashboard/CompetitorPanel.vue'
 import AdPlatformOverviewPanel from '@/components/dashboard/AdPlatformOverviewPanel.vue'
-import type { Customer, Alert, Channel, Campaign, ProductSales, WebsiteData, CustomerGoal, CustomerGoalSummary } from '@/types'
+import type { Customer, Alert, Channel, Campaign, ProductSales, WebsiteData } from '@/types'
 import { useMenuStore } from '@/stores/menu'
 
 // 组合式API
@@ -344,29 +160,7 @@ const channels = ref<Channel[]>([])
 const campaigns = ref<Campaign[]>([])
 const productSales = ref<ProductSales[]>([])
 
-// 客户目标相关数据
-const customerGoals = ref<CustomerGoal[]>([])
-const goalSummary = ref<CustomerGoalSummary>({
-  totalGoals: 0,
-  activeGoals: 0,
-  completedGoals: 0,
-  averageSalesProgress: 0,
-  averageROIProgress: 0,
-  totalSalesTarget: 0,
-  totalSalesActual: 0,
-  totalCostTarget: 0,
-  totalCostActual: 0,
-  bestPerformingProject: '',
-  worstPerformingProject: ''
-})
-const activeGoalTab = ref('monthly')
 
-// 目标筛选标签页
-const goalTabs = [
-  { id: 'monthly', name: '月度目标' },
-  { id: 'quarterly', name: '季度目标' },
-  { id: 'yearly', name: '年度目标' }
-]
 
 const websiteData = ref<WebsiteData>({
   // 结果指标
@@ -482,10 +276,7 @@ const quickStats = ref([
 
 // 计算属性 - unreadCount 被移除因为不需要在这个组件中使用
 
-// 根据当前标签页筛选目标
-const filteredGoals = computed(() => {
-  return customerGoals.value.filter(goal => goal.goalType === activeGoalTab.value)
-})
+
 
 // 收入趋势图表数据
 const revenueChartData = computed(() => {
@@ -676,28 +467,7 @@ const loadCustomers = async () => {
   }
 }
 
-// 加载客户目标数据
-const loadCustomerGoals = async () => {
-  try {
-    // 动态导入mock函数
-    const { mockGetCustomerGoals, mockGetCustomerGoalSummary } = await import('@/mock/dashboard')
 
-    const [goalsResponse, summaryResponse] = await Promise.all([
-      mockGetCustomerGoals(),
-      mockGetCustomerGoalSummary()
-    ])
-
-    if (goalsResponse.success && goalsResponse.data) {
-      customerGoals.value = goalsResponse.data
-    }
-
-    if (summaryResponse.success && summaryResponse.data) {
-      goalSummary.value = summaryResponse.data
-    }
-  } catch (error) {
-    console.error('加载客户目标数据失败:', error)
-  }
-}
 
 // 预警相关方法
 const handleMarkAsRead = async (alertId: number) => {
@@ -872,6 +642,13 @@ const scrollToSection = (sectionId: string) => {
   }
 }
 
+// 处理子菜单导航的section变化
+const handleSectionChange = (sectionId: string) => {
+  activeSection.value = sectionId
+  updateSidebarActiveState(sectionId)
+  updateBreadcrumb(sectionId)
+}
+
 // 暴露给全局使用（如果需要）
 defineExpose({
   scrollToSection
@@ -896,7 +673,6 @@ const initializeMenuState = () => {
 onMounted(() => {
   loadCustomers()
   loadDashboardData()
-  loadCustomerGoals()
   setupScrollObserver()
   initializeMenuState()
 })
@@ -930,7 +706,7 @@ onUnmounted(() => {
 }
 
 .dashboard-content {
-  padding-top: 140px; /* 给筛选器留出足够空间 */
+  padding-top: 200px; /* 给筛选器和子菜单导航留出足够空间 */
 }
 
 /* 移动端适配 */
@@ -943,11 +719,38 @@ onUnmounted(() => {
   .main-layout--collapsed .dashboard-filter-sticky {
     left: 0;
   }
+
+  .dashboard-content {
+    padding-top: 170px; /* 移动端减少一些间距 */
+  }
+
+  .dashboard-section {
+    scroll-margin-top: 150px; /* 移动端调整滚动偏移 */
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-content {
+    padding-top: 160px; /* 小屏幕进一步减少间距 */
+  }
+
+  .dashboard-section {
+    scroll-margin-top: 140px;
+    margin-bottom: var(--spacing-xl); /* 减少section间距 */
+  }
 }
 
 .dashboard-section {
   margin-bottom: var(--spacing-2xl);
-  scroll-margin-top: calc(var(--header-height) + var(--spacing-lg));
+  scroll-margin-top: 180px; /* 头部 + 筛选器 + 子菜单导航的高度 */
+}
+
+.section-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
 }
 
 .section-header {

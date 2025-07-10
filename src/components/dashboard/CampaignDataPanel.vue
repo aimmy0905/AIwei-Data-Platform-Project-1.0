@@ -5,68 +5,7 @@
       <p class="panel-description">营销活动的运营数据和效果评估</p>
     </div>
 
-    <!-- 活动汇总卡片 -->
-    <div class="summary-cards">
-      <div class="summary-card">
-        <div class="card-icon">
-          <Calendar :size="24" />
-        </div>
-        <div class="card-content">
-          <div class="card-title">总活动数</div>
-          <div class="card-value">{{ campaignSummary.totalCampaigns }}</div>
-        </div>
-      </div>
 
-      <div class="summary-card">
-        <div class="card-icon">
-          <Play :size="24" />
-        </div>
-        <div class="card-content">
-          <div class="card-title">进行中</div>
-          <div class="card-value">{{ campaignSummary.activeCampaigns }}</div>
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="card-icon">
-          <DollarSign :size="24" />
-        </div>
-        <div class="card-content">
-          <div class="card-title">总预算</div>
-          <div class="card-value">${{ formatNumber(campaignSummary.totalBudget) }}</div>
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="card-icon">
-          <TrendingUp :size="24" />
-        </div>
-        <div class="card-content">
-          <div class="card-title">总收入</div>
-          <div class="card-value">${{ formatNumber(campaignSummary.totalRevenue) }}</div>
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="card-icon">
-          <Target :size="24" />
-        </div>
-        <div class="card-content">
-          <div class="card-title">平均ROI</div>
-          <div class="card-value">{{ campaignSummary.averageROI }}x</div>
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="card-icon">
-          <Award :size="24" />
-        </div>
-        <div class="card-content">
-          <div class="card-title">最佳活动</div>
-          <div class="card-value">{{ campaignSummary.topPerformingCampaign }}</div>
-        </div>
-      </div>
-    </div>
 
     <!-- 活动数据标签页 -->
     <div class="campaign-tabs">
@@ -97,11 +36,9 @@
               <h3>最新活动列表</h3>
               <div class="filter-controls">
                 <select v-model="statusFilter" class="filter-select">
-                  <option value="">全部状态</option>
-                  <option value="active">进行中</option>
-                  <option value="completed">已完成</option>
-                  <option value="paused">已暂停</option>
-                  <option value="draft">草稿</option>
+                  <option value="">全部阶段</option>
+                  <option value="warmup">预热</option>
+                  <option value="official">正式</option>
                 </select>
                 <select v-model="typeFilter" class="filter-select">
                   <option value="">全部类型</option>
@@ -163,7 +100,7 @@
                     <td>
                       <button
                         class="detail-button"
-                        @click="viewCampaignDetails(campaign.id)"
+                        @click="navigateToCampaignDetails(campaign.id)"
                       >
                         查看详情
                       </button>
@@ -434,6 +371,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import {
   Calendar, Play, DollarSign, TrendingUp, Target, Award,
   List, ArrowLeft, BarChart3
@@ -445,6 +383,9 @@ import {
   mockGetCampaignDetails,
   mockGetCampaignDailyData
 } from '@/mock/dashboard'
+
+// 路由
+const router = useRouter()
 
 // 响应式数据
 const campaignData = ref<CampaignData[]>([])
@@ -467,9 +408,7 @@ const loading = ref(false)
 
 // 标签页配置
 const tabs = [
-  { id: 'list', name: '活动列表', icon: List },
-  { id: 'details', name: '活动详情', icon: Calendar },
-  { id: 'daily', name: '单日数据', icon: BarChart3 }
+  { id: 'list', name: '活动列表', icon: List }
 ]
 
 // 计算属性
@@ -477,7 +416,7 @@ const filteredCampaigns = computed(() => {
   let filtered = campaignData.value
 
   if (statusFilter.value) {
-    filtered = filtered.filter(c => c.status === statusFilter.value)
+    filtered = filtered.filter(c => c.stage === statusFilter.value)
   }
 
   if (typeFilter.value) {
@@ -569,6 +508,11 @@ const viewCampaignDetails = async (campaignId: number) => {
   } catch (error) {
     console.error('获取活动详情失败:', error)
   }
+}
+
+const navigateToCampaignDetails = (campaignId: number) => {
+  // 跳转到活动详情页面
+  router.push(`/campaign/${campaignId}`)
 }
 
 const showAllCampaigns = () => {

@@ -12,13 +12,7 @@ export const mockMenuItems: MenuItem[] = [
     name: '数据看板',
     icon: 'BarChart3',
     children: [
-      {
-        id: 'overview',
-        name: '概览看板',
-        icon: 'PieChart',
-        path: '/dashboard/overview',
-        roles: ['superAdmin', 'manager', 'staff', 'finance', 'sales']
-      },
+
       {
         id: 'customer-goals',
         name: '客户目标',
@@ -55,17 +49,17 @@ export const mockMenuItems: MenuItem[] = [
         roles: ['superAdmin', 'manager', 'staff', 'sales']
       },
       {
-        id: 'influencer-data',
+        id: 'kol-data',
         name: '红人数据',
         icon: 'Users',
-        path: '/dashboard/influencer-data',
+        path: '/dashboard/kol-data',
         roles: ['superAdmin', 'manager', 'staff']
       },
       {
-        id: 'regional-market',
+        id: 'market-data',
         name: '地区市场',
         icon: 'MapPin',
-        path: '/dashboard/regional-market',
+        path: '/dashboard/market-data',
         roles: ['superAdmin', 'manager', 'staff']
       },
       {
