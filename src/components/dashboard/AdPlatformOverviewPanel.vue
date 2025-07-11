@@ -6,208 +6,150 @@
     </div>
 
     <div class="panel-content">
-      <!-- 广告概览统计 -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <DollarSign />
-          </div>
-          <div class="stat-content">
-            <h3>总广告支出</h3>
-            <div class="stat-value">${{ formatNumber(stats.totalSpend) }}</div>
-            <div class="stat-change positive">+{{ stats.spendGrowth }}%</div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">
-            <TrendingUp />
-          </div>
-          <div class="stat-content">
-            <h3>总收入</h3>
-            <div class="stat-value">${{ formatNumber(stats.totalRevenue) }}</div>
-            <div class="stat-change positive">+{{ stats.revenueGrowth }}%</div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">
-            <Target />
-          </div>
-          <div class="stat-content">
-            <h3>平均 ROAS</h3>
-            <div class="stat-value">{{ stats.averageROAS }}x</div>
-            <div class="stat-change positive">+{{ stats.roasGrowth }}%</div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">
-            <MousePointer />
-          </div>
-          <div class="stat-content">
-            <h3>平均 CPC</h3>
-            <div class="stat-value">${{ stats.averageCPC }}</div>
-            <div class="stat-change negative">+{{ stats.cpcChange }}%</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 平台表现对比 -->
-      <div class="platform-comparison">
-        <h3>平台表现对比</h3>
-        <div class="platform-grid">
-          <div
-            v-for="platform in adPlatforms"
-            :key="platform.id"
-            class="platform-card"
-          >
-            <div class="platform-header">
-              <div class="platform-info">
-                <img :src="platform.logo" :alt="platform.name" class="platform-logo">
-                <div>
-                  <h4>{{ platform.name }}</h4>
-                  <span class="platform-status" :class="platform.status">{{ getStatusText(platform.status) }}</span>
-                </div>
-              </div>
-              <div class="platform-roas" :class="getROASClass(platform.roas)">
-                {{ platform.roas }}x
-              </div>
-            </div>
-
-            <div class="platform-metrics">
-              <div class="metric-row">
-                <span class="metric-label">支出:</span>
-                <span class="metric-value">${{ formatNumber(platform.spend) }}</span>
-              </div>
-              <div class="metric-row">
-                <span class="metric-label">收入:</span>
-                <span class="metric-value">${{ formatNumber(platform.revenue) }}</span>
-              </div>
-              <div class="metric-row">
-                <span class="metric-label">点击数:</span>
-                <span class="metric-value">{{ formatNumber(platform.clicks) }}</span>
-              </div>
-              <div class="metric-row">
-                <span class="metric-label">转化数:</span>
-                <span class="metric-value">{{ formatNumber(platform.conversions) }}</span>
-              </div>
-            </div>
-
-            <div class="platform-chart">
-              <div class="chart-header">
-                <span>本月趋势</span>
-                <span class="trend-indicator" :class="getTrendClass(platform.trend)">
-                  {{ platform.trend > 0 ? '+' : '' }}{{ platform.trend }}%
-                </span>
-              </div>
-              <div class="mini-chart">
-                <div
-                  v-for="(value, index) in platform.trendData"
-                  :key="index"
-                  class="chart-bar"
-                  :style="{ height: (value / Math.max(...platform.trendData)) * 100 + '%' }"
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 广告表现趋势 -->
-      <div class="trend-section">
-        <h3>广告表现趋势</h3>
-        <div class="trend-controls">
-          <div class="metric-selector">
+      <!-- 全平台广告数据表格 -->
+      <div class="platform-data-section">
+        <div class="section-header-with-tabs">
+          <h3>全平台广告数据</h3>
+          <div class="platform-tabs">
             <button
-              v-for="metric in trendMetrics"
-              :key="metric.value"
-              :class="['metric-btn', { active: activeTrendMetric === metric.value }]"
-              @click="activeTrendMetric = metric.value"
+              v-for="platform in platformTabs"
+              :key="platform.key"
+              class="platform-tab"
+              :class="platform.key"
+              @click="navigateToPlatform(platform.key)"
             >
-              {{ metric.label }}
+              {{ platform.name }}
             </button>
           </div>
-          <div class="period-selector">
-            <select v-model="selectedPeriod" class="period-select">
-              <option value="7d">最近7天</option>
-              <option value="30d">最近30天</option>
-              <option value="90d">最近90天</option>
-            </select>
-          </div>
         </div>
-        <div class="trend-chart">
-          <LineChart :data="trendChartData" />
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>平台</th>
+                <th>账户名称</th>
+                <th>花费</th>
+                <th>花费占比</th>
+                <th>ROAS</th>
+                <th>购物收入</th>
+                <th>购物数</th>
+                <th>CPA</th>
+                <th>平均购物转化价值</th>
+                <th>转化率</th>
+                <th>展示次数</th>
+                <th>千次展示成本</th>
+                <th>点击量</th>
+                <th>点击率</th>
+                <th>单次点击成本</th>
+                <th>观看次数</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="platform in platformData" :key="platform.id">
+                <td>
+                  <div class="platform-info">
+                    <span class="platform-badge" :class="platform.platform.toLowerCase()">
+                      {{ platform.platform }}
+                    </span>
+                  </div>
+                </td>
+                <td>{{ platform.accountName }}</td>
+                <td class="currency">${{ formatNumber(platform.spend) }}</td>
+                <td class="percentage">{{ platform.spendRatio }}%</td>
+                <td>
+                  <span class="roas-value" :class="getROASClass(platform.roas)">
+                    {{ platform.roas }}x
+                  </span>
+                </td>
+                <td class="currency">${{ formatNumber(platform.revenue) }}</td>
+                <td>{{ formatNumber(platform.purchases) }}</td>
+                <td class="currency">${{ platform.cpa }}</td>
+                <td class="currency">${{ platform.avgPurchaseValue }}</td>
+                <td class="percentage">{{ platform.conversionRate }}%</td>
+                <td>{{ formatNumber(platform.impressions) }}</td>
+                <td class="currency">${{ platform.cpm }}</td>
+                <td>{{ formatNumber(platform.clicks) }}</td>
+                <td class="percentage">{{ platform.ctr }}%</td>
+                <td class="currency">${{ platform.cpc }}</td>
+                <td>{{ formatNumber(platform.views) }}</td>
+              </tr>
+              <!-- 汇总行 -->
+              <tr class="summary-row">
+                <td class="summary-label">
+                  <strong>汇总</strong>
+                </td>
+                <td></td>
+                <td class="currency"><strong>${{ formatNumber(summaryData.totalSpend) }}</strong></td>
+                <td class="percentage"><strong>{{ summaryData.totalSpendRatio }}%</strong></td>
+                <td>
+                  <span class="roas-value" :class="getROASClass(summaryData.avgRoas)">
+                    <strong>{{ summaryData.avgRoas }}x</strong>
+                  </span>
+                </td>
+                <td class="currency"><strong>${{ formatNumber(summaryData.totalRevenue) }}</strong></td>
+                <td><strong>{{ formatNumber(summaryData.totalPurchases) }}</strong></td>
+                <td class="currency"><strong>${{ summaryData.avgCpa }}</strong></td>
+                <td class="currency"><strong>${{ summaryData.avgPurchaseValue }}</strong></td>
+                <td class="percentage"><strong>{{ summaryData.avgConversionRate }}%</strong></td>
+                <td><strong>{{ formatNumber(summaryData.totalImpressions) }}</strong></td>
+                <td class="currency"><strong>${{ summaryData.avgCpm }}</strong></td>
+                <td><strong>{{ formatNumber(summaryData.totalClicks) }}</strong></td>
+                <td class="percentage"><strong>{{ summaryData.avgCtr }}%</strong></td>
+                <td class="currency"><strong>${{ summaryData.avgCpc }}</strong></td>
+                <td><strong>{{ formatNumber(summaryData.totalViews) }}</strong></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <!-- 广告活动排行 -->
-      <div class="campaign-ranking">
-        <h3>广告活动排行</h3>
-        <div class="ranking-table">
-          <div class="table-header">
-            <div class="rank-col">排名</div>
-            <div class="campaign-col">活动名称</div>
-            <div class="platform-col">平台</div>
-            <div class="spend-col">支出</div>
-            <div class="revenue-col">收入</div>
-            <div class="roas-col">ROAS</div>
-            <div class="status-col">状态</div>
-          </div>
-          <div class="table-body">
-            <div
-              v-for="(campaign, index) in topCampaigns"
-              :key="campaign.id"
-              class="table-row"
-            >
-              <div class="rank-col">
-                <span class="rank-badge" :class="getRankClass(index + 1)">{{ index + 1 }}</span>
-              </div>
-              <div class="campaign-col">
-                <div class="campaign-info">
-                  <div class="campaign-name">{{ campaign.name }}</div>
-                  <div class="campaign-type">{{ campaign.type }}</div>
-                </div>
-              </div>
-              <div class="platform-col">
-                <span class="platform-badge" :class="campaign.platform.toLowerCase()">{{ campaign.platform }}</span>
-              </div>
-              <div class="spend-col">${{ formatNumber(campaign.spend) }}</div>
-              <div class="revenue-col">${{ formatNumber(campaign.revenue) }}</div>
-              <div class="roas-col">
-                <span class="roas-value" :class="getROASClass(campaign.roas)">{{ campaign.roas }}x</span>
-              </div>
-              <div class="status-col">
-                <span class="status-badge" :class="campaign.status">{{ getStatusText(campaign.status) }}</span>
+      <!-- 数据可视化图表 -->
+      <div class="charts-section">
+        <div class="chart-container">
+          <div class="chart-card">
+            <h3>各广告平台花费占比</h3>
+            <div class="chart-wrapper">
+              <PieChart
+                :data="spendChartData"
+                height="300px"
+                :show-legend="false"
+                :donut="false"
+              />
+            </div>
+            <div class="chart-legend">
+              <div
+                v-for="item in spendChartData"
+                :key="item.name"
+                class="legend-item"
+              >
+                <div class="legend-color" :style="{ backgroundColor: item.color }"></div>
+                <span class="legend-label">{{ item.name }}</span>
+                <span class="legend-value">${{ formatNumber(item.value) }}</span>
+                <span class="legend-percentage">{{ item.percentage }}%</span>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- 广告洞察 -->
-      <div class="insights-section">
-        <h3>广告洞察</h3>
-        <div class="insights-grid">
-          <div
-            v-for="insight in adInsights"
-            :key="insight.id"
-            class="insight-card"
-          >
-            <div class="insight-icon" :class="insight.type">
-              <component :is="getInsightIcon(insight.type)" />
+          <div class="chart-card">
+            <h3>各广告平台点击率占比</h3>
+            <div class="chart-wrapper">
+              <PieChart
+                :data="ctrPieChartData"
+                height="300px"
+                :show-legend="false"
+                :donut="false"
+              />
             </div>
-            <div class="insight-content">
-              <h4>{{ insight.title }}</h4>
-              <p>{{ insight.description }}</p>
-              <div class="insight-metrics">
-                <span class="metric">{{ insight.metric }}</span>
-                <span class="impact" :class="insight.impact">{{ insight.impactText }}</span>
+            <div class="chart-legend">
+              <div
+                v-for="item in ctrPieChartData"
+                :key="item.name"
+                class="legend-item"
+              >
+                <div class="legend-color" :style="{ backgroundColor: item.color }"></div>
+                <span class="legend-label">{{ item.name }}</span>
+                <span class="legend-value">{{ item.value }}%</span>
               </div>
-            </div>
-            <div class="insight-actions">
-              <button class="action-btn primary">查看详情</button>
-              <button class="action-btn secondary">优化建议</button>
             </div>
           </div>
         </div>
@@ -218,238 +160,192 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { DollarSign, TrendingUp, Target, MousePointer, AlertTriangle, Zap, Info, CheckCircle } from 'lucide-vue-next'
-import LineChart from '@/components/charts/LineChart.vue'
+import { useRouter } from 'vue-router'
+import PieChart from '@/components/charts/PieChart.vue'
 
 // 定义数据类型
-interface AdStats {
-  totalSpend: number
-  spendGrowth: number
-  totalRevenue: number
-  revenueGrowth: number
-  averageROAS: number
-  roasGrowth: number
-  averageCPC: number
-  cpcChange: number
-}
-
-interface AdPlatform {
+interface PlatformData {
   id: string
-  name: string
-  logo: string
-  spend: number
-  revenue: number
-  roas: number
-  clicks: number
-  conversions: number
-  status: 'active' | 'paused' | 'warning'
-  trend: number
-  trendData: number[]
-}
-
-interface Campaign {
-  id: string
-  name: string
-  type: string
   platform: string
+  accountName: string
   spend: number
-  revenue: number
+  spendRatio: number
   roas: number
-  status: 'active' | 'paused' | 'completed'
+  revenue: number
+  purchases: number
+  cpa: number
+  avgPurchaseValue: number
+  conversionRate: number
+  impressions: number
+  cpm: number
+  clicks: number
+  ctr: number
+  cpc: number
+  views: number
 }
 
-interface AdInsight {
-  id: string
-  type: 'opportunity' | 'warning' | 'success' | 'info'
-  title: string
-  description: string
-  metric: string
-  impact: 'positive' | 'negative' | 'neutral'
-  impactText: string
+interface ChartData {
+  name: string
+  value: number
+  color: string
+  percentage?: number
 }
+
+// 路由实例
+const router = useRouter()
 
 // 响应式数据
-const activeTrendMetric = ref('roas')
-const selectedPeriod = ref('30d')
+const platformTabs = ref([
+  { key: 'google', name: 'Google' },
+  { key: 'meta', name: 'Meta' },
+  { key: 'bing', name: 'Bing' },
+  { key: 'criteo', name: 'Criteo' }
+])
 
-const stats = ref<AdStats>({
-  totalSpend: 125000,
-  spendGrowth: 8,
-  totalRevenue: 485000,
-  revenueGrowth: 15,
-  averageROAS: 3.88,
-  roasGrowth: 6,
-  averageCPC: 1.25,
-  cpcChange: 3
-})
-
-const trendMetrics = [
-  { value: 'roas', label: 'ROAS' },
-  { value: 'spend', label: '支出' },
-  { value: 'revenue', label: '收入' },
-  { value: 'cpc', label: 'CPC' }
-]
-
-const adPlatforms = ref<AdPlatform[]>([
+const platformData = ref<PlatformData[]>([
   {
     id: '1',
-    name: 'Meta Ads',
-    logo: '/logos/meta.png',
+    platform: 'Google',
+    accountName: 'Google Ads Account 1',
     spend: 45000,
-    revenue: 185000,
-    roas: 4.11,
-    clicks: 125000,
-    conversions: 2850,
-    status: 'active',
-    trend: 12,
-    trendData: [80, 95, 88, 92, 105, 98, 110]
+    spendRatio: 36,
+    roas: 4.2,
+    revenue: 189000,
+    purchases: 1890,
+    cpa: 23.8,
+    avgPurchaseValue: 100,
+    conversionRate: 3.2,
+    impressions: 2100000,
+    cpm: 21.4,
+    clicks: 45000,
+    ctr: 2.1,
+    cpc: 1.0,
+    views: 1800000
   },
   {
     id: '2',
-    name: 'Google Ads',
-    logo: '/logos/google.png',
+    platform: 'Meta',
+    accountName: 'Meta Ads Account 1',
     spend: 38000,
-    revenue: 142000,
-    roas: 3.74,
-    clicks: 98000,
-    conversions: 2150,
-    status: 'active',
-    trend: 8,
-    trendData: [75, 82, 78, 85, 88, 92, 95]
-  },
-  {
-    id: '3',
-    name: 'Bing Ads',
-    logo: '/logos/bing.png',
-    spend: 28000,
-    revenue: 95000,
-    roas: 3.39,
-    clicks: 65000,
-    conversions: 1420,
-    status: 'warning',
-    trend: -3,
-    trendData: [85, 78, 82, 75, 73, 70, 68]
-  },
-  {
-    id: '4',
-    name: 'Criteo',
-    logo: '/logos/criteo.png',
-    spend: 14000,
-    revenue: 63000,
-    roas: 4.5,
-    clicks: 42000,
-    conversions: 980,
-    status: 'active',
-    trend: 18,
-    trendData: [60, 65, 72, 78, 85, 88, 92]
-  }
-])
-
-const topCampaigns = ref<Campaign[]>([
-  {
-    id: '1',
-    name: '夏季护肤品推广',
-    type: '转化活动',
-    platform: 'Meta',
-    spend: 15000,
-    revenue: 68000,
-    roas: 4.53,
-    status: 'active'
-  },
-  {
-    id: '2',
-    name: '品牌认知度提升',
-    type: '品牌活动',
-    platform: 'Google',
-    spend: 12000,
-    revenue: 52000,
-    roas: 4.33,
-    status: 'active'
-  },
-  {
-    id: '3',
-    name: '重定向活动',
-    type: '重定向',
-    platform: 'Criteo',
-    spend: 8000,
-    revenue: 35000,
-    roas: 4.38,
-    status: 'active'
-  },
-  {
-    id: '4',
-    name: '搜索广告优化',
-    type: '搜索活动',
-    platform: 'Google',
-    spend: 10000,
-    revenue: 38000,
+    spendRatio: 30,
     roas: 3.8,
-    status: 'active'
-  },
-  {
-    id: '5',
-    name: '视频广告测试',
-    type: '视频活动',
-    platform: 'Meta',
-    spend: 9000,
-    revenue: 32000,
-    roas: 3.56,
-    status: 'paused'
-  }
-])
-
-const adInsights = ref<AdInsight[]>([
-  {
-    id: '1',
-    type: 'opportunity',
-    title: 'Criteo 表现优异',
-    description: 'Criteo 平台的 ROAS 达到 4.5x，建议增加投入',
-    metric: 'ROAS: 4.5x',
-    impact: 'positive',
-    impactText: '高潜力'
-  },
-  {
-    id: '2',
-    type: 'warning',
-    title: 'Bing Ads 表现下滑',
-    description: 'Bing Ads 平台的表现连续3周下滑，需要优化策略',
-    metric: '下滑: -3%',
-    impact: 'negative',
-    impactText: '需关注'
+    revenue: 144400,
+    purchases: 1444,
+    cpa: 26.3,
+    avgPurchaseValue: 100,
+    conversionRate: 2.8,
+    impressions: 1900000,
+    cpm: 20.0,
+    clicks: 38000,
+    ctr: 2.0,
+    cpc: 1.0,
+    views: 1520000
   },
   {
     id: '3',
-    type: 'success',
-    title: 'Meta Ads 增长强劲',
-    description: 'Meta Ads 平台本月增长 12%，转化率稳步提升',
-    metric: '增长: +12%',
-    impact: 'positive',
-    impactText: '表现优异'
+    platform: 'Bing',
+    accountName: 'Bing Ads Account 1',
+    spend: 25000,
+    spendRatio: 20,
+    roas: 3.5,
+    revenue: 87500,
+    purchases: 875,
+    cpa: 28.6,
+    avgPurchaseValue: 100,
+    conversionRate: 2.5,
+    impressions: 1250000,
+    cpm: 20.0,
+    clicks: 25000,
+    ctr: 2.0,
+    cpc: 1.0,
+    views: 1000000
   },
   {
     id: '4',
-    type: 'info',
-    title: 'CPC 成本上升',
-    description: '整体 CPC 成本上升 3%，建议优化关键词策略',
-    metric: 'CPC: $1.25',
-    impact: 'neutral',
-    impactText: '需优化'
+    platform: 'Criteo',
+    accountName: 'Criteo Account 1',
+    spend: 17000,
+    spendRatio: 14,
+    roas: 3.2,
+    revenue: 54400,
+    purchases: 544,
+    cpa: 31.3,
+    avgPurchaseValue: 100,
+    conversionRate: 2.2,
+    impressions: 850000,
+    cpm: 20.0,
+    clicks: 17000,
+    ctr: 2.0,
+    cpc: 1.0,
+    views: 680000
   }
 ])
 
 // 计算属性
-const trendChartData = computed(() => {
-  const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-  const platforms = ['Meta', 'Google', 'Bing', 'Criteo']
-  const colors = ['#1877f2', '#4285f4', '#00809d', '#ff6900']
+const spendChartData = computed(() => {
+  const colors = ['#4285f4', '#1877f2', '#00809d', '#ff6900']
+  return platformData.value.map((platform, index) => ({
+    name: platform.platform,
+    value: platform.spend,
+    color: colors[index],
+    percentage: platform.spendRatio
+  }))
+})
+
+const ctrChartData = computed(() => {
+  const colors = ['#4285f4', '#1877f2', '#00809d', '#ff6900']
+  return {
+    labels: platformData.value.map(platform => platform.platform),
+    datasets: [{
+      label: '点击率',
+      data: platformData.value.map(platform => platform.ctr),
+      color: colors[0]
+    }]
+  }
+})
+
+const ctrPieChartData = computed(() => {
+  const colors = ['#4285f4', '#1877f2', '#00809d', '#ff6900']
+  return platformData.value.map((platform, index) => ({
+    name: platform.platform,
+    value: platform.ctr,
+    color: colors[index]
+  }))
+})
+
+// 汇总数据计算属性
+const summaryData = computed(() => {
+  const data = platformData.value
+  const totalSpend = data.reduce((sum, platform) => sum + platform.spend, 0)
+  const totalRevenue = data.reduce((sum, platform) => sum + platform.revenue, 0)
+  const totalPurchases = data.reduce((sum, platform) => sum + platform.purchases, 0)
+  const totalImpressions = data.reduce((sum, platform) => sum + platform.impressions, 0)
+  const totalClicks = data.reduce((sum, platform) => sum + platform.clicks, 0)
+  const totalViews = data.reduce((sum, platform) => sum + platform.views, 0)
+
+  const avgRoas = totalSpend > 0 ? Number((totalRevenue / totalSpend).toFixed(1)) : 0
+  const avgCpa = totalPurchases > 0 ? Number((totalSpend / totalPurchases).toFixed(1)) : 0
+  const avgPurchaseValue = totalPurchases > 0 ? Number((totalRevenue / totalPurchases).toFixed(0)) : 0
+  const avgConversionRate = totalClicks > 0 ? Number(((totalPurchases / totalClicks) * 100).toFixed(1)) : 0
+  const avgCpm = totalImpressions > 0 ? Number(((totalSpend / totalImpressions) * 1000).toFixed(1)) : 0
+  const avgCtr = totalImpressions > 0 ? Number(((totalClicks / totalImpressions) * 100).toFixed(1)) : 0
+  const avgCpc = totalClicks > 0 ? Number((totalSpend / totalClicks).toFixed(1)) : 0
 
   return {
-    labels: days,
-    datasets: platforms.map((platform, index) => ({
-      label: platform,
-      data: Array.from({ length: 7 }, () => Math.floor(Math.random() * 50) + 50),
-      color: colors[index]
-    }))
+    totalSpend,
+    totalSpendRatio: 100, // 汇总行显示100%
+    avgRoas,
+    totalRevenue,
+    totalPurchases,
+    avgCpa,
+    avgPurchaseValue,
+    avgConversionRate,
+    totalImpressions,
+    avgCpm,
+    totalClicks,
+    avgCtr,
+    avgCpc,
+    totalViews
   }
 })
 
@@ -463,44 +359,27 @@ const formatNumber = (num: number): string => {
   return num.toString()
 }
 
-const getStatusText = (status: string): string => {
-  const statusMap = {
-    active: '活跃',
-    paused: '暂停',
-    warning: '警告',
-    completed: '完成'
-  }
-  return statusMap[status as keyof typeof statusMap] || status
-}
-
 const getROASClass = (roas: number): string => {
-  if (roas >= 4) return 'roas-excellent'
-  if (roas >= 3) return 'roas-good'
-  if (roas >= 2) return 'roas-fair'
-  return 'roas-poor'
+  if (roas >= 4) return 'excellent'
+  if (roas >= 3) return 'good'
+  if (roas >= 2) return 'average'
+  return 'poor'
 }
 
-const getTrendClass = (trend: number): string => {
-  if (trend > 0) return 'trend-positive'
-  if (trend < 0) return 'trend-negative'
-  return 'trend-neutral'
-}
-
-const getRankClass = (rank: number): string => {
-  if (rank === 1) return 'rank-first'
-  if (rank === 2) return 'rank-second'
-  if (rank === 3) return 'rank-third'
-  return 'rank-default'
-}
-
-const getInsightIcon = (type: string) => {
-  const iconMap = {
-    opportunity: Target,
-    warning: AlertTriangle,
-    success: CheckCircle,
-    info: Info
+const navigateToPlatform = (platform: string): void => {
+  // 根据平台跳转到对应的详情页
+  const routeMap: { [key: string]: string } = {
+    'google': 'google-dashboard',
+    'meta': 'meta-dashboard',
+    'bing': 'bing-dashboard',
+    'criteo': 'criteo-dashboard'
   }
-  return iconMap[type as keyof typeof iconMap] || Info
+
+  const routeName = routeMap[platform]
+  if (routeName) {
+    console.log(`导航到 ${platform} 详情页: ${routeName}`)
+    router.push({ name: routeName })
+  }
 }
 
 onMounted(() => {
@@ -510,539 +389,390 @@ onMounted(() => {
 
 <style scoped>
 .ad-platform-overview-panel {
-  padding: 24px;
-  background: var(--color-background);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: auto !important;
+  min-height: 200px;
 }
 
 .section-header {
-  margin-bottom: 24px;
+  padding: 24px;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .section-title {
   font-size: 24px;
   font-weight: 600;
-  color: var(--color-text);
+  color: #1f2937;
   margin: 0 0 8px 0;
 }
 
 .section-description {
-  color: var(--color-text-secondary);
+  color: #6b7280;
   margin: 0;
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 16px;
+.panel-content {
+  padding: 24px;
+}
+
+.platform-data-section {
   margin-bottom: 32px;
 }
 
-.stat-card {
-  background: var(--color-background-soft);
-  border-radius: 8px;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.stat-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  background: var(--color-primary);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.stat-content h3 {
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  margin: 0 0 8px 0;
-}
-
-.stat-value {
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--color-text);
-  margin-bottom: 4px;
-}
-
-.stat-change {
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.stat-change.positive {
-  color: var(--color-success);
-}
-
-.stat-change.negative {
-  color: var(--color-danger);
-}
-
-.platform-comparison {
-  margin-bottom: 32px;
-}
-
-.platform-comparison h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--color-text);
-  margin: 0 0 16px 0;
-}
-
-.platform-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 16px;
-}
-
-.platform-card {
-  background: var(--color-background-soft);
-  border-radius: 8px;
-  padding: 20px;
-}
-
-.platform-header {
+.section-header-with-tabs {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+}
+
+.platform-data-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.platform-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.platform-tab {
+  padding: 8px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: white;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.platform-tab:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  transform: translateY(-1px);
+}
+
+.platform-tab.google {
+  border-color: #4285f4;
+  color: #4285f4;
+}
+
+.platform-tab.google:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+}
+
+.platform-tab.meta {
+  border-color: #1877f2;
+  color: #1877f2;
+}
+
+.platform-tab.meta:hover {
+  background: #eff6ff;
+  border-color: #1d4ed8;
+}
+
+.platform-tab.bing {
+  border-color: #00809d;
+  color: #00809d;
+}
+
+.platform-tab.bing:hover {
+  background: #ecfdf5;
+  border-color: #059669;
+}
+
+.platform-tab.criteo {
+  border-color: #ff6900;
+  color: #ff6900;
+}
+
+.platform-tab.criteo:hover {
+  background: #fef3c7;
+  border-color: #f59e0b;
+}
+
+.data-table-container {
+  overflow-x: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  color: #374151;
+}
+
+.data-table th {
+  background-color: #f8fafc;
+  color: #6b7280;
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  font-weight: 600;
+}
+
+.data-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.data-table tr:hover {
+  background-color: #f8fafc;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.summary-row {
+  background-color: #f8fafc !important;
+  border-top: 2px solid #e2e8f0;
+}
+
+.summary-row:hover {
+  background-color: #f1f5f9 !important;
+}
+
+.summary-row td {
+  font-weight: 600;
+  color: #1f2937;
+  border-bottom: none;
+}
+
+.summary-label {
+  color: #374151;
+  font-size: 14px;
 }
 
 .platform-info {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-.platform-logo {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  object-fit: cover;
-}
-
-.platform-info h4 {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--color-text);
-  margin: 0 0 4px 0;
-}
-
-.platform-status {
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  color: white;
-}
-
-.platform-status.active { background: var(--color-success); }
-.platform-status.paused { background: var(--color-warning); }
-.platform-status.warning { background: var(--color-danger); }
-
-.platform-roas {
-  font-size: 18px;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 6px;
-  color: white;
-}
-
-.platform-roas.roas-excellent { background: var(--color-success); }
-.platform-roas.roas-good { background: var(--color-warning); }
-.platform-roas.roas-fair { background: var(--color-info); }
-.platform-roas.roas-poor { background: var(--color-danger); }
-
-.platform-metrics {
-  margin-bottom: 16px;
-}
-
-.metric-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.metric-label {
-  font-size: 14px;
-  color: var(--color-text-secondary);
-}
-
-.metric-value {
-  font-weight: 500;
-  color: var(--color-text);
-}
-
-.platform-chart {
-  border-top: 1px solid var(--color-border);
-  padding-top: 16px;
-}
-
-.chart-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.chart-header span {
-  font-size: 14px;
-  color: var(--color-text-secondary);
-}
-
-.trend-indicator {
-  font-size: 12px;
-  font-weight: 500;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.trend-indicator.trend-positive {
-  background: var(--color-success-light);
-  color: var(--color-success);
-}
-
-.trend-indicator.trend-negative {
-  background: var(--color-danger-light);
-  color: var(--color-danger);
-}
-
-.mini-chart {
-  display: flex;
-  align-items: end;
-  gap: 2px;
-  height: 40px;
-}
-
-.chart-bar {
-  flex: 1;
-  background: var(--color-primary);
-  border-radius: 2px;
-  min-height: 4px;
-  opacity: 0.7;
-  transition: opacity 0.2s;
-}
-
-.chart-bar:hover {
-  opacity: 1;
-}
-
-.trend-section {
-  margin-bottom: 32px;
-}
-
-.trend-section h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--color-text);
-  margin: 0 0 16px 0;
-}
-
-.trend-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.metric-selector {
-  display: flex;
   gap: 8px;
 }
 
-.metric-btn {
-  padding: 6px 12px;
-  border: 1px solid var(--color-border);
-  background: var(--color-background);
-  color: var(--color-text-secondary);
+.currency {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.percentage {
+  font-weight: 500;
+  color: #059669;
+}
+
+.roas-value {
+  padding: 4px 8px;
   border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
+  font-weight: 500;
+  font-size: 13px;
 }
 
-.metric-btn.active {
-  background: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
+.roas-value.excellent {
+  background: #dcfce7;
+  color: #059669;
 }
 
-.period-select {
-  padding: 6px 12px;
-  border: 1px solid var(--color-border);
-  background: var(--color-background);
-  color: var(--color-text);
-  border-radius: 4px;
-  cursor: pointer;
+.roas-value.good {
+  background: #fef3c7;
+  color: #d97706;
 }
 
-.trend-chart {
-  background: var(--color-background-soft);
+.roas-value.average {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.roas-value.poor {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.charts-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.chart-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.chart-card {
+  background: #f8fafc;
   border-radius: 8px;
-  padding: 16px;
-  height: 300px;
+  padding: 20px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
 }
 
-.campaign-ranking {
-  margin-bottom: 32px;
+.chart-card:hover {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  transform: translateY(-1px);
 }
 
-.campaign-ranking h3 {
-  font-size: 18px;
+.chart-card h3 {
+  font-size: 16px;
   font-weight: 600;
-  color: var(--color-text);
+  color: #1f2937;
   margin: 0 0 16px 0;
 }
 
-.ranking-table {
-  background: var(--color-background-soft);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.table-header {
-  display: grid;
-  grid-template-columns: 60px 1fr 100px 100px 100px 80px 80px;
-  gap: 16px;
-  padding: 16px;
-  background: var(--color-background-mute);
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  font-size: 14px;
-}
-
-.table-row {
-  display: grid;
-  grid-template-columns: 60px 1fr 100px 100px 100px 80px 80px;
-  gap: 16px;
-  padding: 16px;
-  border-top: 1px solid var(--color-border);
-  align-items: center;
-}
-
-.rank-badge {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
+.chart-wrapper {
+  height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  font-weight: 600;
-  color: white;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
 }
 
-.rank-first { background: #ffd700; }
-.rank-second { background: #c0c0c0; }
-.rank-third { background: #cd7f32; }
-.rank-default { background: var(--color-text-secondary); }
-
-.campaign-info {
+.chart-legend {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
 }
 
-.campaign-name {
-  font-weight: 500;
-  color: var(--color-text);
-}
-
-.campaign-type {
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 12px;
-  color: var(--color-text-secondary);
+  color: #6b7280;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.legend-label {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.legend-value {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.legend-percentage {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.chart-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.stat-platform {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .platform-badge {
   padding: 4px 8px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   color: white;
 }
 
-.platform-badge.meta { background: #1877f2; }
 .platform-badge.google { background: #4285f4; }
+.platform-badge.meta { background: #1877f2; }
+.platform-badge.facebook { background: #1877f2; }
 .platform-badge.bing { background: #00809d; }
 .platform-badge.criteo { background: #ff6900; }
 
-.roas-value.roas-excellent { color: var(--color-success); }
-.roas-value.roas-good { color: var(--color-warning); }
-.roas-value.roas-fair { color: var(--color-info); }
-.roas-value.roas-poor { color: var(--color-danger); }
-
-.status-badge {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+.stat-value {
   font-weight: 500;
-  color: white;
+  color: #1f2937;
 }
 
-.status-badge.active { background: var(--color-success); }
-.status-badge.paused { background: var(--color-warning); }
-.status-badge.completed { background: var(--color-info); }
+@media (max-width: 1024px) {
+  .charts-section {
+    grid-template-columns: 1fr;
+  }
 
-.insights-section h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--color-text);
-  margin: 0 0 16px 0;
-}
-
-.insights-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 16px;
-}
-
-.insight-card {
-  background: var(--color-background-soft);
-  border-radius: 8px;
-  padding: 20px;
-  display: flex;
-  gap: 16px;
-}
-
-.insight-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: white;
-}
-
-.insight-icon.opportunity { background: var(--color-success); }
-.insight-icon.warning { background: var(--color-warning); }
-.insight-icon.success { background: var(--color-primary); }
-.insight-icon.info { background: var(--color-info); }
-
-.insight-content {
-  flex: 1;
-}
-
-.insight-content h4 {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--color-text);
-  margin: 0 0 8px 0;
-}
-
-.insight-content p {
-  color: var(--color-text-secondary);
-  margin: 0 0 12px 0;
-  line-height: 1.5;
-}
-
-.insight-metrics {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.metric {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--color-text);
-}
-
-.impact {
-  font-size: 12px;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: 500;
-}
-
-.impact.positive {
-  background: var(--color-success-light);
-  color: var(--color-success);
-}
-
-.impact.negative {
-  background: var(--color-danger-light);
-  color: var(--color-danger);
-}
-
-.impact.neutral {
-  background: var(--color-info-light);
-  color: var(--color-info);
-}
-
-.insight-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: flex-end;
-}
-
-.action-btn {
-  padding: 6px 12px;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.action-btn.primary {
-  background: var(--color-primary);
-  color: white;
-}
-
-.action-btn.secondary {
-  background: var(--color-background);
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
-}
-
-.action-btn:hover {
-  opacity: 0.8;
+  .chart-container {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
+  .panel-content {
+    padding: 16px;
   }
 
-  .platform-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .trend-controls {
+  .section-header-with-tabs {
     flex-direction: column;
+    align-items: flex-start;
     gap: 12px;
-    align-items: stretch;
   }
 
-  .table-header,
-  .table-row {
-    grid-template-columns: 1fr;
-    gap: 8px;
+  .platform-tabs {
+    flex-wrap: wrap;
+    gap: 6px;
   }
 
-  .insights-grid {
-    grid-template-columns: 1fr;
+  .platform-tab {
+    padding: 6px 12px;
+    font-size: 12px;
   }
 
-  .insight-card {
+  .data-table {
+    font-size: 12px;
+  }
+
+  .data-table th, .data-table td {
+    padding: 8px 12px;
+  }
+
+  .chart-legend, .chart-stats {
     flex-direction: column;
-  }
-
-  .insight-actions {
-    flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
+    gap: 8px;
   }
 }
 </style>
