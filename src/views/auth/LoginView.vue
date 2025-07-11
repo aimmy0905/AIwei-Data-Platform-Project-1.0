@@ -255,22 +255,18 @@ const handleLogin = async () => {
   loading.value = true
   loginError.value = ''
 
-  try {
-    const response = await authStore.login(formData.value)
+  // 直接调用登录，不使用 try-catch，因为这是模拟登录
+  const response = await authStore.login(formData.value)
 
-    if (response.success) {
-      // 登录成功，跳转到数据看板
-      await router.push({ name: 'dashboard-overview' })
-    } else {
-      // 登录失败，显示错误信息
-      loginError.value = response.message || '登录失败，请稍后重试'
-    }
-  } catch (error) {
-    console.error('登录错误:', error)
-    loginError.value = '登录请求失败，请检查网络连接'
-  } finally {
-    loading.value = false
+  if (response.success) {
+    // 登录成功，跳转到数据看板
+    await router.push({ name: 'dashboard' })
+  } else {
+    // 登录失败，显示错误信息
+    loginError.value = response.message || '登录失败，请稍后重试'
   }
+
+  loading.value = false
 }
 
 // 填充演示账号
@@ -289,7 +285,7 @@ onMounted(() => {
 
   // 如果已经登录，直接跳转到数据看板
   if (authStore.isAuthenticated) {
-    router.push({ name: 'dashboard-overview' })
+    router.push({ name: 'dashboard' })
   }
 })
 </script>

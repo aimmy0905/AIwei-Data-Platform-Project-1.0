@@ -18,30 +18,20 @@ export const useAuthStore = defineStore('auth', () => {
   // 动作
   const login = async (form: LoginForm) => {
     loading.value = true
-    try {
-      const response = await mockLogin(form)
-      if (response.success && response.data) {
-        user.value = response.data.user
-        token.value = response.data.token
-        isAuthenticated.value = true
 
-        // 存储到本地存储
-        localStorage.setItem('auth_token', response.data.token)
-        localStorage.setItem('user_info', JSON.stringify(response.data.user))
+    const response = await mockLogin(form)
+    if (response.success && response.data) {
+      user.value = response.data.user
+      token.value = response.data.token
+      isAuthenticated.value = true
 
-        return response
-      }
-      return response
-    } catch (error) {
-      console.error('登录失败:', error)
-      return {
-        success: false,
-        message: '登录请求失败，请稍后重试',
-        code: 500
-      }
-    } finally {
-      loading.value = false
+      // 存储到本地存储
+      localStorage.setItem('auth_token', response.data.token)
+      localStorage.setItem('user_info', JSON.stringify(response.data.user))
     }
+
+    loading.value = false
+    return response
   }
 
   const logout = async () => {
