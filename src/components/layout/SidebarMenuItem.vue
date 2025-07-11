@@ -1,19 +1,19 @@
 <template>
   <div class="menu-item">
     <!-- 有子菜单的项目 -->
-    <div 
+    <div
       v-if="item.children && item.children.length > 0"
       class="menu-item__group"
     >
       <div
         class="menu-item__header"
         :class="{ 'menu-item__header--active': isOpen }"
-        @click="toggleSubmenu"
+        @click="handleHeaderClick"
       >
         <div class="menu-item__content">
-          <component 
-            :is="getIcon(item.icon)" 
-            :size="20" 
+          <component
+            :is="getIcon(item.icon)"
+            :size="20"
             class="menu-item__icon"
           />
           <transition name="fade">
@@ -26,15 +26,15 @@
           </span>
         </div>
         <transition name="fade">
-          <ChevronDown 
+          <ChevronDown
             v-show="!collapsed"
-            :size="16" 
+            :size="16"
             class="menu-item__arrow"
             :class="{ 'menu-item__arrow--open': isOpen }"
           />
         </transition>
       </div>
-      
+
       <!-- 子菜单 -->
       <Transition name="slide-down">
         <div v-show="isOpen && !collapsed" class="menu-item__submenu">
@@ -54,16 +54,16 @@
     <div
       v-else
       class="menu-item__link"
-      :class="{ 
+      :class="{
         'menu-item__link--active': isActive,
-        'menu-item__link--collapsed': collapsed 
+        'menu-item__link--collapsed': collapsed
       }"
       @click="handleClick"
     >
       <div class="menu-item__content">
-        <component 
-          :is="getIcon(item.icon)" 
-          :size="20" 
+        <component
+          :is="getIcon(item.icon)"
+          :size="20"
           class="menu-item__icon"
         />
         <transition name="fade">
@@ -75,7 +75,7 @@
           {{ item.badge }}
         </span>
       </div>
-      
+
       <!-- 折叠状态下的提示 -->
       <div v-if="collapsed" class="menu-item__tooltip">
         {{ item.name }}
@@ -89,13 +89,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { 
-  ChevronDown, 
-  BarChart3, 
-  PieChart, 
-  Target, 
-  Globe, 
-  TrendingUp, 
+import {
+  ChevronDown,
+  BarChart3,
+  PieChart,
+  Target,
+  Globe,
+  TrendingUp,
   Calendar,
   Package,
   Users,
@@ -183,12 +183,24 @@ const getIcon = (iconName: string) => {
 
 const toggleSubmenu = () => {
   if (!props.collapsed) {
+    console.log('Toggling submenu for:', props.item.id)
     menuStore.toggleSubmenu(props.item.id)
+    // 也要触发选择事件，让父组件知道这个菜单项被点击了
+    emit('select', props.item)
   }
 }
 
 const handleClick = () => {
+  console.log('Menu item clicked:', props.item.id, props.item.name)
   emit('select', props.item)
+}
+
+const handleHeaderClick = () => {
+  if (props.item.path) {
+    emit('select', props.item)
+  } else {
+    toggleSubmenu()
+  }
 }
 </script>
 

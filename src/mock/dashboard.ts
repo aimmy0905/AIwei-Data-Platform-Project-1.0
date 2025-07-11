@@ -4568,3 +4568,1538 @@ export const mockGetCustomerGoalsByPeriod = (goalType: 'monthly' | 'quarterly' |
     }, 200)
   })
 }
+
+// Meta数据看板Mock数据
+export const mockMetaAccounts = [
+  {
+    id: 'meta-001',
+    name: 'Fashion Store Meta Account',
+    status: 'active',
+    statusText: '正常',
+    balance: '$15,280.50',
+    currency: 'USD'
+  },
+  {
+    id: 'meta-002',
+    name: 'Tech Gadgets Meta Account',
+    status: 'limited',
+    statusText: '受限',
+    balance: '$8,950.20',
+    currency: 'USD'
+  },
+  {
+    id: 'meta-003',
+    name: 'Beauty Cosmetics Meta Account',
+    status: 'active',
+    statusText: '正常',
+    balance: '$22,150.75',
+    currency: 'USD'
+  }
+]
+
+export const mockMetaAlerts = [
+  {
+    id: 1,
+    type: 'balance',
+    title: '账户余额不足',
+    message: 'Fashion Store Meta Account 余额低于 $1000',
+    value: '$850.20',
+    priority: 'high',
+    createdAt: '2025-01-07 10:30:00'
+  },
+  {
+    id: 2,
+    type: 'performance',
+    title: '广告表现异常',
+    message: 'CTR 下降超过 30%',
+    value: '1.2%',
+    priority: 'medium',
+    createdAt: '2025-01-07 09:15:00'
+  },
+  {
+    id: 3,
+    type: 'creative',
+    title: '素材效果下降',
+    message: '视频广告 ROAS 下降 25%',
+    value: '2.8x',
+    priority: 'medium',
+    createdAt: '2025-01-07 08:45:00'
+  },
+  {
+    id: 4,
+    type: 'budget',
+    title: '预算使用提醒',
+    message: '日预算已使用 85%',
+    value: '$1,275',
+    priority: 'low',
+    createdAt: '2025-01-07 08:00:00'
+  }
+]
+
+export const mockMetaAccountOverview = {
+  // 账户总览数据
+  totalSpend: 58420.50,
+  totalSpendChange: 12.5,
+  dailyAverage: 8345.79,
+  dailyAverageChange: -3.2,
+  adRevenue: 245680.30,
+  adRevenueChange: 18.7,
+  roas: 4.2,
+  roasChange: 8.3,
+  users: 125400,
+  usersChange: 15.2,
+  cpc: 1.85,
+  cpcChange: -5.1,
+
+  // 趋势数据
+  trendData: {
+    labels: ['1月1日', '1月2日', '1月3日', '1月4日', '1月5日', '1月6日', '1月7日'],
+    datasets: [
+      {
+        label: '收入',
+        data: [32500, 34200, 31800, 36500, 35100, 38200, 39800],
+        color: '#52c41a'
+      },
+      {
+        label: '花费',
+        data: [8200, 8600, 7900, 9100, 8750, 9500, 9900],
+        color: '#1890ff'
+      },
+      {
+        label: '客单价',
+        data: [85, 88, 82, 92, 89, 95, 98],
+        color: '#fa8c16'
+      }
+    ]
+  },
+
+  salesRoasTrendData: {
+    labels: ['1月1日', '1月2日', '1月3日', '1月4日', '1月5日', '1月6日', '1月7日'],
+    datasets: [
+      {
+        label: '销量',
+        data: [382, 389, 387, 396, 394, 402, 406],
+        color: '#722ed1'
+      },
+      {
+        label: 'ROAS',
+        data: [3.96, 3.98, 4.02, 4.01, 4.01, 4.02, 4.02],
+        color: '#eb2f96'
+      }
+    ]
+  }
+}
+
+export const mockMetaDailyData = [
+  {
+    date: '2025-01-07',
+    spend: 9850.20,
+    revenue: 39800.50,
+    roas: 4.04,
+    aov: 98.50,
+    sales: 404,
+    conversionCost: 24.38,
+    customerPrice: 98.50,
+    conversionRate: 3.2,
+    addToCartCost: 8.50,
+    addToCartRate: 12.5,
+    users: 18500,
+    ctr: 2.8,
+    cpm: 15.20
+  },
+  {
+    date: '2025-01-06',
+    spend: 9500.00,
+    revenue: 38200.00,
+    roas: 4.02,
+    aov: 95.00,
+    sales: 402,
+    conversionCost: 23.64,
+    customerPrice: 95.00,
+    conversionRate: 3.1,
+    addToCartCost: 8.20,
+    addToCartRate: 12.2,
+    users: 17800,
+    ctr: 2.7,
+    cpm: 14.80
+  },
+  {
+    date: '2025-01-05',
+    spend: 8750.00,
+    revenue: 35100.00,
+    roas: 4.01,
+    aov: 89.00,
+    sales: 394,
+    conversionCost: 22.21,
+    customerPrice: 89.00,
+    conversionRate: 3.0,
+    addToCartCost: 7.90,
+    addToCartRate: 11.8,
+    users: 16900,
+    ctr: 2.6,
+    cpm: 14.50
+  },
+  {
+    date: '2025-01-04',
+    spend: 9100.00,
+    revenue: 36500.00,
+    roas: 4.01,
+    aov: 92.00,
+    sales: 396,
+    conversionCost: 22.98,
+    customerPrice: 92.00,
+    conversionRate: 3.1,
+    addToCartCost: 8.10,
+    addToCartRate: 12.0,
+    users: 17200,
+    ctr: 2.7,
+    cpm: 14.70
+  },
+  {
+    date: '2025-01-03',
+    spend: 7900.00,
+    revenue: 31800.00,
+    roas: 4.02,
+    aov: 82.00,
+    sales: 387,
+    conversionCost: 20.41,
+    customerPrice: 82.00,
+    conversionRate: 3.2,
+    addToCartCost: 7.50,
+    addToCartRate: 11.5,
+    users: 16200,
+    ctr: 2.8,
+    cpm: 14.20
+  },
+  {
+    date: '2025-01-02',
+    spend: 8600.00,
+    revenue: 34200.00,
+    roas: 3.98,
+    aov: 88.00,
+    sales: 389,
+    conversionCost: 22.11,
+    customerPrice: 88.00,
+    conversionRate: 2.9,
+    addToCartCost: 7.80,
+    addToCartRate: 11.2,
+    users: 16800,
+    ctr: 2.5,
+    cpm: 14.40
+  },
+  {
+    date: '2025-01-01',
+    spend: 8200.00,
+    revenue: 32500.00,
+    roas: 3.96,
+    aov: 85.00,
+    sales: 382,
+    conversionCost: 21.47,
+    customerPrice: 85.00,
+    conversionRate: 2.8,
+    addToCartCost: 7.60,
+    addToCartRate: 10.8,
+    users: 16500,
+    ctr: 2.4,
+    cpm: 14.10
+  }
+]
+
+export const mockMetaAdObjectives = [
+  {
+    objective: 'conversion',
+    name: '转化广告',
+    spend: 35420.50,
+    revenue: 148200.30,
+    roas: 4.18,
+    aov: 80.43,
+    sales: 1842,
+    customerPrice: 80.43,
+    conversionCost: 19.24,
+    conversionRate: 2.7,
+    addToCartCost: 6.89,
+    addToCartRate: 7.5,
+    users: 68600,
+    ctr: 2.8,
+    cpm: 14.45
+  },
+  {
+    objective: 'traffic',
+    name: '流量广告',
+    spend: 15800.00,
+    revenue: 68500.00,
+    roas: 4.33,
+    aov: 54.54,
+    sales: 1256,
+    customerPrice: 54.54,
+    conversionCost: 12.58,
+    conversionRate: 2.4,
+    addToCartCost: 4.28,
+    addToCartRate: 6.8,
+    users: 52400,
+    ctr: 2.8,
+    cpm: 8.54
+  },
+  {
+    objective: 'brand_awareness',
+    name: '品牌广告',
+    spend: 7200.00,
+    revenue: 28980.00,
+    roas: 4.03,
+    aov: 56.60,
+    sales: 512,
+    customerPrice: 56.60,
+    conversionCost: 14.06,
+    conversionRate: 2.0,
+    addToCartCost: 4.50,
+    addToCartRate: 5.2,
+    users: 25600,
+    ctr: 0.8,
+    cpm: 2.25
+  }
+]
+
+export const mockMetaAdObjectivesChartData = {
+  spendData: [
+    { name: '转化广告', value: 35420.50, color: '#1890ff' },
+    { name: '流量广告', value: 15800.00, color: '#52c41a' },
+    { name: '品牌广告', value: 7200.00, color: '#fa8c16' }
+  ],
+  revenueData: [
+    { name: '转化广告', value: 148200.30, color: '#1890ff' },
+    { name: '流量广告', value: 68500.00, color: '#52c41a' },
+    { name: '品牌广告', value: 28980.00, color: '#fa8c16' }
+  ]
+}
+
+// Meta广告数据层级
+export const mockMetaAdLayers = {
+  // 曝光层
+  exposure: [
+    {
+      date: '2025-01-07',
+      amountSpent: 9850.20,
+      impressions: 425000,
+      cpm: 23.18,
+      reach: 185000,
+      frequency: 2.3,
+      clicks: 11900,
+      ctr: 2.8,
+      cpc: 0.83
+    },
+    {
+      date: '2025-01-06',
+      amountSpent: 9500.00,
+      impressions: 410000,
+      cpm: 23.17,
+      reach: 178000,
+      frequency: 2.3,
+      clicks: 11070,
+      ctr: 2.7,
+      cpc: 0.86
+    },
+    {
+      date: '2025-01-05',
+      amountSpent: 8750.00,
+      impressions: 385000,
+      cpm: 22.73,
+      reach: 165000,
+      frequency: 2.3,
+      clicks: 10010,
+      ctr: 2.6,
+      cpc: 0.87
+    }
+  ],
+
+  // 互动及视频播放指标
+  engagement: [
+    {
+      date: '2025-01-07',
+      postEngagement: 5420,
+      costPerPostEngagement: 1.82,
+      videoPlays: 28500,
+      videoAveragePlayTime: 15.2,
+      videoPlays3s: 22800,
+      costPerVideoPlay3s: 0.43,
+      thruPlays: 12500,
+      costPerThruPlay: 0.79
+    },
+    {
+      date: '2025-01-06',
+      postEngagement: 5180,
+      costPerPostEngagement: 1.83,
+      videoPlays: 27200,
+      videoAveragePlayTime: 14.8,
+      videoPlays3s: 21800,
+      costPerVideoPlay3s: 0.44,
+      thruPlays: 11900,
+      costPerThruPlay: 0.80
+    },
+    {
+      date: '2025-01-05',
+      postEngagement: 4850,
+      costPerPostEngagement: 1.80,
+      videoPlays: 25600,
+      videoAveragePlayTime: 14.5,
+      videoPlays3s: 20500,
+      costPerVideoPlay3s: 0.43,
+      thruPlays: 11200,
+      costPerThruPlay: 0.78
+    }
+  ],
+
+  // 点击及意向层指标
+  clickIntent: [
+    {
+      date: '2025-01-07',
+      linkClicks: 8950,
+      linkCTR: 2.1,
+      costPerLinkClick: 1.10,
+      landingPageViews: 7850,
+      costPerLandingPageView: 1.25,
+      contentViews: 9200,
+      costPerContentView: 1.07,
+      addToCarts: 1158,
+      costPerAddToCart: 8.51,
+      checkoutsInitiated: 642,
+      costPerCheckoutsInitiated: 15.34
+    },
+    {
+      date: '2025-01-06',
+      linkClicks: 8420,
+      linkCTR: 2.1,
+      costPerLinkClick: 1.13,
+      landingPageViews: 7380,
+      costPerLandingPageView: 1.29,
+      contentViews: 8650,
+      costPerContentView: 1.10,
+      addToCarts: 1095,
+      costPerAddToCart: 8.68,
+      checkoutsInitiated: 598,
+      costPerCheckoutsInitiated: 15.89
+    },
+    {
+      date: '2025-01-05',
+      linkClicks: 7850,
+      linkCTR: 2.0,
+      costPerLinkClick: 1.11,
+      landingPageViews: 6890,
+      costPerLandingPageView: 1.27,
+      contentViews: 8100,
+      costPerContentView: 1.08,
+      addToCarts: 1020,
+      costPerAddToCart: 8.58,
+      checkoutsInitiated: 558,
+      costPerCheckoutsInitiated: 15.68
+    }
+  ],
+
+  // 购物结果指标
+  shopping: [
+    {
+      date: '2025-01-07',
+      purchaseRoas: 4.04,
+      purchases: 404,
+      costPerPurchase: 24.38,
+      purchaseConversionValue: 39800.50,
+      avgPurchaseConversionValue: 98.50,
+      purchaseRatePerLandingPageView: 5.1,
+      purchaseRatePerLinkClick: 4.5
+    },
+    {
+      date: '2025-01-06',
+      purchaseRoas: 4.02,
+      purchases: 402,
+      costPerPurchase: 23.64,
+      purchaseConversionValue: 38200.00,
+      avgPurchaseConversionValue: 95.00,
+      purchaseRatePerLandingPageView: 5.4,
+      purchaseRatePerLinkClick: 4.8
+    },
+    {
+      date: '2025-01-05',
+      purchaseRoas: 4.01,
+      purchases: 394,
+      costPerPurchase: 22.21,
+      purchaseConversionValue: 35100.00,
+      avgPurchaseConversionValue: 89.00,
+      purchaseRatePerLandingPageView: 5.7,
+      purchaseRatePerLinkClick: 5.0
+    }
+  ]
+}
+
+// 获取Meta数据看板数据的Mock函数
+export const mockGetMetaAccountOverview = (): Promise<ApiResponse<typeof mockMetaAccountOverview>> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: mockMetaAccountOverview
+      })
+    }, 300)
+  })
+}
+
+export const mockGetMetaAccounts = (): Promise<ApiResponse<typeof mockMetaAccounts>> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: mockMetaAccounts
+      })
+    }, 200)
+  })
+}
+
+export const mockGetMetaAlerts = (): Promise<ApiResponse<typeof mockMetaAlerts>> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: mockMetaAlerts
+      })
+    }, 200)
+  })
+}
+
+export const mockGetMetaDailyData = (): Promise<ApiResponse<typeof mockMetaDailyData>> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: mockMetaDailyData
+      })
+    }, 300)
+  })
+}
+
+export const mockGetMetaAdObjectives = (): Promise<ApiResponse<typeof mockMetaAdObjectives>> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: mockMetaAdObjectives
+      })
+    }, 200)
+  })
+}
+
+export const mockGetMetaAdLayers = (): Promise<ApiResponse<typeof mockMetaAdLayers>> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: mockMetaAdLayers
+      })
+    }, 300)
+  })
+}
+
+// 自定义数据指标选择
+export const mockMetaCustomMetrics = {
+  // 曝光层指标
+  exposure: [
+    { id: 'amountSpent', name: 'Amount spent(已花费金额)', selected: true },
+    { id: 'impressions', name: 'Impressions(展示次数)', selected: true },
+    { id: 'views', name: 'Views(浏览量)', selected: false },
+    { id: 'cpm', name: 'CPM(千次展示费用)', selected: true },
+    { id: 'reach', name: 'Reach(覆盖人数)', selected: true },
+    { id: 'costPer1000Reach', name: 'Cost per 1,000 Accounts Center accounts reached', selected: false },
+    { id: 'frequency', name: 'Frequency(频次)', selected: true },
+    { id: 'clicksAll', name: 'Clicks(all)点击量(全部)', selected: true },
+    { id: 'ctrAll', name: 'CTR(all)点击率(全部)', selected: true },
+    { id: 'cpcAll', name: 'CPC(all)单次点击费用(全部)', selected: true }
+  ],
+
+  // 互动指标
+  engagement: [
+    { id: 'facebookLikes', name: 'Facebook likes (Facebook 获赞数)', selected: false },
+    { id: 'costPerLike', name: 'Cost per Like(单次点赞费用)', selected: false },
+    { id: 'pageEngagement', name: 'Page engagement(公共主页互动)', selected: false },
+    { id: 'costPerPageEngagement', name: 'Cost per Page engagement(单次公共主页互动费用)', selected: false },
+    { id: 'postComments', name: 'Post comments(帖子评论)', selected: false },
+    { id: 'postEngagement', name: 'Post engagement(帖文互动)', selected: true },
+    { id: 'costPerPostEngagement', name: 'Cost per post engagement(单次帖文互动费用)', selected: true }
+  ],
+
+  // 视频播放指标
+  video: [
+    { id: 'videoPlays', name: 'Video plays(视频播放量)', selected: true },
+    { id: 'videoAveragePlayTime', name: 'Video average play time(视频平均播放时长)', selected: true },
+    { id: 'videoPlays25', name: 'Video plays at 25%(视频播放进度达25%的次数)', selected: false },
+    { id: 'videoPlays50', name: 'Video plays at 50%(视频播放进度达50%的次数)', selected: false },
+    { id: 'videoPlays75', name: 'Video plays at 75%(视频播放进度达75%的次数)', selected: false },
+    { id: 'videoPlays95', name: 'Video plays at 95%(视频播放进度达95%的次数)', selected: false },
+    { id: 'videoPlays100', name: 'Video plays at 100%(视频播放进度达100%的次数)', selected: false },
+    { id: 'videoPlays3s', name: '3-second video plays(播放视频达3秒的次数)', selected: true },
+    { id: 'costPerVideoPlay3s', name: 'Cost per 3-second video play(播放视频达3秒的单次费用)', selected: true },
+    { id: 'thruPlays', name: 'ThruPlays (ThruPlay 次数)', selected: true },
+    { id: 'costPerThruPlay', name: 'Cost per ThruPlay(单次ThruPlay费用)', selected: true }
+  ],
+
+  // 点击意向层
+  clickIntent: [
+    { id: 'linkClicks', name: 'Link clicks(链接点击量)', selected: true },
+    { id: 'linkCTR', name: 'CTR(link click-through rate)(链接点击率)', selected: true },
+    { id: 'costPerLinkClick', name: 'CPC(cost per link click)(单次链接点击费用)', selected: true },
+    { id: 'outboundClicks', name: 'Outbound Clicks(出站点击量)', selected: false },
+    { id: 'outboundCTR', name: 'Outbound CTR(click-through rate)(出站点击率)', selected: false },
+    { id: 'costPerOutboundClick', name: 'Cost per outbound click(单次出站点击费用)', selected: false },
+    { id: 'instagramProfileVisits', name: 'Instagram profile visits(Instagram主页访问量)', selected: false },
+    { id: 'uniqueLinkClicks', name: 'Unique link clicks(链接点击量-独立用户)', selected: false },
+    { id: 'uniqueLinkCTR', name: 'Unique CTR(link click-through rate)(链接点击率-独立用户)', selected: false },
+    { id: 'costPerUniqueLinkClick', name: 'Cost per unique link click(单次链接点击费用(全部)-独立用户)', selected: false }
+  ],
+
+  // 转化层
+  conversion: [
+    { id: 'landingPageViews', name: 'Landing page views(落地页浏览量)', selected: true },
+    { id: 'costPerLandingPageView', name: 'Cost per Landing page views', selected: true },
+    { id: 'contentViews', name: 'Content views(内容查看)', selected: true },
+    { id: 'costPerContentView', name: 'Cost per Content views', selected: true },
+    { id: 'addToCarts', name: 'Adds to cart(加入购物车次数)', selected: true },
+    { id: 'costPerAddToCart', name: 'Cost per Adds to cart', selected: true },
+    { id: 'checkoutsInitiated', name: 'Checkouts initiated(发起结账)', selected: true },
+    { id: 'costPerCheckoutsInitiated', name: 'Cost per Checkouts initiated', selected: true },
+    { id: 'registrationsCompleted', name: 'Registrations completed(完成注册次数)', selected: false },
+    { id: 'costPerRegistrationsCompleted', name: 'Cost per Registrations completed', selected: false },
+    { id: 'addsOfPaymentInfo', name: 'Adds of payment info(添加支付信息)', selected: false },
+    { id: 'costPerAddsOfPaymentInfo', name: 'Cost per Adds of payment info', selected: false },
+    { id: 'leads', name: 'Leads(留下潜在客户信息)', selected: false },
+    { id: 'costPerLeads', name: 'Cost per Leads', selected: false },
+    { id: 'subscriptions', name: 'Subscriptions(订阅)', selected: false },
+    { id: 'costPerSubscriptions', name: 'Cost per Subscriptions', selected: false },
+    { id: 'purchaseRoas', name: 'Purchase ROAS(Return on ad spend)(广告花费回报(ROAS)-购物)', selected: true },
+    { id: 'purchases', name: 'Purchases(购物)', selected: true },
+    { id: 'costPerPurchases', name: 'Cost per Purchases', selected: true },
+    { id: 'purchaseConversionValue', name: 'Purchases conversion value(购物转化价值)', selected: true },
+    { id: 'avgPurchaseConversionValue', name: 'Average purchases conversion value(平均购物转化价值)', selected: true }
+  ],
+
+  // 表现漏斗
+  funnel: [
+    { id: 'videoPlays3sRatePerImpressions', name: '3-second video plays rate per impressions(单次展示的播放视频达3秒率)', selected: false },
+    { id: 'landingPageViewsRatePerLinkClicks', name: 'Landing page views rate per link clicks(单次链接点击的落地页浏览率)', selected: false },
+    { id: 'purchaseRatePerLandingPageViews', name: 'Purchases rate per landing page views(单次落地页浏览的购物率)', selected: true },
+    { id: 'purchaseRatePerLinkClicks', name: 'Purchases rate per link clicks(单次链接点击的购物率)', selected: true }
+  ]
+}
+
+// 拉新与再营销数据
+export const mockMetaNewVsRemarketing = [
+  {
+    type: 'new',
+    name: '拉新',
+    spend: 35420.50,
+    revenue: 148200.30,
+    aov: 95.50,
+    sales: 1552,
+    customerPrice: 95.50,
+    conversionCost: 22.84,
+    conversionRate: 3.1,
+    addToCartCost: 8.25,
+    addToCartRate: 12.8,
+    users: 18500,
+    ctr: 2.9,
+    cpm: 16.20
+  },
+  {
+    type: 'remarketing',
+    name: '再营销',
+    spend: 23000.00,
+    revenue: 97480.20,
+    aov: 105.20,
+    sales: 926,
+    customerPrice: 105.20,
+    conversionCost: 24.84,
+    conversionRate: 2.8,
+    addToCartCost: 7.80,
+    addToCartRate: 11.5,
+    users: 12400,
+    ctr: 3.2,
+    cpm: 14.80
+  }
+]
+
+export const mockMetaNewVsRemarketingChartData = {
+  spendData: [
+    { name: '拉新', value: 35420.50, color: '#1890ff' },
+    { name: '再营销', value: 23000.00, color: '#52c41a' }
+  ],
+  revenueData: [
+    { name: '拉新', value: 148200.30, color: '#1890ff' },
+    { name: '再营销', value: 97480.20, color: '#52c41a' }
+  ]
+}
+
+// 广告形式数据
+export const mockMetaAdFormats = [
+  {
+    format: 'video',
+    name: '视频',
+    spend: 28500.20,
+    revenue: 118200.50,
+    aov: 98.50,
+    sales: 1200,
+    customerPrice: 98.50,
+    conversionCost: 23.75,
+    conversionRate: 3.0,
+    addToCartCost: 8.10,
+    addToCartRate: 12.2,
+    users: 15200,
+    ctr: 3.1,
+    cpm: 18.50
+  },
+  {
+    format: 'dpa',
+    name: 'DPA',
+    spend: 18420.30,
+    revenue: 78500.80,
+    aov: 92.80,
+    sales: 846,
+    customerPrice: 92.80,
+    conversionCost: 21.77,
+    conversionRate: 3.2,
+    addToCartCost: 7.90,
+    addToCartRate: 13.1,
+    users: 11800,
+    ctr: 2.8,
+    cpm: 15.20
+  },
+  {
+    format: 'image',
+    name: '图片',
+    spend: 11500.00,
+    revenue: 48980.00,
+    aov: 89.20,
+    sales: 549,
+    customerPrice: 89.20,
+    conversionCost: 20.95,
+    conversionRate: 2.9,
+    addToCartCost: 7.50,
+    addToCartRate: 11.8,
+    users: 8900,
+    ctr: 2.5,
+    cpm: 14.10
+  }
+]
+
+export const mockMetaAdFormatsChartData = {
+  spendData: [
+    { name: '视频', value: 28500.20, color: '#1890ff' },
+    { name: 'DPA', value: 18420.30, color: '#52c41a' },
+    { name: '图片', value: 11500.00, color: '#fa8c16' }
+  ],
+  revenueData: [
+    { name: '视频', value: 118200.50, color: '#1890ff' },
+    { name: 'DPA', value: 78500.80, color: '#52c41a' },
+    { name: '图片', value: 48980.00, color: '#fa8c16' }
+  ]
+}
+
+// Mock函数
+export const mockGetMetaCustomMetrics = (): Promise<ApiResponse<typeof mockMetaCustomMetrics>> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: mockMetaCustomMetrics
+      })
+    }, 200)
+  })
+}
+
+export const mockGetMetaNewVsRemarketing = (): Promise<ApiResponse<typeof mockMetaNewVsRemarketing>> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: mockMetaNewVsRemarketing
+      })
+    }, 300)
+  })
+}
+
+export const mockGetMetaAdFormats = (): Promise<ApiResponse<typeof mockMetaAdFormats>> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: mockMetaAdFormats
+      })
+    }, 300)
+  })
+}
+
+// 落地页广告表现数据
+export const mockMetaLandingPages = {
+  // 用户转化数据
+  userConversion: [
+    {
+      landingPageName: '首页 - 主页面',
+      spend: 12500.20,
+      revenue: 52800.50,
+      roas: 4.22,
+      sales: 536,
+      customerPrice: 98.50,
+      conversionCost: 23.32,
+      conversionRate: 3.1
+    },
+    {
+      landingPageName: '时尚女装 - 分类页',
+      spend: 8900.30,
+      revenue: 38200.80,
+      roas: 4.29,
+      sales: 412,
+      customerPrice: 92.72,
+      conversionCost: 21.60,
+      conversionRate: 3.2
+    },
+    {
+      landingPageName: '夏季连衣裙 - 产品页',
+      spend: 15200.50,
+      revenue: 61500.20,
+      roas: 4.04,
+      sales: 628,
+      customerPrice: 97.93,
+      conversionCost: 24.21,
+      conversionRate: 2.9
+    },
+    {
+      landingPageName: '新品上市 - 活动页',
+      spend: 6800.00,
+      revenue: 25900.00,
+      roas: 3.81,
+      sales: 285,
+      customerPrice: 90.88,
+      conversionCost: 23.86,
+      conversionRate: 2.7
+    },
+    {
+      landingPageName: '品牌故事 - 关于我们',
+      spend: 9200.80,
+      revenue: 35600.40,
+      roas: 3.87,
+      sales: 368,
+      customerPrice: 96.74,
+      conversionCost: 25.00,
+      conversionRate: 2.8
+    },
+    {
+      landingPageName: '秋冬外套 - 产品页',
+      spend: 11800.60,
+      revenue: 48500.20,
+      roas: 4.11,
+      sales: 495,
+      customerPrice: 98.00,
+      conversionCost: 23.84,
+      conversionRate: 3.0
+    },
+    {
+      landingPageName: '限时折扣 - 促销页',
+      spend: 7500.00,
+      revenue: 31200.00,
+      roas: 4.16,
+      sales: 325,
+      customerPrice: 96.00,
+      conversionCost: 23.08,
+      conversionRate: 3.3
+    },
+    {
+      landingPageName: '配饰专区 - 分类页',
+      spend: 5600.40,
+      revenue: 22800.50,
+      roas: 4.07,
+      sales: 238,
+      customerPrice: 95.80,
+      conversionCost: 23.53,
+      conversionRate: 2.9
+    },
+    {
+      landingPageName: '会员专享 - 会员页',
+      spend: 8300.20,
+      revenue: 35100.80,
+      roas: 4.23,
+      sales: 365,
+      customerPrice: 96.16,
+      conversionCost: 22.74,
+      conversionRate: 3.4
+    },
+    {
+      landingPageName: '客户评价 - 评价页',
+      spend: 4200.50,
+      revenue: 17500.20,
+      roas: 4.17,
+      sales: 182,
+      customerPrice: 96.15,
+      conversionCost: 23.08,
+      conversionRate: 3.1
+    }
+  ],
+
+  // 用户加购转化数据
+  userAddToCart: [
+    {
+      landingPageName: '首页 - 主页面',
+      spend: 12500.20,
+      addPaymentInfo: 1280,
+      addPaymentInfoCost: 9.77,
+      initiateCheckout: 856,
+      initiateCheckoutCost: 14.60,
+      addToCart: 1520,
+      addToCartCost: 8.22,
+      addToCartRate: 13.2
+    },
+    {
+      landingPageName: '时尚女装 - 分类页',
+      spend: 8900.30,
+      addPaymentInfo: 920,
+      addPaymentInfoCost: 9.67,
+      initiateCheckout: 625,
+      initiateCheckoutCost: 14.24,
+      addToCart: 1105,
+      addToCartCost: 8.05,
+      addToCartRate: 12.8
+    },
+    {
+      landingPageName: '夏季连衣裙 - 产品页',
+      spend: 15200.50,
+      addPaymentInfo: 1450,
+      addPaymentInfoCost: 10.48,
+      initiateCheckout: 980,
+      initiateCheckoutCost: 15.51,
+      addToCart: 1720,
+      addToCartCost: 8.84,
+      addToCartRate: 12.5
+    },
+    {
+      landingPageName: '新品上市 - 活动页',
+      spend: 6800.00,
+      addPaymentInfo: 680,
+      addPaymentInfoCost: 10.00,
+      initiateCheckout: 450,
+      initiateCheckoutCost: 15.11,
+      addToCart: 820,
+      addToCartCost: 8.29,
+      addToCartRate: 11.8
+    },
+    {
+      landingPageName: '品牌故事 - 关于我们',
+      spend: 9200.80,
+      addPaymentInfo: 980,
+      addPaymentInfoCost: 9.39,
+      initiateCheckout: 652,
+      initiateCheckoutCost: 14.11,
+      addToCart: 1150,
+      addToCartCost: 8.00,
+      addToCartRate: 12.9
+    },
+    {
+      landingPageName: '秋冬外套 - 产品页',
+      spend: 11800.60,
+      addPaymentInfo: 1180,
+      addPaymentInfoCost: 10.00,
+      initiateCheckout: 785,
+      initiateCheckoutCost: 15.03,
+      addToCart: 1420,
+      addToCartCost: 8.31,
+      addToCartRate: 13.1
+    },
+    {
+      landingPageName: '限时折扣 - 促销页',
+      spend: 7500.00,
+      addPaymentInfo: 820,
+      addPaymentInfoCost: 9.15,
+      initiateCheckout: 550,
+      initiateCheckoutCost: 13.64,
+      addToCart: 980,
+      addToCartCost: 7.65,
+      addToCartRate: 13.8
+    },
+    {
+      landingPageName: '配饰专区 - 分类页',
+      spend: 5600.40,
+      addPaymentInfo: 590,
+      addPaymentInfoCost: 9.49,
+      initiateCheckout: 395,
+      initiateCheckoutCost: 14.18,
+      addToCart: 720,
+      addToCartCost: 7.78,
+      addToCartRate: 12.6
+    },
+    {
+      landingPageName: '会员专享 - 会员页',
+      spend: 8300.20,
+      addPaymentInfo: 920,
+      addPaymentInfoCost: 9.02,
+      initiateCheckout: 615,
+      initiateCheckoutCost: 13.50,
+      addToCart: 1080,
+      addToCartCost: 7.69,
+      addToCartRate: 14.2
+    },
+    {
+      landingPageName: '客户评价 - 评价页',
+      spend: 4200.50,
+      addPaymentInfo: 450,
+      addPaymentInfoCost: 9.33,
+      initiateCheckout: 298,
+      initiateCheckoutCost: 14.09,
+      addToCart: 550,
+      addToCartCost: 7.64,
+      addToCartRate: 12.4
+    }
+  ],
+
+  // 用户过程数据
+  userProcess: [
+    {
+      landingPageName: '首页 - 主页面',
+      spend: 12500.20,
+      clicks: 15200,
+      cpc: 0.82,
+      ctr: 2.9,
+      linkClicks: 11800,
+      linkCTR: 2.3,
+      linkCPC: 1.06,
+      contentViews: 13500,
+      contentViewCost: 0.93,
+      cpm: 18.50
+    },
+    {
+      landingPageName: '时尚女装 - 分类页',
+      spend: 8900.30,
+      clicks: 11200,
+      cpc: 0.79,
+      ctr: 3.1,
+      linkClicks: 8650,
+      linkCTR: 2.4,
+      linkCPC: 1.03,
+      contentViews: 9800,
+      contentViewCost: 0.91,
+      cpm: 17.20
+    },
+    {
+      landingPageName: '夏季连衣裙 - 产品页',
+      spend: 15200.50,
+      clicks: 18500,
+      cpc: 0.82,
+      ctr: 2.8,
+      linkClicks: 14200,
+      linkCTR: 2.2,
+      linkCPC: 1.07,
+      contentViews: 16800,
+      contentViewCost: 0.90,
+      cpm: 19.80
+    },
+    {
+      landingPageName: '新品上市 - 活动页',
+      spend: 6800.00,
+      clicks: 8500,
+      cpc: 0.80,
+      ctr: 2.6,
+      linkClicks: 6200,
+      linkCTR: 1.9,
+      linkCPC: 1.10,
+      contentViews: 7500,
+      contentViewCost: 0.91,
+      cpm: 16.50
+    },
+    {
+      landingPageName: '品牌故事 - 关于我们',
+      spend: 9200.80,
+      clicks: 11500,
+      cpc: 0.80,
+      ctr: 2.7,
+      linkClicks: 8900,
+      linkCTR: 2.1,
+      linkCPC: 1.03,
+      contentViews: 10200,
+      contentViewCost: 0.90,
+      cpm: 17.80
+    },
+    {
+      landingPageName: '秋冬外套 - 产品页',
+      spend: 11800.60,
+      clicks: 14500,
+      cpc: 0.81,
+      ctr: 2.9,
+      linkClicks: 11200,
+      linkCTR: 2.3,
+      linkCPC: 1.05,
+      contentViews: 12800,
+      contentViewCost: 0.92,
+      cpm: 18.20
+    },
+    {
+      landingPageName: '限时折扣 - 促销页',
+      spend: 7500.00,
+      clicks: 9800,
+      cpc: 0.77,
+      ctr: 3.2,
+      linkClicks: 7650,
+      linkCTR: 2.5,
+      linkCPC: 0.98,
+      contentViews: 8900,
+      contentViewCost: 0.84,
+      cpm: 16.80
+    },
+    {
+      landingPageName: '配饰专区 - 分类页',
+      spend: 5600.40,
+      clicks: 7200,
+      cpc: 0.78,
+      ctr: 2.8,
+      linkClicks: 5500,
+      linkCTR: 2.1,
+      linkCPC: 1.02,
+      contentViews: 6400,
+      contentViewCost: 0.88,
+      cpm: 16.20
+    },
+    {
+      landingPageName: '会员专享 - 会员页',
+      spend: 8300.20,
+      clicks: 10500,
+      cpc: 0.79,
+      ctr: 3.0,
+      linkClicks: 8200,
+      linkCTR: 2.3,
+      linkCPC: 1.01,
+      contentViews: 9500,
+      contentViewCost: 0.87,
+      cpm: 17.50
+    },
+    {
+      landingPageName: '客户评价 - 评价页',
+      spend: 4200.50,
+      clicks: 5800,
+      cpc: 0.72,
+      ctr: 2.9,
+      linkClicks: 4500,
+      linkCTR: 2.2,
+      linkCPC: 0.93,
+      contentViews: 5200,
+      contentViewCost: 0.81,
+      cpm: 15.80
+    }
+  ]
+}
+
+export const mockMetaLandingPagesChartData = {
+  spendData: [
+    { name: 'Product A', value: 12500.20, color: '#1890ff' },
+    { name: 'Product B', value: 8900.30, color: '#52c41a' },
+    { name: 'Category Fashion', value: 15200.50, color: '#fa8c16' },
+    { name: 'Home', value: 6800.00, color: '#722ed1' }
+  ],
+  revenueData: [
+    { name: 'Product A', value: 52800.50, color: '#1890ff' },
+    { name: 'Product B', value: 38200.80, color: '#52c41a' },
+    { name: 'Category Fashion', value: 61500.20, color: '#fa8c16' },
+    { name: 'Home', value: 25900.00, color: '#722ed1' }
+  ]
+}
+
+// 素材表现数据
+export const mockMetaCreatives = {
+  // 图片素材
+  images: [
+    {
+      landingPage: '首页 - 主页面',
+      preview: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop',
+      spend: 8500.20,
+      revenue: 35200.50,
+      aov: 98.50,
+      roas: 4.14,
+      sales: 357,
+      customerPrice: 98.50,
+      conversionCost: 23.81,
+      conversionRate: 3.0,
+      addToCartCost: 8.15,
+      addToCartRate: 12.5,
+      users: 9800,
+      ctr: 2.9,
+      cpm: 17.50
+    },
+    {
+      landingPage: '时尚女装 - 分类页',
+      preview: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=300&fit=crop',
+      spend: 6200.30,
+      revenue: 26800.80,
+      aov: 92.80,
+      roas: 4.32,
+      sales: 289,
+      customerPrice: 92.80,
+      conversionCost: 21.46,
+      conversionRate: 3.2,
+      addToCartCost: 7.85,
+      addToCartRate: 13.1,
+      users: 7500,
+      ctr: 3.1,
+      cpm: 16.20
+    },
+    {
+      landingPage: '夏季连衣裙 - 产品页',
+      preview: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=300&fit=crop',
+      spend: 11200.50,
+      revenue: 45600.20,
+      aov: 95.20,
+      roas: 4.07,
+      sales: 479,
+      customerPrice: 95.20,
+      conversionCost: 23.38,
+      conversionRate: 2.9,
+      addToCartCost: 8.05,
+      addToCartRate: 12.2,
+      users: 12800,
+      ctr: 2.8,
+      cpm: 18.80
+    },
+    {
+      landingPage: '新品上市 - 活动页',
+      preview: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&h=300&fit=crop',
+      spend: 9500.40,
+      revenue: 38200.60,
+      aov: 89.50,
+      roas: 4.02,
+      sales: 427,
+      customerPrice: 89.50,
+      conversionCost: 22.25,
+      conversionRate: 3.1,
+      addToCartCost: 7.95,
+      addToCartRate: 12.8,
+      users: 11200,
+      ctr: 2.7,
+      cpm: 16.80
+    },
+    {
+      landingPage: '秋冬外套 - 产品页',
+      preview: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
+      spend: 7800.20,
+      revenue: 32100.50,
+      aov: 94.20,
+      roas: 4.12,
+      sales: 341,
+      customerPrice: 94.20,
+      conversionCost: 22.87,
+      conversionRate: 2.9,
+      addToCartCost: 8.10,
+      addToCartRate: 12.6,
+      users: 9500,
+      ctr: 2.8,
+      cpm: 17.20
+    }
+  ],
+
+  // 视频素材
+  videos: [
+    {
+      landingPage: '首页 - 主页面',
+      preview: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
+      spend: 15200.80,
+      revenue: 68500.20,
+      aov: 105.50,
+      roas: 4.51,
+      sales: 649,
+      customerPrice: 105.50,
+      conversionCost: 23.42,
+      conversionRate: 3.3,
+      addToCartCost: 8.55,
+      addToCartRate: 13.8,
+      users: 18500,
+      ctr: 3.2,
+      cpm: 19.50
+    },
+    {
+      landingPage: '时尚女装 - 分类页',
+      preview: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4',
+      spend: 12800.50,
+      revenue: 56200.30,
+      aov: 98.20,
+      roas: 4.39,
+      sales: 572,
+      customerPrice: 98.20,
+      conversionCost: 22.38,
+      conversionRate: 3.1,
+      addToCartCost: 8.20,
+      addToCartRate: 13.2,
+      users: 15200,
+      ctr: 3.0,
+      cpm: 18.20
+    },
+    {
+      landingPage: '夏季连衣裙 - 产品页',
+      preview: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_5mb.mp4',
+      spend: 18500.20,
+      revenue: 78900.50,
+      aov: 102.80,
+      roas: 4.27,
+      sales: 767,
+      customerPrice: 102.80,
+      conversionCost: 24.12,
+      conversionRate: 2.9,
+      addToCartCost: 8.90,
+      addToCartRate: 12.8,
+      users: 22800,
+      ctr: 2.9,
+      cpm: 20.50
+    }
+  ]
+}
+
+// Mock函数
+export const mockGetMetaLandingPages = (): Promise<ApiResponse<typeof mockMetaLandingPages>> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: mockMetaLandingPages
+      })
+    }, 300)
+  })
+}
+
+export const mockGetMetaCreatives = (): Promise<ApiResponse<typeof mockMetaCreatives>> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: mockMetaCreatives
+      })
+    }, 300)
+  })
+}
+
+// 快速添加剩余功能的Mock数据
+export const mockMetaRemainingFeatures = {
+  // 目录广告
+  catalogAds: {
+    adTypes: [
+      { type: 'Facebook', spend: 25420.50, roas: 4.2, customerPrice: 95.50, conversionRate: 3.1, addToCartRate: 12.5, ctr: 2.8, users: 15200, cpc: 0.85, cpm: 18.50 },
+      { type: 'Instagram', spend: 18200.30, roas: 4.5, customerPrice: 102.20, conversionRate: 3.3, addToCartRate: 13.2, ctr: 3.1, users: 12800, cpc: 0.78, cpm: 16.20 },
+      { type: 'Audience_network', spend: 8900.20, roas: 3.8, customerPrice: 88.50, conversionRate: 2.9, addToCartRate: 11.8, ctr: 2.5, users: 8500, cpc: 0.92, cpm: 19.80 },
+      { type: 'Messenger', spend: 5200.00, roas: 3.9, customerPrice: 91.20, conversionRate: 2.8, addToCartRate: 11.2, ctr: 2.6, users: 6200, cpc: 0.88, cpm: 17.50 }
+    ],
+    catalogGroups: [
+      { productId: 'PROD-001', spend: 12500.20, ctr: 2.9, users: 9800, cpc: 0.82, cpm: 18.50 },
+      { productId: 'PROD-002', spend: 8900.30, ctr: 3.1, users: 7500, cpc: 0.79, cpm: 17.20 },
+      { productId: 'PROD-003', spend: 15200.50, ctr: 2.8, users: 12800, cpc: 0.85, cpm: 19.80 }
+    ]
+  },
+
+  // 受众类型
+  audienceTypes: {
+    summary: [
+      { type: 'interest', name: '兴趣受众', spend: 28500.20, revenue: 118200.50, aov: 98.50, roas: 4.14, sales: 1200, customerPrice: 98.50, conversionCost: 23.75, conversionRate: 3.0, addToCartCost: 8.10, addToCartRate: 12.2, users: 15200, ctr: 3.1, cpm: 18.50 },
+      { type: 'lookalike', name: '类似受众', spend: 18420.30, revenue: 78500.80, aov: 92.80, roas: 4.26, sales: 846, customerPrice: 92.80, conversionCost: 21.77, conversionRate: 3.2, addToCartCost: 7.90, addToCartRate: 13.1, users: 11800, ctr: 2.8, cpm: 15.20 },
+      { type: 'asc', name: 'ASC', spend: 11500.00, revenue: 48980.00, aov: 89.20, roas: 4.26, sales: 549, customerPrice: 89.20, conversionCost: 20.95, conversionRate: 2.9, addToCartCost: 7.50, addToCartRate: 11.8, users: 8900, ctr: 2.5, cpm: 14.10 },
+      { type: 'remarketing', name: '再营销受众', spend: 9800.50, revenue: 42500.70, aov: 95.80, roas: 4.34, sales: 444, customerPrice: 95.80, conversionCost: 22.07, conversionRate: 3.1, addToCartCost: 7.95, addToCartRate: 12.0, users: 7800, ctr: 2.9, cpm: 16.50 }
+    ],
+    interestDetails: [
+      { adGroupName: '时尚爱好者', spend: 12500.20, roas: 4.2, sales: 536, customerPrice: 98.50, conversionRate: 3.1, conversionCost: 23.32, addToCartRate: 12.5, addToCartCost: 8.15, users: 9800, ctr: 2.9, cpc: 0.82, cpm: 18.50 },
+      { adGroupName: '美妆达人', spend: 8900.30, roas: 4.1, sales: 412, customerPrice: 92.72, conversionRate: 3.0, conversionCost: 21.60, addToCartRate: 12.2, addToCartCost: 7.85, users: 7500, ctr: 2.8, cpc: 0.79, cpm: 17.20 }
+    ]
+  },
+
+  // 用户画像
+  demographics: {
+    age: [
+      { ageRange: '18-24', spend: 15200.50, revenue: 61500.20, aov: 97.93, roas: 4.04, sales: 628, customerPrice: 97.93, conversionCost: 24.21, conversionRate: 2.9, addToCartCost: 8.84, addToCartRate: 12.5, users: 12800, ctr: 2.8, cpm: 18.80 },
+      { ageRange: '25-34', spend: 22800.20, revenue: 95200.80, aov: 105.50, roas: 4.17, sales: 902, customerPrice: 105.50, conversionCost: 25.28, conversionRate: 3.1, addToCartCost: 8.95, addToCartRate: 12.8, users: 18500, ctr: 3.0, cpm: 19.50 },
+      { ageRange: '35-44', spend: 18500.30, revenue: 76800.50, aov: 98.20, roas: 4.15, sales: 782, customerPrice: 98.20, conversionCost: 23.66, conversionRate: 3.0, addToCartCost: 8.25, addToCartRate: 12.2, users: 15200, ctr: 2.9, cpm: 18.20 }
+    ],
+    gender: [
+      { gender: '女性', spend: 38500.20, revenue: 165200.50, aov: 102.80, roas: 4.29, sales: 1607, customerPrice: 102.80, conversionCost: 23.96, conversionRate: 3.1, addToCartCost: 8.75, addToCartRate: 12.8, users: 28500, ctr: 3.0, cpm: 19.20 },
+      { gender: '男性', spend: 18000.80, revenue: 68300.00, aov: 91.50, roas: 3.79, sales: 747, customerPrice: 91.50, conversionCost: 24.10, conversionRate: 2.8, addToCartCost: 8.20, addToCartRate: 11.5, users: 16000, ctr: 2.7, cpm: 17.80 }
+    ],
+    device: [
+      { device: 'Mobile_app', spend: 35200.50, revenue: 148500.20, aov: 98.50, roas: 4.22, sales: 1507, customerPrice: 98.50, conversionCost: 23.36, conversionRate: 3.0, addToCartCost: 8.45, addToCartRate: 12.5, users: 26800, ctr: 2.9, cpm: 18.50 },
+      { device: 'Desktop', spend: 15800.30, revenue: 65200.80, aov: 105.20, roas: 4.13, sales: 620, customerPrice: 105.20, conversionCost: 25.48, conversionRate: 2.9, addToCartCost: 8.85, addToCartRate: 12.0, users: 12500, ctr: 2.8, cpm: 19.80 },
+      { device: 'Mobile_web', spend: 5500.20, revenue: 19800.50, aov: 88.50, roas: 3.60, sales: 227, customerPrice: 88.50, conversionCost: 24.23, conversionRate: 2.7, addToCartCost: 8.15, addToCartRate: 11.2, users: 5200, ctr: 2.5, cpm: 16.50 }
+    ]
+  }
+}
+
+export const mockGetMetaRemainingFeatures = (): Promise<ApiResponse<typeof mockMetaRemainingFeatures>> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: mockMetaRemainingFeatures
+      })
+    }, 300)
+  })
+}
+
+// 目录广告数据
+export const mockGetMetaCatalogAds = (): Promise<ApiResponse<typeof mockMetaRemainingFeatures.catalogAds>> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: mockMetaRemainingFeatures.catalogAds
+      })
+    }, 300)
+  })
+}
+
+// 受众类型数据
+export const mockGetMetaAudienceTypes = (): Promise<ApiResponse<typeof mockMetaRemainingFeatures.audienceTypes>> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: mockMetaRemainingFeatures.audienceTypes
+      })
+    }, 300)
+  })
+}
+
+// 用户画像数据
+export const mockGetMetaUserDemographics = (): Promise<ApiResponse<typeof mockMetaRemainingFeatures.demographics>> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: mockMetaRemainingFeatures.demographics
+      })
+    }, 300)
+  })
+}
+
+// 落地页数据
+export const mockGetMetaLandingPageData = (): Promise<ApiResponse<any[]>> => {
+  const landingPageData = [
+    {
+      url: '/product-page-1',
+      name: '产品页面1',
+      spend: 1250.00,
+      revenue: 3750.00,
+      roas: 3.0,
+      aov: 125.00,
+      sales: 30,
+      customerPrice: 125.00,
+      conversionCost: 41.67,
+      conversionRate: 2.4,
+      addToCartCost: 15.63,
+      addToCartRate: 8.0,
+      users: 520,
+      ctr: 1.8,
+      cpm: 12.50
+    },
+    {
+      url: '/product-page-2',
+      name: '产品页面2',
+      spend: 980.00,
+      revenue: 2450.00,
+      roas: 2.5,
+      aov: 98.00,
+      sales: 25,
+      customerPrice: 98.00,
+      conversionCost: 39.20,
+      conversionRate: 2.1,
+      addToCartCost: 14.29,
+      addToCartRate: 7.0,
+      users: 450,
+      ctr: 1.6,
+      cpm: 11.20
+    },
+    {
+      url: '/homepage',
+      name: '首页',
+      spend: 750.00,
+      revenue: 1875.00,
+      roas: 2.5,
+      aov: 93.75,
+      sales: 20,
+      customerPrice: 93.75,
+      conversionCost: 37.50,
+      conversionRate: 2.0,
+      addToCartCost: 12.50,
+      addToCartRate: 6.0,
+      users: 380,
+      ctr: 1.4,
+      cpm: 10.80
+    }
+  ]
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: landingPageData
+      })
+    }, 300)
+  })
+}
+
+// 素材数据
+export const mockGetMetaCreativeData = (): Promise<ApiResponse<any[]>> => {
+  const creativeData = [
+    {
+      id: 'creative-1',
+      name: '春季促销视频',
+      thumbnail: '/avatars/default.svg',
+      spend: 1500.00,
+      revenue: 4500.00,
+      roas: 3.0,
+      aov: 150.00,
+      sales: 30,
+      customerPrice: 150.00,
+      conversionCost: 50.00,
+      conversionRate: 2.0,
+      addToCartCost: 18.75,
+      addToCartRate: 8.0,
+      users: 600,
+      ctr: 2.5,
+      cpm: 15.00
+    },
+    {
+      id: 'creative-2',
+      name: '产品展示图片',
+      thumbnail: '/avatars/default.svg',
+      spend: 1200.00,
+      revenue: 3000.00,
+      roas: 2.5,
+      aov: 120.00,
+      sales: 25,
+      customerPrice: 120.00,
+      conversionCost: 48.00,
+      conversionRate: 1.8,
+      addToCartCost: 17.14,
+      addToCartRate: 7.0,
+      users: 480,
+      ctr: 2.2,
+      cpm: 13.50
+    },
+    {
+      id: 'creative-3',
+      name: '用户评价轮播',
+      thumbnail: '/avatars/default.svg',
+      spend: 800.00,
+      revenue: 1600.00,
+      roas: 2.0,
+      aov: 80.00,
+      sales: 20,
+      customerPrice: 80.00,
+      conversionCost: 40.00,
+      conversionRate: 1.5,
+      addToCartCost: 13.33,
+      addToCartRate: 6.0,
+      users: 320,
+      ctr: 1.8,
+      cpm: 11.00
+    }
+  ]
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: creativeData
+      })
+    }, 300)
+  })
+}

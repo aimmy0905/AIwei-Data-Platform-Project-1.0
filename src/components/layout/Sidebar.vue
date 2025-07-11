@@ -74,7 +74,11 @@ const user = computed(() => authStore.user)
 const userName = computed(() => authStore.userName)
 const userAvatar = computed(() => authStore.userAvatar)
 const collapsed = computed(() => menuStore.collapsed)
-const visibleMenuItems = computed(() => menuStore.visibleMenuItems)
+const visibleMenuItems = computed(() => {
+  const items = menuStore.visibleMenuItems
+  console.log('Visible menu items:', items)
+  return items
+})
 
 // 方法
 const toggleCollapse = () => {
@@ -82,9 +86,37 @@ const toggleCollapse = () => {
 }
 
 const handleMenuSelect = async (item: MenuItem) => {
+  console.log('Menu item selected:', item)
+
   if (item.path) {
-    // 如果是数据看板的子菜单，使用锚点跳转
-    if (item.path.startsWith('/dashboard/')) {
+    // 广告数据使用锚点跳转到数据看板页面的对应模块
+    if (item.path === '/dashboard/ad-platform-overview') {
+      // 先确保导航到数据看板页面
+      if (router.currentRoute.value.name !== 'dashboard') {
+        await router.push({ name: 'dashboard' })
+        // 等待页面渲染完成
+        await new Promise(resolve => setTimeout(resolve, 200))
+      }
+
+      // 然后滚动到广告数据总览部分
+      await scrollToSectionWithOffset('ad-platform-overview')
+      menuStore.setActiveMenu(item.id)
+    } else if (item.path === '/dashboard/meta-dashboard' ||
+        item.path === '/dashboard/google-dashboard' ||
+        item.path === '/dashboard/bing-dashboard' ||
+        item.path === '/dashboard/criteo-dashboard') {
+      // 其他广告平台页面直接使用路由跳转
+      const routeName = getRouteNameFromPath(item.path)
+      console.log('Navigating to route:', routeName)
+
+      try {
+        await router.push({ name: routeName })
+        menuStore.setActiveMenu(item.id)
+      } catch (error) {
+        console.error('Navigation failed:', error)
+      }
+    } else if (item.path.startsWith('/dashboard/')) {
+      // 其他数据看板的子菜单，使用锚点跳转
       const sectionId = item.path.replace('/dashboard/', '')
 
       // 先确保导航到数据看板页面
@@ -94,13 +126,26 @@ const handleMenuSelect = async (item: MenuItem) => {
         await new Promise(resolve => setTimeout(resolve, 200))
       }
 
-      // 然后滚动到对应的锚点，使用改进的滚动方法
+      // 然后滚动到对应的锚点
       await scrollToSectionWithOffset(sectionId)
       menuStore.setActiveMenu(item.id)
     } else {
       // 其他菜单使用路由跳转
-      router.push({ name: getRouteNameFromPath(item.path) })
-      menuStore.setActiveMenu(item.id)
+      const routeName = getRouteNameFromPath(item.path)
+      console.log('Navigating to route:', routeName)
+
+      try {
+        await router.push({ name: routeName })
+        menuStore.setActiveMenu(item.id)
+      } catch (error) {
+        console.error('Navigation failed:', error)
+      }
+    }
+  } else {
+    // 如果没有路径，可能是父级菜单，只切换展开状态
+    if (item.children && item.children.length > 0) {
+      console.log('Toggling submenu for:', item.id)
+      menuStore.toggleSubmenu(item.id)
     }
   }
 }

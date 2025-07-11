@@ -2,12 +2,12 @@
   <div class="main-layout" :class="{ 'main-layout--collapsed': collapsed }">
     <!-- 侧边栏 -->
     <Sidebar />
-    
+
     <!-- 主内容区域 -->
     <div class="main-layout__content">
       <!-- 头部导航 -->
       <Header />
-      
+
       <!-- 页面内容 -->
       <main class="main-layout__main">
         <div class="main-layout__container">
@@ -19,7 +19,7 @@
           </router-view>
         </div>
       </main>
-      
+
       <!-- 底部 -->
       <footer class="main-layout__footer">
         <div class="main-layout__footer-content">
@@ -32,9 +32,9 @@
         </div>
       </footer>
     </div>
-    
+
     <!-- 移动端遮罩层 -->
-    <div 
+    <div
       v-if="showMobileOverlay"
       class="main-layout__overlay"
       @click="closeMobileMenu"
@@ -83,26 +83,52 @@ const handleResize = () => {
 onMounted(async () => {
   // 初始化主题
   initTheme()
-  
+
   // 初始化认证状态
   await authStore.initAuth()
-  
-  // 如果已登录，加载菜单
-  if (authStore.isAuthenticated && authStore.userRole) {
-    await menuStore.loadMenu(authStore.userRole)
-    
-    // 根据当前路由设置活跃菜单
-    const currentPath = router.currentRoute.value.path
-    menuStore.setActiveMenuByPath(currentPath)
-  }
-  
-  // 监听窗口大小变化
-  window.addEventListener('resize', handleResize)
-  
+
   // 监听路由变化
   router.afterEach((to) => {
+    console.log('Route changed to:', to.path)
     menuStore.setActiveMenuByPath(to.path)
+
+    // 如果是dashboard页面，确保数据看板菜单是展开的
+    if (to.path === '/dashboard' || to.path.startsWith('/dashboard/')) {
+      if (!menuStore.isMenuOpen('dashboard')) {
+        menuStore.toggleSubmenu('dashboard')
+      }
+    }
   })
+
+  // 初始化当前路由的菜单状态
+  const initializeMenuState = () => {
+    const currentPath = router.currentRoute.value.path
+    console.log('Initializing menu state for path:', currentPath)
+
+    // 如果是dashboard页面，确保数据看板菜单是展开的
+    if (currentPath === '/dashboard' || currentPath.startsWith('/dashboard/')) {
+      if (!menuStore.isMenuOpen('dashboard')) {
+        menuStore.toggleSubmenu('dashboard')
+      }
+    }
+  }
+
+  // 在菜单加载完成后初始化菜单状态
+  if (authStore.isAuthenticated && authStore.userRole) {
+    console.log('Loading menu for authenticated user with role:', authStore.userRole)
+    await menuStore.loadMenu(authStore.userRole)
+
+    // 根据当前路由设置活跃菜单
+    const currentPath = router.currentRoute.value.path
+    console.log('Setting active menu for current path:', currentPath)
+    menuStore.setActiveMenuByPath(currentPath)
+
+    // 初始化菜单展开状态
+    initializeMenuState()
+  }
+
+  // 监听窗口大小变化
+  window.addEventListener('resize', handleResize)
 })
 
 onUnmounted(() => {
@@ -215,21 +241,21 @@ onUnmounted(() => {
   .main-layout__content {
     margin-left: 0;
   }
-  
+
   .main-layout--collapsed .main-layout__content {
     margin-left: 0;
   }
-  
+
   .main-layout__main {
     padding: var(--spacing-md);
   }
-  
+
   .main-layout__footer-content {
     flex-direction: column;
     gap: var(--spacing-sm);
     text-align: center;
   }
-  
+
   .main-layout__footer-links {
     justify-content: center;
   }
@@ -239,7 +265,7 @@ onUnmounted(() => {
   .main-layout__main {
     padding: var(--spacing-sm);
   }
-  
+
   .main-layout__footer-links {
     flex-direction: column;
     gap: var(--spacing-sm);
@@ -251,7 +277,7 @@ onUnmounted(() => {
   .main-layout__content {
     margin-left: 0;
   }
-  
+
   .main-layout__footer {
     display: none;
   }

@@ -16,7 +16,7 @@ export const useMenuStore = defineStore('menu', () => {
   const visibleMenuItems = computed(() => {
     const authStore = useAuthStore()
     if (!authStore.userRole) return []
-    
+
     return filterMenuByRole(menuItems.value, authStore.userRole)
   })
 
@@ -31,14 +31,14 @@ export const useMenuStore = defineStore('menu', () => {
       if (item.roles && !item.roles.includes(role)) {
         return false
       }
-      
+
       // 递归过滤子菜单
       if (item.children) {
         item.children = filterMenuByRole(item.children, role)
         // 如果子菜单为空且当前菜单没有路径，则不显示
         return item.children.length > 0 || item.path
       }
-      
+
       return true
     })
   }
@@ -75,11 +75,11 @@ export const useMenuStore = defineStore('menu', () => {
   const getMenuPath = (items: MenuItem[], targetId: string, path: string[] = []): string[] => {
     for (const item of items) {
       const currentPath = [...path, item.id]
-      
+
       if (item.id === targetId) {
         return currentPath
       }
-      
+
       if (item.children) {
         const found = getMenuPath(item.children, targetId, currentPath)
         if (found.length > 0) return found
@@ -92,9 +92,11 @@ export const useMenuStore = defineStore('menu', () => {
   const loadMenu = async (role: UserRole) => {
     loading.value = true
     try {
+      console.log('Loading menu for role:', role)
       const response = await mockGetMenu(role)
       if (response.success && response.data) {
         menuItems.value = response.data
+        console.log('Menu loaded successfully:', response.data)
       }
     } catch (error) {
       console.error('加载菜单失败:', error)
@@ -105,7 +107,7 @@ export const useMenuStore = defineStore('menu', () => {
 
   const setActiveMenu = (menuId: string) => {
     activeMenuId.value = menuId
-    
+
     // 自动展开父级菜单
     const menuPath = getMenuPath(menuItems.value, menuId)
     if (menuPath.length > 1) {
@@ -116,16 +118,31 @@ export const useMenuStore = defineStore('menu', () => {
   }
 
   const setActiveMenuByPath = (path: string) => {
+    console.log('Setting active menu by path:', path)
     const menu = findMenuByPath(visibleMenuItems.value, path)
     if (menu) {
+      console.log('Found menu for path:', menu)
       setActiveMenu(menu.id)
     } else {
-      // 如果找不到对应的菜单，尝试处理dashboard的section路径
+      console.log('No menu found for path, trying fallback logic')
+      // 如果找不到对应的菜单，尝试处理特殊路径
       if (path.startsWith('/dashboard') || path === '/dashboard') {
-        // 默认设置为第一个dashboard子菜单
-        const dashboardMenu = findMenuById(visibleMenuItems.value, 'dashboard')
-        if (dashboardMenu?.children && dashboardMenu.children.length > 0) {
-          setActiveMenu(dashboardMenu.children[0].id)
+        if (path === '/dashboard/ad-platform-overview') {
+          setActiveMenu('ad-platform-overview')
+        } else if (path === '/dashboard/meta-dashboard') {
+          setActiveMenu('meta-dashboard')
+        } else if (path === '/dashboard/google-dashboard') {
+          setActiveMenu('google-dashboard')
+        } else if (path === '/dashboard/bing-dashboard') {
+          setActiveMenu('bing-dashboard')
+        } else if (path === '/dashboard/criteo-dashboard') {
+          setActiveMenu('criteo-dashboard')
+        } else {
+          // 默认设置为第一个dashboard子菜单
+          const dashboardMenu = findMenuById(visibleMenuItems.value, 'dashboard')
+          if (dashboardMenu?.children && dashboardMenu.children.length > 0) {
+            setActiveMenu(dashboardMenu.children[0].id)
+          }
         }
       }
     }
@@ -165,9 +182,9 @@ export const useMenuStore = defineStore('menu', () => {
     if (dynamicBreadcrumb.value.length > 0) {
       return dynamicBreadcrumb.value
     }
-    
+
     if (!activeMenuId.value) return []
-    
+
     const path = getMenuPath(menuItems.value, activeMenuId.value)
     return path.map(id => findMenuById(menuItems.value, id)).filter(Boolean) as MenuItem[]
   })
@@ -210,12 +227,12 @@ export const useMenuStore = defineStore('menu', () => {
     activeMenuId,
     openKeys,
     loading,
-    
+
     // 计算属性
     visibleMenuItems,
     currentMenu,
     getBreadcrumb,
-    
+
     // 动作
     loadMenu,
     setActiveMenu,

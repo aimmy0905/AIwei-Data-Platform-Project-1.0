@@ -12,65 +12,71 @@ export const mockMenuItems: MenuItem[] = [
     name: '数据看板',
     icon: 'BarChart3',
     children: [
-
       {
-        id: 'customer-goals',
+        id: 'dashboard-alerts',
+        name: '预警提醒',
+        icon: 'AlertTriangle',
+        path: '/dashboard/alerts',
+        roles: ['superAdmin', 'manager', 'staff', 'finance', 'sales']
+      },
+      {
+        id: 'dashboard-customer-goals',
         name: '客户目标',
         icon: 'Target',
         path: '/dashboard/customer-goals',
         roles: ['superAdmin', 'manager', 'staff', 'sales']
       },
       {
-        id: 'website-data',
+        id: 'dashboard-website-data',
         name: '网站数据',
         icon: 'Globe',
         path: '/dashboard/website-data',
         roles: ['superAdmin', 'manager', 'staff']
       },
       {
-        id: 'channel-data',
+        id: 'dashboard-channel-data',
         name: '渠道数据',
         icon: 'TrendingUp',
         path: '/dashboard/channel-data',
         roles: ['superAdmin', 'manager', 'staff']
       },
       {
-        id: 'campaign-data',
+        id: 'dashboard-campaign-data',
         name: '活动数据',
         icon: 'Calendar',
         path: '/dashboard/campaign-data',
         roles: ['superAdmin', 'manager', 'staff']
       },
       {
-        id: 'product-sales',
+        id: 'dashboard-product-sales',
         name: '产品销售',
         icon: 'Package',
         path: '/dashboard/product-sales',
         roles: ['superAdmin', 'manager', 'staff', 'sales']
       },
       {
-        id: 'kol-data',
+        id: 'dashboard-kol-data',
         name: '红人数据',
         icon: 'Users',
         path: '/dashboard/kol-data',
         roles: ['superAdmin', 'manager', 'staff']
       },
       {
-        id: 'market-data',
+        id: 'dashboard-market-data',
         name: '地区市场',
         icon: 'MapPin',
         path: '/dashboard/market-data',
         roles: ['superAdmin', 'manager', 'staff']
       },
       {
-        id: 'page-performance',
+        id: 'dashboard-page-performance',
         name: '页面表现',
         icon: 'FileText',
         path: '/dashboard/page-performance',
         roles: ['superAdmin', 'manager', 'staff']
       },
       {
-        id: 'competitor-analysis',
+        id: 'dashboard-competitor-analysis',
         name: '竞品分析',
         icon: 'Search',
         path: '/dashboard/competitor-analysis',
@@ -80,36 +86,7 @@ export const mockMenuItems: MenuItem[] = [
         id: 'ad-data',
         name: '广告数据',
         icon: 'Megaphone',
-        children: [
-          {
-            id: 'meta-ads',
-            name: 'Meta数据',
-            icon: 'Facebook',
-            path: '/dashboard/ad-data/meta',
-            roles: ['superAdmin', 'manager', 'staff']
-          },
-          {
-            id: 'google-ads',
-            name: 'Google数据',
-            icon: 'Chrome',
-            path: '/dashboard/ad-data/google',
-            roles: ['superAdmin', 'manager', 'staff']
-          },
-          {
-            id: 'criteo-ads',
-            name: 'Criteo数据',
-            icon: 'Monitor',
-            path: '/dashboard/ad-data/criteo',
-            roles: ['superAdmin', 'manager', 'staff']
-          },
-          {
-            id: 'bing-ads',
-            name: 'Bing数据',
-            icon: 'Search',
-            path: '/dashboard/ad-data/bing',
-            roles: ['superAdmin', 'manager', 'staff']
-          }
-        ],
+        path: '/dashboard/ad-platform-overview',
         roles: ['superAdmin', 'manager', 'staff']
       }
     ],
