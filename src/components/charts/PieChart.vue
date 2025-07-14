@@ -92,13 +92,31 @@ const chartOption = computed(() => {
       }
     },
 
-    legend: props.showLegend ? {
-      orient: 'vertical',
-      right: 10,
-      top: 'center',
-      textStyle: {
-        color: colors.textSecondary
-      }
+        legend: props.showLegend ? {
+      orient: 'horizontal',
+      bottom: 20,
+      left: 'center',
+      itemWidth: 12,
+      itemHeight: 12,
+      itemGap: 15,
+      width: '95%',
+      formatter: (name: string) => {
+        const item = props.data.find(d => d.name === name)
+        if (!item) return name
+
+        const total = props.data.reduce((sum, d) => sum + d.value, 0)
+        const percentage = ((item.value / total) * 100).toFixed(1)
+        const value = formatValue(item.value)
+
+        // 限制名称长度，避免过长导致重叠
+        const shortName = name.length > 6 ? name.substring(0, 6) + '...' : name
+        return `${shortName} $${value}`
+      },
+              textStyle: {
+          color: colors.textPrimary,
+          fontSize: 11,
+          lineHeight: 16
+        }
     } : { show: false },
 
     series: [
@@ -106,8 +124,8 @@ const chartOption = computed(() => {
         type: 'pie',
         radius: props.donut
           ? (Array.isArray(props.radius) ? props.radius : ['40%', props.radius])
-          : props.radius,
-        center: ['50%', '50%'],
+          : '70%',
+        center: ['50%', '40%'],
         data: props.data.map((item, index) => ({
           ...item,
           itemStyle: {
@@ -122,13 +140,10 @@ const chartOption = computed(() => {
           }
         },
         label: {
-          show: !props.showLegend,
-          position: 'outside',
-          color: colors.textPrimary,
-          formatter: '{b}: {c} ({d}%)'
+          show: false
         },
         labelLine: {
-          show: !props.showLegend
+          show: false
         },
         animationType: 'scale',
         animationEasing: 'elasticOut',
