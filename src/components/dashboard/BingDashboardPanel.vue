@@ -358,13 +358,13 @@
         <div class="charts-grid">
           <div class="chart-container">
             <div class="chart-content">
-              <PieChart :data="costDistributionChartData" height="300px" />
+              <PieChart :data="costDistributionChartData" height="450px" />
             </div>
             <h4 class="chart-title">成本占比</h4>
           </div>
           <div class="chart-container">
             <div class="chart-content">
-              <PieChart :data="revenueDistributionChartData" height="300px" />
+              <PieChart :data="revenueDistributionChartData" height="450px" />
             </div>
             <h4 class="chart-title">收入占比</h4>
           </div>
@@ -608,7 +608,7 @@
                 <tr v-for="row in dashboardData.imageCreativeData" :key="row.adId">
                   <td>{{ row.adId }} / {{ row.imageId }}</td>
                   <td>
-                    <img :src="row.image" :alt="row.adId" class="material-image" />
+                    <img :src="row.image" :alt="row.adId" class="material-image" @error="handleImageError" />
                   </td>
                   <td>
                     <a :href="row.adLink" target="_blank" class="ad-link">查看广告</a>
@@ -652,7 +652,7 @@
               <tbody>
                 <tr v-for="row in dashboardData.videoCreativeData" :key="row.videoId">
                   <td>
-                    <img :src="row.thumbnail" :alt="row.videoId" class="material-image" />
+                    <img :src="row.thumbnail" :alt="row.videoId" class="material-image" @error="handleImageError" />
                   </td>
                   <td>
                     <a :href="row.videoLink" target="_blank" class="ad-link">查看视频</a>
@@ -814,6 +814,12 @@ const formatDate = (dateString: string) => {
     month: '2-digit',
     day: '2-digit'
   })
+}
+
+const handleImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement
+  img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA4MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yNSAyMEg1NVY0MEgyNVYyMFoiIGZpbGw9IiNEMUQ1REIiLz4KPGNpcmNsZSBjeD0iMzEiIGN5PSIyNyIgcj0iMyIgZmlsbD0iI0Y5RkFGQiIvPgo8cGF0aCBkPSJNMjUgMzVMMzAgMzBMMzUgMzVMNDUgMjVMNTUgMzVWNDBIMjVWMzVaIiBmaWxsPSIjRjlGQUZCIi8+CjwvZz4KPC9zdmc+'
+  img.alt = 'Image not found'
 }
 
 onMounted(() => {

@@ -445,7 +445,7 @@ export const bingDashboardData = {
     {
       adId: 'IMG_001',
       imageId: 'bing_img_001',
-      image: '/public/creative-samples/bing-image-1.jpg',
+      image: '/creative-samples/bing-image-1.jpg',
       adLink: 'https://example.com/ad/001',
       impressions: 25680,
       clicks: 1058,
@@ -460,7 +460,7 @@ export const bingDashboardData = {
     {
       adId: 'IMG_002',
       imageId: 'bing_img_002',
-      image: '/public/creative-samples/bing-image-2.jpg',
+      image: '/creative-samples/bing-image-2.jpg',
       adLink: 'https://example.com/ad/002',
       impressions: 31250,
       clicks: 1406,
@@ -477,7 +477,7 @@ export const bingDashboardData = {
   // 视频素材表现
   videoCreativeData: [
     {
-      thumbnail: '/public/creative-samples/bing-video-thumb-1.jpg',
+      thumbnail: '/creative-samples/bing-video-thumb-1.jpg',
       videoLink: 'https://example.com/video/001',
       videoId: 'bing_video_001',
       duration: 30,
@@ -489,7 +489,7 @@ export const bingDashboardData = {
       conversions: 15
     },
     {
-      thumbnail: '/public/creative-samples/bing-video-thumb-2.jpg',
+      thumbnail: '/creative-samples/bing-video-thumb-2.jpg',
       videoLink: 'https://example.com/video/002',
       videoId: 'bing_video_002',
       duration: 15,

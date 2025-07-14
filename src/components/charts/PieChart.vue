@@ -92,40 +92,40 @@ const chartOption = computed(() => {
       }
     },
 
-        legend: props.showLegend ? {
+                        legend: props.showLegend ? {
       orient: 'horizontal',
-      bottom: 20,
+      bottom: 15,
       left: 'center',
-      itemWidth: 12,
-      itemHeight: 12,
-      itemGap: 15,
+      itemWidth: 8,
+      itemHeight: 8,
+      itemGap: 20,
       width: '95%',
       formatter: (name: string) => {
         const item = props.data.find(d => d.name === name)
         if (!item) return name
 
-        const total = props.data.reduce((sum, d) => sum + d.value, 0)
-        const percentage = ((item.value / total) * 100).toFixed(1)
         const value = formatValue(item.value)
+        // 计算总值用于显示百分比
+        const total = props.data.reduce((sum, item) => sum + item.value, 0)
+        const percentage = ((item.value / total) * 100).toFixed(1)
 
-        // 限制名称长度，避免过长导致重叠
-        const shortName = name.length > 6 ? name.substring(0, 6) + '...' : name
-        return `${shortName} $${value}`
+        // 缩短名称以适应水平布局
+        const shortName = name.length > 8 ? name.substring(0, 8) + '...' : name
+        return `${shortName} $${value} (${percentage}%)`
       },
-              textStyle: {
-          color: colors.textPrimary,
-          fontSize: 11,
-          lineHeight: 16
-        }
+      textStyle: {
+        color: colors.textPrimary,
+        fontSize: 10,
+        lineHeight: 16,
+        fontFamily: 'Arial, sans-serif'
+      }
     } : { show: false },
 
-    series: [
+            series: [
       {
         type: 'pie',
-        radius: props.donut
-          ? (Array.isArray(props.radius) ? props.radius : ['40%', props.radius])
-          : '70%',
-        center: ['50%', '40%'],
+        radius: ['30%', '55%'],
+        center: ['50%', '45%'],
         data: props.data.map((item, index) => ({
           ...item,
           itemStyle: {
@@ -145,6 +145,7 @@ const chartOption = computed(() => {
         labelLine: {
           show: false
         },
+        silent: false,
         animationType: 'scale',
         animationEasing: 'elasticOut',
         animationDelay: () => Math.random() * 200
