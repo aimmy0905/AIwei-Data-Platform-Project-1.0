@@ -14,8 +14,20 @@ import type {
   ApiResponse
 } from '@/types'
 
+// 扩展客户类型，添加产品设计文档要求的字段
+export interface ExtendedCustomer extends Customer {
+  cooperationType: string // 合作方式
+  serviceStartTime: string // 服务开始时间
+  cooperationStartTime: string // 合作开始时间
+  primaryContact: ContactPerson // 主要联系人
+  serviceTeam: string // 服务团队
+  grade: 'A' | 'B' | 'C' // 客户分级
+  signingSales: string // 签单销售人员
+  regions: string[] // 地区
+}
+
 // 模拟客户列表数据
-export const mockCustomers: Customer[] = [
+export const mockCustomers: ExtendedCustomer[] = [
   {
     id: 1,
     name: '时尚潮流服饰有限公司',
@@ -26,7 +38,22 @@ export const mockCustomers: Customer[] = [
     status: 'active',
     manager: '张小明',
     createdAt: '2024-01-15T08:00:00Z',
-    lastUpdated: '2024-12-20T10:30:00Z'
+    lastUpdated: '2024-12-20T10:30:00Z',
+    cooperationType: '代运营',
+    serviceStartTime: '2024-02-01T08:00:00Z',
+    cooperationStartTime: '2024-01-15T08:00:00Z',
+    primaryContact: {
+      id: 1,
+      name: '李总',
+      position: '总经理',
+      phone: '13800138001',
+      email: 'ceo@fashiontrend.com',
+      isPrimary: true
+    },
+    serviceTeam: '时尚组',
+    grade: 'A',
+    signingSales: '张小明',
+    regions: ['美国', '欧洲', '加拿大']
   },
   {
     id: 2,
@@ -38,7 +65,22 @@ export const mockCustomers: Customer[] = [
     status: 'active',
     manager: '李美丽',
     createdAt: '2024-02-10T09:15:00Z',
-    lastUpdated: '2024-12-19T16:45:00Z'
+    lastUpdated: '2024-12-19T16:45:00Z',
+    cooperationType: '咨询服务',
+    serviceStartTime: '2024-02-20T09:00:00Z',
+    cooperationStartTime: '2024-02-10T09:15:00Z',
+    primaryContact: {
+      id: 2,
+      name: '王经理',
+      position: '市场总监',
+      phone: '13800138002',
+      email: 'marketing@techinnovate.com',
+      isPrimary: true
+    },
+    serviceTeam: '科技组',
+    grade: 'B',
+    signingSales: '李美丽',
+    regions: ['美国', '日本']
   },
   {
     id: 3,
@@ -50,7 +92,22 @@ export const mockCustomers: Customer[] = [
     status: 'active',
     manager: '王强',
     createdAt: '2024-03-05T14:20:00Z',
-    lastUpdated: '2024-12-18T11:20:00Z'
+    lastUpdated: '2024-12-18T11:20:00Z',
+    cooperationType: '代运营',
+    serviceStartTime: '2024-03-15T08:00:00Z',
+    cooperationStartTime: '2024-03-05T14:20:00Z',
+    primaryContact: {
+      id: 3,
+      name: '赵女士',
+      position: '运营总监',
+      phone: '13800138003',
+      email: 'ops@beautycare.com',
+      isPrimary: true
+    },
+    serviceTeam: '美妆组',
+    grade: 'A',
+    signingSales: '王强',
+    regions: ['美国', '欧洲', '澳大利亚']
   },
   {
     id: 4,
@@ -62,7 +119,22 @@ export const mockCustomers: Customer[] = [
     status: 'inactive',
     manager: '赵敏',
     createdAt: '2024-04-12T10:30:00Z',
-    lastUpdated: '2024-12-17T09:15:00Z'
+    lastUpdated: '2024-12-17T09:15:00Z',
+    cooperationType: '技术支持',
+    serviceStartTime: '2024-04-20T08:00:00Z',
+    cooperationStartTime: '2024-04-12T10:30:00Z',
+    primaryContact: {
+      id: 4,
+      name: '孙总',
+      position: '销售总监',
+      phone: '13800138004',
+      email: 'sales@sportsfitness.com',
+      isPrimary: true
+    },
+    serviceTeam: '运动组',
+    grade: 'C',
+    signingSales: '赵敏',
+    regions: ['美国', '加拿大']
   },
   {
     id: 5,
@@ -74,7 +146,22 @@ export const mockCustomers: Customer[] = [
     status: 'active',
     manager: '陈华',
     createdAt: '2024-05-08T11:45:00Z',
-    lastUpdated: '2024-12-16T15:30:00Z'
+    lastUpdated: '2024-12-16T15:30:00Z',
+    cooperationType: '代运营',
+    serviceStartTime: '2024-05-15T08:00:00Z',
+    cooperationStartTime: '2024-05-08T11:45:00Z',
+    primaryContact: {
+      id: 5,
+      name: '周经理',
+      position: '产品经理',
+      phone: '13800138005',
+      email: 'product@homedecor.com',
+      isPrimary: true
+    },
+    serviceTeam: '家居组',
+    grade: 'B',
+    signingSales: '陈华',
+    regions: ['美国', '欧洲']
   },
   {
     id: 6,
@@ -86,7 +173,22 @@ export const mockCustomers: Customer[] = [
     status: 'active',
     manager: '刘洋',
     createdAt: '2024-06-20T13:00:00Z',
-    lastUpdated: '2024-12-15T12:45:00Z'
+    lastUpdated: '2024-12-15T12:45:00Z',
+    cooperationType: '代运营',
+    serviceStartTime: '2024-07-01T08:00:00Z',
+    cooperationStartTime: '2024-06-20T13:00:00Z',
+    primaryContact: {
+      id: 6,
+      name: '吴总',
+      position: '技术总监',
+      phone: '13800138006',
+      email: 'tech@smarthome.com',
+      isPrimary: true
+    },
+    serviceTeam: '科技组',
+    grade: 'A',
+    signingSales: '刘洋',
+    regions: ['美国', '欧洲', '日本']
   },
   {
     id: 7,
@@ -98,7 +200,22 @@ export const mockCustomers: Customer[] = [
     status: 'suspended',
     manager: '周杰',
     createdAt: '2024-07-03T16:20:00Z',
-    lastUpdated: '2024-12-14T08:30:00Z'
+    lastUpdated: '2024-12-14T08:30:00Z',
+    cooperationType: '培训服务',
+    serviceStartTime: '2024-07-10T08:00:00Z',
+    cooperationStartTime: '2024-07-03T16:20:00Z',
+    primaryContact: {
+      id: 7,
+      name: '林经理',
+      position: '品牌经理',
+      phone: '13800138007',
+      email: 'brand@outdoorgear.com',
+      isPrimary: true
+    },
+    serviceTeam: '运动组',
+    grade: 'C',
+    signingSales: '周杰',
+    regions: ['美国', '澳大利亚']
   },
   {
     id: 8,
@@ -110,7 +227,22 @@ export const mockCustomers: Customer[] = [
     status: 'active',
     manager: '吴娟',
     createdAt: '2024-08-15T09:30:00Z',
-    lastUpdated: '2024-12-13T14:20:00Z'
+    lastUpdated: '2024-12-13T14:20:00Z',
+    cooperationType: '代运营',
+    serviceStartTime: '2024-08-20T08:00:00Z',
+    cooperationStartTime: '2024-08-15T09:30:00Z',
+    primaryContact: {
+      id: 8,
+      name: '郑总',
+      position: '创始人',
+      phone: '13800138008',
+      email: 'founder@luxuryjewelry.com',
+      isPrimary: true
+    },
+    serviceTeam: '时尚组',
+    grade: 'A',
+    signingSales: '吴娟',
+    regions: ['美国', '欧洲', '日本', '澳大利亚']
   },
   {
     id: 9,
@@ -122,7 +254,22 @@ export const mockCustomers: Customer[] = [
     status: 'active',
     manager: '孙丽',
     createdAt: '2024-09-10T12:15:00Z',
-    lastUpdated: '2024-12-12T10:45:00Z'
+    lastUpdated: '2024-12-12T10:45:00Z',
+    cooperationType: '咨询服务',
+    serviceStartTime: '2024-09-15T08:00:00Z',
+    cooperationStartTime: '2024-09-10T12:15:00Z',
+    primaryContact: {
+      id: 9,
+      name: '黄经理',
+      position: '采购经理',
+      phone: '13800138009',
+      email: 'purchase@kidstoys.com',
+      isPrimary: true
+    },
+    serviceTeam: '家居组',
+    grade: 'C',
+    signingSales: '孙丽',
+    regions: ['美国', '加拿大']
   },
   {
     id: 10,
@@ -134,7 +281,22 @@ export const mockCustomers: Customer[] = [
     status: 'active',
     manager: '马超',
     createdAt: '2024-10-25T14:45:00Z',
-    lastUpdated: '2024-12-11T16:30:00Z'
+    lastUpdated: '2024-12-11T16:30:00Z',
+    cooperationType: '代运营',
+    serviceStartTime: '2024-11-01T08:00:00Z',
+    cooperationStartTime: '2024-10-25T14:45:00Z',
+    primaryContact: {
+      id: 10,
+      name: '刘总',
+      position: '总经理',
+      phone: '13800138010',
+      email: 'ceo@organicfood.com',
+      isPrimary: true
+    },
+    serviceTeam: '美妆组',
+    grade: 'B',
+    signingSales: '马超',
+    regions: ['美国', '欧洲', '加拿大']
   }
 ]
 
@@ -278,7 +440,7 @@ export const mockCustomerDetails: { [key: number]: CustomerDetail } = {
 }
 
 // 模拟API函数
-export const mockGetCustomers = (): Promise<ApiResponse<Customer[]>> => {
+export const mockGetCustomers = (): Promise<ApiResponse<ExtendedCustomer[]>> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({

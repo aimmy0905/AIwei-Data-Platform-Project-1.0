@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>筛选项测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .dashboard-filter-container {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: white;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            margin-bottom: 16px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .dashboard-filter-container.sticky {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-bottom: 1px solid #ccc;
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+        
+        .dashboard-filter-test {
+            background: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+        }
+        
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            color: #333;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+        }
+        
+        .quick-dates {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .period-btn {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            color: #666;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .period-btn:hover {
+            background: #f5f5f5;
+        }
+        
+        .period-btn--active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .filter-reset {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            color: #666;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-reset:hover {
+            background: #f5f5f5;
+        }
+        
+        .content {
+            height: 2000px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-filter-container" id="filterContainer">
+        <div class="dashboard-filter-test">
+            <div class="filter-section">
+                <!-- 客户筛选 -->
+                <div class="filter-group">
+                    <label class="filter-label">客户项目</label>
+                    <div class="customer-filter">
+                        <select class="filter-select">
+                            <option value="">全部客户</option>
+                            <option value="1">客户A</option>
+                            <option value="2">客户B</option>
+                            <option value="3">客户C</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 时间筛选 -->
+                <div class="filter-group">
+                    <label class="filter-label">时间范围</label>
+                    <div class="date-filter">
+                        <div class="quick-dates">
+                            <button class="period-btn period-btn--active">今日</button>
+                            <button class="period-btn">昨日</button>
+                            <button class="period-btn">近7日</button>
+                            <button class="period-btn">近14天</button>
+                            <button class="period-btn">近90天</button>
+                            <button class="period-btn">近1年</button>
+                            <button class="period-btn">自定义</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="filter-actions">
+                    <button class="filter-reset">重置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <h1>数据看板内容</h1>
+        <p>这里是数据看板的主要内容。向下滚动查看筛选项的固定效果。</p>
+        <p>滚动时，上方的筛选项会固定在页面顶部。</p>
+        
+        <div style="margin-top: 50px;">
+            <h2>预警提醒</h2>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <p>这里是预警提醒的内容...</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 50px;">
+            <h2>客户目标</h2>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <p>这里是客户目标的内容...</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 50px;">
+            <h2>网站数据</h2>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <p>这里是网站数据的内容...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 滚动监听，实现筛选项固定效果
+        function handleScroll() {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const filterContainer = document.getElementById('filterContainer');
+            
+            if (scrollTop > 120) {
+                filterContainer.classList.add('sticky');
+            } else {
+                filterContainer.classList.remove('sticky');
+            }
+        }
+
+        window.addEventListener('scroll', handleScroll);
+
+        // 时间筛选按钮点击事件
+        document.querySelectorAll('.period-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('period-btn--active'));
+                this.classList.add('period-btn--active');
+            });
+        });
+    </script>
+</body>
+</html> 

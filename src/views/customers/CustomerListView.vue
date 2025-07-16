@@ -26,7 +26,7 @@
         <div class="search-section">
           <SearchInput
             v-model="searchQuery"
-            placeholder="搜索客户名称、网站或负责人..."
+            placeholder="搜索客户名称、联系人、联系电话、签单销售人员..."
             :suggestions="searchSuggestions"
             @search="handleSearch"
             @clear="handleSearchClear"
@@ -124,10 +124,13 @@
               <div class="sort-options">
                 <select v-model="sortBy" @change="handleSort" class="sort-select">
                   <option value="name">按名称排序</option>
+                  <option value="cooperationType">按合作方式排序</option>
                   <option value="revenue">按收入排序</option>
                   <option value="roi">按ROI排序</option>
-                  <option value="created">按创建时间排序</option>
-                  <option value="updated">按更新时间排序</option>
+                  <option value="cooperationStartTime">按合作开始时间排序</option>
+                  <option value="serviceStartTime">按服务开始时间排序</option>
+                  <option value="grade">按分级排序</option>
+                  <option value="lastUpdated">按更新时间排序</option>
                 </select>
                 <button
                   class="sort-direction"
@@ -158,16 +161,26 @@
                   客户名称
                   <ArrowUpDown :size="14" v-if="sortBy === 'name'" />
                 </th>
+                <th @click="setSortBy('cooperationType')" class="sortable">
+                  合作方式
+                  <ArrowUpDown :size="14" v-if="sortBy === 'cooperationType'" />
+                </th>
                 <th @click="setSortBy('industry')" class="sortable">
-                  行业
+                  客户行业
                   <ArrowUpDown :size="14" v-if="sortBy === 'industry'" />
                 </th>
                 <th>地区</th>
                 <th>联系人</th>
+                <th>联系岗位</th>
+                <th>联系电话</th>
                 <th>服务团队</th>
-                <th @click="setSortBy('cooperationStart')" class="sortable">
+                <th @click="setSortBy('cooperationStartTime')" class="sortable">
                   合作开始时间
-                  <ArrowUpDown :size="14" v-if="sortBy === 'cooperationStart'" />
+                  <ArrowUpDown :size="14" v-if="sortBy === 'cooperationStartTime'" />
+                </th>
+                <th @click="setSortBy('serviceStartTime')" class="sortable">
+                  服务开始时间
+                  <ArrowUpDown :size="14" v-if="sortBy === 'serviceStartTime'" />
                 </th>
                 <th @click="setSortBy('grade')" class="sortable">
                   分级
@@ -177,9 +190,9 @@
                   状态
                   <ArrowUpDown :size="14" v-if="sortBy === 'status'" />
                 </th>
-                <th @click="setSortBy('sales')" class="sortable">
+                <th @click="setSortBy('signingSales')" class="sortable">
                   签单销售人员
-                  <ArrowUpDown :size="14" v-if="sortBy === 'sales'" />
+                  <ArrowUpDown :size="14" v-if="sortBy === 'signingSales'" />
                 </th>
                 <th>操作</th>
               </tr>
@@ -212,23 +225,35 @@
                   </div>
                 </td>
                 <td>
+                  <span class="cooperation-badge">{{ customer.cooperationType }}</span>
+                </td>
+                <td>
                   <span class="industry-badge">{{ customer.industry }}</span>
                 </td>
                 <td>
                   <span class="region-text">{{ getCustomerRegions(customer) }}</span>
                 </td>
                 <td>
-                  <span class="contact-text">{{ customer.manager }}</span>
+                  <span class="contact-text">{{ customer.primaryContact.name }}</span>
                 </td>
                 <td>
-                  <span class="team-text">{{ getServiceTeam(customer) }}</span>
+                  <span class="position-text">{{ customer.primaryContact.position }}</span>
                 </td>
                 <td>
-                  <span class="date-text">{{ formatDate(customer.createdAt) }}</span>
+                  <span class="phone-text">{{ customer.primaryContact.phone }}</span>
                 </td>
                 <td>
-                  <span class="grade-badge" :class="`grade-badge--${getCustomerGrade(customer)}`">
-                    {{ getCustomerGrade(customer) }}
+                  <span class="team-text">{{ customer.serviceTeam }}</span>
+                </td>
+                <td>
+                  <span class="date-text">{{ formatDate(customer.cooperationStartTime) }}</span>
+                </td>
+                <td>
+                  <span class="date-text">{{ formatDate(customer.serviceStartTime) }}</span>
+                </td>
+                <td>
+                  <span class="grade-badge" :class="`grade-badge--${customer.grade}`">
+                    {{ customer.grade }}
                   </span>
                 </td>
                 <td>
@@ -237,7 +262,7 @@
                   </span>
                 </td>
                 <td>
-                  <span class="sales-text">{{ customer.manager }}</span>
+                  <span class="sales-text">{{ customer.signingSales }}</span>
                 </td>
                 <td @click.stop>
                   <div class="action-menu">
@@ -284,6 +309,20 @@
             <div class="customer-card__content">
               <h4 class="customer-card__name">{{ customer.name }}</h4>
               <p class="customer-card__website">{{ customer.website }}</p>
+              <div class="customer-card__info">
+                <div class="info-item">
+                  <span class="info-label">合作方式</span>
+                  <span class="cooperation-tag">{{ customer.cooperationType }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">服务团队</span>
+                  <span class="team-tag">{{ customer.serviceTeam }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">联系人</span>
+                  <span class="contact-info">{{ customer.primaryContact.name }} ({{ customer.primaryContact.position }})</span>
+                </div>
+              </div>
               <div class="customer-card__metrics">
                 <div class="metric">
                   <span class="metric-label">收入</span>
@@ -296,6 +335,7 @@
               </div>
               <div class="customer-card__footer">
                 <span class="industry-tag">{{ customer.industry }}</span>
+                <span class="grade-tag" :class="`grade-tag--${customer.grade}`">{{ customer.grade }}级</span>
                 <span class="status-indicator" :class="`status-indicator--${customer.status}`"></span>
               </div>
             </div>
@@ -396,12 +436,11 @@ import {
   List, Grid, ArrowUpDown, ChevronLeft, ChevronRight,
   Edit, Eye, MoreHorizontal, Mail, Trash2, Loader, MessageSquare
 } from 'lucide-vue-next'
-import { mockGetCustomers } from '@/mock/customer'
+import { mockGetCustomers, type ExtendedCustomer } from '@/mock/customer'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FilterPanel from '@/components/common/FilterPanel.vue'
 import ExportModal from '@/components/common/ExportModal.vue'
 import { formatters } from '@/utils/export'
-import type { Customer } from '@/types'
 import type { ExportColumn } from '@/utils/export'
 
 // 路由
@@ -409,7 +448,7 @@ const router = useRouter()
 
 // 响应式数据
 const loading = ref(true)
-const customers = ref<Customer[]>([])
+const customers = ref<ExtendedCustomer[]>([])
 const searchQuery = ref('')
 const viewMode = ref<'table' | 'grid'>('table')
 const sortBy = ref('name')
@@ -428,8 +467,10 @@ const filters = reactive({
   category: '',
   minAmount: null as number | null,
   maxAmount: null as number | null,
-  manager: '',
-  roiRange: ''
+  cooperationType: '',
+  serviceTeam: '',
+  grade: '',
+  signingSales: ''
 })
 
 // 筛选选项配置
@@ -449,20 +490,43 @@ const industryOptions = [
 
 const customFilterOptions = [
   {
-    key: 'manager',
-    label: '负责人',
-    type: 'input' as const,
-    placeholder: '输入负责人姓名'
-  },
-  {
-    key: 'roiRange',
-    label: 'ROI范围',
+    key: 'cooperationType',
+    label: '合作方式',
     type: 'select' as const,
     options: [
-      { value: 'low', label: '低于2x' },
-      { value: 'medium', label: '2x-4x' },
-      { value: 'high', label: '高于4x' }
+      { value: '代运营', label: '代运营' },
+      { value: '咨询服务', label: '咨询服务' },
+      { value: '技术支持', label: '技术支持' },
+      { value: '培训服务', label: '培训服务' }
     ]
+  },
+  {
+    key: 'serviceTeam',
+    label: '服务团队',
+    type: 'select' as const,
+    options: [
+      { value: '时尚组', label: '时尚组' },
+      { value: '科技组', label: '科技组' },
+      { value: '美妆组', label: '美妆组' },
+      { value: '运动组', label: '运动组' },
+      { value: '家居组', label: '家居组' }
+    ]
+  },
+  {
+    key: 'grade',
+    label: '客户分级',
+    type: 'select' as const,
+    options: [
+      { value: 'A', label: 'A级客户' },
+      { value: 'B', label: 'B级客户' },
+      { value: 'C', label: 'C级客户' }
+    ]
+  },
+  {
+    key: 'signingSales',
+    label: '签单销售人员',
+    type: 'input' as const,
+    placeholder: '输入销售人员姓名'
   }
 ]
 
@@ -471,8 +535,11 @@ const searchSuggestions = computed(() => {
   const suggestions = new Set<string>()
   customers.value.forEach(customer => {
     suggestions.add(customer.name)
-    suggestions.add(customer.manager)
-    suggestions.add(customer.industry)
+    suggestions.add(customer.primaryContact.name)
+    suggestions.add(customer.primaryContact.phone)
+    suggestions.add(customer.signingSales)
+    suggestions.add(customer.cooperationType)
+    suggestions.add(customer.serviceTeam)
   })
   return Array.from(suggestions)
 })
@@ -485,9 +552,11 @@ const filteredCustomers = computed(() => {
     const query = searchQuery.value.toLowerCase()
     result = result.filter(customer =>
       customer.name.toLowerCase().includes(query) ||
-      customer.website.toLowerCase().includes(query) ||
-      customer.manager.toLowerCase().includes(query) ||
-      customer.industry.toLowerCase().includes(query)
+      customer.primaryContact.name.toLowerCase().includes(query) ||
+      customer.primaryContact.phone.toLowerCase().includes(query) ||
+      customer.signingSales.toLowerCase().includes(query) ||
+      customer.cooperationType.toLowerCase().includes(query) ||
+      customer.serviceTeam.toLowerCase().includes(query)
     )
   }
 
@@ -498,16 +567,36 @@ const filteredCustomers = computed(() => {
 
   // 行业过滤
   if (filters.category) {
-    result = result.filter(customer => {
-      const industryMap: Record<string, string> = {
-        'fashion': '时尚服装',
-        'tech': '数码科技',
-        'beauty': '美容护肤',
-        'sports': '体育用品',
-        'home': '家居装饰'
-      }
-      return customer.industry === industryMap[filters.category]
-    })
+    const industryMap: Record<string, string> = {
+      'fashion': '时尚服装',
+      'tech': '数码科技',
+      'beauty': '美容护肤',
+      'sports': '体育用品',
+      'home': '家居装饰'
+    }
+    result = result.filter(customer => customer.industry === industryMap[filters.category])
+  }
+
+  // 合作方式过滤
+  if (filters.cooperationType) {
+    result = result.filter(customer => customer.cooperationType === filters.cooperationType)
+  }
+
+  // 服务团队过滤
+  if (filters.serviceTeam) {
+    result = result.filter(customer => customer.serviceTeam === filters.serviceTeam)
+  }
+
+  // 客户分级过滤
+  if (filters.grade) {
+    result = result.filter(customer => customer.grade === filters.grade)
+  }
+
+  // 签单销售人员过滤
+  if (filters.signingSales) {
+    result = result.filter(customer =>
+      customer.signingSales.toLowerCase().includes(filters.signingSales.toLowerCase())
+    )
   }
 
   // 收入范围过滤
@@ -516,25 +605,6 @@ const filteredCustomers = computed(() => {
   }
   if (filters.maxAmount !== null) {
     result = result.filter(customer => customer.revenue <= filters.maxAmount!)
-  }
-
-  // 负责人过滤
-  if (filters.manager) {
-    result = result.filter(customer =>
-      customer.manager.toLowerCase().includes(filters.manager.toLowerCase())
-    )
-  }
-
-  // ROI范围过滤
-  if (filters.roiRange) {
-    result = result.filter(customer => {
-      switch (filters.roiRange) {
-        case 'low': return customer.roi < 2
-        case 'medium': return customer.roi >= 2 && customer.roi <= 4
-        case 'high': return customer.roi > 4
-        default: return true
-      }
-    })
   }
 
   // 排序
@@ -546,6 +616,10 @@ const filteredCustomers = computed(() => {
         valueA = a.name.toLowerCase()
         valueB = b.name.toLowerCase()
         break
+      case 'cooperationType':
+        valueA = a.cooperationType
+        valueB = b.cooperationType
+        break
       case 'revenue':
         valueA = a.revenue
         valueB = b.revenue
@@ -554,11 +628,19 @@ const filteredCustomers = computed(() => {
         valueA = a.roi
         valueB = b.roi
         break
-      case 'created':
-        valueA = new Date(a.createdAt).getTime()
-        valueB = new Date(b.createdAt).getTime()
+      case 'cooperationStartTime':
+        valueA = new Date(a.cooperationStartTime).getTime()
+        valueB = new Date(b.cooperationStartTime).getTime()
         break
-      case 'updated':
+      case 'serviceStartTime':
+        valueA = new Date(a.serviceStartTime).getTime()
+        valueB = new Date(b.serviceStartTime).getTime()
+        break
+      case 'grade':
+        valueA = a.grade
+        valueB = b.grade
+        break
+      case 'lastUpdated':
         valueA = new Date(a.lastUpdated).getTime()
         valueB = new Date(b.lastUpdated).getTime()
         break
@@ -609,7 +691,7 @@ const customerStats = computed(() => {
   const total = filteredCustomers.value.length
   const active = filteredCustomers.value.filter(c => c.status === 'active').length
   const totalRevenue = filteredCustomers.value.reduce((sum, c) => sum + c.revenue, 0)
-  const gradeA = filteredCustomers.value.filter(c => getCustomerGrade(c) === 'A').length
+  const gradeA = filteredCustomers.value.filter(c => c.grade === 'A').length
 
   return { total, active, totalRevenue, gradeA }
 })
@@ -624,22 +706,50 @@ const exportColumns: ExportColumn[] = [
     label: '客户名称'
   },
   {
-    key: 'website',
-    label: '网站地址'
+    key: 'cooperationType',
+    label: '合作方式'
   },
   {
     key: 'industry',
-    label: '行业'
+    label: '客户行业'
   },
   {
-    key: 'revenue',
-    label: '收入',
-    formatter: formatters.currency
+    key: 'regions',
+    label: '地区',
+    formatter: (value) => Array.isArray(value) ? value.join(', ') : String(value || '')
   },
   {
-    key: 'roi',
-    label: 'ROI',
-    formatter: (value) => typeof value === 'number' ? `${value}x` : String(value || '')
+    key: 'primaryContact',
+    label: '联系人',
+    formatter: (value: any) => value?.name || ''
+  },
+  {
+    key: 'primaryContact',
+    label: '联系岗位',
+    formatter: (value: any) => value?.position || ''
+  },
+  {
+    key: 'primaryContact',
+    label: '联系电话',
+    formatter: (value: any) => value?.phone || ''
+  },
+  {
+    key: 'serviceTeam',
+    label: '服务团队'
+  },
+  {
+    key: 'cooperationStartTime',
+    label: '合作开始时间',
+    formatter: formatters.date
+  },
+  {
+    key: 'serviceStartTime',
+    label: '服务开始时间',
+    formatter: formatters.date
+  },
+  {
+    key: 'grade',
+    label: '分级'
   },
   {
     key: 'status',
@@ -654,18 +764,18 @@ const exportColumns: ExportColumn[] = [
     }
   },
   {
-    key: 'manager',
-    label: '负责人'
+    key: 'signingSales',
+    label: '签单销售人员'
   },
   {
-    key: 'createdAt',
-    label: '创建时间',
-    formatter: formatters.date
+    key: 'revenue',
+    label: '收入',
+    formatter: formatters.currency
   },
   {
-    key: 'lastUpdated',
-    label: '最后更新',
-    formatter: formatters.date
+    key: 'roi',
+    label: 'ROI',
+    formatter: (value) => typeof value === 'number' ? `${value}x` : String(value || '')
   }
 ]
 
@@ -700,30 +810,8 @@ const getStatusText = (status: string): string => {
   return statusMap[status as keyof typeof statusMap] || status
 }
 
-const getCustomerRegions = (customer: Customer): string => {
-  // 这里可以根据实际需要从客户详情中获取地区信息
-  // 目前使用模拟数据
-  const regions = ['美国', '欧洲', '加拿大']
-  return regions.slice(0, 2).join(', ') + (regions.length > 2 ? '...' : '')
-}
-
-const getServiceTeam = (customer: Customer): string => {
-  // 根据行业分配服务团队
-  const teamMap: Record<string, string> = {
-    '时尚服装': '时尚组',
-    '数码科技': '科技组',
-    '美容护肤': '美妆组',
-    '体育用品': '运动组',
-    '家居装饰': '家居组'
-  }
-  return teamMap[customer.industry] || '综合组'
-}
-
-const getCustomerGrade = (customer: Customer): string => {
-  // 根据收入和ROI计算客户分级
-  if (customer.revenue > 3000000 && customer.roi > 4) return 'A'
-  if (customer.revenue > 1500000 && customer.roi > 3) return 'B'
-  return 'C'
+const getCustomerRegions = (customer: ExtendedCustomer): string => {
+  return customer.regions.slice(0, 2).join(', ') + (customer.regions.length > 2 ? '...' : '')
 }
 
 const handleSearch = (query: string) => {
@@ -781,11 +869,11 @@ const handleSelectAll = () => {
   }
 }
 
-const handleRowClick = (customer: Customer) => {
+const handleRowClick = (customer: ExtendedCustomer) => {
   viewCustomer(customer)
 }
 
-const handleCardClick = (customer: Customer) => {
+const handleCardClick = (customer: ExtendedCustomer) => {
   viewCustomer(customer)
 }
 
@@ -799,20 +887,20 @@ const createCustomer = () => {
   router.push({ name: 'customer-create' })
 }
 
-const editCustomer = (customer: Customer) => {
+const editCustomer = (customer: ExtendedCustomer) => {
   console.log('编辑客户:', customer.name)
 }
 
-const viewCustomer = (customer: Customer) => {
+const viewCustomer = (customer: ExtendedCustomer) => {
   router.push({ name: 'customer-detail', params: { id: customer.id.toString() } })
 }
 
-const addCustomerQA = (customer: Customer) => {
+const addCustomerQA = (customer: ExtendedCustomer) => {
   console.log('添加客户Q&A:', customer.name)
   // 这里可以打开Q&A添加弹窗
 }
 
-const showCustomerMenu = (customer: Customer) => {
+const showCustomerMenu = (customer: ExtendedCustomer) => {
   console.log('显示客户菜单:', customer.name)
 }
 
@@ -1370,6 +1458,38 @@ onMounted(() => {
   margin: 0 0 var(--spacing-md) 0;
 }
 
+.customer-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.cooperation-tag,
+.team-tag {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--color-background);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-primary);
+}
+
+.contact-info {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-primary);
+}
+
 .customer-card__metrics {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1407,6 +1527,28 @@ onMounted(() => {
   border-radius: var(--border-radius-sm);
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
+}
+
+.grade-tag {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.grade-tag--A {
+  background: rgba(82, 196, 26, 0.1);
+  color: var(--color-success);
+}
+
+.grade-tag--B {
+  background: rgba(24, 144, 255, 0.1);
+  color: var(--color-info);
+}
+
+.grade-tag--C {
+  background: rgba(250, 173, 20, 0.1);
+  color: var(--color-warning);
 }
 
 .status-indicator {
@@ -1661,6 +1803,14 @@ onMounted(() => {
   .customer-table th,
   .customer-table td {
     padding: var(--spacing-sm);
+  }
+
+  .cooperation-badge,
+  .industry-badge,
+  .grade-badge,
+  .status-badge {
+    font-size: var(--font-size-xs);
+    padding: 2px 6px;
   }
 
   .bulk-actions {

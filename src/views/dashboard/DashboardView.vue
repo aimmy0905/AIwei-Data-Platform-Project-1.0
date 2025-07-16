@@ -1,7 +1,18 @@
 <template>
-  <div class="dashboard-content">
-      <!-- 预警提醒部分 -->
-      <section id="alerts" class="dashboard-section">
+    <div class="dashboard-content">
+    <!-- 筛选项部分 - 固定在顶部 -->
+    <div class="dashboard-filter-container">
+      <DashboardFilter
+        :customer-options="customers"
+        :initial-filters="filters"
+        @filter-change="handleFilterChange"
+        @filter-apply="handleFilterApply"
+        @filter-reset="handleFilterReset"
+      />
+    </div>
+
+    <!-- 预警提醒部分 -->
+    <section id="alerts" class="dashboard-section">
       <AlertPanel
         :alerts="recentAlerts"
         :loading="loading"
@@ -107,6 +118,7 @@ import CompetitorPanel from '@/components/dashboard/CompetitorPanel.vue'
 import AdPlatformOverviewPanel from '@/components/dashboard/AdPlatformOverviewPanel.vue'
 import type { Customer, Alert, Channel, Campaign, ProductSales, WebsiteData } from '@/types'
 import { useMenuStore } from '@/stores/menu'
+import DashboardFilter from '@/components/common/DashboardFilter.vue'
 
 // 组合式API
 const menuStore = useMenuStore()
@@ -633,6 +645,54 @@ const initializeMenuState = () => {
   updateBreadcrumb('alerts')
 }
 
+// 筛选项相关状态和方法
+interface DashboardFilters {
+  customerId: number | null
+  projectId: string
+  viewMode: 'all' | 'my'
+  dateRange: string
+  startDate: string
+  endDate: string
+}
+
+const filters = ref<DashboardFilters>({
+  customerId: null,
+  projectId: '',
+  viewMode: 'all',
+  dateRange: 'today',
+  startDate: '',
+  endDate: ''
+})
+
+
+
+const handleFilterChange = (newFilters: DashboardFilters) => {
+  filters.value = { ...newFilters }
+}
+
+const handleFilterApply = (appliedFilters: DashboardFilters) => {
+  console.log('Filter applied:', appliedFilters)
+  filters.value = { ...appliedFilters }
+  // 应用过滤逻辑，例如重新加载数据
+  loadDashboardData()
+}
+
+const handleFilterReset = () => {
+  console.log('Filter reset')
+  // 重置过滤器
+  filters.value = {
+    customerId: null,
+    projectId: '',
+    viewMode: 'all',
+    dateRange: 'today',
+    startDate: '',
+    endDate: ''
+  }
+  loadDashboardData()
+}
+
+
+
 // 生命周期
 onMounted(() => {
   loadCustomers()
@@ -657,22 +717,56 @@ onUnmounted(() => {
   padding-right: 20px;
 }
 
+/* 筛选项容器样式 */
+.dashboard-filter-container {
+  position: sticky;
+  top: 64px;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.98);
+  border-bottom: 1px solid var(--color-border-light);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  margin-bottom: var(--spacing-2xl);
+  backdrop-filter: blur(12px);
+  border-radius: 8px;
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+
+
+
+
 /* 移动端适配 */
-@media (max-width: 768px) {
-  .dashboard-content {
-    padding-top: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+@media (max-width: 1024px) {
+  .dashboard-filter-container {
+    margin-left: -20px;
+    margin-right: -20px;
     padding-left: 20px;
     padding-right: 20px;
-  }
-
-  .dashboard-section {
-    scroll-margin-top: 80px;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
+  .dashboard-filter-container {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .dashboard-filter-container.sticky {
+    top: 60px;
+    padding-left: 20px;
+    padding-right: 20px;
+    max-width: none;
+    z-index: 1001;
+  }
+}
+
   .dashboard-content {
     padding-top: 20px;
     max-width: 1200px;
@@ -682,9 +776,33 @@ onUnmounted(() => {
   }
 
   .dashboard-section {
-    scroll-margin-top: 80px;
-    margin-bottom: var(--spacing-xl);
+    scroll-margin-top: 140px; /* 考虑筛选项高度 */
   }
+
+@media (max-width: 480px) {
+  .dashboard-filter-container {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .dashboard-filter-container.sticky {
+    top: 56px;
+    padding-left: 20px;
+    padding-right: 20px;
+    max-width: none;
+    z-index: 1002;
+  }
+}
+
+.dashboard-content {
+  padding-top: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .dashboard-section {

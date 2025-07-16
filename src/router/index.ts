@@ -33,7 +33,7 @@ const router = createRouter({
         {
           path: '',
           name: 'dashboard',
-          component: () => import('@/views/dashboard/SimpleDashboard.vue')
+          component: () => import('@/views/dashboard/DashboardView.vue')
         },
         {
           path: 'influencer-data',

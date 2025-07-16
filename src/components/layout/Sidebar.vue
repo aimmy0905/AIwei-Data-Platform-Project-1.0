@@ -197,13 +197,7 @@ const toggleMenu = (menuId: string) => {
   // 找到对应的菜单项
   const menuItem = menuItems.value.find(item => item.id === menuId)
 
-  // 如果菜单项有路径，先跳转
-  if (menuItem && menuItem.path) {
-    console.log('🔧 主菜单项有路径，执行跳转:', menuItem.path)
-    selectMenu(menuItem)
-  }
-
-  // 然后处理子菜单展开/折叠
+  // 处理子菜单展开/折叠
   const index = openMenus.value.indexOf(menuId)
   if (index > -1) {
     openMenus.value.splice(index, 1)
@@ -212,32 +206,29 @@ const toggleMenu = (menuId: string) => {
   }
 
   console.log('🔧 当前展开的菜单:', openMenus.value)
+
+  // 如果菜单项有路径，并且有子菜单，则在展开时跳转
+  if (menuItem && menuItem.path && menuItem.children && menuItem.children.length > 0) {
+    // 只有在展开菜单时才跳转到主菜单路径
+    if (openMenus.value.includes(menuId)) {
+      console.log('🔧 主菜单项有路径且正在展开，执行跳转:', menuItem.path)
+      selectMenu(menuItem)
+    }
+  }
 }
 
 const selectMenu = (item: MenuItem) => {
-  console.log('🔧 选择菜单:', item.name, item.path)
-  console.log('🔧 菜单项完整信息:', JSON.stringify(item, null, 2))
+  console.log('🔧 选择菜单:', item.name, item.path, item.id)
 
   if (item.path) {
     console.log('🔧 准备跳转到路径:', item.path)
 
-    // 特殊处理：如果是客户相关菜单，确保客户管理菜单展开
-    if (item.id === 'customer-list' || item.path === '/customers' || item.path?.startsWith('/customers')) {
+    // 确保相关菜单展开
+    if (item.path.startsWith('/customers')) {
       console.log('🔧 客户菜单点击，确保客户管理菜单展开')
-      // 确保客户管理菜单展开
       if (!openMenus.value.includes('customers')) {
         openMenus.value.push('customers')
       }
-
-      router.push(item.path).then(() => {
-        console.log('🔧 客户菜单路由跳转成功')
-      }).catch((error) => {
-        console.error('🔧 客户菜单路由跳转失败:', error)
-      })
-
-      // 设置活跃菜单
-      menuStore.setActiveMenu(item.id)
-      return
     }
 
     // 检查是否是仪表板子模块，如果是则跳转到主仪表板并滚动到对应模块
@@ -261,8 +252,28 @@ const selectMenu = (item: MenuItem) => {
     } else {
       // 直接跳转到指定路径
       console.log('🔧 直接跳转到路径:', item.path)
+
+      // 特殊处理客户列表路径
+      if (item.path === '/customers' && item.id === 'customer-list') {
+        console.log('🔧 客户列表菜单点击，强制跳转到客户管理页面')
+        router.push('/customers').then(() => {
+          console.log('🔧 客户列表路由跳转成功')
+          // 设置活跃菜单
+          menuStore.setActiveMenu('customer-list')
+          // 确保客户管理菜单展开
+          if (!openMenus.value.includes('customers')) {
+            openMenus.value.push('customers')
+          }
+        }).catch((error) => {
+          console.error('🔧 客户列表路由跳转失败:', error)
+        })
+        return
+      }
+
       router.push(item.path).then(() => {
         console.log('🔧 路由跳转成功')
+        // 设置活跃菜单
+        menuStore.setActiveMenu(item.id)
       }).catch((error) => {
         console.error('🔧 路由跳转失败:', error)
       })
@@ -271,8 +282,10 @@ const selectMenu = (item: MenuItem) => {
     console.log('🔧 菜单项没有路径，无法跳转')
   }
 
-  // 设置活跃菜单
-  menuStore.setActiveMenu(item.id)
+  // 如果没有特殊处理，设置活跃菜单
+  if (!(item.path === '/customers' && item.id === 'customer-list')) {
+    menuStore.setActiveMenu(item.id)
+  }
 }
 
 const getRoleText = (role: string): string => {
@@ -322,6 +335,7 @@ onMounted(async () => {
   }
 
   console.log('🔧 菜单加载完成，菜单项数量:', menuItems.value.length)
+  console.log('🔧 可见菜单项:', menuItems.value.map(item => ({ id: item.id, name: item.name, path: item.path })))
 
   // 根据当前路径设置菜单状态
   const currentPath = router.currentRoute.value.path
@@ -333,6 +347,13 @@ onMounted(async () => {
     if (!openMenus.value.includes('customers')) {
       openMenus.value.push('customers')
     }
+    // 设置活跃菜单
+    menuStore.setActiveMenuByPath(currentPath)
+  }
+
+  // 确保数据看板菜单默认展开
+  if (!openMenus.value.includes('dashboard')) {
+    openMenus.value.push('dashboard')
   }
 })
 </script>

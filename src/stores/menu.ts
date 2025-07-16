@@ -126,7 +126,15 @@ export const useMenuStore = defineStore('menu', () => {
     } else {
       console.log('No menu found for path, trying fallback logic')
       // 如果找不到对应的菜单，尝试处理特殊路径
-      if (path.startsWith('/dashboard') || path === '/dashboard') {
+      if (path.startsWith('/customers')) {
+        // 处理客户相关路径
+        if (path === '/customers') {
+          setActiveMenu('customer-list')
+        } else if (path.startsWith('/customers/')) {
+          // 客户详情或其他客户子页面，仍然激活客户列表菜单
+          setActiveMenu('customer-list')
+        }
+      } else if (path.startsWith('/dashboard') || path === '/dashboard') {
         if (path === '/dashboard/ad-platform-overview') {
           setActiveMenu('ad-platform-overview')
         } else if (path === '/dashboard/meta-dashboard') {
