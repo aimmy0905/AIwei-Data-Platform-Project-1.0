@@ -436,6 +436,501 @@ export const mockCustomerDetails: { [key: number]: CustomerDetail } = {
     ],
     createdAt: '2024-01-15T08:00:00Z',
     lastUpdated: '2024-12-20T10:30:00Z'
+  },
+  2: {
+    id: 2,
+    cooperationDetails: {
+      customerName: '智能科技产品公司',
+      cooperationStartTime: '2024-02-01T08:00:00Z',
+      serviceStartTime: '2024-02-15T08:00:00Z',
+      cooperationType: '咨询服务',
+      signingSales: '李小红',
+      specialConditions: '按季度付费，提供月度数据报告',
+      customerGrade: 'B',
+      customerStatus: 'active'
+    },
+    basicInfo: {
+      serviceTeam: '科技组',
+      contactPersons: [
+        {
+          id: 1,
+          name: '陈总',
+          position: 'CEO',
+          phone: '13900139001',
+          email: 'ceo@smarttech.com',
+          isPrimary: true
+        }
+      ],
+      industry: '智能硬件',
+      regions: ['美国', '日本', '韩国'],
+      businessModel: '技术驱动型品牌',
+      overseasSalesScale: '200-500万美元',
+      overseasSalesRatio: 60,
+      targetSalesScale: '1000万美元',
+      mainSalesChannel: '独立站+亚马逊',
+      hasTechTeam: true,
+      hasOperationTeam: true,
+      hasBrandTeam: false,
+      cooperationTransfer: '新客户'
+    },
+    websiteInfo: {
+      newProductFrequency: '每季度2-3款',
+      websiteLaunchTime: '2023-08-01T00:00:00Z',
+      lastYearSales: 3200000,
+      targetMarkets: ['美国', '日本', '韩国'],
+      mainProducts: '智能家居设备、穿戴设备',
+      productAdvantages: '技术先进、功能丰富、用户体验好',
+      pricingStrategy: '中高端定价',
+      inventoryStatus: true,
+      annualSalesTarget: 5000000,
+      annualCostTarget: 3000000,
+      costRatio: 60
+    },
+    competitorInfo: {
+      competitorWebsites: [
+        {
+          id: 1,
+          websiteUrl: 'https://techcompetitor.com',
+          companyName: '科技竞争对手',
+          notes: '技术实力强，但价格偏高'
+        }
+      ]
+    },
+    specialAttention: {
+      customerExpectations: '希望快速占领亚洲市场',
+      communicationPreferences: '双周汇报，紧急事项随时沟通',
+      specialRequirements: '需要本地化营销策略',
+      culturalConsiderations: '重视技术创新和品质',
+      timeZonePreferences: '北京时间',
+      languagePreferences: '中文',
+      decisionMakers: '陈总（全权决策）',
+      budgetConstraints: '月度预算30万',
+      complianceRequirements: '需要符合各国电子产品认证',
+      riskFactors: '技术更新快，产品生命周期短',
+      successFactors: '技术创新、市场推广、渠道建设',
+      historicalIssues: '无重大问题'
+    },
+    qaRecords: [],
+    renewalNotes: '新客户，表现良好，有长期合作潜力',
+    projects: [],
+    adAccounts: [
+      {
+        id: 1,
+        platform: 'google',
+        accountId: 'GA-234567890',
+        accountName: '智能科技-Google广告',
+        status: 'active',
+        balance: 12000,
+        lastUpdated: '2024-12-20T10:30:00Z'
+      }
+    ],
+    createdAt: '2024-02-01T08:00:00Z',
+    lastUpdated: '2024-12-20T10:30:00Z'
+  },
+  3: {
+    id: 3,
+    cooperationDetails: {
+      customerName: '美妆护肤品牌',
+      cooperationStartTime: '2024-03-01T08:00:00Z',
+      serviceStartTime: '2024-03-15T08:00:00Z',
+      cooperationType: '代运营',
+      signingSales: '王小强',
+      specialConditions: '提供KOL资源对接',
+      customerGrade: 'A',
+      customerStatus: 'active'
+    },
+    basicInfo: {
+      serviceTeam: '美妆组',
+      contactPersons: [
+        {
+          id: 1,
+          name: '张经理',
+          position: '品牌总监',
+          phone: '13700137001',
+          email: 'brand@beautycare.com',
+          isPrimary: true
+        }
+      ],
+      industry: '美妆护肤',
+      regions: ['美国', '欧洲', '澳洲'],
+      businessModel: '品牌代理出海',
+      overseasSalesScale: '1000-2000万美元',
+      overseasSalesRatio: 80,
+      targetSalesScale: '3000万美元',
+      mainSalesChannel: '独立站',
+      hasTechTeam: false,
+      hasOperationTeam: true,
+      hasBrandTeam: true,
+      cooperationTransfer: '代理商推荐'
+    },
+    websiteInfo: {
+      newProductFrequency: '每月3-5款',
+      websiteLaunchTime: '2023-01-01T00:00:00Z',
+      lastYearSales: 15000000,
+      targetMarkets: ['美国', '欧洲', '澳洲'],
+      mainProducts: '护肤品、彩妆、香水',
+      productAdvantages: '天然成分、效果显著、包装精美',
+      pricingStrategy: '高端定价策略',
+      inventoryStatus: true,
+      annualSalesTarget: 20000000,
+      annualCostTarget: 12000000,
+      costRatio: 60
+    },
+    competitorInfo: {
+      competitorWebsites: [
+        {
+          id: 1,
+          websiteUrl: 'https://beautycompetitor.com',
+          companyName: '美妆竞争对手',
+          notes: '品牌知名度高，但价格竞争激烈'
+        }
+      ]
+    },
+    specialAttention: {
+      customerExpectations: '希望成为细分市场领导者',
+      communicationPreferences: '每周汇报，重要活动提前沟通',
+      specialRequirements: '需要专业的美妆营销策略',
+      culturalConsiderations: '注重品牌形象和社交影响力',
+      timeZonePreferences: '北京时间',
+      languagePreferences: '中文',
+      decisionMakers: '张经理（品牌决策）',
+      budgetConstraints: '月度预算80万',
+      complianceRequirements: '需要符合化妆品安全标准',
+      riskFactors: '季节性需求波动，流行趋势变化快',
+      successFactors: '品牌建设、KOL合作、用户口碑',
+      historicalIssues: '曾有产品质量投诉'
+    },
+    qaRecords: [],
+    renewalNotes: '重要客户，续费概率高',
+    projects: [],
+    adAccounts: [
+      {
+        id: 1,
+        platform: 'facebook',
+        accountId: 'FB-345678901',
+        accountName: '美妆护肤-Meta广告',
+        status: 'active',
+        balance: 25000,
+        lastUpdated: '2024-12-20T10:30:00Z'
+      }
+    ],
+    createdAt: '2024-03-01T08:00:00Z',
+    lastUpdated: '2024-12-20T10:30:00Z'
+  },
+  4: {
+    id: 4,
+    cooperationDetails: {
+      customerName: '户外运动装备',
+      cooperationStartTime: '2024-04-01T08:00:00Z',
+      serviceStartTime: '2024-04-15T08:00:00Z',
+      cooperationType: '混合服务',
+      signingSales: '刘小明',
+      specialConditions: '旺季额外支持',
+      customerGrade: 'B',
+      customerStatus: 'active'
+    },
+    basicInfo: {
+      serviceTeam: '运动组',
+      contactPersons: [
+        {
+          id: 1,
+          name: '赵总',
+          position: '运营总监',
+          phone: '13600136001',
+          email: 'ops@outdoorgear.com',
+          isPrimary: true
+        }
+      ],
+      industry: '户外运动',
+      regions: ['美国', '加拿大', '欧洲'],
+      businessModel: '制造商直销',
+      overseasSalesScale: '300-800万美元',
+      overseasSalesRatio: 70,
+      targetSalesScale: '1500万美元',
+      mainSalesChannel: '独立站+线下',
+      hasTechTeam: true,
+      hasOperationTeam: false,
+      hasBrandTeam: false,
+      cooperationTransfer: '展会获客'
+    },
+    websiteInfo: {
+      newProductFrequency: '每季度10-15款',
+      websiteLaunchTime: '2023-03-01T00:00:00Z',
+      lastYearSales: 6000000,
+      targetMarkets: ['美国', '加拿大', '欧洲'],
+      mainProducts: '户外服装、装备、配件',
+      productAdvantages: '功能性强、耐用性好、性价比高',
+      pricingStrategy: '中端定价',
+      inventoryStatus: true,
+      annualSalesTarget: 8000000,
+      annualCostTarget: 5000000,
+      costRatio: 62.5
+    },
+    competitorInfo: {
+      competitorWebsites: [
+        {
+          id: 1,
+          websiteUrl: 'https://outdoorcompetitor.com',
+          companyName: '户外竞争对手',
+          notes: '品牌历史悠久，但创新不足'
+        }
+      ]
+    },
+    specialAttention: {
+      customerExpectations: '希望扩大北美市场份额',
+      communicationPreferences: '月度汇报，旺季加强沟通',
+      specialRequirements: '需要季节性营销策略',
+      culturalConsiderations: '注重产品实用性和性能',
+      timeZonePreferences: '北京时间',
+      languagePreferences: '中文',
+      decisionMakers: '赵总（运营决策）',
+      budgetConstraints: '月度预算40万',
+      complianceRequirements: '需要符合户外产品安全标准',
+      riskFactors: '季节性强，库存管理难度大',
+      successFactors: '产品质量、渠道建设、季节性推广',
+      historicalIssues: '库存周转慢'
+    },
+    qaRecords: [],
+    renewalNotes: '合作稳定，有续费意向',
+    projects: [],
+    adAccounts: [
+      {
+        id: 1,
+        platform: 'google',
+        accountId: 'GA-456789012',
+        accountName: '户外运动-Google广告',
+        status: 'active',
+        balance: 18000,
+        lastUpdated: '2024-12-20T10:30:00Z'
+      }
+    ],
+    createdAt: '2024-04-01T08:00:00Z',
+    lastUpdated: '2024-12-20T10:30:00Z'
+  },
+  5: {
+    id: 5,
+    cooperationDetails: {
+      customerName: '母婴用品专营店',
+      cooperationStartTime: '2024-05-01T08:00:00Z',
+      serviceStartTime: '2024-05-15T08:00:00Z',
+      cooperationType: '代运营',
+      signingSales: '陈小丽',
+      specialConditions: '提供育儿专家咨询',
+      customerGrade: 'A',
+      customerStatus: 'active'
+    },
+    basicInfo: {
+      serviceTeam: '母婴组',
+      contactPersons: [
+        {
+          id: 1,
+          name: '孙经理',
+          position: '产品经理',
+          phone: '13500135001',
+          email: 'product@babycare.com',
+          isPrimary: true
+        }
+      ],
+      industry: '母婴用品',
+      regions: ['美国', '加拿大', '澳洲'],
+      businessModel: '品牌代理+自营',
+      overseasSalesScale: '800-1500万美元',
+      overseasSalesRatio: 85,
+      targetSalesScale: '2500万美元',
+      mainSalesChannel: '独立站+亚马逊',
+      hasTechTeam: false,
+      hasOperationTeam: true,
+      hasBrandTeam: true,
+      cooperationTransfer: '客户推荐'
+    },
+    websiteInfo: {
+      newProductFrequency: '每月8-12款',
+      websiteLaunchTime: '2023-05-01T00:00:00Z',
+      lastYearSales: 12000000,
+      targetMarkets: ['美国', '加拿大', '澳洲'],
+      mainProducts: '婴儿用品、玩具、营养品',
+      productAdvantages: '安全无害、设计贴心、品质可靠',
+      pricingStrategy: '中高端定价',
+      inventoryStatus: true,
+      annualSalesTarget: 18000000,
+      annualCostTarget: 10000000,
+      costRatio: 55.6
+    },
+    competitorInfo: {
+      competitorWebsites: [
+        {
+          id: 1,
+          websiteUrl: 'https://babycompetitor.com',
+          companyName: '母婴竞争对手',
+          notes: '品牌认知度高，但价格偏高'
+        }
+      ]
+    },
+    specialAttention: {
+      customerExpectations: '希望成为母婴行业标杆',
+      communicationPreferences: '每周汇报，新品上线及时沟通',
+      specialRequirements: '需要专业的母婴营销策略',
+      culturalConsiderations: '注重产品安全和教育价值',
+      timeZonePreferences: '北京时间',
+      languagePreferences: '中文',
+      decisionMakers: '孙经理（产品决策）',
+      budgetConstraints: '月度预算60万',
+      complianceRequirements: '需要符合婴幼儿产品安全标准',
+      riskFactors: '安全要求高，监管严格',
+      successFactors: '产品安全、品牌信任、用户教育',
+      historicalIssues: '无重大问题'
+    },
+    qaRecords: [],
+    renewalNotes: '优质客户，续费意愿强',
+    projects: [],
+    adAccounts: [
+      {
+        id: 1,
+        platform: 'facebook',
+        accountId: 'FB-567890123',
+        accountName: '母婴用品-Meta广告',
+        status: 'active',
+        balance: 22000,
+        lastUpdated: '2024-12-20T10:30:00Z'
+      }
+    ],
+    createdAt: '2024-05-01T08:00:00Z',
+    lastUpdated: '2024-12-20T10:30:00Z'
+  },
+  6: {
+    id: 6,
+    cooperationDetails: {
+      customerName: '家居生活品牌',
+      cooperationStartTime: '2024-06-01T08:00:00Z',
+      serviceStartTime: '2024-06-15T08:00:00Z',
+      cooperationType: '咨询服务',
+      signingSales: '周小伟',
+      specialConditions: '提供家居设计咨询',
+      customerGrade: 'B',
+      customerStatus: 'active'
+    },
+    basicInfo: {
+      serviceTeam: '家居组',
+      contactPersons: [
+        {
+          id: 1,
+          name: '吴总',
+          position: '品牌总监',
+          phone: '13400134001',
+          email: 'brand@homeliving.com',
+          isPrimary: true
+        },
+        {
+          id: 2,
+          name: '林经理',
+          position: '市场经理',
+          phone: '13400134002',
+          email: 'marketing@homeliving.com',
+          isPrimary: false
+        }
+      ],
+      industry: '家居生活',
+      regions: ['美国', '欧洲', '日本'],
+      businessModel: '原创设计品牌',
+      overseasSalesScale: '400-900万美元',
+      overseasSalesRatio: 65,
+      targetSalesScale: '1800万美元',
+      mainSalesChannel: '独立站',
+      hasTechTeam: true,
+      hasOperationTeam: false,
+      hasBrandTeam: true,
+      cooperationTransfer: '设计师推荐'
+    },
+    websiteInfo: {
+      newProductFrequency: '每月6-8款',
+      websiteLaunchTime: '2023-04-01T00:00:00Z',
+      lastYearSales: 7200000,
+      targetMarkets: ['美国', '欧洲', '日本'],
+      mainProducts: '家具、装饰品、收纳用品',
+      productAdvantages: '设计独特、工艺精良、环保材质',
+      pricingStrategy: '中高端定价',
+      inventoryStatus: true,
+      annualSalesTarget: 10000000,
+      annualCostTarget: 6500000,
+      costRatio: 65
+    },
+    competitorInfo: {
+      competitorWebsites: [
+        {
+          id: 1,
+          websiteUrl: 'https://homecompetitor.com',
+          companyName: '家居竞争对手A',
+          notes: '设计风格相似，但价格更低'
+        },
+        {
+          id: 2,
+          websiteUrl: 'https://livingcompetitor.com',
+          companyName: '家居竞争对手B',
+          notes: '品牌知名度高，产品线更全'
+        }
+      ]
+    },
+    specialAttention: {
+      customerExpectations: '希望打造高端家居品牌形象',
+      communicationPreferences: '双周汇报，设计相关及时沟通',
+      specialRequirements: '需要重视品牌形象和设计感',
+      culturalConsiderations: '注重生活品质和美学体验',
+      timeZonePreferences: '北京时间',
+      languagePreferences: '中文',
+      decisionMakers: '吴总（品牌决策）、林经理（市场执行）',
+      budgetConstraints: '月度预算45万',
+      complianceRequirements: '需要符合家具安全和环保标准',
+      riskFactors: '设计周期长，库存风险大',
+      successFactors: '设计创新、品牌建设、渠道拓展',
+      historicalIssues: '设计版权纠纷'
+    },
+    qaRecords: [
+      {
+        id: 1,
+        customerId: 6,
+        issueDate: '2024-11-20T14:00:00Z',
+        issueCategory: '营销效果问题',
+        issueDescription: '新品推广效果不理想，转化率偏低',
+        impactLevel: 'medium',
+        rootCause: '目标受众定位不够精准，产品卖点突出不够',
+        immediateSolution: '调整广告创意，突出产品设计特色',
+        correctiveMeasures: '重新制作产品视频，优化产品页面',
+        preventiveMeasures: '建立产品测试机制，提前验证市场反应',
+        responsiblePerson: '周小伟',
+        dueDate: '2024-12-15T18:00:00Z',
+                 actualCompletionDate: '',
+        status: 'in_progress',
+        followUpActions: '每周跟进优化进展',
+        lessonsLearned: '新品推广需要更长的预热期',
+        attachments: ['campaign_analysis.pdf'],
+        createdAt: '2024-11-20T14:00:00Z',
+        updatedAt: '2024-12-20T10:30:00Z'
+      }
+    ],
+    renewalNotes: '设计导向客户，对服务质量要求高，需要持续关注',
+    projects: [],
+    adAccounts: [
+      {
+        id: 1,
+        platform: 'google',
+        accountId: 'GA-678901234',
+        accountName: '家居生活-Google广告',
+        status: 'active',
+        balance: 16500,
+        lastUpdated: '2024-12-20T10:30:00Z'
+      },
+      {
+        id: 2,
+        platform: 'facebook',
+        accountId: 'FB-789012345',
+        accountName: '家居生活-Meta广告',
+        status: 'active',
+        balance: 11000,
+        lastUpdated: '2024-12-20T10:30:00Z'
+      }
+    ],
+    createdAt: '2024-06-01T08:00:00Z',
+    lastUpdated: '2024-12-20T10:30:00Z'
   }
 }
 

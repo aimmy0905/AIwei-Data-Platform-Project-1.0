@@ -42,161 +42,147 @@
       </div>
     </div>
 
-    <!-- 标签页导航 -->
-    <div class="tabs-container">
-      <div class="tabs-nav">
-        <button
-          v-for="tab in tabs"
-          :key="tab.key"
-          class="tab-btn"
-          :class="{ 'tab-btn--active': activeTab === tab.key }"
-          @click="activeTab = tab.key"
-        >
-          <component :is="tab.icon" :size="16" />
-          {{ tab.label }}
-        </button>
-      </div>
-    </div>
-
-    <!-- 标签页内容 -->
-    <div class="tabs-content">
+    <!-- 页面内容 -->
+    <div class="page-content">
       <div v-if="loading" class="loading-container">
         <Loader :size="48" class="loading-spinner" />
         <span>加载客户详情中...</span>
       </div>
 
-      <div v-else-if="customerDetail">
+      <div v-else-if="customerDetail" class="content-sections">
         <!-- 合作详情 -->
-        <div v-if="activeTab === 'cooperation'" class="tab-content">
-          <div class="content-section">
-            <h3 class="section-title">合作详情</h3>
-            <div class="info-grid">
-              <div class="info-item">
-                <label class="info-label">客户名称</label>
-                <span class="info-value">{{ customerDetail.cooperationDetails.customerName }}</span>
-              </div>
-              <div class="info-item">
-                <label class="info-label">合作方式</label>
-                <span class="info-value">{{ customerDetail.cooperationDetails.cooperationType }}</span>
-              </div>
-              <div class="info-item">
-                <label class="info-label">合作起始时间</label>
-                <span class="info-value">{{ formatDate(customerDetail.cooperationDetails.cooperationStartTime) }}</span>
-              </div>
-              <div class="info-item">
-                <label class="info-label">实际服务开始时间</label>
-                <span class="info-value">{{ formatDate(customerDetail.cooperationDetails.serviceStartTime) }}</span>
-              </div>
-              <div class="info-item">
-                <label class="info-label">签单销售</label>
-                <span class="info-value">{{ customerDetail.cooperationDetails.signingSales }}</span>
-              </div>
-              <div class="info-item">
-                <label class="info-label">客户分级</label>
-                <span class="grade-badge" :class="`grade-badge--${customerDetail.cooperationDetails.customerGrade}`">
-                  {{ customerDetail.cooperationDetails.customerGrade }}级
-                </span>
-              </div>
+        <div class="content-section">
+          <h3 class="section-title">
+            <Handshake :size="20" />
+            合作详情
+          </h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label class="info-label">客户名称</label>
+              <span class="info-value">{{ customerDetail.cooperationDetails.customerName }}</span>
             </div>
-            <div class="info-item info-item--full">
-              <label class="info-label">特殊合作条件</label>
-              <div class="info-value info-value--text">
-                {{ customerDetail.cooperationDetails.specialConditions || '无特殊条件' }}
-              </div>
+            <div class="info-item">
+              <label class="info-label">合作方式</label>
+              <span class="info-value">{{ customerDetail.cooperationDetails.cooperationType }}</span>
+            </div>
+            <div class="info-item">
+              <label class="info-label">合作起始时间</label>
+              <span class="info-value">{{ formatDate(customerDetail.cooperationDetails.cooperationStartTime) }}</span>
+            </div>
+            <div class="info-item">
+              <label class="info-label">实际服务开始时间</label>
+              <span class="info-value">{{ formatDate(customerDetail.cooperationDetails.serviceStartTime) }}</span>
+            </div>
+            <div class="info-item">
+              <label class="info-label">签单销售</label>
+              <span class="info-value">{{ customerDetail.cooperationDetails.signingSales }}</span>
+            </div>
+            <div class="info-item">
+              <label class="info-label">客户分级</label>
+              <span class="grade-badge" :class="`grade-badge--${customerDetail.cooperationDetails.customerGrade}`">
+                {{ customerDetail.cooperationDetails.customerGrade }}级
+              </span>
+            </div>
+          </div>
+          <div class="info-item info-item--full">
+            <label class="info-label">特殊合作条件</label>
+            <div class="info-value info-value--text">
+              {{ customerDetail.cooperationDetails.specialConditions || '无特殊条件' }}
             </div>
           </div>
         </div>
 
         <!-- 客户基础信息 -->
-        <div v-if="activeTab === 'basic'" class="tab-content">
-          <div class="content-section">
-            <h3 class="section-title">基础信息</h3>
-            <div class="info-grid">
-              <div class="info-item">
-                <label class="info-label">服务团队</label>
-                <span class="info-value">{{ customerDetail.basicInfo.serviceTeam }}</span>
+        <div class="content-section">
+          <h3 class="section-title">
+            <User :size="20" />
+            基础信息
+          </h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label class="info-label">服务团队</label>
+              <span class="info-value">{{ customerDetail.basicInfo.serviceTeam }}</span>
+            </div>
+            <div class="info-item">
+              <label class="info-label">客户行业</label>
+              <span class="info-value">{{ customerDetail.basicInfo.industry }}</span>
+            </div>
+            <div class="info-item">
+              <label class="info-label">商业模式</label>
+              <span class="info-value">{{ customerDetail.basicInfo.businessModel }}</span>
+            </div>
+            <div class="info-item">
+              <label class="info-label">海外销售规模</label>
+              <span class="info-value">{{ customerDetail.basicInfo.overseasSalesScale }}</span>
+            </div>
+            <div class="info-item">
+              <label class="info-label">海外销售占比</label>
+              <span class="info-value">{{ customerDetail.basicInfo.overseasSalesRatio }}%</span>
+            </div>
+            <div class="info-item">
+              <label class="info-label">目标销售规模</label>
+              <span class="info-value">{{ customerDetail.basicInfo.targetSalesScale }}</span>
+            </div>
+            <div class="info-item">
+              <label class="info-label">主要销售渠道</label>
+              <span class="info-value">{{ customerDetail.basicInfo.mainSalesChannel }}</span>
+            </div>
+          </div>
+
+          <div class="info-section">
+            <h4 class="subsection-title">客户地区</h4>
+            <div class="tag-list">
+              <span v-for="region in customerDetail.basicInfo.regions" :key="region" class="tag">
+                {{ region }}
+              </span>
+            </div>
+          </div>
+
+          <div class="info-section">
+            <h4 class="subsection-title">团队配置</h4>
+            <div class="team-config">
+              <div class="team-item">
+                <Check v-if="customerDetail.basicInfo.hasTechTeam" :size="16" class="check-icon check-icon--success" />
+                <X v-else :size="16" class="check-icon check-icon--error" />
+                <span>技术及素材制作团队</span>
               </div>
-              <div class="info-item">
-                <label class="info-label">客户行业</label>
-                <span class="info-value">{{ customerDetail.basicInfo.industry }}</span>
+              <div class="team-item">
+                <Check v-if="customerDetail.basicInfo.hasOperationTeam" :size="16" class="check-icon check-icon--success" />
+                <X v-else :size="16" class="check-icon check-icon--error" />
+                <span>投放或运营团队</span>
               </div>
-              <div class="info-item">
-                <label class="info-label">商业模式</label>
-                <span class="info-value">{{ customerDetail.basicInfo.businessModel }}</span>
-              </div>
-              <div class="info-item">
-                <label class="info-label">海外销售规模</label>
-                <span class="info-value">{{ customerDetail.basicInfo.overseasSalesScale }}</span>
-              </div>
-              <div class="info-item">
-                <label class="info-label">海外销售占比</label>
-                <span class="info-value">{{ customerDetail.basicInfo.overseasSalesRatio }}%</span>
-              </div>
-              <div class="info-item">
-                <label class="info-label">目标销售规模</label>
-                <span class="info-value">{{ customerDetail.basicInfo.targetSalesScale }}</span>
-              </div>
-              <div class="info-item">
-                <label class="info-label">主要销售渠道</label>
-                <span class="info-value">{{ customerDetail.basicInfo.mainSalesChannel }}</span>
+              <div class="team-item">
+                <Check v-if="customerDetail.basicInfo.hasBrandTeam" :size="16" class="check-icon check-icon--success" />
+                <X v-else :size="16" class="check-icon check-icon--error" />
+                <span>品牌及内容团队</span>
               </div>
             </div>
+          </div>
 
-            <div class="info-section">
-              <h4 class="subsection-title">客户地区</h4>
-              <div class="tag-list">
-                <span v-for="region in customerDetail.basicInfo.regions" :key="region" class="tag">
-                  {{ region }}
-                </span>
-              </div>
-            </div>
-
-            <div class="info-section">
-              <h4 class="subsection-title">团队配置</h4>
-              <div class="team-config">
-                <div class="team-item">
-                  <Check v-if="customerDetail.basicInfo.hasTechTeam" :size="16" class="check-icon check-icon--success" />
-                  <X v-else :size="16" class="check-icon check-icon--error" />
-                  <span>技术及素材制作团队</span>
-                </div>
-                <div class="team-item">
-                  <Check v-if="customerDetail.basicInfo.hasOperationTeam" :size="16" class="check-icon check-icon--success" />
-                  <X v-else :size="16" class="check-icon check-icon--error" />
-                  <span>投放或运营团队</span>
-                </div>
-                <div class="team-item">
-                  <Check v-if="customerDetail.basicInfo.hasBrandTeam" :size="16" class="check-icon check-icon--success" />
-                  <X v-else :size="16" class="check-icon check-icon--error" />
-                  <span>品牌及内容团队</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="info-section">
-              <h4 class="subsection-title">联系人信息</h4>
-              <div class="contact-list">
-                <div v-for="contact in customerDetail.basicInfo.contactPersons" :key="contact.id" class="contact-card">
-                  <div class="contact-header">
-                    <div class="contact-avatar">
-                      {{ contact.name.charAt(0).toUpperCase() }}
-                    </div>
-                    <div class="contact-info">
-                      <div class="contact-name">
-                        {{ contact.name }}
-                        <span v-if="contact.isPrimary" class="primary-badge">主要联系人</span>
-                      </div>
-                      <div class="contact-position">{{ contact.position }}</div>
-                    </div>
+          <div class="info-section">
+            <h4 class="subsection-title">联系人信息</h4>
+            <div class="contact-list">
+              <div v-for="contact in customerDetail.basicInfo.contactPersons" :key="contact.id" class="contact-card">
+                <div class="contact-header">
+                  <div class="contact-avatar">
+                    {{ contact.name.charAt(0).toUpperCase() }}
                   </div>
-                  <div class="contact-details">
-                    <div class="contact-item">
-                      <Phone :size="14" />
-                      <span>{{ contact.phone }}</span>
+                  <div class="contact-info">
+                    <div class="contact-name">
+                      {{ contact.name }}
+                      <span v-if="contact.isPrimary" class="primary-badge">主要联系人</span>
                     </div>
-                    <div class="contact-item">
-                      <Mail :size="14" />
-                      <span>{{ contact.email }}</span>
-                    </div>
+                    <div class="contact-position">{{ contact.position }}</div>
+                  </div>
+                </div>
+                <div class="contact-details">
+                  <div class="contact-item">
+                    <Phone :size="14" />
+                    <span>{{ contact.phone }}</span>
+                  </div>
+                  <div class="contact-item">
+                    <Mail :size="14" />
+                    <span>{{ contact.email }}</span>
                   </div>
                 </div>
               </div>
@@ -205,101 +191,105 @@
         </div>
 
         <!-- 独立站情况及目标 -->
-        <div v-if="activeTab === 'website'" class="tab-content">
-          <div class="content-section">
-            <h3 class="section-title">独立站情况及目标</h3>
-            <div class="info-grid">
-              <div class="info-item">
-                <label class="info-label">网站上线时间</label>
-                <span class="info-value">{{ formatDate(customerDetail.websiteInfo.websiteLaunchTime) }}</span>
-              </div>
-              <div class="info-item">
-                <label class="info-label">新品上线频率</label>
-                <span class="info-value">{{ customerDetail.websiteInfo.newProductFrequency }}</span>
-              </div>
-              <div class="info-item">
-                <label class="info-label">去年销售额</label>
-                <span class="info-value">${{ formatNumber(customerDetail.websiteInfo.lastYearSales) }}</span>
-              </div>
-              <div class="info-item">
-                <label class="info-label">年度销售目标</label>
-                <span class="info-value">${{ formatNumber(customerDetail.websiteInfo.annualSalesTarget) }}</span>
-              </div>
-              <div class="info-item">
-                <label class="info-label">年度成本目标</label>
-                <span class="info-value">${{ formatNumber(customerDetail.websiteInfo.annualCostTarget) }}</span>
-              </div>
-              <div class="info-item">
-                <label class="info-label">成本占比</label>
-                <span class="info-value">{{ customerDetail.websiteInfo.costRatio }}%</span>
-              </div>
-              <div class="info-item">
-                <label class="info-label">价格定位策略</label>
-                <span class="info-value">{{ customerDetail.websiteInfo.pricingStrategy }}</span>
-              </div>
-              <div class="info-item">
-                <label class="info-label">库存状态</label>
-                <span class="status-indicator" :class="customerDetail.websiteInfo.inventoryStatus ? 'status-indicator--success' : 'status-indicator--warning'">
-                  {{ customerDetail.websiteInfo.inventoryStatus ? '有库存' : '无库存' }}
-                </span>
-              </div>
+        <div class="content-section">
+          <h3 class="section-title">
+            <Globe :size="20" />
+            独立站情况及目标
+          </h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label class="info-label">网站上线时间</label>
+              <span class="info-value">{{ formatDate(customerDetail.websiteInfo.websiteLaunchTime) }}</span>
             </div>
-
-            <div class="info-section">
-              <h4 class="subsection-title">目标市场</h4>
-              <div class="tag-list">
-                <span v-for="market in customerDetail.websiteInfo.targetMarkets" :key="market" class="tag">
-                  {{ market }}
-                </span>
-              </div>
+            <div class="info-item">
+              <label class="info-label">新品上线频率</label>
+              <span class="info-value">{{ customerDetail.websiteInfo.newProductFrequency }}</span>
             </div>
-
-            <div class="info-item info-item--full">
-              <label class="info-label">主要推广产品</label>
-              <div class="info-value info-value--text">
-                {{ customerDetail.websiteInfo.mainProducts }}
-              </div>
+            <div class="info-item">
+              <label class="info-label">去年销售额</label>
+              <span class="info-value">${{ formatNumber(customerDetail.websiteInfo.lastYearSales) }}</span>
             </div>
+            <div class="info-item">
+              <label class="info-label">年度销售目标</label>
+              <span class="info-value">${{ formatNumber(customerDetail.websiteInfo.annualSalesTarget) }}</span>
+            </div>
+            <div class="info-item">
+              <label class="info-label">年度成本目标</label>
+              <span class="info-value">${{ formatNumber(customerDetail.websiteInfo.annualCostTarget) }}</span>
+            </div>
+            <div class="info-item">
+              <label class="info-label">成本占比</label>
+              <span class="info-value">{{ customerDetail.websiteInfo.costRatio }}%</span>
+            </div>
+            <div class="info-item">
+              <label class="info-label">价格定位策略</label>
+              <span class="info-value">{{ customerDetail.websiteInfo.pricingStrategy }}</span>
+            </div>
+            <div class="info-item">
+              <label class="info-label">库存状态</label>
+              <span class="status-indicator" :class="customerDetail.websiteInfo.inventoryStatus ? 'status-indicator--success' : 'status-indicator--warning'">
+                {{ customerDetail.websiteInfo.inventoryStatus ? '有库存' : '无库存' }}
+              </span>
+            </div>
+          </div>
 
-            <div class="info-item info-item--full">
-              <label class="info-label">产品优势卖点</label>
-              <div class="info-value info-value--text">
-                {{ customerDetail.websiteInfo.productAdvantages }}
-              </div>
+          <div class="info-section">
+            <h4 class="subsection-title">目标市场</h4>
+            <div class="tag-list">
+              <span v-for="market in customerDetail.websiteInfo.targetMarkets" :key="market" class="tag">
+                {{ market }}
+              </span>
+            </div>
+          </div>
+
+          <div class="info-item info-item--full">
+            <label class="info-label">主要推广产品</label>
+            <div class="info-value info-value--text">
+              {{ customerDetail.websiteInfo.mainProducts }}
+            </div>
+          </div>
+
+          <div class="info-item info-item--full">
+            <label class="info-label">产品优势卖点</label>
+            <div class="info-value info-value--text">
+              {{ customerDetail.websiteInfo.productAdvantages }}
             </div>
           </div>
         </div>
 
         <!-- 竞对情况 -->
-        <div v-if="activeTab === 'competitor'" class="tab-content">
-          <div class="content-section">
-            <h3 class="section-title">竞争对手情况</h3>
-            <div class="competitor-list">
-              <div v-for="competitor in customerDetail.competitorInfo.competitorWebsites" :key="competitor.id" class="competitor-card">
-                <div class="competitor-header">
-                  <div class="competitor-info">
-                    <h4 class="competitor-name">{{ competitor.companyName }}</h4>
-                    <a :href="competitor.websiteUrl" target="_blank" class="competitor-url">
-                      <ExternalLink :size="14" />
-                      {{ competitor.websiteUrl }}
-                    </a>
-                  </div>
-                </div>
-                <div v-if="competitor.notes" class="competitor-notes">
-                  <p>{{ competitor.notes }}</p>
+        <div class="content-section">
+          <h3 class="section-title">
+            <Users :size="20" />
+            竞争对手情况
+          </h3>
+          <div class="competitor-list">
+            <div v-for="competitor in customerDetail.competitorInfo.competitorWebsites" :key="competitor.id" class="competitor-card">
+              <div class="competitor-header">
+                <div class="competitor-info">
+                  <h4 class="competitor-name">{{ competitor.companyName }}</h4>
+                  <a :href="competitor.websiteUrl" target="_blank" class="competitor-url">
+                    <ExternalLink :size="14" />
+                    {{ competitor.websiteUrl }}
+                  </a>
                 </div>
               </div>
+              <div v-if="competitor.notes" class="competitor-notes">
+                <p>{{ competitor.notes }}</p>
+              </div>
             </div>
-            <div v-if="customerDetail.competitorInfo.competitorWebsites.length === 0" class="empty-state">
-              <p>暂无竞争对手信息</p>
-            </div>
+          </div>
+          <div v-if="customerDetail.competitorInfo.competitorWebsites.length === 0" class="empty-state">
+            <p>暂无竞争对手信息</p>
           </div>
         </div>
 
         <!-- 特别关注事项 -->
-        <div v-if="activeTab === 'attention'" class="tab-content">
-          <div class="content-section">
-            <h3 class="section-title">特别关注事项</h3>
+        <div class="content-section">
+          <h3 class="section-title">
+            <AlertTriangle :size="20" />
+            特别关注事项
+          </h3>
             <div class="attention-grid">
               <div class="attention-item">
                 <h4 class="attention-title">
@@ -386,75 +376,77 @@
                 <p class="attention-content">{{ customerDetail.specialAttention.historicalIssues || '无历史问题' }}</p>
               </div>
             </div>
-          </div>
         </div>
 
         <!-- Q&A记录 -->
-        <div v-if="activeTab === 'qa'" class="tab-content">
-          <div class="content-section">
-            <div class="section-header">
-              <h3 class="section-title">Q&A记录</h3>
-              <button class="action-btn action-btn--primary" @click="addQA">
-                <Plus :size="16" />
-                添加Q&A
-              </button>
-            </div>
-            <div class="qa-list">
-              <div v-for="qa in customerDetail.qaRecords" :key="qa.id" class="qa-card">
-                <div class="qa-header">
-                  <div class="qa-meta">
-                    <span class="qa-category">{{ qa.issueCategory }}</span>
-                    <span class="qa-date">{{ formatDate(qa.issueDate) }}</span>
-                    <span class="impact-badge" :class="`impact-badge--${qa.impactLevel}`">
-                      {{ getImpactText(qa.impactLevel) }}
-                    </span>
-                    <span class="qa-status-badge" :class="`qa-status-badge--${qa.status}`">
-                      {{ getQAStatusText(qa.status) }}
-                    </span>
-                  </div>
+        <div class="content-section">
+          <div class="section-header">
+            <h3 class="section-title">
+              <MessageCircle :size="20" />
+              Q&A记录
+            </h3>
+            <button class="action-btn action-btn--primary" @click="addQA">
+              <Plus :size="16" />
+              添加Q&A
+            </button>
+          </div>
+          <div class="qa-list">
+            <div v-for="qa in customerDetail.qaRecords" :key="qa.id" class="qa-card">
+              <div class="qa-header">
+                <div class="qa-meta">
+                  <span class="qa-category">{{ qa.issueCategory }}</span>
+                  <span class="qa-date">{{ formatDate(qa.issueDate) }}</span>
+                  <span class="impact-badge" :class="`impact-badge--${qa.impactLevel}`">
+                    {{ getImpactText(qa.impactLevel) }}
+                  </span>
+                  <span class="qa-status-badge" :class="`qa-status-badge--${qa.status}`">
+                    {{ getQAStatusText(qa.status) }}
+                  </span>
                 </div>
-                <div class="qa-content">
-                  <div class="qa-section">
-                    <h5 class="qa-section-title">问题描述</h5>
-                    <p class="qa-text">{{ qa.issueDescription }}</p>
-                  </div>
-                  <div class="qa-section">
-                    <h5 class="qa-section-title">根本原因</h5>
-                    <p class="qa-text">{{ qa.rootCause }}</p>
-                  </div>
-                  <div class="qa-section">
-                    <h5 class="qa-section-title">解决方案</h5>
-                    <p class="qa-text">{{ qa.immediateSolution }}</p>
-                  </div>
-                  <div class="qa-section">
-                    <h5 class="qa-section-title">改正措施</h5>
-                    <p class="qa-text">{{ qa.correctiveMeasures }}</p>
-                  </div>
-                  <div class="qa-footer">
-                    <div class="qa-info">
-                      <span>负责人：{{ qa.responsiblePerson }}</span>
-                      <span>完成期限：{{ formatDate(qa.dueDate) }}</span>
-                      <span v-if="qa.actualCompletionDate">实际完成：{{ formatDate(qa.actualCompletionDate) }}</span>
-                    </div>
+              </div>
+              <div class="qa-content">
+                <div class="qa-section">
+                  <h5 class="qa-section-title">问题描述</h5>
+                  <p class="qa-text">{{ qa.issueDescription }}</p>
+                </div>
+                <div class="qa-section">
+                  <h5 class="qa-section-title">根本原因</h5>
+                  <p class="qa-text">{{ qa.rootCause }}</p>
+                </div>
+                <div class="qa-section">
+                  <h5 class="qa-section-title">解决方案</h5>
+                  <p class="qa-text">{{ qa.immediateSolution }}</p>
+                </div>
+                <div class="qa-section">
+                  <h5 class="qa-section-title">改正措施</h5>
+                  <p class="qa-text">{{ qa.correctiveMeasures }}</p>
+                </div>
+                <div class="qa-footer">
+                  <div class="qa-info">
+                    <span>负责人：{{ qa.responsiblePerson }}</span>
+                    <span>完成期限：{{ formatDate(qa.dueDate) }}</span>
+                    <span v-if="qa.actualCompletionDate">实际完成：{{ formatDate(qa.actualCompletionDate) }}</span>
                   </div>
                 </div>
               </div>
             </div>
-            <div v-if="customerDetail.qaRecords.length === 0" class="empty-state">
-              <MessageSquare :size="48" />
-              <p>暂无Q&A记录</p>
-              <button class="action-btn action-btn--primary" @click="addQA">
-                <Plus :size="16" />
-                添加第一条Q&A
-              </button>
-            </div>
+          </div>
+          <div v-if="customerDetail.qaRecords.length === 0" class="empty-state">
+            <MessageSquare :size="48" />
+            <p>暂无Q&A记录</p>
+            <button class="action-btn action-btn--primary" @click="addQA">
+              <Plus :size="16" />
+              添加第一条Q&A
+            </button>
           </div>
         </div>
 
         <!-- 续费跟进 -->
-        <div v-if="activeTab === 'renewal'" class="tab-content">
-          <div class="content-section">
-            <h3 class="section-title">续费跟进需注意</h3>
+        <div class="content-section">
+          <h3 class="section-title">
+            <RefreshCw :size="20" />
+            续费跟进需注意
+          </h3>
             <div class="renewal-content">
               <div class="renewal-notes">
                 <h4 class="renewal-title">续费备注</h4>
@@ -489,7 +481,6 @@
                 </div>
               </div>
             </div>
-          </div>
         </div>
       </div>
 
@@ -524,18 +515,6 @@ const router = useRouter()
 // 响应式数据
 const loading = ref(true)
 const customerDetail = ref<CustomerDetail | null>(null)
-const activeTab = ref('cooperation')
-
-// 标签页配置
-const tabs = [
-  { key: 'cooperation', label: '合作详情', icon: Handshake },
-  { key: 'basic', label: '基础信息', icon: User },
-  { key: 'website', label: '独立站情况', icon: Globe },
-  { key: 'competitor', label: '竞对情况', icon: Users },
-  { key: 'attention', label: '特别关注', icon: AlertTriangle },
-  { key: 'qa', label: 'Q&A记录', icon: MessageCircle },
-  { key: 'renewal', label: '续费跟进', icon: RefreshCw }
-]
 
 // 计算属性
 const customerId = computed(() => {
@@ -845,8 +824,14 @@ onMounted(() => {
   border-bottom-color: var(--color-primary);
 }
 
-.tabs-content {
+.page-content {
   min-height: 400px;
+}
+
+.content-sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
 }
 
 .loading-container {
