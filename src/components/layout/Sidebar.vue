@@ -221,6 +221,25 @@ const selectMenu = (item: MenuItem) => {
   if (item.path) {
     console.log('🔧 准备跳转到路径:', item.path)
 
+    // 特殊处理：如果是客户相关菜单，确保客户管理菜单展开
+    if (item.id === 'customer-list' || item.path === '/customers' || item.path?.startsWith('/customers')) {
+      console.log('🔧 客户菜单点击，确保客户管理菜单展开')
+      // 确保客户管理菜单展开
+      if (!openMenus.value.includes('customers')) {
+        openMenus.value.push('customers')
+      }
+
+      router.push(item.path).then(() => {
+        console.log('🔧 客户菜单路由跳转成功')
+      }).catch((error) => {
+        console.error('🔧 客户菜单路由跳转失败:', error)
+      })
+
+      // 设置活跃菜单
+      menuStore.setActiveMenu(item.id)
+      return
+    }
+
     // 检查是否是仪表板子模块，如果是则跳转到主仪表板并滚动到对应模块
     if (item.path.startsWith('/dashboard/') && item.path !== '/dashboard') {
       const sectionId = item.path.replace('/dashboard/', '')
@@ -287,8 +306,6 @@ const getUserAvatar = (): string => {
 onMounted(async () => {
   console.log('🔧 侧边栏组件已挂载')
 
-
-
   // 自动登录
   if (!authStore.isAuthenticated) {
     console.log('🔧 自动登录中...')
@@ -305,6 +322,18 @@ onMounted(async () => {
   }
 
   console.log('🔧 菜单加载完成，菜单项数量:', menuItems.value.length)
+
+  // 根据当前路径设置菜单状态
+  const currentPath = router.currentRoute.value.path
+  console.log('🔧 当前路径:', currentPath)
+
+  // 如果当前在客户相关页面，确保客户管理菜单展开
+  if (currentPath.startsWith('/customers')) {
+    console.log('🔧 当前在客户页面，展开客户管理菜单')
+    if (!openMenus.value.includes('customers')) {
+      openMenus.value.push('customers')
+    }
+  }
 })
 </script>
 
