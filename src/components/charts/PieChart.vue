@@ -124,7 +124,7 @@ const chartOption = computed(() => {
             series: [
       {
         type: 'pie',
-        radius: ['30%', '55%'],
+        radius: props.donut ? ['30%', '55%'] : '55%',
         center: ['50%', '45%'],
         data: props.data.map((item, index) => ({
           ...item,

@@ -1,67 +1,138 @@
 <template>
   <aside
     class="sidebar"
-    :class="{ 'sidebar--collapsed': collapsed }"
+    :class="{ 'sidebar--collapsed': isCollapsed }"
   >
     <!-- 侧边栏头部 -->
     <div class="sidebar__header">
       <div class="sidebar__logo">
         <img src="/LOGO-new.webp" alt="Logo" class="sidebar__logo-img" />
-        <transition name="fade">
-          <span v-show="!collapsed" class="sidebar__logo-text">
-            艾维数据平台
-          </span>
-        </transition>
+        <span v-if="!isCollapsed" class="sidebar__logo-text">
+          艾维数据平台
+        </span>
       </div>
       <button
         class="sidebar__toggle"
-        @click="toggleCollapse"
-        :title="collapsed ? '展开菜单' : '折叠菜单'"
+        @click="handleToggle"
+        :title="isCollapsed ? '展开菜单' : '折叠菜单'"
       >
-        <ChevronRight v-if="collapsed" :size="20" />
+        <ChevronRight v-if="isCollapsed" :size="20" />
         <ChevronLeft v-else :size="20" />
       </button>
     </div>
 
+
+
     <!-- 菜单列表 -->
     <nav class="sidebar__nav">
       <div class="sidebar__menu">
-        <SidebarMenuItem
-          v-for="item in visibleMenuItems"
+        <div
+          v-for="item in menuItems"
           :key="item.id"
-          :item="item"
-          :collapsed="collapsed"
-          @select="handleMenuSelect"
-        />
+          class="menu-item"
+        >
+          <!-- 有子菜单的项目 -->
+          <div v-if="item.children && item.children.length > 0">
+            <div
+              class="menu-item__header"
+              :class="{ 'menu-item__header--active': openMenus.includes(item.id) }"
+              @click.stop="toggleMenu(item.id)"
+              style="cursor: pointer; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-radius: 6px; transition: all 0.2s;"
+            >
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <component :is="getIcon(item.icon)" :size="20" />
+                <span v-if="!isCollapsed">{{ item.name }}</span>
+              </div>
+              <ChevronDown
+                v-if="!isCollapsed"
+                :size="16"
+                :style="{ transform: openMenus.includes(item.id) ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }"
+              />
+            </div>
+
+            <!-- 子菜单 -->
+            <div
+              v-if="openMenus.includes(item.id) && !isCollapsed"
+              class="submenu"
+              style="padding-left: 20px; margin-top: 4px;"
+            >
+              <div
+                v-for="child in item.children"
+                :key="child.id"
+                class="menu-item__link"
+                @click.stop="selectMenu(child)"
+                style="cursor: pointer; padding: 8px 16px; border-radius: 4px; margin-bottom: 2px; transition: all 0.2s;"
+              >
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <component :is="getIcon(child.icon)" :size="18" />
+                  <span>{{ child.name }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 普通菜单项 -->
+          <div
+            v-else
+            class="menu-item__link"
+            @click="selectMenu(item)"
+            style="cursor: pointer; padding: 12px 16px; border-radius: 6px; margin-bottom: 4px; transition: all 0.2s;"
+          >
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <component :is="getIcon(item.icon)" :size="20" />
+              <span v-if="!isCollapsed">{{ item.name }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </nav>
 
-    <!-- 侧边栏底部 -->
-    <div class="sidebar__footer">
-      <div class="sidebar__user" v-if="user">
-        <img
-          :src="getUserAvatarUrl()"
-          :alt="userName"
-          class="sidebar__user-avatar"
-        />
-        <transition name="fade">
-          <div v-show="!collapsed" class="sidebar__user-info">
-            <div class="sidebar__user-name">{{ userName }}</div>
-            <div class="sidebar__user-role">{{ getRoleText(user.role) }}</div>
-          </div>
-        </transition>
+    <!-- 用户信息 -->
+    <div class="sidebar__footer" v-if="currentUser">
+      <div class="sidebar__user">
+        <img :src="getUserAvatar()" :alt="currentUser.username" class="sidebar__user-avatar" />
+        <div v-if="!isCollapsed" class="sidebar__user-info">
+          <div class="sidebar__user-name">{{ currentUser.username }}</div>
+          <div class="sidebar__user-role">{{ getRoleText(currentUser.role) }}</div>
+        </div>
       </div>
     </div>
   </aside>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
+  BarChart3,
+  Target,
+  Globe,
+  TrendingUp,
+  Calendar,
+  Package,
+  Users,
+  MapPin,
+  FileText,
+  Search,
+  Megaphone,
+  Monitor,
+  List,
+  BarChart,
+  DollarSign,
+  Star,
+  Building,
+  Award,
+  FolderOpen,
+  Settings,
+  Shield,
+  Palette,
+  Cog
+} from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { useMenuStore } from '@/stores/menu'
-import SidebarMenuItem from './SidebarMenuItem.vue'
 import type { MenuItem } from '@/types'
 
 // 组合式API
@@ -69,121 +140,125 @@ const router = useRouter()
 const authStore = useAuthStore()
 const menuStore = useMenuStore()
 
+// 本地状态
+const isCollapsed = ref(false)
+const clickCount = ref(0)
+const openMenus = ref<string[]>(['dashboard']) // 默认展开数据看板
+
+// 监听store的折叠状态变化
+watch(() => menuStore.collapsed, (newValue) => {
+  console.log('🔧 Store折叠状态变化:', newValue)
+  isCollapsed.value = newValue
+}, { immediate: true })
+
 // 计算属性
-const user = computed(() => authStore.user)
-const userName = computed(() => authStore.userName)
-const userAvatar = computed(() => authStore.userAvatar)
-const collapsed = computed(() => menuStore.collapsed)
-const visibleMenuItems = computed(() => {
-  const items = menuStore.visibleMenuItems
-  console.log('Visible menu items:', items)
-  return items
-})
+const currentUser = computed(() => authStore.user)
+const menuItems = computed(() => menuStore.visibleMenuItems)
+
+// 图标映射
+const iconMap = {
+  BarChart3, Target, Globe, TrendingUp, Calendar, Package, Users, MapPin,
+  FileText, Search, Megaphone, Monitor, List, BarChart, DollarSign, Star,
+  Building, Award, FolderOpen, Settings, Shield, Palette, Cog,
+  Facebook: Monitor,
+  Chrome: Monitor,
+  UserCheck: Users,
+  UserCog: Users,
+  Sitemap: Building,
+  AlertTriangle: Search,
+  Download: DollarSign,
+  Tool: Settings
+}
 
 // 方法
-const toggleCollapse = () => {
-  menuStore.toggleCollapse()
+const getIcon = (iconName: string) => {
+  return iconMap[iconName as keyof typeof iconMap] || BarChart3
 }
 
-const handleMenuSelect = async (item: MenuItem) => {
-  console.log('Menu item selected:', item)
+const handleToggle = () => {
+  clickCount.value++
+  isCollapsed.value = !isCollapsed.value
+  console.log('🔧 侧边栏折叠状态:', isCollapsed.value)
+
+  // 同步到store - 使用store的方法
+  menuStore.toggleCollapse()
+
+  // 折叠时清空展开的菜单
+  if (isCollapsed.value) {
+    openMenus.value = []
+  } else {
+    openMenus.value = ['dashboard'] // 展开时恢复数据看板
+  }
+}
+
+const toggleMenu = (menuId: string) => {
+  console.log('🔧 切换菜单:', menuId)
+
+  // 找到对应的菜单项
+  const menuItem = menuItems.value.find(item => item.id === menuId)
+
+  // 如果菜单项有路径，先跳转
+  if (menuItem && menuItem.path) {
+    console.log('🔧 主菜单项有路径，执行跳转:', menuItem.path)
+    selectMenu(menuItem)
+  }
+
+  // 然后处理子菜单展开/折叠
+  const index = openMenus.value.indexOf(menuId)
+  if (index > -1) {
+    openMenus.value.splice(index, 1)
+  } else {
+    openMenus.value.push(menuId)
+  }
+
+  console.log('🔧 当前展开的菜单:', openMenus.value)
+}
+
+const selectMenu = (item: MenuItem) => {
+  console.log('🔧 选择菜单:', item.name, item.path)
+  console.log('🔧 菜单项完整信息:', JSON.stringify(item, null, 2))
 
   if (item.path) {
-    // 广告数据使用锚点跳转到数据看板页面的对应模块
-    if (item.path === '/dashboard/ad-platform-overview') {
-      // 先确保导航到数据看板页面
-      if (router.currentRoute.value.name !== 'dashboard') {
-        await router.push({ name: 'dashboard' })
-        // 等待页面渲染完成
-        await new Promise(resolve => setTimeout(resolve, 200))
-      }
+    console.log('🔧 准备跳转到路径:', item.path)
 
-      // 然后滚动到广告数据总览部分
-      await scrollToSectionWithOffset('ad-platform-overview')
-      menuStore.setActiveMenu(item.id)
-    } else if (item.path === '/dashboard/meta-dashboard' ||
-        item.path === '/dashboard/google-dashboard' ||
-        item.path === '/dashboard/bing-dashboard' ||
-        item.path === '/dashboard/criteo-dashboard') {
-      // 其他广告平台页面直接使用路由跳转
-      const routeName = getRouteNameFromPath(item.path)
-      console.log('Navigating to route:', routeName)
-
-      try {
-        await router.push({ name: routeName })
-        menuStore.setActiveMenu(item.id)
-      } catch (error) {
-        console.error('Navigation failed:', error)
-      }
-    } else if (item.path.startsWith('/dashboard/')) {
-      // 其他数据看板的子菜单，使用锚点跳转
+    // 检查是否是仪表板子模块，如果是则跳转到主仪表板并滚动到对应模块
+    if (item.path.startsWith('/dashboard/') && item.path !== '/dashboard') {
       const sectionId = item.path.replace('/dashboard/', '')
+      console.log('🔧 仪表板子模块跳转:', sectionId)
 
-      // 先确保导航到数据看板页面
-      if (router.currentRoute.value.name !== 'dashboard') {
-        await router.push({ name: 'dashboard' })
-        // 等待页面渲染完成
-        await new Promise(resolve => setTimeout(resolve, 200))
-      }
-
-      // 然后滚动到对应的锚点
-      await scrollToSectionWithOffset(sectionId)
-      menuStore.setActiveMenu(item.id)
+      // 跳转到主仪表板
+      router.push('/dashboard').then(() => {
+        // 等待页面渲染完成后滚动到对应模块
+        setTimeout(() => {
+          const element = document.getElementById(sectionId)
+          if (element) {
+            element.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            })
+          }
+        }, 100)
+      })
     } else {
-      // 其他菜单使用路由跳转
-      const routeName = getRouteNameFromPath(item.path)
-      console.log('Navigating to route:', routeName)
-
-      try {
-        await router.push({ name: routeName })
-        menuStore.setActiveMenu(item.id)
-      } catch (error) {
-        console.error('Navigation failed:', error)
-      }
+      // 直接跳转到指定路径
+      console.log('🔧 直接跳转到路径:', item.path)
+      router.push(item.path).then(() => {
+        console.log('🔧 路由跳转成功')
+      }).catch((error) => {
+        console.error('🔧 路由跳转失败:', error)
+      })
     }
   } else {
-    // 如果没有路径，可能是父级菜单，只切换展开状态
-    if (item.children && item.children.length > 0) {
-      console.log('Toggling submenu for:', item.id)
-      menuStore.toggleSubmenu(item.id)
-    }
+    console.log('🔧 菜单项没有路径，无法跳转')
   }
-}
 
-// 改进的滚动方法，考虑所有固定元素的高度
-const scrollToSectionWithOffset = async (sectionId: string) => {
-  const element = document.getElementById(sectionId)
-  if (element) {
-    const headerHeight = 60 // 头部高度
-    const filterHeight = 80 // 筛选器高度
-    const subNavHeight = 60 // 子菜单导航高度
-    const offset = headerHeight + filterHeight + subNavHeight + 20 // 额外间距
-
-    const elementPosition = element.offsetTop - offset
-
-    window.scrollTo({
-      top: Math.max(0, elementPosition),
-      behavior: 'smooth'
-    })
-
-    // 等待滚动完成后触发子菜单导航的状态更新
-    await new Promise(resolve => setTimeout(resolve, 100))
-
-    // 手动触发section change事件来同步子菜单导航
-    const event = new CustomEvent('dashboard-section-change', {
-      detail: { sectionId }
-    })
-    window.dispatchEvent(event)
-  }
-}
-
-const getRouteNameFromPath = (path: string): string => {
-  // 将路径转换为路由名称
-  return path.replace(/^\//, '').replace(/\//g, '-')
+  // 设置活跃菜单
+  menuStore.setActiveMenu(item.id)
 }
 
 const getRoleText = (role: string): string => {
   const roleMap: Record<string, string> = {
+    admin: '管理员',
     superAdmin: '超级管理员',
     manager: '部门经理',
     staff: '员工',
@@ -193,14 +268,8 @@ const getRoleText = (role: string): string => {
   return roleMap[role] || role
 }
 
-const getUserAvatarUrl = (): string => {
-  // 如果用户有自定义头像，使用自定义头像
-  if (userAvatar.value) {
-    return userAvatar.value
-  }
-
-  // 根据用户角色返回对应的头像
-  const role = user.value?.role || 'default'
+const getUserAvatar = (): string => {
+  const role = currentUser.value?.role || 'default'
   const roleAvatarMap: Record<string, string> = {
     admin: '/avatars/admin.svg',
     manager: '/avatars/manager.svg',
@@ -209,57 +278,79 @@ const getUserAvatarUrl = (): string => {
     superAdmin: '/avatars/admin.svg',
     sales: '/avatars/staff.svg'
   }
-
   return roleAvatarMap[role] || '/avatars/default.svg'
 }
+
+
+
+// 生命周期
+onMounted(async () => {
+  console.log('🔧 侧边栏组件已挂载')
+
+
+
+  // 自动登录
+  if (!authStore.isAuthenticated) {
+    console.log('🔧 自动登录中...')
+    await authStore.login({
+      username: 'admin',
+      password: 'admin123',
+      remember: false
+    })
+  }
+
+  // 加载菜单
+  if (authStore.userRole) {
+    await menuStore.loadMenu(authStore.userRole)
+  }
+
+  console.log('🔧 菜单加载完成，菜单项数量:', menuItems.value.length)
+})
 </script>
 
 <style scoped>
 .sidebar {
-  width: var(--sidebar-width);
+  width: 260px;
   height: 100vh;
-  background: var(--color-surface);
-  border-right: 1px solid var(--color-border);
+  background: #ffffff;
+  border-right: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
-  transition: width var(--duration-normal);
   position: fixed;
   left: 0;
   top: 0;
-  z-index: var(--z-fixed);
+  z-index: 1000;
+  transition: width 0.3s ease;
 }
 
 .sidebar--collapsed {
-  width: var(--sidebar-collapsed-width);
+  width: 80px;
 }
 
 .sidebar__header {
-  height: var(--header-height);
-  padding: var(--spacing-md);
+  height: 64px;
+  padding: 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--color-border-light);
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .sidebar__logo {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  flex: 1;
-  min-width: 0;
+  gap: 8px;
 }
 
 .sidebar__logo-img {
-  display: none;
+  width: 32px;
+  height: 32px;
 }
 
 .sidebar__logo-text {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
 }
 
 .sidebar__toggle {
@@ -268,99 +359,66 @@ const getUserAvatarUrl = (): string => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: none;
+  background: #f5f5f5;
   border: none;
-  border-radius: var(--border-radius-sm);
-  color: var(--color-text-secondary);
+  border-radius: 4px;
   cursor: pointer;
-  transition: all var(--duration-fast);
-  flex-shrink: 0;
+  color: #666;
+  transition: all 0.2s;
 }
 
 .sidebar__toggle:hover {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
+  background: #e0e0e0;
+  color: #333;
 }
 
 .sidebar__nav {
   flex: 1;
-  padding: var(--spacing-md) 0;
+  padding: 16px 8px;
   overflow-y: auto;
-  overflow-x: hidden;
 }
 
-.sidebar__menu {
-  padding: 0 var(--spacing-sm);
+.menu-item__header:hover,
+.menu-item__link:hover {
+  background: #f5f5f5 !important;
+}
+
+.menu-item__header--active {
+  background: #e3f2fd !important;
+  color: #1976d2 !important;
 }
 
 .sidebar__footer {
-  padding: var(--spacing-md);
-  border-top: 1px solid var(--color-border-light);
+  padding: 16px;
+  border-top: 1px solid #f0f0f0;
 }
 
 .sidebar__user {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm);
-  border-radius: var(--border-radius-md);
-  transition: background-color var(--duration-fast);
-}
-
-.sidebar__user:hover {
-  background: var(--color-background);
+  gap: 8px;
 }
 
 .sidebar__user-avatar {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
 }
 
 .sidebar__user-info {
   flex: 1;
-  min-width: 0;
 }
 
 .sidebar__user-name {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
 }
 
 .sidebar__user-role {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 12px;
+  color: #666;
 }
 
-/* 动画 */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity var(--duration-fast);
-}
 
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-/* 响应式 */
-@media (max-width: 768px) {
-  .sidebar {
-    transform: translateX(-100%);
-    transition: transform var(--duration-normal);
-  }
-
-  .sidebar.sidebar--mobile-open {
-    transform: translateX(0);
-  }
-}
 </style>

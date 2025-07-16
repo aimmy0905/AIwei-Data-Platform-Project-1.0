@@ -1,7 +1,9 @@
-// Mock数据统一导出
+// 导出所有 mock 数据
 export * from './auth'
 export * from './dashboard'
+export * from './bing-dashboard'
 export * from './menu'
+export * from './customer'
 
 // Mock菜单数据
 import type { MenuItem, UserRole } from '@/types'

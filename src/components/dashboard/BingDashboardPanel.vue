@@ -1,5 +1,35 @@
 <template>
   <div class="bing-dashboard-panel">
+    <!-- 账户选择 -->
+    <div class="account-section">
+      <div class="section-header">
+        <h3 class="section-title">
+          <User />
+          选择账户
+        </h3>
+        <p class="section-description">选择需要查看的Bing广告账户</p>
+      </div>
+
+      <div class="account-selector">
+        <div class="account-dropdown">
+          <select v-model="selectedAccountId" @change="handleAccountChange">
+            <option v-for="account in dashboardData.accounts" :key="account.id" :value="account.id">
+              {{ account.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="account-info">
+          <div :class="['status-badge', `status-badge--${currentAccount.status}`]">
+            {{ getStatusText(currentAccount.status) }}
+          </div>
+          <div class="account-balance">
+            余额: {{ formatCurrency(currentAccount.balance, currentAccount.currency) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 数据提醒 -->
     <div class="alert-section">
       <div class="section-header">
@@ -27,36 +57,6 @@
             <div class="alert-value">{{ alert.value }}</div>
           </div>
           <button class="alert-action">{{ alert.action }}</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 账户选择 -->
-    <div class="account-section">
-      <div class="section-header">
-        <h3 class="section-title">
-          <User />
-          选择账户
-        </h3>
-        <p class="section-description">选择需要查看的Bing广告账户</p>
-      </div>
-
-      <div class="account-selector">
-        <div class="account-dropdown">
-          <select v-model="selectedAccountId" @change="handleAccountChange">
-            <option v-for="account in dashboardData.accounts" :key="account.id" :value="account.id">
-              {{ account.name }}
-            </option>
-          </select>
-        </div>
-
-        <div class="account-info">
-          <div :class="['status-badge', `status-badge--${currentAccount.status}`]">
-            {{ getStatusText(currentAccount.status) }}
-          </div>
-          <div class="account-balance">
-            余额: {{ formatCurrency(currentAccount.balance, currentAccount.currency) }}
-          </div>
         </div>
       </div>
     </div>

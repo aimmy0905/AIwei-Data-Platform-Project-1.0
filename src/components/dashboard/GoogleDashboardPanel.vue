@@ -353,8 +353,7 @@
               :data="adFormsCostDistributionData"
               :height="'350px'"
               :show-legend="true"
-              :donut="true"
-              :donut-radius="['35%', '65%']"
+              :donut="false"
             />
           </div>
 
@@ -364,8 +363,7 @@
               :data="adFormsRevenueDistributionData"
               :height="'350px'"
               :show-legend="true"
-              :donut="true"
-              :donut-radius="['35%', '65%']"
+              :donut="false"
             />
           </div>
         </div>
@@ -445,8 +443,7 @@
                 :data="adTypesCostDistributionData"
                 :height="'300px'"
                 :show-legend="false"
-                :donut="true"
-                :donut-radius="['40%', '70%']"
+                :donut="false"
               />
             </div>
             <div class="chart-legend">
@@ -472,8 +469,7 @@
                 :data="adTypesRevenueDistributionData"
                 :height="'300px'"
                 :show-legend="false"
-                :donut="true"
-                :donut-radius="['40%', '70%']"
+                :donut="false"
               />
             </div>
             <div class="chart-legend">

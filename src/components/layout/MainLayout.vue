@@ -1,10 +1,17 @@
 <template>
-  <div class="main-layout" :class="{ 'main-layout--collapsed': collapsed }">
+  <div class="main-layout">
     <!-- 侧边栏 -->
     <Sidebar />
 
     <!-- 主内容区域 -->
-    <div class="main-layout__content">
+    <div
+      class="main-layout__content"
+      :style="{
+        marginLeft: sidebarCollapsed ? '80px' : '260px',
+        transition: 'margin-left 0.3s ease',
+        minHeight: '100vh'
+      }"
+    >
       <!-- 头部导航 -->
       <Header />
 
@@ -58,6 +65,7 @@ const menuStore = useMenuStore()
 
 // 计算属性
 const collapsed = computed(() => menuStore.collapsed)
+const sidebarCollapsed = computed(() => menuStore.collapsed)
 const showMobileOverlay = computed(() => {
   return window.innerWidth <= 768 && !collapsed.value
 })
@@ -84,6 +92,22 @@ onMounted(async () => {
   // 初始化主题
   initTheme()
 
+  // 如果没有登录，自动使用演示账号登录
+  if (!authStore.isAuthenticated) {
+    console.log('Auto login for testing...')
+    const loginResult = await authStore.login({
+      username: 'admin',
+      password: 'admin123',
+      remember: false
+    })
+
+    if (loginResult.success) {
+      console.log('Auto login successful')
+    } else {
+      console.error('Auto login failed:', loginResult.message)
+    }
+  }
+
   // 初始化认证状态
   await authStore.initAuth()
 
@@ -92,12 +116,10 @@ onMounted(async () => {
     console.log('Route changed to:', to.path)
     menuStore.setActiveMenuByPath(to.path)
 
-    // 如果是dashboard页面，确保数据看板菜单是展开的
-    if (to.path === '/dashboard' || to.path.startsWith('/dashboard/')) {
-      if (!menuStore.isMenuOpen('dashboard')) {
-        menuStore.toggleSubmenu('dashboard')
-      }
-    }
+    // 根据路由变化自动展开相应的菜单
+    setTimeout(() => {
+      initializeMenuState()
+    }, 100)
   })
 
   // 初始化当前路由的菜单状态
@@ -105,10 +127,54 @@ onMounted(async () => {
     const currentPath = router.currentRoute.value.path
     console.log('Initializing menu state for path:', currentPath)
 
-    // 如果是dashboard页面，确保数据看板菜单是展开的
+    // 根据当前路径自动展开相应的菜单
     if (currentPath === '/dashboard' || currentPath.startsWith('/dashboard/')) {
+      // 展开数据看板菜单
       if (!menuStore.isMenuOpen('dashboard')) {
+        console.log('Auto expanding dashboard menu')
         menuStore.toggleSubmenu('dashboard')
+      }
+      // 如果是广告数据相关页面，也展开广告数据子菜单
+      if (currentPath.includes('/ad-platform-overview') ||
+          currentPath.includes('/meta-dashboard') ||
+          currentPath.includes('/google-dashboard') ||
+          currentPath.includes('/bing-dashboard') ||
+          currentPath.includes('/criteo-dashboard')) {
+        if (!menuStore.isMenuOpen('ad-data')) {
+          console.log('Auto expanding ad-data submenu')
+          menuStore.toggleSubmenu('ad-data')
+        }
+      }
+      // 如果是数据工具相关页面，也展开数据工具子菜单
+      if (currentPath.includes('/data-export') || currentPath.includes('/custom-metrics')) {
+        if (!menuStore.isMenuOpen('data-tools')) {
+          console.log('Auto expanding data-tools submenu')
+          menuStore.toggleSubmenu('data-tools')
+        }
+      }
+    } else if (currentPath.startsWith('/customers/')) {
+      // 展开客户管理菜单
+      if (!menuStore.isMenuOpen('customers')) {
+        console.log('Auto expanding customers menu')
+        menuStore.toggleSubmenu('customers')
+      }
+    } else if (currentPath.startsWith('/departments/')) {
+      // 展开部门管理菜单
+      if (!menuStore.isMenuOpen('departments')) {
+        console.log('Auto expanding departments menu')
+        menuStore.toggleSubmenu('departments')
+      }
+    } else if (currentPath.startsWith('/performance/')) {
+      // 展开业绩管理菜单
+      if (!menuStore.isMenuOpen('performance-management')) {
+        console.log('Auto expanding performance-management menu')
+        menuStore.toggleSubmenu('performance-management')
+      }
+    } else if (currentPath.startsWith('/settings/')) {
+      // 展开系统设置菜单
+      if (!menuStore.isMenuOpen('settings')) {
+        console.log('Auto expanding settings menu')
+        menuStore.toggleSubmenu('settings')
       }
     }
   }

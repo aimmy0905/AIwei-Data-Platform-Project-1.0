@@ -149,12 +149,13 @@ export const mockMenuItems: MenuItem[] = [
     id: 'customers',
     name: '客户管理',
     icon: 'UserCheck',
+    path: '/customers',
     children: [
       {
         id: 'customer-list',
         name: '客户列表',
         icon: 'List',
-        path: '/customers/list',
+        path: '/customers',
         roles: ['superAdmin', 'manager', 'staff', 'sales']
       },
       {

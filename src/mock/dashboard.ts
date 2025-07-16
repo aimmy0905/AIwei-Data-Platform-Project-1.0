@@ -1,7 +1,7 @@
 import type { Customer, Project, Channel, ChannelData, ChannelSummary, ChannelDimension, WebsiteData, WebsiteDataComparison, PeriodComparison, ComparisonPeriod, Campaign, CampaignData, CampaignDailyData, CampaignSummary, ProductSales, ProductSalesData, ProductRanking, ProductSalesSummary, KOLData, PostData, KOLSummary, PostSummary, CountryMarketData, MarketSummary, MarketTrend, PagePerformanceData, PagePerformanceSummary, CompetitorData, CompetitorSummary, AdPlatformData, AdPlatformSummary, MetaAdData, MetaAdObjectiveData, MetaAudienceData, MetaPlacementData, MetaDemographicData, MetaCreativeData, GoogleAdData, GoogleAdTypeData, CriteoAdData, CriteoPlacementData, BingAdData, Alert, ChartData, ApiResponse, CustomerGoal, CustomerGoalSummary, CustomerGoalFilter } from '@/types'
 
-// Mock客户数据
-export const mockCustomers: Customer[] = [
+// Mock客户数据 - 仅供内部使用，公共导出使用 customer.ts 中的版本
+const mockCustomers: Customer[] = [
   {
     id: 1,
     name: 'Fashion Store USA',
@@ -1840,17 +1840,7 @@ export const mockGetDashboardData = (): Promise<ApiResponse<{
   })
 }
 
-// Mock获取客户列表
-export const mockGetCustomers = (): Promise<ApiResponse<Customer[]>> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        success: true,
-        data: mockCustomers
-      })
-    }, 500)
-  })
-}
+// Mock获取客户列表 - 已移至 customer.ts 避免重复导出
 
 // Mock获取渠道数据
 export const mockGetChannels = (): Promise<ApiResponse<Channel[]>> => {

@@ -695,13 +695,13 @@ onMounted(() => {
 }
 
 .chart-section-1 {
-  background: #f0f9ff !important;
-  border: 2px solid #3b82f6 !important;
+  background: #f9fafb !important;
+  border: 1px solid #e5e7eb !important;
 }
 
 .chart-section-2 {
-  background: #f0fdf4 !important;
-  border: 2px solid #10b981 !important;
+  background: #f9fafb !important;
+  border: 1px solid #e5e7eb !important;
 }
 
 .chart-section h3 {

@@ -6,16 +6,16 @@
         <p class="page-description">管理和分析您的客户数据，优化客户关系</p>
       </div>
       <div class="page-header__actions">
-        <button 
+        <button
           class="action-btn action-btn--secondary"
           @click="showExportModal = true"
         >
           <Download :size="16" />
           导出数据
         </button>
-        <button class="action-btn action-btn--primary">
+        <button class="action-btn action-btn--primary" @click="createCustomer">
           <Plus :size="16" />
-          添加客户
+          新建客户
         </button>
       </div>
     </div>
@@ -88,8 +88,8 @@
             <Target :size="24" />
           </div>
           <div class="stat-content">
-            <div class="stat-value">{{ customerStats.avgROI }}x</div>
-            <div class="stat-label">平均ROI</div>
+            <div class="stat-value">{{ customerStats.gradeA }}</div>
+            <div class="stat-label">A级客户</div>
           </div>
         </div>
       </div>
@@ -104,7 +104,7 @@
           <div class="table-header__right">
             <div class="table-controls">
               <div class="view-options">
-                <button 
+                <button
                   class="view-btn"
                   :class="{ 'view-btn--active': viewMode === 'table' }"
                   @click="viewMode = 'table'"
@@ -112,7 +112,7 @@
                 >
                   <List :size="16" />
                 </button>
-                <button 
+                <button
                   class="view-btn"
                   :class="{ 'view-btn--active': viewMode === 'grid' }"
                   @click="viewMode = 'grid'"
@@ -129,7 +129,7 @@
                   <option value="created">按创建时间排序</option>
                   <option value="updated">按更新时间排序</option>
                 </select>
-                <button 
+                <button
                   class="sort-direction"
                   @click="toggleSortDirection"
                   :title="sortDirection === 'asc' ? '升序' : '降序'"
@@ -147,42 +147,45 @@
             <thead>
               <tr>
                 <th>
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     v-model="selectAll"
                     @change="handleSelectAll"
                     class="checkbox-input"
                   />
                 </th>
                 <th @click="setSortBy('name')" class="sortable">
-                  客户信息
+                  客户名称
                   <ArrowUpDown :size="14" v-if="sortBy === 'name'" />
                 </th>
                 <th @click="setSortBy('industry')" class="sortable">
                   行业
                   <ArrowUpDown :size="14" v-if="sortBy === 'industry'" />
                 </th>
-                <th @click="setSortBy('revenue')" class="sortable">
-                  收入
-                  <ArrowUpDown :size="14" v-if="sortBy === 'revenue'" />
+                <th>地区</th>
+                <th>联系人</th>
+                <th>服务团队</th>
+                <th @click="setSortBy('cooperationStart')" class="sortable">
+                  合作开始时间
+                  <ArrowUpDown :size="14" v-if="sortBy === 'cooperationStart'" />
                 </th>
-                <th @click="setSortBy('roi')" class="sortable">
-                  ROI
-                  <ArrowUpDown :size="14" v-if="sortBy === 'roi'" />
+                <th @click="setSortBy('grade')" class="sortable">
+                  分级
+                  <ArrowUpDown :size="14" v-if="sortBy === 'grade'" />
                 </th>
                 <th @click="setSortBy('status')" class="sortable">
                   状态
                   <ArrowUpDown :size="14" v-if="sortBy === 'status'" />
                 </th>
-                <th @click="setSortBy('updated')" class="sortable">
-                  最后更新
-                  <ArrowUpDown :size="14" v-if="sortBy === 'updated'" />
+                <th @click="setSortBy('sales')" class="sortable">
+                  签单销售人员
+                  <ArrowUpDown :size="14" v-if="sortBy === 'sales'" />
                 </th>
                 <th>操作</th>
               </tr>
             </thead>
             <tbody>
-              <tr 
+              <tr
                 v-for="customer in paginatedCustomers"
                 :key="customer.id"
                 class="customer-row"
@@ -190,8 +193,8 @@
                 @click="handleRowClick(customer)"
               >
                 <td @click.stop>
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     v-model="selectedCustomers"
                     :value="customer.id"
                     class="checkbox-input"
@@ -205,7 +208,6 @@
                     <div class="customer-details">
                       <div class="customer-name">{{ customer.name }}</div>
                       <div class="customer-website">{{ customer.website }}</div>
-                      <div class="customer-manager">负责人: {{ customer.manager }}</div>
                     </div>
                   </div>
                 </td>
@@ -213,11 +215,20 @@
                   <span class="industry-badge">{{ customer.industry }}</span>
                 </td>
                 <td>
-                  <span class="revenue-value">${{ formatNumber(customer.revenue) }}</span>
+                  <span class="region-text">{{ getCustomerRegions(customer) }}</span>
                 </td>
                 <td>
-                  <span class="roi-badge" :class="getRoiClass(customer.roi)">
-                    {{ customer.roi }}x
+                  <span class="contact-text">{{ customer.manager }}</span>
+                </td>
+                <td>
+                  <span class="team-text">{{ getServiceTeam(customer) }}</span>
+                </td>
+                <td>
+                  <span class="date-text">{{ formatDate(customer.createdAt) }}</span>
+                </td>
+                <td>
+                  <span class="grade-badge" :class="`grade-badge--${getCustomerGrade(customer)}`">
+                    {{ getCustomerGrade(customer) }}
                   </span>
                 </td>
                 <td>
@@ -226,17 +237,20 @@
                   </span>
                 </td>
                 <td>
-                  <span class="update-time">{{ formatDate(customer.lastUpdated) }}</span>
+                  <span class="sales-text">{{ customer.manager }}</span>
                 </td>
                 <td @click.stop>
                   <div class="action-menu">
-                    <button class="action-btn action-btn--small" @click="editCustomer(customer)">
-                      <Edit :size="14" />
-                    </button>
-                    <button class="action-btn action-btn--small" @click="viewCustomer(customer)">
+                    <button class="action-btn action-btn--small" @click="viewCustomer(customer)" title="查看详情">
                       <Eye :size="14" />
                     </button>
-                    <button class="action-btn action-btn--small" @click="showCustomerMenu(customer)">
+                    <button class="action-btn action-btn--small" @click="editCustomer(customer)" title="客户编辑">
+                      <Edit :size="14" />
+                    </button>
+                    <button class="action-btn action-btn--small" @click="addCustomerQA(customer)" title="添加Q&A">
+                      <MessageSquare :size="14" />
+                    </button>
+                    <button class="action-btn action-btn--small" @click="showCustomerMenu(customer)" title="更多操作">
                       <MoreHorizontal :size="14" />
                     </button>
                   </div>
@@ -248,7 +262,7 @@
 
         <!-- 网格视图 -->
         <div v-else class="customer-grid">
-          <div 
+          <div
             v-for="customer in paginatedCustomers"
             :key="customer.id"
             class="customer-card"
@@ -295,7 +309,7 @@
             共 {{ filteredCustomers.length }} 条记录
           </div>
           <div class="pagination-controls">
-            <button 
+            <button
               class="pagination-btn"
               :disabled="currentPage === 1"
               @click="goToPage(currentPage - 1)"
@@ -314,7 +328,7 @@
                 {{ page }}
               </button>
             </div>
-            <button 
+            <button
               class="pagination-btn"
               :disabled="currentPage === totalPages"
               @click="goToPage(currentPage + 1)"
@@ -337,7 +351,7 @@
           <Mail :size="16" />
           发送邮件
         </button>
-        <button 
+        <button
           class="bulk-btn"
           @click="showExportModal = true"
         >
@@ -376,18 +390,22 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive } from 'vue'
-import { 
+import { useRouter } from 'vue-router'
+import {
   Plus, Download, Users, TrendingUp, DollarSign, Target,
   List, Grid, ArrowUpDown, ChevronLeft, ChevronRight,
-  Edit, Eye, MoreHorizontal, Mail, Trash2, Loader
+  Edit, Eye, MoreHorizontal, Mail, Trash2, Loader, MessageSquare
 } from 'lucide-vue-next'
-import { mockGetCustomers } from '@/mock'
+import { mockGetCustomers } from '@/mock/customer'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FilterPanel from '@/components/common/FilterPanel.vue'
 import ExportModal from '@/components/common/ExportModal.vue'
 import { formatters } from '@/utils/export'
 import type { Customer } from '@/types'
 import type { ExportColumn } from '@/utils/export'
+
+// 路由
+const router = useRouter()
 
 // 响应式数据
 const loading = ref(true)
@@ -502,7 +520,7 @@ const filteredCustomers = computed(() => {
 
   // 负责人过滤
   if (filters.manager) {
-    result = result.filter(customer => 
+    result = result.filter(customer =>
       customer.manager.toLowerCase().includes(filters.manager.toLowerCase())
     )
   }
@@ -522,7 +540,7 @@ const filteredCustomers = computed(() => {
   // 排序
   result.sort((a, b) => {
     let valueA: unknown, valueB: unknown
-    
+
     switch (sortBy.value) {
       case 'name':
         valueA = a.name.toLowerCase()
@@ -550,15 +568,15 @@ const filteredCustomers = computed(() => {
     }
 
     if (typeof valueA === 'string' && typeof valueB === 'string') {
-      return sortDirection.value === 'asc' 
+      return sortDirection.value === 'asc'
         ? valueA.localeCompare(valueB)
         : valueB.localeCompare(valueA)
     }
-    
+
     if (typeof valueA === 'number' && typeof valueB === 'number') {
       return sortDirection.value === 'asc' ? valueA - valueB : valueB - valueA
     }
-    
+
     return 0
   })
 
@@ -579,11 +597,11 @@ const visiblePages = computed(() => {
   const pages = []
   const start = Math.max(1, currentPage.value - 2)
   const end = Math.min(totalPages.value, start + 4)
-  
+
   for (let i = start; i <= end; i++) {
     pages.push(i)
   }
-  
+
   return pages
 })
 
@@ -591,10 +609,9 @@ const customerStats = computed(() => {
   const total = filteredCustomers.value.length
   const active = filteredCustomers.value.filter(c => c.status === 'active').length
   const totalRevenue = filteredCustomers.value.reduce((sum, c) => sum + c.revenue, 0)
-  const avgROI = total > 0 ? 
-    (filteredCustomers.value.reduce((sum, c) => sum + c.roi, 0) / total).toFixed(1) : '0.0'
-  
-  return { total, active, totalRevenue, avgROI }
+  const gradeA = filteredCustomers.value.filter(c => getCustomerGrade(c) === 'A').length
+
+  return { total, active, totalRevenue, gradeA }
 })
 
 const selectedCustomersData = computed(() => {
@@ -683,6 +700,32 @@ const getStatusText = (status: string): string => {
   return statusMap[status as keyof typeof statusMap] || status
 }
 
+const getCustomerRegions = (customer: Customer): string => {
+  // 这里可以根据实际需要从客户详情中获取地区信息
+  // 目前使用模拟数据
+  const regions = ['美国', '欧洲', '加拿大']
+  return regions.slice(0, 2).join(', ') + (regions.length > 2 ? '...' : '')
+}
+
+const getServiceTeam = (customer: Customer): string => {
+  // 根据行业分配服务团队
+  const teamMap: Record<string, string> = {
+    '时尚服装': '时尚组',
+    '数码科技': '科技组',
+    '美容护肤': '美妆组',
+    '体育用品': '运动组',
+    '家居装饰': '家居组'
+  }
+  return teamMap[customer.industry] || '综合组'
+}
+
+const getCustomerGrade = (customer: Customer): string => {
+  // 根据收入和ROI计算客户分级
+  if (customer.revenue > 3000000 && customer.roi > 4) return 'A'
+  if (customer.revenue > 1500000 && customer.roi > 3) return 'B'
+  return 'C'
+}
+
 const handleSearch = (query: string) => {
   searchQuery.value = query
   currentPage.value = 1
@@ -752,12 +795,21 @@ const goToPage = (page: number) => {
   }
 }
 
+const createCustomer = () => {
+  router.push({ name: 'customer-create' })
+}
+
 const editCustomer = (customer: Customer) => {
   console.log('编辑客户:', customer.name)
 }
 
 const viewCustomer = (customer: Customer) => {
-  console.log('查看客户:', customer.name)
+  router.push({ name: 'customer-detail', params: { id: customer.id.toString() } })
+}
+
+const addCustomerQA = (customer: Customer) => {
+  console.log('添加客户Q&A:', customer.name)
+  // 这里可以打开Q&A添加弹窗
 }
 
 const showCustomerMenu = (customer: Customer) => {
@@ -775,7 +827,7 @@ const handleExportComplete = (exportData: {
     recordCount: exportData.data.length,
     columnCount: exportData.columns.length
   })
-  
+
   // 这里可以添加导出完成后的处理逻辑
   // 例如：记录导出日志、显示成功消息等
 }
@@ -1160,21 +1212,54 @@ onMounted(() => {
   font-weight: var(--font-weight-medium);
 }
 
-.roi-excellent { 
+.roi-excellent {
   background: rgba(82, 196, 26, 0.1);
   color: var(--color-success);
 }
-.roi-good { 
+.roi-good {
   background: rgba(24, 144, 255, 0.1);
   color: var(--color-info);
 }
-.roi-fair { 
+.roi-fair {
   background: rgba(250, 173, 20, 0.1);
   color: var(--color-warning);
 }
-.roi-poor { 
+.roi-poor {
   background: rgba(245, 34, 45, 0.1);
   color: var(--color-error);
+}
+
+.region-text,
+.contact-text,
+.team-text,
+.date-text,
+.sales-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.grade-badge {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+  min-width: 24px;
+}
+
+.grade-badge--A {
+  background: rgba(82, 196, 26, 0.1);
+  color: var(--color-success);
+}
+
+.grade-badge--B {
+  background: rgba(24, 144, 255, 0.1);
+  color: var(--color-info);
+}
+
+.grade-badge--C {
+  background: rgba(250, 173, 20, 0.1);
+  color: var(--color-warning);
 }
 
 .status-badge {
@@ -1497,7 +1582,7 @@ onMounted(() => {
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
   }
-  
+
   .customer-stats {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1509,75 +1594,75 @@ onMounted(() => {
     align-items: stretch;
     gap: var(--spacing-lg);
   }
-  
+
   .page-header__actions {
     flex-direction: column;
     gap: var(--spacing-sm);
   }
-  
+
   .action-btn {
     flex: 1;
     justify-content: center;
   }
-  
+
   .search-filter-section {
     gap: var(--spacing-md);
   }
-  
+
   .search-section {
     flex-direction: column;
     gap: var(--spacing-sm);
   }
-  
+
   .customer-search {
     max-width: none;
   }
-  
+
   .customer-stats {
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
   }
-  
+
   .stat-card {
     padding: var(--spacing-md);
   }
-  
+
   .table-header {
     flex-direction: column;
     align-items: stretch;
     gap: var(--spacing-sm);
     padding: var(--spacing-md);
   }
-  
+
   .table-controls {
     flex-direction: column;
     align-items: stretch;
     gap: var(--spacing-sm);
   }
-  
+
   .view-options {
     align-self: center;
   }
-  
+
   .customer-grid {
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
     padding: var(--spacing-md);
   }
-  
+
   .customer-card {
     padding: var(--spacing-md);
   }
-  
+
   .customer-table {
     font-size: var(--font-size-sm);
   }
-  
+
   .customer-table th,
   .customer-table td {
     padding: var(--spacing-sm);
   }
-  
+
   .bulk-actions {
     left: var(--spacing-md);
     right: var(--spacing-md);
@@ -1587,34 +1672,34 @@ onMounted(() => {
     gap: var(--spacing-md);
     padding: var(--spacing-md);
   }
-  
+
   .bulk-actions__buttons {
     justify-content: center;
     flex-wrap: wrap;
   }
-  
+
   .bulk-action-btn {
     flex: 1;
     min-width: 120px;
   }
-  
+
   .pagination-section {
     flex-direction: column;
     align-items: stretch;
     text-align: center;
     gap: var(--spacing-sm);
   }
-  
+
   .pagination-controls {
     justify-content: center;
     flex-wrap: wrap;
   }
-  
+
   .pagination-numbers {
     order: 2;
     justify-content: center;
   }
-  
+
   .pagination-btn {
     min-width: 80px;
   }
@@ -1624,51 +1709,51 @@ onMounted(() => {
   .page-title {
     font-size: var(--font-size-2xl);
   }
-  
+
   .stat-card {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-sm);
   }
-  
+
   .stat-icon {
     align-self: center;
     width: 40px;
     height: 40px;
   }
-  
+
   .stat-value {
     font-size: var(--font-size-xl);
   }
-  
+
   .customer-card {
     padding: var(--spacing-sm);
   }
-  
+
   .customer-table {
     font-size: var(--font-size-xs);
   }
-  
+
   .customer-table th,
   .customer-table td {
     padding: var(--spacing-xs);
   }
-  
+
   .table-actions {
     gap: var(--spacing-xs);
   }
-  
+
   .action-btn {
     padding: var(--spacing-xs) var(--spacing-sm);
     font-size: var(--font-size-xs);
   }
-  
+
   .bulk-action-btn {
     padding: var(--spacing-xs) var(--spacing-sm);
     font-size: var(--font-size-xs);
   }
-  
+
   .pagination-number {
     width: 28px;
     height: 28px;

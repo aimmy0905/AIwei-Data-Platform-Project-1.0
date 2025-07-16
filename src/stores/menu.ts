@@ -149,20 +149,34 @@ export const useMenuStore = defineStore('menu', () => {
   }
 
   const toggleCollapse = () => {
+    console.log('toggleCollapse called, current value:', collapsed.value)
+    const oldValue = collapsed.value
     collapsed.value = !collapsed.value
+    console.log('toggleCollapse result:', oldValue, '->', collapsed.value)
+
     // 折叠时清空展开的菜单
     if (collapsed.value) {
       openKeys.value = []
     }
+
+    // 强制触发响应式更新
+    console.log('Force trigger reactive update')
   }
 
   const toggleSubmenu = (menuId: string) => {
+    console.log('toggleSubmenu called for:', menuId)
+    console.log('Current openKeys:', openKeys.value)
+
     const index = openKeys.value.indexOf(menuId)
     if (index > -1) {
+      console.log('Closing submenu:', menuId)
       openKeys.value.splice(index, 1)
     } else {
+      console.log('Opening submenu:', menuId)
       openKeys.value.push(menuId)
     }
+
+    console.log('New openKeys:', openKeys.value)
   }
 
   const isMenuOpen = (menuId: string) => {
