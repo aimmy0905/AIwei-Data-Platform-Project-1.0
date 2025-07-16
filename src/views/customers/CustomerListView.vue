@@ -139,6 +139,14 @@
                   签单销售人员
                   <ArrowUpDown :size="14" v-if="sortBy === 'signingSales'" />
                 </th>
+                <th @click="setSortBy('totalServiceFee')" class="sortable">
+                  累计服务费
+                  <ArrowUpDown :size="14" v-if="sortBy === 'totalServiceFee'" />
+                </th>
+                <th @click="setSortBy('serviceProjectCount')" class="sortable">
+                  服务项目数量
+                  <ArrowUpDown :size="14" v-if="sortBy === 'serviceProjectCount'" />
+                </th>
                 <th>操作</th>
               </tr>
             </thead>
@@ -209,6 +217,12 @@
                 <td>
                   <span class="sales-text">{{ customer.signingSales }}</span>
                 </td>
+                <td>
+                  <span class="service-fee-text">¥{{ formatNumber(customer.totalServiceFee) }}</span>
+                </td>
+                <td>
+                  <span class="project-count-text">{{ customer.serviceProjectCount }}</span>
+                </td>
                 <td @click.stop>
                   <div class="action-menu">
                     <button class="action-btn action-btn--small" @click="viewCustomer(customer)" title="查看详情">
@@ -276,6 +290,14 @@
                 <div class="metric">
                   <span class="metric-label">ROI</span>
                   <span class="metric-value" :class="getRoiClass(customer.roi)">{{ customer.roi }}x</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">服务费</span>
+                  <span class="metric-value service-fee-text">¥{{ formatNumber(customer.totalServiceFee) }}</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">项目数</span>
+                  <span class="metric-value project-count-text">{{ customer.serviceProjectCount }}</span>
                 </div>
               </div>
               <div class="customer-card__footer">
@@ -589,6 +611,18 @@ const filteredCustomers = computed(() => {
         valueA = new Date(a.lastUpdated).getTime()
         valueB = new Date(b.lastUpdated).getTime()
         break
+      case 'totalServiceFee':
+        valueA = a.totalServiceFee
+        valueB = b.totalServiceFee
+        break
+      case 'serviceProjectCount':
+        valueA = a.serviceProjectCount
+        valueB = b.serviceProjectCount
+        break
+      case 'signingSales':
+        valueA = a.signingSales.toLowerCase()
+        valueB = b.signingSales.toLowerCase()
+        break
       default:
         valueA = a.name.toLowerCase()
         valueB = b.name.toLowerCase()
@@ -711,6 +745,15 @@ const exportColumns: ExportColumn[] = [
   {
     key: 'signingSales',
     label: '签单销售人员'
+  },
+  {
+    key: 'totalServiceFee',
+    label: '累计服务费',
+    formatter: formatters.currency
+  },
+  {
+    key: 'serviceProjectCount',
+    label: '服务项目数量'
   },
   {
     key: 'revenue',
@@ -1204,7 +1247,7 @@ onMounted(() => {
 
 .customer-table table {
   width: 100%;
-  min-width: 1200px; /* 确保表格足够宽以触发水平滚动 */
+  min-width: 1400px; /* 确保表格足够宽以触发水平滚动 */
   border-collapse: collapse;
 }
 
@@ -1402,9 +1445,21 @@ onMounted(() => {
 .contact-text,
 .team-text,
 .date-text,
-.sales-text {
+.sales-text,
+.service-fee-text,
+.project-count-text {
   font-size: var(--font-size-sm);
   color: var(--color-text-primary);
+}
+
+.service-fee-text {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-success);
+}
+
+.project-count-text {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-info);
 }
 
 .grade-badge {
@@ -1574,7 +1629,7 @@ onMounted(() => {
 .customer-card__metrics {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
 }
 

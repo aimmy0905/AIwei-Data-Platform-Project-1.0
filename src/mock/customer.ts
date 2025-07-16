@@ -24,6 +24,8 @@ export interface ExtendedCustomer extends Customer {
   grade: 'A' | 'B' | 'C' // 客户分级
   signingSales: string // 签单销售人员
   regions: string[] // 地区
+  totalServiceFee: number // 累计服务费
+  serviceProjectCount: number // 服务项目数量
 }
 
 // 模拟客户列表数据
@@ -53,7 +55,9 @@ export const mockCustomers: ExtendedCustomer[] = [
     serviceTeam: '时尚组',
     grade: 'A',
     signingSales: '张小明',
-    regions: ['美国', '欧洲', '加拿大']
+    regions: ['美国', '欧洲', '加拿大'],
+    totalServiceFee: 120000,
+    serviceProjectCount: 15
   },
   {
     id: 2,
@@ -80,7 +84,9 @@ export const mockCustomers: ExtendedCustomer[] = [
     serviceTeam: '科技组',
     grade: 'B',
     signingSales: '李美丽',
-    regions: ['美国', '日本']
+    regions: ['美国', '日本'],
+    totalServiceFee: 80000,
+    serviceProjectCount: 10
   },
   {
     id: 3,
@@ -107,7 +113,9 @@ export const mockCustomers: ExtendedCustomer[] = [
     serviceTeam: '美妆组',
     grade: 'A',
     signingSales: '王强',
-    regions: ['美国', '欧洲', '澳大利亚']
+    regions: ['美国', '欧洲', '澳大利亚'],
+    totalServiceFee: 150000,
+    serviceProjectCount: 20
   },
   {
     id: 4,
@@ -134,7 +142,9 @@ export const mockCustomers: ExtendedCustomer[] = [
     serviceTeam: '运动组',
     grade: 'C',
     signingSales: '赵敏',
-    regions: ['美国', '加拿大']
+    regions: ['美国', '加拿大'],
+    totalServiceFee: 70000,
+    serviceProjectCount: 10
   },
   {
     id: 5,
@@ -161,7 +171,9 @@ export const mockCustomers: ExtendedCustomer[] = [
     serviceTeam: '家居组',
     grade: 'B',
     signingSales: '陈华',
-    regions: ['美国', '欧洲']
+    regions: ['美国', '欧洲'],
+    totalServiceFee: 100000,
+    serviceProjectCount: 12
   },
   {
     id: 6,
@@ -188,7 +200,9 @@ export const mockCustomers: ExtendedCustomer[] = [
     serviceTeam: '科技组',
     grade: 'A',
     signingSales: '刘洋',
-    regions: ['美国', '欧洲', '日本']
+    regions: ['美国', '欧洲', '日本'],
+    totalServiceFee: 180000,
+    serviceProjectCount: 25
   },
   {
     id: 7,
@@ -215,7 +229,9 @@ export const mockCustomers: ExtendedCustomer[] = [
     serviceTeam: '运动组',
     grade: 'C',
     signingSales: '周杰',
-    regions: ['美国', '澳大利亚']
+    regions: ['美国', '澳大利亚'],
+    totalServiceFee: 50000,
+    serviceProjectCount: 8
   },
   {
     id: 8,
@@ -242,7 +258,9 @@ export const mockCustomers: ExtendedCustomer[] = [
     serviceTeam: '时尚组',
     grade: 'A',
     signingSales: '吴娟',
-    regions: ['美国', '欧洲', '日本', '澳大利亚']
+    regions: ['美国', '欧洲', '日本', '澳大利亚'],
+    totalServiceFee: 200000,
+    serviceProjectCount: 30
   },
   {
     id: 9,
@@ -269,7 +287,9 @@ export const mockCustomers: ExtendedCustomer[] = [
     serviceTeam: '家居组',
     grade: 'C',
     signingSales: '孙丽',
-    regions: ['美国', '加拿大']
+    regions: ['美国', '加拿大'],
+    totalServiceFee: 30000,
+    serviceProjectCount: 5
   },
   {
     id: 10,
@@ -296,7 +316,9 @@ export const mockCustomers: ExtendedCustomer[] = [
     serviceTeam: '美妆组',
     grade: 'B',
     signingSales: '马超',
-    regions: ['美国', '欧洲', '加拿大']
+    regions: ['美国', '欧洲', '加拿大'],
+    totalServiceFee: 100000,
+    serviceProjectCount: 15
   }
 ]
 
