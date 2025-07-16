@@ -39,6 +39,7 @@
 
         <div class="filter-section">
           <FilterPanel
+            :modal="true"
             :show-date-filter="true"
             :show-status-filter="true"
             :show-category-filter="true"
@@ -54,45 +55,7 @@
         </div>
       </div>
 
-      <!-- 统计摘要 -->
-      <div class="customer-stats">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <Users :size="24" />
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">{{ customerStats.total }}</div>
-            <div class="stat-label">总客户数</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">
-            <TrendingUp :size="24" />
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">{{ customerStats.active }}</div>
-            <div class="stat-label">活跃客户</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">
-            <DollarSign :size="24" />
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">${{ formatNumber(customerStats.totalRevenue) }}</div>
-            <div class="stat-label">总收入</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">
-            <Target :size="24" />
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">{{ customerStats.gradeA }}</div>
-            <div class="stat-label">A级客户</div>
-          </div>
-        </div>
-      </div>
+
 
       <!-- 客户表格 -->
       <div class="customer-table-section">
@@ -121,25 +84,7 @@
                   <Grid :size="16" />
                 </button>
               </div>
-              <div class="sort-options">
-                <select v-model="sortBy" @change="handleSort" class="sort-select">
-                  <option value="name">按名称排序</option>
-                  <option value="cooperationType">按合作方式排序</option>
-                  <option value="revenue">按收入排序</option>
-                  <option value="roi">按ROI排序</option>
-                  <option value="cooperationStartTime">按合作开始时间排序</option>
-                  <option value="serviceStartTime">按服务开始时间排序</option>
-                  <option value="grade">按分级排序</option>
-                  <option value="lastUpdated">按更新时间排序</option>
-                </select>
-                <button
-                  class="sort-direction"
-                  @click="toggleSortDirection"
-                  :title="sortDirection === 'asc' ? '升序' : '降序'"
-                >
-                  <ArrowUpDown :size="16" />
-                </button>
-              </div>
+
             </div>
           </div>
         </div>
@@ -1103,28 +1048,70 @@ onMounted(() => {
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-lg);
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .table-header {
-  padding: var(--spacing-lg);
-  border-bottom: 1px solid var(--color-border-light);
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 2px solid var(--color-border-light);
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--spacing-md);
+  position: relative;
+}
+
+.table-header::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+}
+
+.table-header__left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }
 
 .table-header__left h3 {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
-  margin: 0 0 var(--spacing-xs) 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.table-header__left h3::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: var(--color-primary);
+  border-radius: 2px;
 }
 
 .record-count {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: var(--border-radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.record-count::before {
+  content: '📊';
+  font-size: 12px;
 }
 
 .table-controls {
@@ -1135,27 +1122,43 @@ onMounted(() => {
 
 .view-options {
   display: flex;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--border-radius-md);
   overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .view-btn {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  background: var(--color-surface);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: transparent;
   border: none;
   color: var(--color-text-secondary);
   cursor: pointer;
   transition: all var(--duration-fast);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 36px;
 }
 
 .view-btn:hover {
   background: var(--color-background);
+  color: var(--color-text-primary);
+  transform: translateY(-1px);
 }
 
 .view-btn--active {
   background: var(--color-primary);
   color: white;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.view-btn--active:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
 }
 
 .sort-options {
@@ -1190,28 +1193,71 @@ onMounted(() => {
 
 .customer-table {
   overflow-x: auto;
+  background: var(--color-surface);
+  position: relative;
 }
 
 .customer-table table {
   width: 100%;
+  min-width: 1200px; /* 确保表格足够宽以触发水平滚动 */
   border-collapse: collapse;
 }
 
 .customer-table th,
 .customer-table td {
-  padding: var(--spacing-md);
+  padding: var(--spacing-lg) var(--spacing-md);
   text-align: left;
   border-bottom: 1px solid var(--color-border-light);
+  white-space: nowrap;
 }
 
 .customer-table th {
-  background: var(--color-background);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
   position: sticky;
   top: 0;
   z-index: 1;
+  border-bottom: 2px solid var(--color-border);
+  white-space: nowrap;
+}
+
+/* 固定第一列（复选框） */
+.customer-table th:first-child,
+.customer-table td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
+}
+
+/* 固定第二列（客户名称） */
+.customer-table th:nth-child(2),
+.customer-table td:nth-child(2) {
+  position: sticky;
+  left: 60px; /* 调整第一列的宽度 */
+  z-index: 2;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+}
+
+/* 表头的固定列样式 */
+.customer-table th:first-child {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  z-index: 4;
+}
+
+.customer-table th:nth-child(2) {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  z-index: 3;
 }
 
 .customer-table th.sortable {
@@ -1226,14 +1272,38 @@ onMounted(() => {
 
 .customer-row {
   cursor: pointer;
-  transition: background-color var(--duration-fast);
+  transition: all var(--duration-fast);
+  position: relative;
 }
 
 .customer-row:hover {
-  background: var(--color-background);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.customer-row:hover td:first-child,
+.customer-row:hover td:nth-child(2) {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+
+
 .customer-row--selected {
+  background: var(--color-primary-light);
+}
+
+.customer-row--selected:hover {
+  background: var(--color-primary-light);
+}
+
+.customer-row--selected td:first-child,
+.customer-row--selected td:nth-child(2) {
+  background: var(--color-primary-light);
+}
+
+.customer-row--selected:hover td:first-child,
+.customer-row--selected:hover td:nth-child(2) {
   background: var(--color-primary-light);
 }
 
@@ -1241,6 +1311,8 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
+  white-space: normal;
+  min-width: 200px;
 }
 
 .customer-avatar {
@@ -1265,6 +1337,8 @@ onMounted(() => {
   font-weight: var(--font-weight-medium);
   color: var(--color-text-primary);
   margin-bottom: var(--spacing-xs);
+  white-space: normal;
+  word-break: break-word;
 }
 
 .customer-website {
@@ -1272,6 +1346,8 @@ onMounted(() => {
   color: var(--color-primary);
   margin-bottom: var(--spacing-xs);
   text-decoration: none;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .customer-manager {
