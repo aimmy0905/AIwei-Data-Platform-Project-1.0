@@ -931,6 +931,490 @@ export const mockCustomerDetails: { [key: number]: CustomerDetail } = {
     ],
     createdAt: '2024-06-01T08:00:00Z',
     lastUpdated: '2024-12-20T10:30:00Z'
+  },
+  9: {
+    id: 9,
+    cooperationDetails: {
+      customerName: '儿童玩具乐园',
+      cooperationStartTime: '2024-09-10T12:15:00Z',
+      serviceStartTime: '2024-09-15T08:00:00Z',
+      cooperationType: '咨询服务',
+      signingSales: '孙丽',
+      specialConditions: '按项目收费，提供季度优化报告',
+      customerGrade: 'C',
+      customerStatus: 'active'
+    },
+    basicInfo: {
+      serviceTeam: '家居组',
+      contactPersons: [
+        {
+          id: 9,
+          name: '黄经理',
+          position: '采购经理',
+          phone: '13800138009',
+          email: 'purchase@kidstoys.com',
+          isPrimary: true
+        }
+      ],
+      industry: '家居装饰',
+      regions: ['美国', '加拿大'],
+      businessModel: '传统零售转型',
+      overseasSalesScale: '100-500万美元',
+      overseasSalesRatio: 45,
+      targetSalesScale: '800万美元',
+      mainSalesChannel: '平台+独立站',
+      hasTechTeam: false,
+      hasOperationTeam: true,
+      hasBrandTeam: false,
+      cooperationTransfer: '新客户开发'
+    },
+    websiteInfo: {
+      newProductFrequency: '每季度20-30款',
+      websiteLaunchTime: '2024-08-01T08:00:00Z',
+      lastYearSales: 850000,
+      targetMarkets: ['美国', '加拿大'],
+      mainProducts: '儿童玩具、教育用品、安全座椅',
+      productAdvantages: '安全环保材质，符合国际标准，设计新颖',
+      pricingStrategy: '中档定价',
+      inventoryStatus: true,
+      annualSalesTarget: 1200000,
+      annualCostTarget: 480000,
+      costRatio: 40
+    },
+    competitorInfo: {
+      competitorWebsites: [
+        {
+          id: 1,
+          websiteUrl: 'https://toyworld.com',
+          companyName: 'ToyWorld',
+          notes: '品牌知名度高，产品线丰富，但价格偏高，创新不足，市场份额约15%'
+        }
+      ]
+    },
+    specialAttention: {
+      customerExpectations: '希望快速提升品牌知名度，扩大市场份额',
+      communicationPreferences: '每周电话沟通，月度面对面会议',
+      specialRequirements: '所有产品必须符合儿童安全标准',
+      culturalConsiderations: '重视产品安全和教育价值',
+      timeZonePreferences: '美国东部时间',
+      languagePreferences: '中文、英文',
+      decisionMakers: '黄经理负责采购决策，需要总经理最终确认',
+      budgetConstraints: '季度预算有限，需要精准投放',
+      complianceRequirements: '必须符合CPSC安全标准',
+      riskFactors: '季节性销售波动大，库存管理风险',
+      successFactors: '产品质量、安全认证、创新设计',
+      historicalIssues: '之前合作伙伴服务响应慢，沟通不及时'
+    },
+    qaRecords: [
+      {
+        id: 1,
+        customerId: 9,
+        issueDate: '2024-10-15T14:00:00Z',
+        issueCategory: '产品质量问题',
+        issueDescription: '部分产品在运输过程中出现包装破损',
+        impactLevel: 'medium',
+        rootCause: '包装材料选择不当，运输保护不足',
+        immediateSolution: '更换加厚包装材料，增加缓冲保护',
+        correctiveMeasures: '重新设计包装方案，加强质量检查',
+        preventiveMeasures: '建立包装测试标准，定期检查供应商',
+        responsiblePerson: '孙丽',
+        dueDate: '2024-11-01T18:00:00Z',
+        actualCompletionDate: '2024-10-28T16:00:00Z',
+        status: 'completed',
+        followUpActions: '持续监控包装质量',
+        lessonsLearned: '包装是产品体验的重要组成部分',
+        attachments: ['packaging_test_report.pdf'],
+        createdAt: '2024-10-15T14:00:00Z',
+        updatedAt: '2024-10-28T16:00:00Z'
+      }
+    ],
+    renewalNotes: '价格敏感型客户，需要展示明确的ROI数据',
+    projects: [],
+    adAccounts: [
+      {
+        id: 1,
+        platform: 'google',
+        accountId: 'GA-901234567',
+        accountName: '儿童玩具-Google广告',
+        status: 'active',
+        balance: 8500,
+        lastUpdated: '2024-12-20T10:30:00Z'
+      }
+    ],
+    createdAt: '2024-09-10T12:15:00Z',
+    lastUpdated: '2024-12-20T10:30:00Z'
+  },
+  7: {
+    id: 7,
+    cooperationDetails: {
+      customerName: '户外运动装备',
+      cooperationStartTime: '2024-07-03T16:20:00Z',
+      serviceStartTime: '2024-07-10T08:00:00Z',
+      cooperationType: '培训服务',
+      signingSales: '周杰',
+      specialConditions: '按培训课程收费，提供专业认证',
+      customerGrade: 'C',
+      customerStatus: 'suspended'
+    },
+    basicInfo: {
+      serviceTeam: '运动组',
+      contactPersons: [
+        {
+          id: 7,
+          name: '林经理',
+          position: '品牌经理',
+          phone: '13800138007',
+          email: 'brand@outdoorgear.com',
+          isPrimary: true
+        }
+      ],
+      industry: '体育用品',
+      regions: ['美国', '澳大利亚'],
+      businessModel: '品牌代理',
+      overseasSalesScale: '50-100万美元',
+      overseasSalesRatio: 60,
+      targetSalesScale: '200万美元',
+      mainSalesChannel: '平台销售',
+      hasTechTeam: false,
+      hasOperationTeam: false,
+      hasBrandTeam: true,
+      cooperationTransfer: '品牌升级转型'
+    },
+    websiteInfo: {
+      newProductFrequency: '每季度10-15款',
+      websiteLaunchTime: '2024-06-01T08:00:00Z',
+      lastYearSales: 950000,
+      targetMarkets: ['美国', '澳大利亚'],
+      mainProducts: '户外帐篷、登山装备、运动服装',
+      productAdvantages: '专业户外品质，耐用性强，功能齐全',
+      pricingStrategy: '中高端定价',
+      inventoryStatus: false,
+      annualSalesTarget: 1500000,
+      annualCostTarget: 750000,
+      costRatio: 50
+    },
+    competitorInfo: {
+      competitorWebsites: [
+        {
+          id: 1,
+          websiteUrl: 'https://outdoorworld.com',
+          companyName: 'OutdoorWorld',
+          notes: '专业户外品牌，产品线完整，但价格较高'
+        }
+      ]
+    },
+    specialAttention: {
+      customerExpectations: '希望通过培训提升团队专业能力',
+      communicationPreferences: '定期培训会议，季度评估',
+      specialRequirements: '需要专业户外运动认证',
+      culturalConsiderations: '重视户外运动文化和安全',
+      timeZonePreferences: '美国西部时间',
+      languagePreferences: '英文',
+      decisionMakers: '林经理负责品牌决策',
+      budgetConstraints: '培训预算有限，需要性价比高的方案',
+      complianceRequirements: '户外产品安全标准',
+      riskFactors: '季节性明显，库存风险较高',
+      successFactors: '产品质量、品牌知名度、专业服务',
+      historicalIssues: '服务暂停中，需要重新评估合作模式'
+    },
+    qaRecords: [
+      {
+        id: 1,
+        customerId: 7,
+        issueDate: '2024-11-01T14:00:00Z',
+        issueCategory: '服务暂停',
+        issueDescription: '客户要求暂停服务，重新评估合作模式',
+        impactLevel: 'high',
+        rootCause: '培训效果未达预期，客户满意度下降',
+        immediateSolution: '暂停服务，重新制定培训方案',
+        correctiveMeasures: '优化培训内容，增加实践环节',
+        preventiveMeasures: '定期评估培训效果，及时调整方案',
+        responsiblePerson: '周杰',
+        dueDate: '2024-12-31T18:00:00Z',
+        actualCompletionDate: '',
+        status: 'in_progress',
+        followUpActions: '每月跟进客户意见，准备重启方案',
+        lessonsLearned: '培训服务需要更强的定制化',
+        attachments: ['training_evaluation.pdf'],
+        createdAt: '2024-11-01T14:00:00Z',
+        updatedAt: '2024-12-20T10:30:00Z'
+      }
+    ],
+    renewalNotes: '服务暂停中，需要重新制定合作方案',
+    projects: [],
+    adAccounts: [],
+    createdAt: '2024-07-03T16:20:00Z',
+    lastUpdated: '2024-12-20T10:30:00Z'
+  },
+  8: {
+    id: 8,
+    cooperationDetails: {
+      customerName: '高端珠宝首饰',
+      cooperationStartTime: '2024-08-15T09:30:00Z',
+      serviceStartTime: '2024-08-20T08:00:00Z',
+      cooperationType: '代运营',
+      signingSales: '吴娟',
+      specialConditions: '高端定制服务，专属客户经理，VIP待遇',
+      customerGrade: 'A',
+      customerStatus: 'active'
+    },
+    basicInfo: {
+      serviceTeam: '时尚组',
+      contactPersons: [
+        {
+          id: 8,
+          name: '郑总',
+          position: '创始人',
+          phone: '13800138008',
+          email: 'founder@luxuryjewelry.com',
+          isPrimary: true
+        },
+        {
+          id: 9,
+          name: '李设计师',
+          position: '首席设计师',
+          phone: '13800138018',
+          email: 'design@luxuryjewelry.com',
+          isPrimary: false
+        }
+      ],
+      industry: '时尚服装',
+      regions: ['美国', '欧洲', '日本', '澳大利亚'],
+      businessModel: '高端定制品牌',
+      overseasSalesScale: '1000万美元以上',
+      overseasSalesRatio: 90,
+      targetSalesScale: '2000万美元',
+      mainSalesChannel: '独立站+精品店',
+      hasTechTeam: true,
+      hasOperationTeam: true,
+      hasBrandTeam: true,
+      cooperationTransfer: '高端品牌升级'
+    },
+    websiteInfo: {
+      newProductFrequency: '每月2-3款限量版',
+      websiteLaunchTime: '2024-07-01T08:00:00Z',
+      lastYearSales: 4800000,
+      targetMarkets: ['美国', '欧洲', '日本', '澳大利亚'],
+      mainProducts: '钻石项链、黄金手镯、定制戒指、珍珠耳环',
+      productAdvantages: '顶级材质，独特设计，限量发售，收藏价值高',
+      pricingStrategy: '奢侈品定价',
+      inventoryStatus: true,
+      annualSalesTarget: 8000000,
+      annualCostTarget: 2400000,
+      costRatio: 30
+    },
+    competitorInfo: {
+      competitorWebsites: [
+        {
+          id: 1,
+          websiteUrl: 'https://tiffany.com',
+          companyName: 'Tiffany & Co.',
+          notes: '国际知名珠宝品牌，品牌价值极高，设计经典'
+        },
+        {
+          id: 2,
+          websiteUrl: 'https://cartier.com',
+          companyName: 'Cartier',
+          notes: '法国奢侈品牌，历史悠久，皇室御用'
+        }
+      ]
+    },
+    specialAttention: {
+      customerExpectations: '打造国际知名高端珠宝品牌',
+      communicationPreferences: '高频次沟通，每周视频会议',
+      specialRequirements: '所有营销材料需要体现奢华品质',
+      culturalConsiderations: '注重东西方文化融合，国际化视野',
+      timeZonePreferences: '北京时间',
+      languagePreferences: '中文、英文、日文',
+      decisionMakers: '郑总拥有最终决策权',
+      budgetConstraints: '预算充足，追求最佳效果',
+      complianceRequirements: '珠宝行业认证，贵金属标准',
+      riskFactors: '高端市场竞争激烈，品牌定位要求极高',
+      successFactors: '品牌形象、设计创新、服务质量',
+      historicalIssues: '对服务标准要求极高，需要专业团队'
+    },
+    qaRecords: [
+      {
+        id: 1,
+        customerId: 8,
+        issueDate: '2024-10-20T14:00:00Z',
+        issueCategory: '品牌形象问题',
+        issueDescription: '部分广告素材未能体现品牌的奢华定位',
+        impactLevel: 'high',
+        rootCause: '创意团队对高端珠宝行业理解不够深入',
+        immediateSolution: '重新制作符合品牌调性的广告素材',
+        correctiveMeasures: '组建专业的奢侈品营销团队',
+        preventiveMeasures: '建立严格的品牌审核流程',
+        responsiblePerson: '吴娟',
+        dueDate: '2024-11-15T18:00:00Z',
+        actualCompletionDate: '2024-11-10T16:00:00Z',
+        status: 'completed',
+        followUpActions: '持续优化品牌形象展示',
+        lessonsLearned: '高端品牌需要专业的营销策略',
+        attachments: ['brand_guidelines.pdf', 'luxury_marketing_strategy.pdf'],
+        createdAt: '2024-10-20T14:00:00Z',
+        updatedAt: '2024-11-10T16:00:00Z'
+      }
+    ],
+    renewalNotes: '高价值客户，服务标准要求极高，续费意愿强',
+    projects: [],
+    adAccounts: [
+      {
+        id: 1,
+        platform: 'google',
+        accountId: 'GA-812345678',
+        accountName: '珠宝首饰-Google广告',
+        status: 'active',
+        balance: 45000,
+        lastUpdated: '2024-12-20T10:30:00Z'
+      },
+      {
+        id: 2,
+        platform: 'facebook',
+        accountId: 'FB-823456789',
+        accountName: '珠宝首饰-Meta广告',
+        status: 'active',
+        balance: 38000,
+        lastUpdated: '2024-12-20T10:30:00Z'
+      }
+    ],
+    createdAt: '2024-08-15T09:30:00Z',
+    lastUpdated: '2024-12-20T10:30:00Z'
+  },
+  10: {
+    id: 10,
+    cooperationDetails: {
+      customerName: '有机食品专营',
+      cooperationStartTime: '2024-10-25T14:45:00Z',
+      serviceStartTime: '2024-11-01T08:00:00Z',
+      cooperationType: '代运营',
+      signingSales: '马超',
+      specialConditions: '有机认证产品专项服务，健康理念推广',
+      customerGrade: 'B',
+      customerStatus: 'active'
+    },
+    basicInfo: {
+      serviceTeam: '美妆组',
+      contactPersons: [
+        {
+          id: 10,
+          name: '刘总',
+          position: '总经理',
+          phone: '13800138010',
+          email: 'ceo@organicfood.com',
+          isPrimary: true
+        },
+        {
+          id: 11,
+          name: '张营养师',
+          position: '产品总监',
+          phone: '13800138020',
+          email: 'nutrition@organicfood.com',
+          isPrimary: false
+        }
+      ],
+      industry: '美容护肤',
+      regions: ['美国', '欧洲', '加拿大'],
+      businessModel: '有机食品专营',
+      overseasSalesScale: '200-500万美元',
+      overseasSalesRatio: 70,
+      targetSalesScale: '1000万美元',
+      mainSalesChannel: '独立站+健康平台',
+      hasTechTeam: false,
+      hasOperationTeam: true,
+      hasBrandTeam: false,
+      cooperationTransfer: '健康产业转型'
+    },
+    websiteInfo: {
+      newProductFrequency: '每月8-12款',
+      websiteLaunchTime: '2024-10-01T08:00:00Z',
+      lastYearSales: 1400000,
+      targetMarkets: ['美国', '欧洲', '加拿大'],
+      mainProducts: '有机蛋白粉、天然维生素、有机茶叶、健康零食',
+      productAdvantages: '100%有机认证，天然无添加，营养价值高',
+      pricingStrategy: '中高端定价',
+      inventoryStatus: true,
+      annualSalesTarget: 2500000,
+      annualCostTarget: 1000000,
+      costRatio: 40
+    },
+    competitorInfo: {
+      competitorWebsites: [
+        {
+          id: 1,
+          websiteUrl: 'https://wholefoods.com',
+          companyName: 'Whole Foods',
+          notes: '有机食品领导品牌，渠道优势明显'
+        },
+        {
+          id: 2,
+          websiteUrl: 'https://organicvalley.com',
+          companyName: 'Organic Valley',
+          notes: '有机乳制品专家，品牌信任度高'
+        }
+      ]
+    },
+    specialAttention: {
+      customerExpectations: '成为有机食品领域的知名品牌',
+      communicationPreferences: '每两周电话沟通，月度报告',
+      specialRequirements: '所有宣传必须符合有机食品标准',
+      culturalConsiderations: '注重健康生活理念的传播',
+      timeZonePreferences: '美国中部时间',
+      languagePreferences: '中文、英文',
+      decisionMakers: '刘总负责战略决策，张营养师负责产品决策',
+      budgetConstraints: '注重投入产出比，追求可持续增长',
+      complianceRequirements: '有机食品认证，FDA标准',
+      riskFactors: '有机食品认证要求严格，供应链风险',
+      successFactors: '产品品质、健康理念、客户教育',
+      historicalIssues: '新合作客户，需要建立信任关系'
+    },
+    qaRecords: [
+      {
+        id: 1,
+        customerId: 10,
+        issueDate: '2024-11-25T14:00:00Z',
+        issueCategory: '认证问题',
+        issueDescription: '部分产品宣传内容未突出有机认证优势',
+        impactLevel: 'medium',
+        rootCause: '营销团队对有机食品行业了解不足',
+        immediateSolution: '重新设计产品宣传内容，突出有机认证',
+        correctiveMeasures: '加强团队有机食品知识培训',
+        preventiveMeasures: '建立有机食品营销标准流程',
+        responsiblePerson: '马超',
+        dueDate: '2024-12-20T18:00:00Z',
+        actualCompletionDate: '2024-12-15T16:00:00Z',
+        status: 'completed',
+        followUpActions: '持续优化有机食品营销策略',
+        lessonsLearned: '有机食品营销需要专业知识支撑',
+        attachments: ['organic_certification.pdf'],
+        createdAt: '2024-11-25T14:00:00Z',
+        updatedAt: '2024-12-15T16:00:00Z'
+      }
+    ],
+    renewalNotes: '新客户，合作态度积极，有较大发展潜力',
+    projects: [],
+    adAccounts: [
+      {
+        id: 1,
+        platform: 'google',
+        accountId: 'GA-101234567',
+        accountName: '有机食品-Google广告',
+        status: 'active',
+        balance: 12000,
+        lastUpdated: '2024-12-20T10:30:00Z'
+      },
+      {
+        id: 2,
+        platform: 'facebook',
+        accountId: 'FB-101234567',
+        accountName: '有机食品-Meta广告',
+        status: 'active',
+        balance: 8500,
+        lastUpdated: '2024-12-20T10:30:00Z'
+      }
+    ],
+    createdAt: '2024-10-25T14:45:00Z',
+    lastUpdated: '2024-12-20T10:30:00Z'
   }
 }
 

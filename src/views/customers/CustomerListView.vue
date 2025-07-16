@@ -833,7 +833,12 @@ const createCustomer = () => {
 }
 
 const editCustomer = (customer: ExtendedCustomer) => {
-  console.log('编辑客户:', customer.name)
+  // 跳转到客户详情页面并进入编辑模式
+  router.push({
+    name: 'customer-detail',
+    params: { id: customer.id.toString() },
+    query: { edit: 'true' }
+  })
 }
 
 const viewCustomer = (customer: ExtendedCustomer) => {

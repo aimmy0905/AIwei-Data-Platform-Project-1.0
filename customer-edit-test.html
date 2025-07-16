@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户编辑功能测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+        }
+        .test-title {
+            color: #2563eb;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .test-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .test-steps {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .test-steps ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .test-steps li {
+            margin-bottom: 8px;
+        }
+        .expected-result {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #22c55e;
+        }
+        .expected-result h4 {
+            color: #16a34a;
+            margin: 0 0 10px 0;
+        }
+        .link-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .link-button:hover {
+            background: #1d4ed8;
+        }
+        .code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>客户编辑功能测试</h1>
+        <p>这个页面用于测试客户管理系统中的编辑功能是否正常工作。</p>
+
+        <div class="test-section">
+            <h2 class="test-title">测试1：从客户列表页面编辑客户</h2>
+            <p class="test-description">
+                测试从客户列表页面点击编辑按钮，能否正确跳转到客户详情页面的编辑模式。
+            </p>
+            <div class="test-steps">
+                <h4>测试步骤：</h4>
+                <ol>
+                    <li>打开客户列表页面</li>
+                    <li>找到任意一个客户记录</li>
+                    <li>点击该客户行的 "编辑" 按钮（铅笔图标）</li>
+                    <li>观察页面跳转和显示结果</li>
+                </ol>
+            </div>
+            <div class="expected-result">
+                <h4>期望结果：</h4>
+                <ul>
+                    <li>页面应该跳转到客户详情页面</li>
+                    <li>页面标题应该显示 "客户名称（编辑中）"</li>
+                    <li>页面右上角应该显示 "取消编辑" 和 "保存修改" 按钮</li>
+                    <li>URL应该包含 <span class="code">?edit=true</span> 查询参数</li>
+                </ul>
+            </div>
+            <a href="http://localhost:5175/customers" class="link-button">打开客户列表页面</a>
+        </div>
+
+        <div class="test-section">
+            <h2 class="test-title">测试2：从客户详情页面进入编辑模式</h2>
+            <p class="test-description">
+                测试从客户详情页面点击编辑按钮，能否正确进入编辑模式。
+            </p>
+            <div class="test-steps">
+                <h4>测试步骤：</h4>
+                <ol>
+                    <li>打开任意一个客户详情页面</li>
+                    <li>点击页面右上角的 "编辑客户" 按钮</li>
+                    <li>观察页面变化</li>
+                </ol>
+            </div>
+            <div class="expected-result">
+                <h4>期望结果：</h4>
+                <ul>
+                    <li>页面标题应该显示 "客户名称（编辑中）"</li>
+                    <li>页面右上角应该显示 "取消编辑" 和 "保存修改" 按钮</li>
+                    <li>"编辑客户"、"添加Q&A"、"更多操作" 按钮应该隐藏</li>
+                    <li>URL应该包含 <span class="code">?edit=true</span> 查询参数</li>
+                </ul>
+            </div>
+            <a href="http://localhost:5175/customers/1" class="link-button">打开客户详情页面</a>
+        </div>
+
+        <div class="test-section">
+            <h2 class="test-title">测试3：取消编辑功能</h2>
+            <p class="test-description">
+                测试在编辑模式下点击取消编辑按钮，能否正确退出编辑模式。
+            </p>
+            <div class="test-steps">
+                <h4>测试步骤：</h4>
+                <ol>
+                    <li>进入任意客户的编辑模式</li>
+                    <li>点击 "取消编辑" 按钮</li>
+                    <li>观察页面变化</li>
+                </ol>
+            </div>
+            <div class="expected-result">
+                <h4>期望结果：</h4>
+                <ul>
+                    <li>页面应该退出编辑模式</li>
+                    <li>页面标题应该恢复为正常的客户名称（不显示"编辑中"）</li>
+                    <li>页面右上角应该显示 "编辑客户"、"添加Q&A"、"更多操作" 按钮</li>
+                    <li>URL应该移除 <span class="code">?edit=true</span> 查询参数</li>
+                </ul>
+            </div>
+            <a href="http://localhost:5175/customers/1?edit=true" class="link-button">直接打开编辑模式</a>
+        </div>
+
+        <div class="test-section">
+            <h2 class="test-title">测试4：保存修改功能</h2>
+            <p class="test-description">
+                测试在编辑模式下点击保存修改按钮的功能。
+            </p>
+            <div class="test-steps">
+                <h4>测试步骤：</h4>
+                <ol>
+                    <li>进入任意客户的编辑模式</li>
+                    <li>点击 "保存修改" 按钮</li>
+                    <li>观察页面变化和控制台输出</li>
+                </ol>
+            </div>
+            <div class="expected-result">
+                <h4>期望结果：</h4>
+                <ul>
+                    <li>控制台应该输出 "保存客户修改" 消息</li>
+                    <li>页面应该退出编辑模式</li>
+                    <li>页面标题应该恢复为正常的客户名称</li>
+                    <li>页面右上角应该显示正常的操作按钮</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2 class="test-title">功能说明</h2>
+            <p class="test-description">
+                本次实现的功能包括：
+            </p>
+            <ul>
+                <li>✅ 客户列表页面的编辑按钮跳转功能</li>
+                <li>✅ 客户详情页面的编辑模式切换</li>
+                <li>✅ 编辑模式的视觉指示器</li>
+                <li>✅ 取消编辑和保存修改按钮</li>
+                <li>✅ URL查询参数控制编辑模式</li>
+            </ul>
+            <p style="margin-top: 20px; color: #666; font-style: italic;">
+                注意：目前保存功能只是一个占位符，实际的保存逻辑需要根据具体需求进一步实现。
+            </p>
+        </div>
+    </div>
+</body>
+</html> 
