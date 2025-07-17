@@ -80,7 +80,41 @@
         <span>加载客户详情中...</span>
       </div>
 
-      <div v-else-if="customerDetail" class="content-sections">
+      <div v-else-if="customerDetail" class="customer-detail-content">
+        <!-- 标签页导航 -->
+        <div class="tabs-container">
+          <div class="tabs-nav">
+            <button
+              class="tab-btn"
+              :class="{ 'tab-btn--active': activeTab === 'info' }"
+              @click="activeTab = 'info'"
+            >
+              <User :size="16" />
+              客户信息
+            </button>
+            <button
+              class="tab-btn"
+              :class="{ 'tab-btn--active': activeTab === 'projects' }"
+              @click="activeTab = 'projects'"
+            >
+              <Briefcase :size="16" />
+              合作项目
+            </button>
+            <button
+              class="tab-btn"
+              :class="{ 'tab-btn--active': activeTab === 'renewals' }"
+              @click="activeTab = 'renewals'"
+            >
+              <RefreshCw :size="16" />
+              续费记录
+            </button>
+          </div>
+        </div>
+
+        <!-- 标签页内容 -->
+        <div class="tab-content">
+          <!-- 客户信息标签页 -->
+          <div v-if="activeTab === 'info'" class="content-sections">
         <!-- 合作详情 -->
         <div class="content-section">
           <h3 class="section-title">
@@ -259,11 +293,11 @@
                 <span class="info-value">{{ customerDetail.basicInfo.industry }}</span>
               </div>
               <div class="info-item">
-                <label class="info-label">商业模式</label>
+                <label class="info-label">商业及生产模式</label>
                 <span class="info-value">{{ customerDetail.basicInfo.businessModel }}</span>
               </div>
               <div class="info-item">
-                <label class="info-label">海外销售规模</label>
+                <label class="info-label">海外三年内目标销售额规模</label>
                 <span class="info-value">{{ customerDetail.basicInfo.overseasSalesScale }}</span>
               </div>
               <div class="info-item">
@@ -277,6 +311,10 @@
               <div class="info-item">
                 <label class="info-label">主要销售渠道</label>
                 <span class="info-value">{{ customerDetail.basicInfo.mainSalesChannel }}</span>
+              </div>
+              <div class="info-item">
+                <label class="info-label">合作转移情况</label>
+                <span class="info-value">{{ customerDetail.basicInfo.cooperationTransfer || '无' }}</span>
               </div>
             </div>
 
@@ -311,7 +349,13 @@
             </div>
 
             <div class="info-section">
-              <h4 class="subsection-title">联系人信息</h4>
+              <div class="section-header">
+                <h4 class="subsection-title">联系人信息</h4>
+                <button v-if="!isEditMode" class="action-btn action-btn--secondary" @click="showContactModal = true">
+                  <Plus :size="16" />
+                  添加联系人
+                </button>
+              </div>
               <div class="contact-list">
                 <div v-for="contact in customerDetail.basicInfo.contactPersons" :key="contact.id" class="contact-card">
                   <div class="contact-header">
@@ -324,6 +368,14 @@
                         <span v-if="contact.isPrimary" class="primary-badge">主要联系人</span>
                       </div>
                       <div class="contact-position">{{ contact.position }}</div>
+                    </div>
+                    <div v-if="!isEditMode" class="contact-actions">
+                      <button class="icon-btn" @click="editContact(contact)" title="编辑联系人">
+                        <Edit :size="14" />
+                      </button>
+                      <button class="icon-btn icon-btn--danger" @click="deleteContact(contact.id)" title="删除联系人">
+                        <X :size="14" />
+                      </button>
                     </div>
                   </div>
                   <div class="contact-details">
@@ -357,6 +409,7 @@
                   <option value="美妆组">美妆组</option>
                   <option value="运动组">运动组</option>
                   <option value="家居组">家居组</option>
+                  <option value="运营1组">运营1组</option>
                   <option value="综合组">综合组</option>
                 </select>
                 <span v-if="formErrors.serviceTeam" class="error-message">{{ formErrors.serviceTeam }}</span>
@@ -384,24 +437,22 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label required">商业模式</label>
+                <label class="form-label required">商业及生产模式</label>
                 <select
                   v-model="editFormData.basicInfo.businessModel"
                   class="form-select"
                   :class="{ 'form-input--error': formErrors.businessModel }"
                 >
-                  <option value="">请选择商业模式</option>
-                  <option value="B2C">B2C</option>
-                  <option value="B2B">B2B</option>
-                  <option value="B2B2C">B2B2C</option>
-                  <option value="C2C">C2C</option>
-                  <option value="其他">其他</option>
+                  <option value="">请选择商业及生产模式</option>
+                  <option value="工贸一体化的B2B外贸工厂">工贸一体化的B2B外贸工厂</option>
+                  <option value="平台精品卖家">平台精品卖家</option>
+                  <option value="中国本土品牌出海">中国本土品牌出海</option>
                 </select>
                 <span v-if="formErrors.businessModel" class="error-message">{{ formErrors.businessModel }}</span>
               </div>
 
               <div class="form-group">
-                <label class="form-label required">海外销售规模</label>
+                <label class="form-label required">海外三年内目标销售额规模</label>
                 <input
                   v-model="editFormData.basicInfo.overseasSalesScale"
                   type="text"
@@ -479,6 +530,19 @@
                   <span class="checkbox-label">品牌及内容团队</span>
                 </label>
               </div>
+            </div>
+
+            <div class="form-group form-group--full">
+              <label class="form-label">合作转移情况</label>
+              <select
+                v-model="editFormData.basicInfo.cooperationTransfer"
+                class="form-select"
+              >
+                <option value="">请选择合作转移情况</option>
+                <option value="服务商转移">服务商转移</option>
+                <option value="内部团队转移">内部团队转移</option>
+                <option value="新合作">新合作</option>
+              </select>
             </div>
           </div>
         </div>
@@ -646,10 +710,10 @@
                   :class="{ 'form-input--error': formErrors.pricingStrategy }"
                 >
                   <option value="">请选择价格定位策略</option>
-                  <option value="高端定位">高端定位</option>
-                  <option value="中端定位">中端定位</option>
-                  <option value="低端定位">低端定位</option>
-                  <option value="性价比定位">性价比定位</option>
+                  <option value="同价">同价</option>
+                  <option value="独立站价格更高">独立站价格更高</option>
+                  <option value="第三方平台价格更高">第三方平台价格更高</option>
+                  <option value="不同产品不同定价策略">不同产品不同定价策略</option>
                 </select>
                 <span v-if="formErrors.pricingStrategy" class="error-message">{{ formErrors.pricingStrategy }}</span>
               </div>
@@ -692,6 +756,66 @@
             </div>
 
             <div class="form-group form-group--full">
+              <label class="form-label required">目标市场</label>
+              <div class="checkbox-group">
+                <label class="checkbox-item">
+                  <input
+                    type="checkbox"
+                    value="美国"
+                    v-model="editFormData.websiteInfo.targetMarkets"
+                    class="checkbox-input"
+                  />
+                  <span class="checkbox-label">美国</span>
+                </label>
+                <label class="checkbox-item">
+                  <input
+                    type="checkbox"
+                    value="欧洲"
+                    v-model="editFormData.websiteInfo.targetMarkets"
+                    class="checkbox-input"
+                  />
+                  <span class="checkbox-label">欧洲</span>
+                </label>
+                <label class="checkbox-item">
+                  <input
+                    type="checkbox"
+                    value="加拿大"
+                    v-model="editFormData.websiteInfo.targetMarkets"
+                    class="checkbox-input"
+                  />
+                  <span class="checkbox-label">加拿大</span>
+                </label>
+                <label class="checkbox-item">
+                  <input
+                    type="checkbox"
+                    value="澳大利亚"
+                    v-model="editFormData.websiteInfo.targetMarkets"
+                    class="checkbox-input"
+                  />
+                  <span class="checkbox-label">澳大利亚</span>
+                </label>
+                <label class="checkbox-item">
+                  <input
+                    type="checkbox"
+                    value="日本"
+                    v-model="editFormData.websiteInfo.targetMarkets"
+                    class="checkbox-input"
+                  />
+                  <span class="checkbox-label">日本</span>
+                </label>
+                <label class="checkbox-item">
+                  <input
+                    type="checkbox"
+                    value="其他国家"
+                    v-model="editFormData.websiteInfo.targetMarkets"
+                    class="checkbox-input"
+                  />
+                  <span class="checkbox-label">其他国家</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group form-group--full">
               <label class="form-label required">产品优势卖点</label>
               <textarea
                 v-model="editFormData.websiteInfo.productAdvantages"
@@ -707,10 +831,16 @@
 
         <!-- 竞对情况 -->
         <div class="content-section">
-          <h3 class="section-title">
-            <Users :size="20" />
-            竞争对手情况
-          </h3>
+          <div class="section-header">
+            <h3 class="section-title">
+              <Users :size="20" />
+              竞争对手情况
+            </h3>
+            <button v-if="!isEditMode" class="action-btn action-btn--primary" @click="showCompetitorModal = true">
+              <Plus :size="16" />
+              添加竞对
+            </button>
+          </div>
           <div class="competitor-list">
             <div v-for="competitor in customerDetail.competitorInfo.competitorWebsites" :key="competitor.id" class="competitor-card">
               <div class="competitor-header">
@@ -721,6 +851,14 @@
                     {{ competitor.websiteUrl }}
                   </a>
                 </div>
+                <div v-if="!isEditMode" class="competitor-actions">
+                  <button class="icon-btn" @click="editCompetitor(competitor)" title="编辑竞对">
+                    <Edit :size="14" />
+                  </button>
+                  <button class="icon-btn icon-btn--danger" @click="deleteCompetitor(competitor.id)" title="删除竞对">
+                    <X :size="14" />
+                  </button>
+                </div>
               </div>
               <div v-if="competitor.notes" class="competitor-notes">
                 <p>{{ competitor.notes }}</p>
@@ -729,6 +867,10 @@
           </div>
           <div v-if="customerDetail.competitorInfo.competitorWebsites.length === 0" class="empty-state">
             <p>暂无竞争对手信息</p>
+            <button class="action-btn action-btn--primary" @click="showCompetitorModal = true">
+              <Plus :size="16" />
+              添加第一个竞对
+            </button>
           </div>
         </div>
 
@@ -998,6 +1140,27 @@
                   <h5 class="qa-section-title">改正措施</h5>
                   <p class="qa-text">{{ qa.correctiveMeasures }}</p>
                 </div>
+                <div class="qa-section">
+                  <h5 class="qa-section-title">预防措施</h5>
+                  <p class="qa-text">{{ qa.preventiveMeasures || '暂无预防措施' }}</p>
+                </div>
+                <div class="qa-section">
+                  <h5 class="qa-section-title">后续行动</h5>
+                  <p class="qa-text">{{ qa.followUpActions || '暂无后续行动' }}</p>
+                </div>
+                <div class="qa-section">
+                  <h5 class="qa-section-title">经验教训</h5>
+                  <p class="qa-text">{{ qa.lessonsLearned || '暂无经验教训记录' }}</p>
+                </div>
+                <div v-if="qa.attachments && qa.attachments.length > 0" class="qa-section">
+                  <h5 class="qa-section-title">相关附件</h5>
+                  <div class="attachment-list">
+                    <a v-for="attachment in qa.attachments" :key="attachment" :href="attachment" target="_blank" class="attachment-link">
+                      <File :size="14" />
+                      {{ attachment.split('/').pop() }}
+                    </a>
+                  </div>
+                </div>
                 <div class="qa-footer">
                   <div class="qa-info">
                     <span>负责人：{{ qa.responsiblePerson }}</span>
@@ -1034,30 +1197,251 @@
 
               <div class="renewal-accounts">
                 <h4 class="renewal-title">关联广告账户</h4>
-                <div class="account-list">
-                  <div v-for="account in customerDetail.adAccounts" :key="account.id" class="account-card">
-                    <div class="account-header">
-                      <div class="platform-icon" :class="`platform-icon--${account.platform}`">
-                        {{ getPlatformIcon(account.platform) }}
+                <div v-for="(accounts, platform) in groupedAccounts" :key="platform" class="platform-group">
+                  <h5 class="platform-title">{{ getPlatformName(platform) }}</h5>
+                  <div class="account-list">
+                    <div v-for="account in accounts" :key="account.id" class="account-card">
+                      <div class="account-header">
+                        <div class="platform-icon" :class="`platform-icon--${account.platform}`">
+                          {{ getPlatformIcon(account.platform) }}
+                        </div>
+                        <div class="account-info">
+                          <h6 class="account-name">{{ account.accountName }}</h6>
+                          <span class="account-id">{{ account.accountId }}</span>
+                        </div>
+                        <span class="account-status" :class="`account-status--${account.status}`">
+                          {{ getAccountStatusText(account.status) }}
+                        </span>
                       </div>
-                      <div class="account-info">
-                        <h5 class="account-name">{{ account.accountName }}</h5>
-                        <span class="account-id">{{ account.accountId }}</span>
+                      <div class="account-details">
+                        <div class="account-balance">
+                          <span class="balance-label">余额：</span>
+                          <span class="balance-value" :class="account.balance < 1000 ? 'balance-low' : ''">
+                            ${{ formatNumber(account.balance) }}
+                          </span>
+                        </div>
+                        <div v-if="account.dailySpend && account.dailySpend > 0" class="account-days">
+                          <span class="days-label">预计可用：</span>
+                          <span class="days-value" :class="getEstimatedDays(account) < 7 ? 'days-low' : ''">
+                            {{ getEstimatedDays(account) }}天
+                          </span>
+                        </div>
+                        <div v-else class="account-days">
+                          <span class="days-label">预计可用：</span>
+                          <span class="days-value">无限制</span>
+                        </div>
                       </div>
-                      <span class="account-status" :class="`account-status--${account.status}`">
-                        {{ getAccountStatusText(account.status) }}
-                      </span>
-                    </div>
-                    <div class="account-balance">
-                      <span class="balance-label">余额：</span>
-                      <span class="balance-value" :class="account.balance < 1000 ? 'balance-low' : ''">
-                        ${{ formatNumber(account.balance) }}
-                      </span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+        </div>
+          </div>
+
+          <!-- 合作项目标签页 -->
+          <div v-if="activeTab === 'projects'" class="projects-content">
+            <div class="content-section">
+              <div class="section-header">
+                <h3 class="section-title">
+                  <Briefcase :size="20" />
+                  合作项目
+                </h3>
+                <button class="action-btn action-btn--primary" @click="showCreateProject = true">
+                  <Plus :size="16" />
+                  新建项目
+                </button>
+              </div>
+
+              <!-- 项目筛选 -->
+              <div class="project-filters">
+                <div class="filter-group">
+                  <select v-model="projectFilter.status" class="filter-select">
+                    <option value="">全部状态</option>
+                    <option value="active">进行中</option>
+                    <option value="completed">已完成</option>
+                    <option value="paused">已暂停</option>
+                    <option value="cancelled">已取消</option>
+                  </select>
+                  <select v-model="projectFilter.type" class="filter-select">
+                    <option value="">全部类型</option>
+                    <option value="new_customer">新客户</option>
+                    <option value="redevelopment">二次开发</option>
+                    <option value="reactivation">失效复活</option>
+                  </select>
+                  <input
+                    v-model="projectFilter.search"
+                    type="text"
+                    placeholder="搜索项目名称或合同编号"
+                    class="filter-input"
+                  />
+                </div>
+              </div>
+
+              <!-- 项目列表 -->
+              <div class="projects-table-container">
+                <table class="projects-table">
+                  <thead>
+                    <tr>
+                      <th>项目名称</th>
+                      <th>项目时间</th>
+                      <th>项目类型</th>
+                      <th>项目状态</th>
+                      <th>合作平台</th>
+                      <th>合同编号</th>
+                      <th>服务费</th>
+                      <th>余额</th>
+                      <th>负责团队</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="project in filteredProjects" :key="project.id" class="project-row">
+                      <td class="project-name-cell">
+                        <div class="project-name">{{ project.name }}</div>
+                        <div class="project-id">{{ project.id }}</div>
+                      </td>
+                      <td class="project-duration">
+                        <div>{{ formatDate(project.startDate) }}</div>
+                        <div v-if="project.endDate" class="text-secondary">至 {{ formatDate(project.endDate) }}</div>
+                        <div v-else class="text-secondary">进行中</div>
+                      </td>
+                      <td>
+                        <span class="project-type-badge" :class="`type-badge--${project.projectType}`">
+                          {{ getProjectTypeText(project.projectType) }}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="project-status-badge" :class="`status-badge--${project.status}`">
+                          {{ getProjectStatusText(project.status) }}
+                        </span>
+                      </td>
+                      <td>
+                        <div class="platform-tags">
+                          <span v-for="platform in project.cooperationPlatforms" :key="platform" class="platform-tag">
+                            {{ platform }}
+                          </span>
+                        </div>
+                      </td>
+                      <td class="contract-number">{{ project.contractNumber || '-' }}</td>
+                      <td class="service-fee">${{ formatNumber(project.serviceFee || 0) }}</td>
+                      <td class="balance" :class="{ 'balance-low': (project.balance || 0) < 1000 }">
+                        ${{ formatNumber(project.balance || 0) }}
+                      </td>
+                      <td class="operation-team">{{ project.operationTeam || '-' }}</td>
+                      <td class="project-actions">
+                        <div class="action-buttons">
+                          <button class="action-btn action-btn--small" @click="viewProjectDashboard(project)">
+                            <BarChart3 :size="14" />
+                            <span>数据面板</span>
+                          </button>
+                          <button class="action-btn action-btn--small" @click="manageProjectGoals(project)">
+                            <Target :size="14" />
+                            <span>项目目标</span>
+                          </button>
+                          <button class="action-btn action-btn--small" @click="manageProjectAccounts(project)">
+                            <CreditCard :size="14" />
+                            <span>投放账号</span>
+                          </button>
+                          <button class="action-btn action-btn--small" @click="viewProjectReports(project)">
+                            <FileText :size="14" />
+                            <span>项目报告</span>
+                          </button>
+                          <button class="action-btn action-btn--small" @click="editProject(project)">
+                            <Edit :size="14" />
+                            <span>编辑项目</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div v-if="filteredProjects.length === 0" class="empty-state">
+                  <Briefcase :size="48" />
+                  <p>{{ projectFilter.search || projectFilter.status || projectFilter.type ? '没有找到匹配的项目' : '暂无合作项目' }}</p>
+                  <button class="action-btn action-btn--primary" @click="showCreateProject = true">
+                    <Plus :size="16" />
+                    新建项目
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 续费记录标签页 -->
+          <div v-if="activeTab === 'renewals'" class="renewals-content">
+            <div class="content-section">
+              <div class="section-header">
+                <h3 class="section-title">
+                  <RefreshCw :size="20" />
+                  服务费管理
+                </h3>
+                <button class="action-btn action-btn--primary" @click="goToServiceFee">
+                  <DollarSign :size="16" />
+                  查看完整服务费记录
+                </button>
+              </div>
+
+              <div class="service-fee-summary">
+                <div class="summary-cards">
+                  <div class="summary-card">
+                    <div class="card-header">
+                      <h4>总收款金额</h4>
+                      <DollarSign :size="20" class="card-icon" />
+                    </div>
+                    <div class="card-value">$48,000</div>
+                    <div class="card-desc">累计服务费收款</div>
+                  </div>
+
+                  <div class="summary-card">
+                    <div class="card-header">
+                      <h4>收款次数</h4>
+                      <CreditCard :size="20" class="card-icon" />
+                    </div>
+                    <div class="card-value">3</div>
+                    <div class="card-desc">首次付款 + 续费</div>
+                  </div>
+
+                  <div class="summary-card">
+                    <div class="card-header">
+                      <h4>最近收款</h4>
+                      <Calendar :size="20" class="card-icon" />
+                    </div>
+                    <div class="card-value">2025/3/10</div>
+                    <div class="card-desc">上次收款日期</div>
+                  </div>
+                </div>
+
+                <div class="recent-payments">
+                  <h4 class="subsection-title">最近收款记录</h4>
+                  <div class="payment-list">
+                    <div class="payment-item">
+                      <div class="payment-info">
+                        <div class="payment-type">2025年上半年续费</div>
+                        <div class="payment-date">2025/3/10</div>
+                      </div>
+                      <div class="payment-amount">$18,000</div>
+                    </div>
+                    <div class="payment-item">
+                      <div class="payment-info">
+                        <div class="payment-type">2024年度服务费</div>
+                        <div class="payment-date">2024/9/10</div>
+                      </div>
+                      <div class="payment-amount">$30,000</div>
+                    </div>
+                  </div>
+
+                  <div class="view-all-link">
+                    <button class="link-btn" @click="goToServiceFee">
+                      查看全部服务费记录
+                      <ExternalLink :size="14" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1070,6 +1454,131 @@
         </button>
       </div>
     </div>
+
+    <!-- 联系人编辑模态框 -->
+    <div v-if="showContactModal" class="modal-overlay" @click="closeContactModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3>{{ editingContact ? '编辑联系人' : '添加联系人' }}</h3>
+          <button class="modal-close" @click="closeContactModal">
+            <X :size="20" />
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label required">姓名</label>
+              <input
+                v-model="contactForm.name"
+                type="text"
+                class="form-input"
+                placeholder="请输入联系人姓名"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label required">职位</label>
+              <input
+                v-model="contactForm.position"
+                type="text"
+                class="form-input"
+                placeholder="请输入职位"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label required">电话</label>
+              <input
+                v-model="contactForm.phone"
+                type="tel"
+                class="form-input"
+                placeholder="请输入电话号码"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label required">邮箱</label>
+              <input
+                v-model="contactForm.email"
+                type="email"
+                class="form-input"
+                placeholder="请输入邮箱地址"
+                required
+              />
+            </div>
+            <div class="form-group form-group--full">
+              <label class="checkbox-item">
+                <input
+                  v-model="contactForm.isPrimary"
+                  type="checkbox"
+                  class="checkbox-input"
+                />
+                <span class="checkbox-label">设为主要联系人</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="action-btn action-btn--secondary" @click="closeContactModal">
+            取消
+          </button>
+          <button class="action-btn action-btn--primary" @click="saveContact">
+            保存
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 竞对编辑模态框 -->
+    <div v-if="showCompetitorModal" class="modal-overlay" @click="closeCompetitorModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3>{{ editingCompetitor ? '编辑竞争对手' : '添加竞争对手' }}</h3>
+          <button class="modal-close" @click="closeCompetitorModal">
+            <X :size="20" />
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label required">公司名称</label>
+            <input
+              v-model="competitorForm.companyName"
+              type="text"
+              class="form-input"
+              placeholder="请输入竞争对手公司名称"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label required">网站地址</label>
+            <input
+              v-model="competitorForm.websiteUrl"
+              type="url"
+              class="form-input"
+              placeholder="请输入完整的网站地址，如：https://example.com"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">备注</label>
+            <textarea
+              v-model="competitorForm.notes"
+              class="form-textarea"
+              placeholder="请输入备注信息"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="action-btn action-btn--secondary" @click="closeCompetitorModal">
+            取消
+          </button>
+          <button class="action-btn action-btn--primary" @click="saveCompetitor">
+            保存
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -1080,10 +1589,11 @@ import {
   ArrowLeft, Edit, MessageSquare, MoreHorizontal, Loader,
   Handshake, User, Globe, Users, AlertTriangle, MessageCircle,
   RefreshCw, Plus, Check, X, Phone, Mail, ExternalLink,
-  Target, Clock, Languages, Shield, TrendingUp, History, DollarSign, Save
+  Target, Clock, Languages, Shield, TrendingUp, History, DollarSign, Save, File, Briefcase,
+  BarChart3, CreditCard, FileText, Calendar
 } from 'lucide-vue-next'
 import { mockGetCustomerDetail } from '@/mock/customer'
-import type { CustomerDetail } from '@/types'
+import type { CustomerDetail, ContactPerson, CompetitorWebsite } from '@/types'
 
 // 路由相关
 const route = useRoute()
@@ -1094,6 +1604,37 @@ const loading = ref(true)
 const customerDetail = ref<CustomerDetail | null>(null)
 const isEditMode = ref(false)
 const saving = ref(false)
+const activeTab = ref('info')
+const showCreateProject = ref(false)
+
+// 项目筛选
+const projectFilter = reactive({
+  status: '',
+  type: '',
+  search: ''
+})
+
+// 联系人管理
+const showContactModal = ref(false)
+const editingContact = ref<ContactPerson | null>(null)
+const contactForm = reactive({
+  id: 0,
+  name: '',
+  position: '',
+  phone: '',
+  email: '',
+  isPrimary: false
+})
+
+// 竞对管理
+const showCompetitorModal = ref(false)
+const editingCompetitor = ref<CompetitorWebsite | null>(null)
+const competitorForm = reactive({
+  id: 0,
+  websiteUrl: '',
+  companyName: '',
+  notes: ''
+})
 
 // 编辑表单数据
 const editFormData = reactive<CustomerDetail>({
@@ -1169,6 +1710,46 @@ const customerId = computed(() => {
   return parseInt(route.params.id as string)
 })
 
+const groupedAccounts = computed(() => {
+  if (!customerDetail.value?.adAccounts) return {}
+
+  const groups: Record<string, any[]> = {}
+  customerDetail.value.adAccounts.forEach(account => {
+    if (!groups[account.platform]) {
+      groups[account.platform] = []
+    }
+    groups[account.platform].push(account)
+  })
+  return groups
+})
+
+const filteredProjects = computed(() => {
+  if (!customerDetail.value?.projects) return []
+
+  let projects = [...customerDetail.value.projects]
+
+  // 状态筛选
+  if (projectFilter.status) {
+    projects = projects.filter(project => project.status === projectFilter.status)
+  }
+
+  // 类型筛选
+  if (projectFilter.type) {
+    projects = projects.filter(project => project.projectType === projectFilter.type)
+  }
+
+  // 搜索筛选
+  if (projectFilter.search) {
+    const searchTerm = projectFilter.search.toLowerCase()
+    projects = projects.filter(project =>
+      project.name.toLowerCase().includes(searchTerm) ||
+      project.contractNumber?.toLowerCase().includes(searchTerm)
+    )
+  }
+
+  return projects
+})
+
 // 方法
 const formatDate = (dateString: string): string => {
   if (!dateString) return '未设置'
@@ -1235,8 +1816,73 @@ const getAccountStatusText = (status: string): string => {
   return statusMap[status as keyof typeof statusMap] || status
 }
 
+const getPlatformName = (platform: string): string => {
+  const platformMap = {
+    google: 'Google Ads',
+    facebook: 'Meta广告',
+    bing: 'Bing Ads',
+    criteo: 'Criteo',
+    other: '其他平台'
+  }
+  return platformMap[platform as keyof typeof platformMap] || platform
+}
+
+const getEstimatedDays = (account: any): number => {
+  if (!account.dailySpend || account.dailySpend <= 0) return 999
+  return Math.floor(account.balance / account.dailySpend)
+}
+
+const getProjectStatusText = (status: string): string => {
+  const statusMap = {
+    active: '进行中',
+    completed: '已完成',
+    paused: '已暂停',
+    cancelled: '已取消'
+  }
+  return statusMap[status as keyof typeof statusMap] || status
+}
+
+const getProjectTypeText = (type?: string): string => {
+  const typeMap = {
+    new_customer: '新客户',
+    redevelopment: '二次开发',
+    reactivation: '失效复活'
+  }
+  return typeMap[type as keyof typeof typeMap] || type || '未知'
+}
+
+// 项目操作方法
+const viewProjectDashboard = (project: any) => {
+  console.log('查看项目面板数据:', project.name)
+  // 这里可以跳转到项目数据看板页面
+}
+
+const manageProjectGoals = (project: any) => {
+  console.log('管理项目目标:', project.name)
+  // 这里可以打开项目目标管理弹窗或跳转页面
+}
+
+const manageProjectAccounts = (project: any) => {
+  console.log('管理投放账号:', project.name)
+  // 这里可以打开投放账号管理弹窗或跳转页面
+}
+
+const viewProjectReports = (project: any) => {
+  console.log('查看项目报告:', project.name)
+  // 这里可以跳转到项目报告页面
+}
+
+const editProject = (project: any) => {
+  console.log('编辑项目:', project.name)
+  // 这里可以打开项目编辑弹窗或跳转页面
+}
+
 const goBack = () => {
   router.push('/customers')
+}
+
+const goToServiceFee = () => {
+  router.push('/dashboard/service-fee')
 }
 
 const editCustomer = () => {
@@ -1296,6 +1942,117 @@ const saveCustomer = async () => {
 const addQA = () => {
   console.log('添加Q&A')
   // 这里可以打开Q&A添加弹窗
+}
+
+// 联系人管理方法
+const editContact = (contact: ContactPerson) => {
+  editingContact.value = contact
+  Object.assign(contactForm, contact)
+  showContactModal.value = true
+}
+
+const deleteContact = (contactId: number) => {
+  if (confirm('确定要删除这个联系人吗？')) {
+    if (customerDetail.value) {
+      const index = customerDetail.value.basicInfo.contactPersons.findIndex(c => c.id === contactId)
+      if (index > -1) {
+        customerDetail.value.basicInfo.contactPersons.splice(index, 1)
+      }
+    }
+  }
+}
+
+const saveContact = () => {
+  // 这里应该添加联系人保存逻辑
+  if (editingContact.value) {
+    // 编辑现有联系人
+    Object.assign(editingContact.value, contactForm)
+  } else {
+    // 添加新联系人
+    if (customerDetail.value) {
+      const newContact = {
+        ...contactForm,
+        id: Date.now() // 临时ID，实际应该由后端生成
+      }
+      customerDetail.value.basicInfo.contactPersons.push(newContact)
+    }
+  }
+  closeContactModal()
+}
+
+const closeContactModal = () => {
+  showContactModal.value = false
+  editingContact.value = null
+  Object.assign(contactForm, {
+    id: 0,
+    name: '',
+    position: '',
+    phone: '',
+    email: '',
+    isPrimary: false
+  })
+}
+
+// 竞对管理方法
+const editCompetitor = (competitor: CompetitorWebsite) => {
+  editingCompetitor.value = competitor
+  Object.assign(competitorForm, competitor)
+  showCompetitorModal.value = true
+}
+
+const deleteCompetitor = (competitorId: number) => {
+  if (confirm('确定要删除这个竞争对手吗？')) {
+    if (customerDetail.value) {
+      const index = customerDetail.value.competitorInfo.competitorWebsites.findIndex(c => c.id === competitorId)
+      if (index > -1) {
+        customerDetail.value.competitorInfo.competitorWebsites.splice(index, 1)
+      }
+    }
+  }
+}
+
+const saveCompetitor = () => {
+  // 验证网址格式
+  if (!isValidUrl(competitorForm.websiteUrl)) {
+    alert('请输入有效的网址')
+    return
+  }
+
+  if (editingCompetitor.value) {
+    // 编辑现有竞对
+    Object.assign(editingCompetitor.value, competitorForm)
+  } else {
+    // 添加新竞对
+    if (customerDetail.value) {
+      const newCompetitor = {
+        ...competitorForm,
+        id: Date.now() // 临时ID，实际应该由后端生成
+      }
+      customerDetail.value.competitorInfo.competitorWebsites.push(newCompetitor)
+    }
+  }
+  closeCompetitorModal()
+}
+
+const closeCompetitorModal = () => {
+  showCompetitorModal.value = false
+  editingCompetitor.value = null
+  Object.assign(competitorForm, {
+    id: 0,
+    websiteUrl: '',
+    companyName: '',
+    notes: ''
+  })
+}
+
+// 网址验证
+const isValidUrl = (url: string): boolean => {
+  try {
+    new URL(url)
+    return true
+  } catch {
+    return false
+  }
 }
 
 const showMoreActions = () => {
@@ -1398,7 +2155,7 @@ const validateField = (fieldName: string): boolean => {
 
     case 'businessModel':
       if (!editFormData.basicInfo.businessModel) {
-        formErrors.businessModel = '请选择商业模式'
+        formErrors.businessModel = '请选择商业及生产模式'
         isValid = false
       } else {
         delete formErrors.businessModel
@@ -1407,7 +2164,7 @@ const validateField = (fieldName: string): boolean => {
 
     case 'overseasSalesScale':
       if (!editFormData.basicInfo.overseasSalesScale.trim()) {
-        formErrors.overseasSalesScale = '海外销售规模不能为空'
+        formErrors.overseasSalesScale = '海外三年内目标销售额规模不能为空'
         isValid = false
       } else {
         delete formErrors.overseasSalesScale
@@ -1679,6 +2436,25 @@ onMounted(() => {
 .action-btn--secondary:hover {
   border-color: var(--color-primary);
   color: var(--color-primary);
+}
+
+.action-btn--small {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.action-btn--small:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.action-btn--small span {
+  margin-left: var(--spacing-xs);
 }
 
 .status-badge {
@@ -2347,6 +3123,19 @@ onMounted(() => {
   line-height: var(--line-height-relaxed);
 }
 
+.platform-group {
+  margin-bottom: var(--spacing-xl);
+}
+
+.platform-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-md) 0;
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 2px solid var(--color-border);
+}
+
 .account-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -2439,24 +3228,162 @@ onMounted(() => {
   color: var(--color-error);
 }
 
-.account-balance {
+.account-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.account-balance,
+.account-days {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   font-size: var(--font-size-sm);
 }
 
-.balance-label {
+.balance-label,
+.days-label {
   color: var(--color-text-secondary);
 }
 
-.balance-value {
+.balance-value,
+.days-value {
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
 }
 
-.balance-low {
+.balance-low,
+.days-low {
   color: var(--color-error);
+}
+
+/* 服务费管理样式 */
+.service-fee-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.summary-card {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  transition: all var(--duration-fast);
+}
+
+.summary-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.card-header h4 {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.card-icon {
+  color: var(--color-primary);
+}
+
+.card-value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.card-desc {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.recent-payments {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+}
+
+.payment-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.payment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+}
+
+.payment-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.payment-type {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.payment-date {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.payment-amount {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-success);
+}
+
+.view-all-link {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.link-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-md);
+}
+
+.link-btn:hover {
+  background: rgba(59, 130, 246, 0.1);
 }
 
 .empty-state {
@@ -2481,10 +3408,363 @@ onMounted(() => {
   text-align: center;
 }
 
+/* 模态框样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--color-surface);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: var(--spacing-xs);
+  border-radius: var(--border-radius-md);
+  transition: all var(--duration-fast);
+}
+
+.modal-close:hover {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+.modal-body {
+  padding: var(--spacing-lg);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--color-border);
+}
+
+/* 图标按钮样式 */
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+
+.icon-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.icon-btn--danger:hover {
+  border-color: var(--color-error);
+  color: var(--color-error);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* 联系人和竞对操作按钮 */
+.contact-actions,
+.competitor-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-left: auto;
+}
+
+.contact-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.competitor-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+/* 附件列表样式 */
+.attachment-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.attachment-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  transition: background-color var(--duration-fast);
+}
+
+.attachment-link:hover {
+  background: rgba(59, 130, 246, 0.1);
+  text-decoration: underline;
+}
+
+/* 项目列表样式 */
+.project-filters {
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+}
+
+.filter-group {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-select,
+.filter-input {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  min-width: 150px;
+}
+
+.filter-input {
+  min-width: 200px;
+}
+
+.filter-select:focus,
+.filter-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.projects-table-container {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+}
+
+.projects-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+}
+
+.projects-table th {
+  background: var(--color-background);
+  padding: var(--spacing-md);
+  text-align: left;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.projects-table td {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+  vertical-align: top;
+}
+
+.project-row:hover {
+  background: var(--color-background);
+}
+
+.project-name-cell {
+  min-width: 200px;
+}
+
+.project-name {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.project-id {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-family: monospace;
+}
+
+.project-duration {
+  min-width: 120px;
+}
+
+.text-secondary {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.project-type-badge,
+.project-status-badge {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.type-badge--new_customer {
+  background: rgba(82, 196, 26, 0.1);
+  color: var(--color-success);
+}
+
+.type-badge--redevelopment {
+  background: rgba(24, 144, 255, 0.1);
+  color: var(--color-info);
+}
+
+.type-badge--reactivation {
+  background: rgba(250, 173, 20, 0.1);
+  color: var(--color-warning);
+}
+
+.status-badge--active {
+  background: rgba(82, 196, 26, 0.1);
+  color: var(--color-success);
+}
+
+.status-badge--completed {
+  background: rgba(24, 144, 255, 0.1);
+  color: var(--color-info);
+}
+
+.status-badge--paused {
+  background: rgba(250, 173, 20, 0.1);
+  color: var(--color-warning);
+}
+
+.status-badge--cancelled {
+  background: rgba(245, 34, 45, 0.1);
+  color: var(--color-error);
+}
+
+.platform-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.platform-tag {
+  padding: 2px var(--spacing-xs);
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.contract-number {
+  font-family: monospace;
+  font-size: var(--font-size-xs);
+}
+
+.service-fee,
+.balance {
+  font-weight: var(--font-weight-medium);
+  text-align: right;
+}
+
+.balance-low {
+  color: var(--color-error);
+}
+
+.operation-team {
+  color: var(--color-text-primary);
+}
+
+.project-actions {
+  min-width: 200px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
 /* 响应式设计 */
 @media (max-width: 1024px) {
   .info-grid {
     grid-template-columns: 1fr;
+  }
+
+  .filter-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-select,
+  .filter-input {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .projects-table-container {
+    font-size: var(--font-size-xs);
+  }
+
+  .projects-table th,
+  .projects-table td {
+    padding: var(--spacing-sm);
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .action-btn--small {
+    justify-content: flex-start;
   }
 
   .attention-grid {

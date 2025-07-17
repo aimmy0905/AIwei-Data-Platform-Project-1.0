@@ -133,6 +133,11 @@ const router = createRouter({
           path: ':id(\\d+)',
           name: 'customer-detail',
           component: () => import('@/views/customers/CustomerDetailView.vue')
+        },
+        {
+          path: 'service-fees',
+          name: 'service-fees',
+          component: () => import('@/views/finance/ServiceFeeManagementView.vue')
         }
       ]
     },

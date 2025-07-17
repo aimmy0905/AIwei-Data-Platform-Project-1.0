@@ -159,13 +159,6 @@ export const mockMenuItems: MenuItem[] = [
         roles: ['superAdmin', 'manager', 'staff', 'sales']
       },
       {
-        id: 'customer-data',
-        name: '客户数据',
-        icon: 'BarChart',
-        path: '/customers/data',
-        roles: ['superAdmin', 'manager', 'staff', 'sales']
-      },
-      {
         id: 'service-fees',
         name: '服务费管理',
         icon: 'DollarSign',
