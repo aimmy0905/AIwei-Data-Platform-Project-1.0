@@ -1111,11 +1111,11 @@ const validateField = (fieldName: string) => {
       }
     }
 
-    const error = rule(value)
+    const error = (rule as any)(value)
     if (error) {
-      errors[fieldName] = error
+      (errors as Record<string, string>)[fieldName] = error
     } else {
-      delete errors[fieldName]
+      delete (errors as Record<string, string>)[fieldName]
     }
   }
 }
