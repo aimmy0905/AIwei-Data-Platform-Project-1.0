@@ -265,7 +265,7 @@
               :data="objectivesChartData.spendData"
               :height="'300px'"
               :show-legend="false"
-              :donut="true"
+              :donut="false"
             />
             <h5 class="chart-title">花费占比</h5>
             <div class="chart-legend">
@@ -286,7 +286,7 @@
               :data="objectivesChartData.revenueData"
               :height="'300px'"
               :show-legend="false"
-              :donut="true"
+              :donut="false"
             />
             <h5 class="chart-title">收入占比</h5>
             <div class="chart-legend">
@@ -520,7 +520,7 @@
               :data="newVsRemarketingChartData.spendData"
               :height="'300px'"
               :show-legend="false"
-              :donut="true"
+              :donut="false"
             />
             <h5 class="chart-title">花费占比</h5>
             <div class="chart-legend">
@@ -541,7 +541,7 @@
               :data="newVsRemarketingChartData.revenueData"
               :height="'300px'"
               :show-legend="false"
-              :donut="true"
+              :donut="false"
             />
             <h5 class="chart-title">收入占比</h5>
             <div class="chart-legend">
@@ -617,7 +617,7 @@
               :data="adFormatsChartData.spendData"
               :height="'300px'"
               :show-legend="false"
-              :donut="true"
+              :donut="false"
             />
             <h5 class="chart-title">花费占比</h5>
             <div class="chart-legend">
@@ -638,7 +638,7 @@
               :data="adFormatsChartData.revenueData"
               :height="'300px'"
               :show-legend="false"
-              :donut="true"
+              :donut="false"
             />
             <h5 class="chart-title">收入占比</h5>
             <div class="chart-legend">
@@ -744,7 +744,7 @@
                 :data="catalogAdsData.spendDistribution"
                 :height="'300px'"
                 :show-legend="false"
-                :donut="true"
+                :donut="false"
               />
               <h5 class="chart-title">目录组花费占比</h5>
               <div class="chart-legend">
@@ -955,7 +955,7 @@
               :data="audienceTypesData.spendDistribution"
               :height="'300px'"
               :show-legend="false"
-              :donut="true"
+              :donut="false"
             />
             <h5 class="chart-title">受众类型花费占比</h5>
             <div class="chart-legend">
@@ -976,7 +976,7 @@
               :data="audienceTypesData.revenueDistribution"
               :height="'300px'"
               :show-legend="false"
-              :donut="true"
+              :donut="false"
             />
             <h5 class="chart-title">受众类型收入占比</h5>
             <div class="chart-legend">

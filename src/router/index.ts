@@ -120,9 +120,19 @@ const router = createRouter({
       meta: { requiresAuth: true },
       children: [
         {
-          path: 'list',
-          name: 'customer-list',
+          path: '',
+          name: 'customers',
           component: () => import('@/views/customers/CustomerListView.vue')
+        },
+        {
+          path: 'create',
+          name: 'customer-create',
+          component: () => import('@/views/customers/CustomerCreateView.vue')
+        },
+        {
+          path: ':id(\\d+)',
+          name: 'customer-detail',
+          component: () => import('@/views/customers/CustomerDetailView.vue')
         }
       ]
     },

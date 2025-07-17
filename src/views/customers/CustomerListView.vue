@@ -6,16 +6,16 @@
         <p class="page-description">管理和分析您的客户数据，优化客户关系</p>
       </div>
       <div class="page-header__actions">
-        <button 
+        <button
           class="action-btn action-btn--secondary"
           @click="showExportModal = true"
         >
           <Download :size="16" />
           导出数据
         </button>
-        <button class="action-btn action-btn--primary">
+        <button class="action-btn action-btn--primary" @click="createCustomer">
           <Plus :size="16" />
-          添加客户
+          新建客户
         </button>
       </div>
     </div>
@@ -26,7 +26,7 @@
         <div class="search-section">
           <SearchInput
             v-model="searchQuery"
-            placeholder="搜索客户名称、网站或负责人..."
+            placeholder="搜索客户名称、联系人、联系电话、签单销售人员..."
             :suggestions="searchSuggestions"
             @search="handleSearch"
             @clear="handleSearchClear"
@@ -39,6 +39,7 @@
 
         <div class="filter-section">
           <FilterPanel
+            :modal="true"
             :show-date-filter="true"
             :show-status-filter="true"
             :show-category-filter="true"
@@ -54,45 +55,7 @@
         </div>
       </div>
 
-      <!-- 统计摘要 -->
-      <div class="customer-stats">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <Users :size="24" />
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">{{ customerStats.total }}</div>
-            <div class="stat-label">总客户数</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">
-            <TrendingUp :size="24" />
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">{{ customerStats.active }}</div>
-            <div class="stat-label">活跃客户</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">
-            <DollarSign :size="24" />
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">${{ formatNumber(customerStats.totalRevenue) }}</div>
-            <div class="stat-label">总收入</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">
-            <Target :size="24" />
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">{{ customerStats.avgROI }}x</div>
-            <div class="stat-label">平均ROI</div>
-          </div>
-        </div>
-      </div>
+
 
       <!-- 客户表格 -->
       <div class="customer-table-section">
@@ -104,7 +67,7 @@
           <div class="table-header__right">
             <div class="table-controls">
               <div class="view-options">
-                <button 
+                <button
                   class="view-btn"
                   :class="{ 'view-btn--active': viewMode === 'table' }"
                   @click="viewMode = 'table'"
@@ -112,7 +75,7 @@
                 >
                   <List :size="16" />
                 </button>
-                <button 
+                <button
                   class="view-btn"
                   :class="{ 'view-btn--active': viewMode === 'grid' }"
                   @click="viewMode = 'grid'"
@@ -121,22 +84,7 @@
                   <Grid :size="16" />
                 </button>
               </div>
-              <div class="sort-options">
-                <select v-model="sortBy" @change="handleSort" class="sort-select">
-                  <option value="name">按名称排序</option>
-                  <option value="revenue">按收入排序</option>
-                  <option value="roi">按ROI排序</option>
-                  <option value="created">按创建时间排序</option>
-                  <option value="updated">按更新时间排序</option>
-                </select>
-                <button 
-                  class="sort-direction"
-                  @click="toggleSortDirection"
-                  :title="sortDirection === 'asc' ? '升序' : '降序'"
-                >
-                  <ArrowUpDown :size="16" />
-                </button>
-              </div>
+
             </div>
           </div>
         </div>
@@ -147,42 +95,63 @@
             <thead>
               <tr>
                 <th>
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     v-model="selectAll"
                     @change="handleSelectAll"
                     class="checkbox-input"
                   />
                 </th>
                 <th @click="setSortBy('name')" class="sortable">
-                  客户信息
+                  客户名称
                   <ArrowUpDown :size="14" v-if="sortBy === 'name'" />
                 </th>
+                <th @click="setSortBy('cooperationType')" class="sortable">
+                  合作方式
+                  <ArrowUpDown :size="14" v-if="sortBy === 'cooperationType'" />
+                </th>
                 <th @click="setSortBy('industry')" class="sortable">
-                  行业
+                  客户行业
                   <ArrowUpDown :size="14" v-if="sortBy === 'industry'" />
                 </th>
-                <th @click="setSortBy('revenue')" class="sortable">
-                  收入
-                  <ArrowUpDown :size="14" v-if="sortBy === 'revenue'" />
+                <th>地区</th>
+                <th>联系人</th>
+                <th>联系岗位</th>
+                <th>联系电话</th>
+                <th>服务团队</th>
+                <th @click="setSortBy('cooperationStartTime')" class="sortable">
+                  合作开始时间
+                  <ArrowUpDown :size="14" v-if="sortBy === 'cooperationStartTime'" />
                 </th>
-                <th @click="setSortBy('roi')" class="sortable">
-                  ROI
-                  <ArrowUpDown :size="14" v-if="sortBy === 'roi'" />
+                <th @click="setSortBy('serviceStartTime')" class="sortable">
+                  服务开始时间
+                  <ArrowUpDown :size="14" v-if="sortBy === 'serviceStartTime'" />
+                </th>
+                <th @click="setSortBy('grade')" class="sortable">
+                  分级
+                  <ArrowUpDown :size="14" v-if="sortBy === 'grade'" />
                 </th>
                 <th @click="setSortBy('status')" class="sortable">
                   状态
                   <ArrowUpDown :size="14" v-if="sortBy === 'status'" />
                 </th>
-                <th @click="setSortBy('updated')" class="sortable">
-                  最后更新
-                  <ArrowUpDown :size="14" v-if="sortBy === 'updated'" />
+                <th @click="setSortBy('signingSales')" class="sortable">
+                  签单销售人员
+                  <ArrowUpDown :size="14" v-if="sortBy === 'signingSales'" />
+                </th>
+                <th @click="setSortBy('totalServiceFee')" class="sortable">
+                  累计服务费
+                  <ArrowUpDown :size="14" v-if="sortBy === 'totalServiceFee'" />
+                </th>
+                <th @click="setSortBy('serviceProjectCount')" class="sortable">
+                  服务项目数量
+                  <ArrowUpDown :size="14" v-if="sortBy === 'serviceProjectCount'" />
                 </th>
                 <th>操作</th>
               </tr>
             </thead>
             <tbody>
-              <tr 
+              <tr
                 v-for="customer in paginatedCustomers"
                 :key="customer.id"
                 class="customer-row"
@@ -190,8 +159,8 @@
                 @click="handleRowClick(customer)"
               >
                 <td @click.stop>
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     v-model="selectedCustomers"
                     :value="customer.id"
                     class="checkbox-input"
@@ -205,19 +174,39 @@
                     <div class="customer-details">
                       <div class="customer-name">{{ customer.name }}</div>
                       <div class="customer-website">{{ customer.website }}</div>
-                      <div class="customer-manager">负责人: {{ customer.manager }}</div>
                     </div>
                   </div>
+                </td>
+                <td>
+                  <span class="cooperation-badge">{{ customer.cooperationType }}</span>
                 </td>
                 <td>
                   <span class="industry-badge">{{ customer.industry }}</span>
                 </td>
                 <td>
-                  <span class="revenue-value">${{ formatNumber(customer.revenue) }}</span>
+                  <span class="region-text">{{ getCustomerRegions(customer) }}</span>
                 </td>
                 <td>
-                  <span class="roi-badge" :class="getRoiClass(customer.roi)">
-                    {{ customer.roi }}x
+                  <span class="contact-text">{{ customer.primaryContact.name }}</span>
+                </td>
+                <td>
+                  <span class="position-text">{{ customer.primaryContact.position }}</span>
+                </td>
+                <td>
+                  <span class="phone-text">{{ customer.primaryContact.phone }}</span>
+                </td>
+                <td>
+                  <span class="team-text">{{ customer.serviceTeam }}</span>
+                </td>
+                <td>
+                  <span class="date-text">{{ formatDate(customer.cooperationStartTime) }}</span>
+                </td>
+                <td>
+                  <span class="date-text">{{ formatDate(customer.serviceStartTime) }}</span>
+                </td>
+                <td>
+                  <span class="grade-badge" :class="`grade-badge--${customer.grade}`">
+                    {{ customer.grade }}
                   </span>
                 </td>
                 <td>
@@ -226,17 +215,26 @@
                   </span>
                 </td>
                 <td>
-                  <span class="update-time">{{ formatDate(customer.lastUpdated) }}</span>
+                  <span class="sales-text">{{ customer.signingSales }}</span>
+                </td>
+                <td>
+                  <span class="service-fee-text">¥{{ formatNumber(customer.totalServiceFee) }}</span>
+                </td>
+                <td>
+                  <span class="project-count-text">{{ customer.serviceProjectCount }}</span>
                 </td>
                 <td @click.stop>
                   <div class="action-menu">
-                    <button class="action-btn action-btn--small" @click="editCustomer(customer)">
-                      <Edit :size="14" />
-                    </button>
-                    <button class="action-btn action-btn--small" @click="viewCustomer(customer)">
+                    <button class="action-btn action-btn--small" @click="viewCustomer(customer)" title="查看详情">
                       <Eye :size="14" />
                     </button>
-                    <button class="action-btn action-btn--small" @click="showCustomerMenu(customer)">
+                    <button class="action-btn action-btn--small" @click="editCustomer(customer)" title="客户编辑">
+                      <Edit :size="14" />
+                    </button>
+                    <button class="action-btn action-btn--small" @click="addCustomerQA(customer)" title="添加Q&A">
+                      <MessageSquare :size="14" />
+                    </button>
+                    <button class="action-btn action-btn--small" @click="showCustomerMenu(customer)" title="更多操作">
                       <MoreHorizontal :size="14" />
                     </button>
                   </div>
@@ -248,7 +246,7 @@
 
         <!-- 网格视图 -->
         <div v-else class="customer-grid">
-          <div 
+          <div
             v-for="customer in paginatedCustomers"
             :key="customer.id"
             class="customer-card"
@@ -270,6 +268,20 @@
             <div class="customer-card__content">
               <h4 class="customer-card__name">{{ customer.name }}</h4>
               <p class="customer-card__website">{{ customer.website }}</p>
+              <div class="customer-card__info">
+                <div class="info-item">
+                  <span class="info-label">合作方式</span>
+                  <span class="cooperation-tag">{{ customer.cooperationType }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">服务团队</span>
+                  <span class="team-tag">{{ customer.serviceTeam }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">联系人</span>
+                  <span class="contact-info">{{ customer.primaryContact.name }} ({{ customer.primaryContact.position }})</span>
+                </div>
+              </div>
               <div class="customer-card__metrics">
                 <div class="metric">
                   <span class="metric-label">收入</span>
@@ -279,9 +291,18 @@
                   <span class="metric-label">ROI</span>
                   <span class="metric-value" :class="getRoiClass(customer.roi)">{{ customer.roi }}x</span>
                 </div>
+                <div class="metric">
+                  <span class="metric-label">服务费</span>
+                  <span class="metric-value service-fee-text">¥{{ formatNumber(customer.totalServiceFee) }}</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">项目数</span>
+                  <span class="metric-value project-count-text">{{ customer.serviceProjectCount }}</span>
+                </div>
               </div>
               <div class="customer-card__footer">
                 <span class="industry-tag">{{ customer.industry }}</span>
+                <span class="grade-tag" :class="`grade-tag--${customer.grade}`">{{ customer.grade }}级</span>
                 <span class="status-indicator" :class="`status-indicator--${customer.status}`"></span>
               </div>
             </div>
@@ -295,7 +316,7 @@
             共 {{ filteredCustomers.length }} 条记录
           </div>
           <div class="pagination-controls">
-            <button 
+            <button
               class="pagination-btn"
               :disabled="currentPage === 1"
               @click="goToPage(currentPage - 1)"
@@ -314,7 +335,7 @@
                 {{ page }}
               </button>
             </div>
-            <button 
+            <button
               class="pagination-btn"
               :disabled="currentPage === totalPages"
               @click="goToPage(currentPage + 1)"
@@ -337,7 +358,7 @@
           <Mail :size="16" />
           发送邮件
         </button>
-        <button 
+        <button
           class="bulk-btn"
           @click="showExportModal = true"
         >
@@ -376,22 +397,25 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive } from 'vue'
-import { 
+import { useRouter } from 'vue-router'
+import {
   Plus, Download, Users, TrendingUp, DollarSign, Target,
   List, Grid, ArrowUpDown, ChevronLeft, ChevronRight,
-  Edit, Eye, MoreHorizontal, Mail, Trash2, Loader
+  Edit, Eye, MoreHorizontal, Mail, Trash2, Loader, MessageSquare
 } from 'lucide-vue-next'
-import { mockGetCustomers } from '@/mock'
+import { mockGetCustomers, type ExtendedCustomer } from '@/mock/customer'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FilterPanel from '@/components/common/FilterPanel.vue'
 import ExportModal from '@/components/common/ExportModal.vue'
 import { formatters } from '@/utils/export'
-import type { Customer } from '@/types'
 import type { ExportColumn } from '@/utils/export'
+
+// 路由
+const router = useRouter()
 
 // 响应式数据
 const loading = ref(true)
-const customers = ref<Customer[]>([])
+const customers = ref<ExtendedCustomer[]>([])
 const searchQuery = ref('')
 const viewMode = ref<'table' | 'grid'>('table')
 const sortBy = ref('name')
@@ -410,8 +434,10 @@ const filters = reactive({
   category: '',
   minAmount: null as number | null,
   maxAmount: null as number | null,
-  manager: '',
-  roiRange: ''
+  cooperationType: '',
+  serviceTeam: '',
+  grade: '',
+  signingSales: ''
 })
 
 // 筛选选项配置
@@ -431,20 +457,43 @@ const industryOptions = [
 
 const customFilterOptions = [
   {
-    key: 'manager',
-    label: '负责人',
-    type: 'input' as const,
-    placeholder: '输入负责人姓名'
-  },
-  {
-    key: 'roiRange',
-    label: 'ROI范围',
+    key: 'cooperationType',
+    label: '合作方式',
     type: 'select' as const,
     options: [
-      { value: 'low', label: '低于2x' },
-      { value: 'medium', label: '2x-4x' },
-      { value: 'high', label: '高于4x' }
+      { value: '代运营', label: '代运营' },
+      { value: '咨询服务', label: '咨询服务' },
+      { value: '技术支持', label: '技术支持' },
+      { value: '培训服务', label: '培训服务' }
     ]
+  },
+  {
+    key: 'serviceTeam',
+    label: '服务团队',
+    type: 'select' as const,
+    options: [
+      { value: '时尚组', label: '时尚组' },
+      { value: '科技组', label: '科技组' },
+      { value: '美妆组', label: '美妆组' },
+      { value: '运动组', label: '运动组' },
+      { value: '家居组', label: '家居组' }
+    ]
+  },
+  {
+    key: 'grade',
+    label: '客户分级',
+    type: 'select' as const,
+    options: [
+      { value: 'A', label: 'A级客户' },
+      { value: 'B', label: 'B级客户' },
+      { value: 'C', label: 'C级客户' }
+    ]
+  },
+  {
+    key: 'signingSales',
+    label: '签单销售人员',
+    type: 'input' as const,
+    placeholder: '输入销售人员姓名'
   }
 ]
 
@@ -453,8 +502,11 @@ const searchSuggestions = computed(() => {
   const suggestions = new Set<string>()
   customers.value.forEach(customer => {
     suggestions.add(customer.name)
-    suggestions.add(customer.manager)
-    suggestions.add(customer.industry)
+    suggestions.add(customer.primaryContact.name)
+    suggestions.add(customer.primaryContact.phone)
+    suggestions.add(customer.signingSales)
+    suggestions.add(customer.cooperationType)
+    suggestions.add(customer.serviceTeam)
   })
   return Array.from(suggestions)
 })
@@ -467,9 +519,11 @@ const filteredCustomers = computed(() => {
     const query = searchQuery.value.toLowerCase()
     result = result.filter(customer =>
       customer.name.toLowerCase().includes(query) ||
-      customer.website.toLowerCase().includes(query) ||
-      customer.manager.toLowerCase().includes(query) ||
-      customer.industry.toLowerCase().includes(query)
+      customer.primaryContact.name.toLowerCase().includes(query) ||
+      customer.primaryContact.phone.toLowerCase().includes(query) ||
+      customer.signingSales.toLowerCase().includes(query) ||
+      customer.cooperationType.toLowerCase().includes(query) ||
+      customer.serviceTeam.toLowerCase().includes(query)
     )
   }
 
@@ -480,16 +534,36 @@ const filteredCustomers = computed(() => {
 
   // 行业过滤
   if (filters.category) {
-    result = result.filter(customer => {
-      const industryMap: Record<string, string> = {
-        'fashion': '时尚服装',
-        'tech': '数码科技',
-        'beauty': '美容护肤',
-        'sports': '体育用品',
-        'home': '家居装饰'
-      }
-      return customer.industry === industryMap[filters.category]
-    })
+    const industryMap: Record<string, string> = {
+      'fashion': '时尚服装',
+      'tech': '数码科技',
+      'beauty': '美容护肤',
+      'sports': '体育用品',
+      'home': '家居装饰'
+    }
+    result = result.filter(customer => customer.industry === industryMap[filters.category])
+  }
+
+  // 合作方式过滤
+  if (filters.cooperationType) {
+    result = result.filter(customer => customer.cooperationType === filters.cooperationType)
+  }
+
+  // 服务团队过滤
+  if (filters.serviceTeam) {
+    result = result.filter(customer => customer.serviceTeam === filters.serviceTeam)
+  }
+
+  // 客户分级过滤
+  if (filters.grade) {
+    result = result.filter(customer => customer.grade === filters.grade)
+  }
+
+  // 签单销售人员过滤
+  if (filters.signingSales) {
+    result = result.filter(customer =>
+      customer.signingSales.toLowerCase().includes(filters.signingSales.toLowerCase())
+    )
   }
 
   // 收入范围过滤
@@ -500,33 +574,18 @@ const filteredCustomers = computed(() => {
     result = result.filter(customer => customer.revenue <= filters.maxAmount!)
   }
 
-  // 负责人过滤
-  if (filters.manager) {
-    result = result.filter(customer => 
-      customer.manager.toLowerCase().includes(filters.manager.toLowerCase())
-    )
-  }
-
-  // ROI范围过滤
-  if (filters.roiRange) {
-    result = result.filter(customer => {
-      switch (filters.roiRange) {
-        case 'low': return customer.roi < 2
-        case 'medium': return customer.roi >= 2 && customer.roi <= 4
-        case 'high': return customer.roi > 4
-        default: return true
-      }
-    })
-  }
-
   // 排序
   result.sort((a, b) => {
     let valueA: unknown, valueB: unknown
-    
+
     switch (sortBy.value) {
       case 'name':
         valueA = a.name.toLowerCase()
         valueB = b.name.toLowerCase()
+        break
+      case 'cooperationType':
+        valueA = a.cooperationType
+        valueB = b.cooperationType
         break
       case 'revenue':
         valueA = a.revenue
@@ -536,13 +595,33 @@ const filteredCustomers = computed(() => {
         valueA = a.roi
         valueB = b.roi
         break
-      case 'created':
-        valueA = new Date(a.createdAt).getTime()
-        valueB = new Date(b.createdAt).getTime()
+      case 'cooperationStartTime':
+        valueA = new Date(a.cooperationStartTime).getTime()
+        valueB = new Date(b.cooperationStartTime).getTime()
         break
-      case 'updated':
+      case 'serviceStartTime':
+        valueA = new Date(a.serviceStartTime).getTime()
+        valueB = new Date(b.serviceStartTime).getTime()
+        break
+      case 'grade':
+        valueA = a.grade
+        valueB = b.grade
+        break
+      case 'lastUpdated':
         valueA = new Date(a.lastUpdated).getTime()
         valueB = new Date(b.lastUpdated).getTime()
+        break
+      case 'totalServiceFee':
+        valueA = a.totalServiceFee
+        valueB = b.totalServiceFee
+        break
+      case 'serviceProjectCount':
+        valueA = a.serviceProjectCount
+        valueB = b.serviceProjectCount
+        break
+      case 'signingSales':
+        valueA = a.signingSales.toLowerCase()
+        valueB = b.signingSales.toLowerCase()
         break
       default:
         valueA = a.name.toLowerCase()
@@ -550,15 +629,15 @@ const filteredCustomers = computed(() => {
     }
 
     if (typeof valueA === 'string' && typeof valueB === 'string') {
-      return sortDirection.value === 'asc' 
+      return sortDirection.value === 'asc'
         ? valueA.localeCompare(valueB)
         : valueB.localeCompare(valueA)
     }
-    
+
     if (typeof valueA === 'number' && typeof valueB === 'number') {
       return sortDirection.value === 'asc' ? valueA - valueB : valueB - valueA
     }
-    
+
     return 0
   })
 
@@ -579,11 +658,11 @@ const visiblePages = computed(() => {
   const pages = []
   const start = Math.max(1, currentPage.value - 2)
   const end = Math.min(totalPages.value, start + 4)
-  
+
   for (let i = start; i <= end; i++) {
     pages.push(i)
   }
-  
+
   return pages
 })
 
@@ -591,10 +670,9 @@ const customerStats = computed(() => {
   const total = filteredCustomers.value.length
   const active = filteredCustomers.value.filter(c => c.status === 'active').length
   const totalRevenue = filteredCustomers.value.reduce((sum, c) => sum + c.revenue, 0)
-  const avgROI = total > 0 ? 
-    (filteredCustomers.value.reduce((sum, c) => sum + c.roi, 0) / total).toFixed(1) : '0.0'
-  
-  return { total, active, totalRevenue, avgROI }
+  const gradeA = filteredCustomers.value.filter(c => c.grade === 'A').length
+
+  return { total, active, totalRevenue, gradeA }
 })
 
 const selectedCustomersData = computed(() => {
@@ -607,22 +685,50 @@ const exportColumns: ExportColumn[] = [
     label: '客户名称'
   },
   {
-    key: 'website',
-    label: '网站地址'
+    key: 'cooperationType',
+    label: '合作方式'
   },
   {
     key: 'industry',
-    label: '行业'
+    label: '客户行业'
   },
   {
-    key: 'revenue',
-    label: '收入',
-    formatter: formatters.currency
+    key: 'regions',
+    label: '地区',
+    formatter: (value) => Array.isArray(value) ? value.join(', ') : String(value || '')
   },
   {
-    key: 'roi',
-    label: 'ROI',
-    formatter: (value) => typeof value === 'number' ? `${value}x` : String(value || '')
+    key: 'primaryContact',
+    label: '联系人',
+    formatter: (value: any) => value?.name || ''
+  },
+  {
+    key: 'primaryContact',
+    label: '联系岗位',
+    formatter: (value: any) => value?.position || ''
+  },
+  {
+    key: 'primaryContact',
+    label: '联系电话',
+    formatter: (value: any) => value?.phone || ''
+  },
+  {
+    key: 'serviceTeam',
+    label: '服务团队'
+  },
+  {
+    key: 'cooperationStartTime',
+    label: '合作开始时间',
+    formatter: formatters.date
+  },
+  {
+    key: 'serviceStartTime',
+    label: '服务开始时间',
+    formatter: formatters.date
+  },
+  {
+    key: 'grade',
+    label: '分级'
   },
   {
     key: 'status',
@@ -637,18 +743,27 @@ const exportColumns: ExportColumn[] = [
     }
   },
   {
-    key: 'manager',
-    label: '负责人'
+    key: 'signingSales',
+    label: '签单销售人员'
   },
   {
-    key: 'createdAt',
-    label: '创建时间',
-    formatter: formatters.date
+    key: 'totalServiceFee',
+    label: '累计服务费',
+    formatter: formatters.currency
   },
   {
-    key: 'lastUpdated',
-    label: '最后更新',
-    formatter: formatters.date
+    key: 'serviceProjectCount',
+    label: '服务项目数量'
+  },
+  {
+    key: 'revenue',
+    label: '收入',
+    formatter: formatters.currency
+  },
+  {
+    key: 'roi',
+    label: 'ROI',
+    formatter: (value) => typeof value === 'number' ? `${value}x` : String(value || '')
   }
 ]
 
@@ -681,6 +796,10 @@ const getStatusText = (status: string): string => {
     suspended: '暂停'
   }
   return statusMap[status as keyof typeof statusMap] || status
+}
+
+const getCustomerRegions = (customer: ExtendedCustomer): string => {
+  return customer.regions.slice(0, 2).join(', ') + (customer.regions.length > 2 ? '...' : '')
 }
 
 const handleSearch = (query: string) => {
@@ -738,11 +857,11 @@ const handleSelectAll = () => {
   }
 }
 
-const handleRowClick = (customer: Customer) => {
+const handleRowClick = (customer: ExtendedCustomer) => {
   viewCustomer(customer)
 }
 
-const handleCardClick = (customer: Customer) => {
+const handleCardClick = (customer: ExtendedCustomer) => {
   viewCustomer(customer)
 }
 
@@ -752,15 +871,29 @@ const goToPage = (page: number) => {
   }
 }
 
-const editCustomer = (customer: Customer) => {
-  console.log('编辑客户:', customer.name)
+const createCustomer = () => {
+  router.push({ name: 'customer-create' })
 }
 
-const viewCustomer = (customer: Customer) => {
-  console.log('查看客户:', customer.name)
+const editCustomer = (customer: ExtendedCustomer) => {
+  // 跳转到客户详情页面并进入编辑模式
+  router.push({
+    name: 'customer-detail',
+    params: { id: customer.id.toString() },
+    query: { edit: 'true' }
+  })
 }
 
-const showCustomerMenu = (customer: Customer) => {
+const viewCustomer = (customer: ExtendedCustomer) => {
+  router.push({ name: 'customer-detail', params: { id: customer.id.toString() } })
+}
+
+const addCustomerQA = (customer: ExtendedCustomer) => {
+  console.log('添加客户Q&A:', customer.name)
+  // 这里可以打开Q&A添加弹窗
+}
+
+const showCustomerMenu = (customer: ExtendedCustomer) => {
   console.log('显示客户菜单:', customer.name)
 }
 
@@ -775,7 +908,7 @@ const handleExportComplete = (exportData: {
     recordCount: exportData.data.length,
     columnCount: exportData.columns.length
   })
-  
+
   // 这里可以添加导出完成后的处理逻辑
   // 例如：记录导出日志、显示成功消息等
 }
@@ -963,28 +1096,70 @@ onMounted(() => {
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-lg);
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .table-header {
-  padding: var(--spacing-lg);
-  border-bottom: 1px solid var(--color-border-light);
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 2px solid var(--color-border-light);
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--spacing-md);
+  position: relative;
+}
+
+.table-header::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+}
+
+.table-header__left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }
 
 .table-header__left h3 {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
-  margin: 0 0 var(--spacing-xs) 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.table-header__left h3::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: var(--color-primary);
+  border-radius: 2px;
 }
 
 .record-count {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: var(--border-radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.record-count::before {
+  content: '📊';
+  font-size: 12px;
 }
 
 .table-controls {
@@ -995,27 +1170,43 @@ onMounted(() => {
 
 .view-options {
   display: flex;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--border-radius-md);
   overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .view-btn {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  background: var(--color-surface);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: transparent;
   border: none;
   color: var(--color-text-secondary);
   cursor: pointer;
   transition: all var(--duration-fast);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 36px;
 }
 
 .view-btn:hover {
   background: var(--color-background);
+  color: var(--color-text-primary);
+  transform: translateY(-1px);
 }
 
 .view-btn--active {
   background: var(--color-primary);
   color: white;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.view-btn--active:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
 }
 
 .sort-options {
@@ -1050,28 +1241,71 @@ onMounted(() => {
 
 .customer-table {
   overflow-x: auto;
+  background: var(--color-surface);
+  position: relative;
 }
 
 .customer-table table {
   width: 100%;
+  min-width: 1400px; /* 确保表格足够宽以触发水平滚动 */
   border-collapse: collapse;
 }
 
 .customer-table th,
 .customer-table td {
-  padding: var(--spacing-md);
+  padding: var(--spacing-lg) var(--spacing-md);
   text-align: left;
   border-bottom: 1px solid var(--color-border-light);
+  white-space: nowrap;
 }
 
 .customer-table th {
-  background: var(--color-background);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
   position: sticky;
   top: 0;
   z-index: 1;
+  border-bottom: 2px solid var(--color-border);
+  white-space: nowrap;
+}
+
+/* 固定第一列（复选框） */
+.customer-table th:first-child,
+.customer-table td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
+}
+
+/* 固定第二列（客户名称） */
+.customer-table th:nth-child(2),
+.customer-table td:nth-child(2) {
+  position: sticky;
+  left: 60px; /* 调整第一列的宽度 */
+  z-index: 2;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+}
+
+/* 表头的固定列样式 */
+.customer-table th:first-child {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  z-index: 4;
+}
+
+.customer-table th:nth-child(2) {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  z-index: 3;
 }
 
 .customer-table th.sortable {
@@ -1086,14 +1320,38 @@ onMounted(() => {
 
 .customer-row {
   cursor: pointer;
-  transition: background-color var(--duration-fast);
+  transition: all var(--duration-fast);
+  position: relative;
 }
 
 .customer-row:hover {
-  background: var(--color-background);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.customer-row:hover td:first-child,
+.customer-row:hover td:nth-child(2) {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+
+
 .customer-row--selected {
+  background: var(--color-primary-light);
+}
+
+.customer-row--selected:hover {
+  background: var(--color-primary-light);
+}
+
+.customer-row--selected td:first-child,
+.customer-row--selected td:nth-child(2) {
+  background: var(--color-primary-light);
+}
+
+.customer-row--selected:hover td:first-child,
+.customer-row--selected:hover td:nth-child(2) {
   background: var(--color-primary-light);
 }
 
@@ -1101,6 +1359,8 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
+  white-space: normal;
+  min-width: 200px;
 }
 
 .customer-avatar {
@@ -1125,6 +1385,8 @@ onMounted(() => {
   font-weight: var(--font-weight-medium);
   color: var(--color-text-primary);
   margin-bottom: var(--spacing-xs);
+  white-space: normal;
+  word-break: break-word;
 }
 
 .customer-website {
@@ -1132,6 +1394,8 @@ onMounted(() => {
   color: var(--color-primary);
   margin-bottom: var(--spacing-xs);
   text-decoration: none;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .customer-manager {
@@ -1160,21 +1424,66 @@ onMounted(() => {
   font-weight: var(--font-weight-medium);
 }
 
-.roi-excellent { 
+.roi-excellent {
   background: rgba(82, 196, 26, 0.1);
   color: var(--color-success);
 }
-.roi-good { 
+.roi-good {
   background: rgba(24, 144, 255, 0.1);
   color: var(--color-info);
 }
-.roi-fair { 
+.roi-fair {
   background: rgba(250, 173, 20, 0.1);
   color: var(--color-warning);
 }
-.roi-poor { 
+.roi-poor {
   background: rgba(245, 34, 45, 0.1);
   color: var(--color-error);
+}
+
+.region-text,
+.contact-text,
+.team-text,
+.date-text,
+.sales-text,
+.service-fee-text,
+.project-count-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.service-fee-text {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-success);
+}
+
+.project-count-text {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-info);
+}
+
+.grade-badge {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+  min-width: 24px;
+}
+
+.grade-badge--A {
+  background: rgba(82, 196, 26, 0.1);
+  color: var(--color-success);
+}
+
+.grade-badge--B {
+  background: rgba(24, 144, 255, 0.1);
+  color: var(--color-info);
+}
+
+.grade-badge--C {
+  background: rgba(250, 173, 20, 0.1);
+  color: var(--color-warning);
 }
 
 .status-badge {
@@ -1285,10 +1594,42 @@ onMounted(() => {
   margin: 0 0 var(--spacing-md) 0;
 }
 
+.customer-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.cooperation-tag,
+.team-tag {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--color-background);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-primary);
+}
+
+.contact-info {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-primary);
+}
+
 .customer-card__metrics {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
 }
 
@@ -1322,6 +1663,28 @@ onMounted(() => {
   border-radius: var(--border-radius-sm);
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
+}
+
+.grade-tag {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.grade-tag--A {
+  background: rgba(82, 196, 26, 0.1);
+  color: var(--color-success);
+}
+
+.grade-tag--B {
+  background: rgba(24, 144, 255, 0.1);
+  color: var(--color-info);
+}
+
+.grade-tag--C {
+  background: rgba(250, 173, 20, 0.1);
+  color: var(--color-warning);
 }
 
 .status-indicator {
@@ -1497,7 +1860,7 @@ onMounted(() => {
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
   }
-  
+
   .customer-stats {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1509,75 +1872,83 @@ onMounted(() => {
     align-items: stretch;
     gap: var(--spacing-lg);
   }
-  
+
   .page-header__actions {
     flex-direction: column;
     gap: var(--spacing-sm);
   }
-  
+
   .action-btn {
     flex: 1;
     justify-content: center;
   }
-  
+
   .search-filter-section {
     gap: var(--spacing-md);
   }
-  
+
   .search-section {
     flex-direction: column;
     gap: var(--spacing-sm);
   }
-  
+
   .customer-search {
     max-width: none;
   }
-  
+
   .customer-stats {
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
   }
-  
+
   .stat-card {
     padding: var(--spacing-md);
   }
-  
+
   .table-header {
     flex-direction: column;
     align-items: stretch;
     gap: var(--spacing-sm);
     padding: var(--spacing-md);
   }
-  
+
   .table-controls {
     flex-direction: column;
     align-items: stretch;
     gap: var(--spacing-sm);
   }
-  
+
   .view-options {
     align-self: center;
   }
-  
+
   .customer-grid {
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
     padding: var(--spacing-md);
   }
-  
+
   .customer-card {
     padding: var(--spacing-md);
   }
-  
+
   .customer-table {
     font-size: var(--font-size-sm);
   }
-  
+
   .customer-table th,
   .customer-table td {
     padding: var(--spacing-sm);
   }
-  
+
+  .cooperation-badge,
+  .industry-badge,
+  .grade-badge,
+  .status-badge {
+    font-size: var(--font-size-xs);
+    padding: 2px 6px;
+  }
+
   .bulk-actions {
     left: var(--spacing-md);
     right: var(--spacing-md);
@@ -1587,34 +1958,34 @@ onMounted(() => {
     gap: var(--spacing-md);
     padding: var(--spacing-md);
   }
-  
+
   .bulk-actions__buttons {
     justify-content: center;
     flex-wrap: wrap;
   }
-  
+
   .bulk-action-btn {
     flex: 1;
     min-width: 120px;
   }
-  
+
   .pagination-section {
     flex-direction: column;
     align-items: stretch;
     text-align: center;
     gap: var(--spacing-sm);
   }
-  
+
   .pagination-controls {
     justify-content: center;
     flex-wrap: wrap;
   }
-  
+
   .pagination-numbers {
     order: 2;
     justify-content: center;
   }
-  
+
   .pagination-btn {
     min-width: 80px;
   }
@@ -1624,51 +1995,51 @@ onMounted(() => {
   .page-title {
     font-size: var(--font-size-2xl);
   }
-  
+
   .stat-card {
     flex-direction: column;
     text-align: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-sm);
   }
-  
+
   .stat-icon {
     align-self: center;
     width: 40px;
     height: 40px;
   }
-  
+
   .stat-value {
     font-size: var(--font-size-xl);
   }
-  
+
   .customer-card {
     padding: var(--spacing-sm);
   }
-  
+
   .customer-table {
     font-size: var(--font-size-xs);
   }
-  
+
   .customer-table th,
   .customer-table td {
     padding: var(--spacing-xs);
   }
-  
+
   .table-actions {
     gap: var(--spacing-xs);
   }
-  
+
   .action-btn {
     padding: var(--spacing-xs) var(--spacing-sm);
     font-size: var(--font-size-xs);
   }
-  
+
   .bulk-action-btn {
     padding: var(--spacing-xs) var(--spacing-sm);
     font-size: var(--font-size-xs);
   }
-  
+
   .pagination-number {
     width: 28px;
     height: 28px;

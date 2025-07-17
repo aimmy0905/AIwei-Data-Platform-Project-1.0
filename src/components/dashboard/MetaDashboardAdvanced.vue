@@ -124,7 +124,7 @@
               :data="landingPagesChartData.spendData"
               :height="'300px'"
               :show-legend="false"
-              :donut="true"
+              :donut="false"
             />
             <h5 class="chart-title">花费占比</h5>
             <div class="chart-legend">
@@ -145,7 +145,7 @@
               :data="landingPagesChartData.revenueData"
               :height="'300px'"
               :show-legend="false"
-              :donut="true"
+              :donut="false"
             />
             <h5 class="chart-title">收入占比</h5>
             <div class="chart-legend">

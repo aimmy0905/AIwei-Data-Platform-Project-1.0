@@ -1,25 +1,18 @@
 <template>
-  <div class="dashboard-view">
-    <!-- 筛选组件 -->
-    <div class="dashboard-filter-sticky">
+    <div class="dashboard-content">
+    <!-- 筛选项部分 - 固定在顶部 -->
+    <div class="dashboard-filter-container">
       <DashboardFilter
         :customer-options="customers"
-        @filter-apply="handleFilterApply"
+        :initial-filters="filters"
         @filter-change="handleFilterChange"
+        @filter-apply="handleFilterApply"
         @filter-reset="handleFilterReset"
       />
     </div>
 
-    <!-- 子菜单导航 -->
-    <DashboardSubNav
-      :sections="dashboardSections"
-      @section-change="handleSectionChange"
-    />
-
-    <!-- 仪表板内容 -->
-    <div class="dashboard-content">
-      <!-- 预警提醒部分 -->
-      <section id="alerts" class="dashboard-section">
+    <!-- 预警提醒部分 -->
+    <section id="alerts" class="dashboard-section">
       <AlertPanel
         :alerts="recentAlerts"
         :loading="loading"
@@ -91,7 +84,6 @@
       <AdPlatformOverviewPanel />
     </section>
     </div>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -112,9 +104,8 @@ import {
 import { mockGetDashboardData, mockGetCustomers } from '@/mock'
 import LineChart from '@/components/charts/LineChart.vue'
 import PieChartComponent from '@/components/charts/PieChart.vue'
-import DashboardFilter from '@/components/common/DashboardFilter.vue'
 import AlertPanel from '@/components/common/AlertPanel.vue'
-import DashboardSubNav from '@/components/dashboard/DashboardSubNav.vue'
+
 import CustomerGoalsModule from '@/components/dashboard/CustomerGoalsModule.vue'
 import WebsiteDataPanel from '@/components/dashboard/WebsiteDataPanel.vue'
 import ChannelDataPanel from '@/components/dashboard/ChannelDataPanel.vue'
@@ -127,6 +118,7 @@ import CompetitorPanel from '@/components/dashboard/CompetitorPanel.vue'
 import AdPlatformOverviewPanel from '@/components/dashboard/AdPlatformOverviewPanel.vue'
 import type { Customer, Alert, Channel, Campaign, ProductSales, WebsiteData } from '@/types'
 import { useMenuStore } from '@/stores/menu'
+import DashboardFilter from '@/components/common/DashboardFilter.vue'
 
 // 组合式API
 const menuStore = useMenuStore()
@@ -437,23 +429,7 @@ const formatTime = (time: string): string => {
   return '刚刚'
 }
 
-// 筛选相关方法
-const handleFilterApply = (filters: any) => {
-  console.log('应用筛选:', filters)
-  // 根据筛选条件重新加载数据
-  loadDashboardData()
-}
 
-const handleFilterChange = (filters: any) => {
-  console.log('筛选条件变化:', filters)
-  // 可以在这里实时更新数据或做其他处理
-}
-
-const handleFilterReset = () => {
-  console.log('重置筛选条件')
-  // 重置筛选条件后重新加载数据
-  loadDashboardData()
-}
 
 // 加载客户数据
 const loadCustomers = async () => {
@@ -669,6 +645,54 @@ const initializeMenuState = () => {
   updateBreadcrumb('alerts')
 }
 
+// 筛选项相关状态和方法
+interface DashboardFilters {
+  customerId: number | null
+  projectId: string
+  viewMode: 'all' | 'my'
+  dateRange: string
+  startDate: string
+  endDate: string
+}
+
+const filters = ref<DashboardFilters>({
+  customerId: null,
+  projectId: '',
+  viewMode: 'all',
+  dateRange: 'today',
+  startDate: '',
+  endDate: ''
+})
+
+
+
+const handleFilterChange = (newFilters: DashboardFilters) => {
+  filters.value = { ...newFilters }
+}
+
+const handleFilterApply = (appliedFilters: DashboardFilters) => {
+  console.log('Filter applied:', appliedFilters)
+  filters.value = { ...appliedFilters }
+  // 应用过滤逻辑，例如重新加载数据
+  loadDashboardData()
+}
+
+const handleFilterReset = () => {
+  console.log('Filter reset')
+  // 重置过滤器
+  filters.value = {
+    customerId: null,
+    projectId: '',
+    viewMode: 'all',
+    dateRange: 'today',
+    startDate: '',
+    endDate: ''
+  }
+  loadDashboardData()
+}
+
+
+
 // 生命周期
 onMounted(() => {
   loadCustomers()
@@ -685,64 +709,105 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.dashboard-view {
-  padding: 0;
+.dashboard-content {
+  padding-top: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
-.dashboard-filter-sticky {
-  position: fixed;
-  top: var(--header-height, 60px);
-  left: var(--sidebar-width, 250px);
-  right: 0;
+/* 筛选项容器样式 */
+.dashboard-filter-container {
+  position: sticky;
+  top: 64px;
   z-index: 1000;
-  background: white;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: left var(--duration-normal);
+  background-color: rgba(255, 255, 255, 0.98);
+  border-bottom: 1px solid var(--color-border-light);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  margin-bottom: var(--spacing-2xl);
+  backdrop-filter: blur(12px);
+  border-radius: 8px;
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
-.main-layout--collapsed .dashboard-filter-sticky {
-  left: var(--sidebar-collapsed-width, 70px);
+
+
+
+
+/* 移动端适配 */
+@media (max-width: 1024px) {
+  .dashboard-filter-container {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-filter-container {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .dashboard-filter-container.sticky {
+    top: 60px;
+    padding-left: 20px;
+    padding-right: 20px;
+    max-width: none;
+    z-index: 1001;
+  }
+}
+
+  .dashboard-content {
+    padding-top: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .dashboard-section {
+    scroll-margin-top: 140px; /* 考虑筛选项高度 */
+  }
+
+@media (max-width: 480px) {
+  .dashboard-filter-container {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .dashboard-filter-container.sticky {
+    top: 56px;
+    padding-left: 20px;
+    padding-right: 20px;
+    max-width: none;
+    z-index: 1002;
+  }
 }
 
 .dashboard-content {
-  padding-top: 200px; /* 给筛选器和子菜单导航留出足够空间 */
-}
-
-/* 移动端适配 */
-@media (max-width: 768px) {
-  .dashboard-filter-sticky {
-    left: 0;
-    right: 0;
-  }
-
-  .main-layout--collapsed .dashboard-filter-sticky {
-    left: 0;
-  }
-
-  .dashboard-content {
-    padding-top: 170px; /* 移动端减少一些间距 */
-  }
-
-  .dashboard-section {
-    scroll-margin-top: 150px; /* 移动端调整滚动偏移 */
-  }
-}
-
-@media (max-width: 480px) {
-  .dashboard-content {
-    padding-top: 160px; /* 小屏幕进一步减少间距 */
-  }
-
-  .dashboard-section {
-    scroll-margin-top: 140px;
-    margin-bottom: var(--spacing-xl); /* 减少section间距 */
-  }
+  padding-top: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .dashboard-section {
   margin-bottom: var(--spacing-2xl);
-  scroll-margin-top: 180px; /* 头部 + 筛选器 + 子菜单导航的高度 */
+  scroll-margin-top: 80px; /* 头部导航的高度 */
 }
 
 .section-card {

@@ -35,6 +35,163 @@ export interface Customer {
   assignedTo?: string
 }
 
+// 客户详细信息类型
+export interface CustomerDetail {
+  id: number
+  // 合作详情
+  cooperationDetails: CooperationDetails
+  // 客户基础信息
+  basicInfo: CustomerBasicInfo
+  // 独立站情况及目标
+  websiteInfo: WebsiteInfo
+  // 竞对情况
+  competitorInfo: CompetitorInfo
+  // 特别关注事项
+  specialAttention: SpecialAttention
+  // Q&A记录
+  qaRecords: CustomerQA[]
+  // 续费跟进
+  renewalNotes: string
+  // 关联项目
+  projects: Project[]
+  // 广告账户
+  adAccounts: AdAccount[]
+  // 创建和更新时间
+  createdAt: string
+  lastUpdated: string
+}
+
+// 合作详情
+export interface CooperationDetails {
+  customerName: string
+  cooperationStartTime: string // 合作起始时间（合同）
+  serviceStartTime: string // 实际服务开始时间
+  cooperationType: string // 合作方式
+  signingSales: string // 签单销售
+  specialConditions: string // 其它特殊合作条件
+  customerGrade: 'A' | 'B' | 'C' // 客户分级
+  customerStatus: 'active' | 'inactive' | 'suspended' // 客户状态
+}
+
+// 客户基础信息
+export interface CustomerBasicInfo {
+  serviceTeam: string // 艾维服务团队（具体项目组）
+  contactPersons: ContactPerson[] // 联系人及对应岗位
+  industry: string // 客户行业
+  regions: string[] // 客户所有地区
+  businessModel: string // 商业及生产模式
+  overseasSalesScale: string // 海外销售额规模
+  overseasSalesRatio: number // 海外销售在企业占比
+  targetSalesScale: string // 海外三年内目标销售额规模
+  mainSalesChannel: string // 目前公司海外销售最重要的销售渠道
+  hasTechTeam: boolean // 企业内是否有网站技术及素材制作团队
+  hasOperationTeam: boolean // 企业内是否有投放或运营团队
+  hasBrandTeam: boolean // 企业内是否有品牌及内容团队
+  cooperationTransfer: string // 此次合作是服务商转移还是内部团队转移
+}
+
+// 联系人
+export interface ContactPerson {
+  id: number
+  name: string // 联系人姓名
+  position: string // 岗位
+  phone: string // 电话
+  email: string // 邮箱
+  isPrimary: boolean // 是否主要联系人
+}
+
+// 独立站情况及目标
+export interface WebsiteInfo {
+  newProductFrequency: string // 新品上线频率
+  websiteLaunchTime: string // 独立站上线时间
+  lastYearSales: number // 过去一年独立站出口销售额
+  targetMarkets: string[] // 独立站主要推广目标市场
+  mainProducts: string // 独立站主要推广重要产品
+  productAdvantages: string // 产品最大的优势卖点
+  pricingStrategy: string // 独立站及第三方平台价格定位
+  inventoryStatus: boolean // 独立站销售产品是否在仓
+  annualSalesTarget: number // 年度销售目标
+  annualCostTarget: number // 年度成本目标
+  costRatio: number // 成本占比
+}
+
+// 竞对情况
+export interface CompetitorInfo {
+  competitorWebsites: CompetitorWebsite[] // 竞争对手网址
+}
+
+// 竞对网址
+export interface CompetitorWebsite {
+  id: number
+  websiteUrl: string // 竞对网址
+  companyName: string // 竞对公司名称
+  notes: string // 备注
+}
+
+// 特别关注事项
+export interface SpecialAttention {
+  customerExpectations: string // 客户期望
+  communicationPreferences: string // 沟通偏好
+  specialRequirements: string // 特殊要求
+  culturalConsiderations: string // 文化考虑因素
+  timeZonePreferences: string // 时区偏好
+  languagePreferences: string // 语言偏好
+  decisionMakers: string // 决策者信息
+  budgetConstraints: string // 预算限制
+  complianceRequirements: string // 合规要求
+  riskFactors: string // 风险因素
+  successFactors: string // 成功因素
+  historicalIssues: string // 历史问题
+}
+
+// 客户Q&A记录
+export interface CustomerQA {
+  id: number
+  customerId: number
+  issueDate: string // 问题发生日期
+  issueCategory: string // 问题分类
+  issueDescription: string // 问题详细描述
+  impactLevel: 'low' | 'medium' | 'high' | 'critical' // 影响程度
+  rootCause: string // 根本原因分析
+  immediateSolution: string // 即时解决方案
+  correctiveMeasures: string // 改正措施
+  preventiveMeasures: string // 预防措施
+  responsiblePerson: string // 负责人
+  dueDate: string // 完成期限
+  actualCompletionDate: string // 实际完成日期
+  status: 'pending' | 'in_progress' | 'completed' | 'cancelled' // 状态
+  followUpActions: string // 后续行动
+  lessonsLearned: string // 经验教训
+  attachments: string[] // 相关附件
+  createdAt: string
+  updatedAt: string
+}
+
+// 广告账户
+export interface AdAccount {
+  id: number
+  platform: 'google' | 'facebook' | 'bing' | 'criteo' | 'other'
+  accountId: string
+  accountName: string
+  status: 'active' | 'paused' | 'limited' | 'suspended'
+  balance: number
+  lastUpdated: string
+}
+
+// 续费记录
+export interface RenewalRecord {
+  id: number
+  customerId: number
+  renewalType: string // 续费类型
+  renewalAmount: number // 续费金额
+  renewalPeriod: string // 续费周期
+  renewalDate: string // 续费日期
+  expiryDate: string // 到期日期
+  status: 'pending' | 'completed' | 'cancelled' // 续费状态
+  salesPerson: string // 负责销售
+  notes: string // 备注
+}
+
 // 项目类型
 export interface Project {
   id: string

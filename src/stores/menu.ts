@@ -126,7 +126,15 @@ export const useMenuStore = defineStore('menu', () => {
     } else {
       console.log('No menu found for path, trying fallback logic')
       // 如果找不到对应的菜单，尝试处理特殊路径
-      if (path.startsWith('/dashboard') || path === '/dashboard') {
+      if (path.startsWith('/customers')) {
+        // 处理客户相关路径
+        if (path === '/customers') {
+          setActiveMenu('customer-list')
+        } else if (path.startsWith('/customers/')) {
+          // 客户详情或其他客户子页面，仍然激活客户列表菜单
+          setActiveMenu('customer-list')
+        }
+      } else if (path.startsWith('/dashboard') || path === '/dashboard') {
         if (path === '/dashboard/ad-platform-overview') {
           setActiveMenu('ad-platform-overview')
         } else if (path === '/dashboard/meta-dashboard') {
@@ -149,20 +157,34 @@ export const useMenuStore = defineStore('menu', () => {
   }
 
   const toggleCollapse = () => {
+    console.log('toggleCollapse called, current value:', collapsed.value)
+    const oldValue = collapsed.value
     collapsed.value = !collapsed.value
+    console.log('toggleCollapse result:', oldValue, '->', collapsed.value)
+
     // 折叠时清空展开的菜单
     if (collapsed.value) {
       openKeys.value = []
     }
+
+    // 强制触发响应式更新
+    console.log('Force trigger reactive update')
   }
 
   const toggleSubmenu = (menuId: string) => {
+    console.log('toggleSubmenu called for:', menuId)
+    console.log('Current openKeys:', openKeys.value)
+
     const index = openKeys.value.indexOf(menuId)
     if (index > -1) {
+      console.log('Closing submenu:', menuId)
       openKeys.value.splice(index, 1)
     } else {
+      console.log('Opening submenu:', menuId)
       openKeys.value.push(menuId)
     }
+
+    console.log('New openKeys:', openKeys.value)
   }
 
   const isMenuOpen = (menuId: string) => {

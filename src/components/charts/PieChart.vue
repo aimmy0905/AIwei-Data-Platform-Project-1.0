@@ -92,22 +92,40 @@ const chartOption = computed(() => {
       }
     },
 
-    legend: props.showLegend ? {
-      orient: 'vertical',
-      right: 10,
-      top: 'center',
+                        legend: props.showLegend ? {
+      orient: 'horizontal',
+      bottom: 15,
+      left: 'center',
+      itemWidth: 8,
+      itemHeight: 8,
+      itemGap: 20,
+      width: '95%',
+      formatter: (name: string) => {
+        const item = props.data.find(d => d.name === name)
+        if (!item) return name
+
+        const value = formatValue(item.value)
+        // 计算总值用于显示百分比
+        const total = props.data.reduce((sum, item) => sum + item.value, 0)
+        const percentage = ((item.value / total) * 100).toFixed(1)
+
+        // 缩短名称以适应水平布局
+        const shortName = name.length > 8 ? name.substring(0, 8) + '...' : name
+        return `${shortName} $${value} (${percentage}%)`
+      },
       textStyle: {
-        color: colors.textSecondary
+        color: colors.textPrimary,
+        fontSize: 10,
+        lineHeight: 16,
+        fontFamily: 'Arial, sans-serif'
       }
     } : { show: false },
 
-    series: [
+            series: [
       {
         type: 'pie',
-        radius: props.donut
-          ? (Array.isArray(props.radius) ? props.radius : ['40%', props.radius])
-          : props.radius,
-        center: ['50%', '50%'],
+        radius: props.donut ? ['30%', '55%'] : '55%',
+        center: ['50%', '45%'],
         data: props.data.map((item, index) => ({
           ...item,
           itemStyle: {
@@ -122,14 +140,12 @@ const chartOption = computed(() => {
           }
         },
         label: {
-          show: !props.showLegend,
-          position: 'outside',
-          color: colors.textPrimary,
-          formatter: '{b}: {c} ({d}%)'
+          show: false
         },
         labelLine: {
-          show: !props.showLegend
+          show: false
         },
+        silent: false,
         animationType: 'scale',
         animationEasing: 'elasticOut',
         animationDelay: () => Math.random() * 200

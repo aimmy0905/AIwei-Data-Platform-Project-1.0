@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户列表功能增强测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        .feature-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+        }
+        .feature-title {
+            color: #2563eb;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .feature-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .demo-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        .demo-table th,
+        .demo-table td {
+            border: 1px solid #ddd;
+            padding: 12px 8px;
+            text-align: left;
+        }
+        .demo-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        .demo-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .service-fee {
+            color: #22c55e;
+            font-weight: 600;
+        }
+        .project-count {
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        .highlight {
+            background-color: #fef3c7;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .link-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 10px 10px 10px 0;
+            font-weight: 500;
+        }
+        .link-button:hover {
+            background: #1d4ed8;
+        }
+        .link-button.secondary {
+            background: #6b7280;
+        }
+        .link-button.secondary:hover {
+            background: #4b5563;
+        }
+        .code-block {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .status-new {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>客户列表功能增强测试</h1>
+            <p>本页面用于测试和演示客户列表中新增的"累计服务费"和"服务项目数量"功能</p>
+        </div>
+
+        <div class="feature-section">
+            <h2 class="feature-title">🎯 功能概述</h2>
+            <p class="feature-description">
+                本次更新为客户列表页面添加了两个重要的数据列：
+            </p>
+            <ul>
+                <li><strong>累计服务费</strong>：显示每个客户的累计服务费用，帮助了解客户价值</li>
+                <li><strong>服务项目数量</strong>：显示每个客户的服务项目总数，帮助评估服务深度</li>
+            </ul>
+            <div class="code-block">
+                <strong>新增字段：</strong><br>
+                - totalServiceFee: number // 累计服务费<br>
+                - serviceProjectCount: number // 服务项目数量
+            </div>
+        </div>
+
+        <div class="feature-section">
+            <h2 class="feature-title">📊 数据示例</h2>
+            <p class="feature-description">
+                以下是客户列表中新增列的数据示例：
+            </p>
+            <table class="demo-table">
+                <thead>
+                    <tr>
+                        <th>客户名称</th>
+                        <th>合作方式</th>
+                        <th>客户行业</th>
+                        <th>服务团队</th>
+                        <th class="highlight">累计服务费</th>
+                        <th class="highlight">服务项目数量</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>时尚潮流服饰有限公司</td>
+                        <td>代运营</td>
+                        <td>时尚服装</td>
+                        <td>时尚组</td>
+                        <td class="service-fee">¥120,000</td>
+                        <td class="project-count">15</td>
+                        <td><span class="status-badge status-completed">活跃</span></td>
+                    </tr>
+                    <tr>
+                        <td>科技数码创新公司</td>
+                        <td>咨询服务</td>
+                        <td>数码科技</td>
+                        <td>科技组</td>
+                        <td class="service-fee">¥80,000</td>
+                        <td class="project-count">10</td>
+                        <td><span class="status-badge status-completed">活跃</span></td>
+                    </tr>
+                    <tr>
+                        <td>美容护肤品牌</td>
+                        <td>代运营</td>
+                        <td>美容护肤</td>
+                        <td>美妆组</td>
+                        <td class="service-fee">¥150,000</td>
+                        <td class="project-count">20</td>
+                        <td><span class="status-badge status-completed">活跃</span></td>
+                    </tr>
+                    <tr>
+                        <td>运动健身器材</td>
+                        <td>技术支持</td>
+                        <td>体育用品</td>
+                        <td>运动组</td>
+                        <td class="service-fee">¥70,000</td>
+                        <td class="project-count">10</td>
+                        <td><span class="status-badge status-new">非活跃</span></td>
+                    </tr>
+                    <tr>
+                        <td>高端珠宝首饰</td>
+                        <td>代运营</td>
+                        <td>时尚服装</td>
+                        <td>时尚组</td>
+                        <td class="service-fee">¥200,000</td>
+                        <td class="project-count">30</td>
+                        <td><span class="status-badge status-completed">活跃</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="feature-section">
+            <h2 class="feature-title">✨ 新功能特点</h2>
+            <div class="feature-description">
+                <h4>1. 表格视图增强</h4>
+                <ul>
+                    <li>新增"累计服务费"列，使用 <span class="service-fee">绿色</span> 高亮显示</li>
+                    <li>新增"服务项目数量"列，使用 <span class="project-count">蓝色</span> 高亮显示</li>
+                    <li>支持按这两个字段进行排序（点击列标题）</li>
+                    <li>数据格式化：服务费显示为 ¥120,000，项目数显示为整数</li>
+                </ul>
+
+                <h4>2. 网格视图增强</h4>
+                <ul>
+                    <li>在客户卡片的指标区域新增服务费和项目数显示</li>
+                    <li>保持与表格视图一致的颜色主题</li>
+                    <li>响应式布局，适配不同屏幕尺寸</li>
+                </ul>
+
+                <h4>3. 排序功能</h4>
+                <ul>
+                    <li>点击"累计服务费"列标题可以按服务费排序</li>
+                    <li>点击"服务项目数量"列标题可以按项目数排序</li>
+                    <li>支持升序和降序切换</li>
+                </ul>
+
+                <h4>4. 导出功能</h4>
+                <ul>
+                    <li>导出的Excel/CSV文件包含新增的两个字段</li>
+                    <li>累计服务费格式化为货币格式</li>
+                    <li>服务项目数量保持数字格式</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="feature-section">
+            <h2 class="feature-title">🔧 测试步骤</h2>
+            <div class="feature-description">
+                <h4>步骤1：查看表格视图</h4>
+                <ol>
+                    <li>访问客户管理页面</li>
+                    <li>确认表格中显示了"累计服务费"和"服务项目数量"两列</li>
+                    <li>检查数据格式是否正确（服务费有¥符号，项目数为整数）</li>
+                    <li>检查颜色主题是否正确（服务费绿色，项目数蓝色）</li>
+                </ol>
+
+                <h4>步骤2：测试排序功能</h4>
+                <ol>
+                    <li>点击"累计服务费"列标题</li>
+                    <li>确认数据按服务费金额排序</li>
+                    <li>再次点击确认排序方向切换</li>
+                    <li>点击"服务项目数量"列标题测试项目数排序</li>
+                </ol>
+
+                <h4>步骤3：测试网格视图</h4>
+                <ol>
+                    <li>点击右上角的网格视图按钮</li>
+                    <li>确认客户卡片中显示了服务费和项目数指标</li>
+                    <li>检查颜色主题是否与表格视图一致</li>
+                </ol>
+
+                <h4>步骤4：测试导出功能</h4>
+                <ol>
+                    <li>点击"导出数据"按钮</li>
+                    <li>选择导出格式（Excel或CSV）</li>
+                    <li>确认导出文件包含新增的两个字段</li>
+                    <li>检查数据格式是否正确</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="feature-section">
+            <h2 class="feature-title">🚀 快速测试</h2>
+            <p class="feature-description">
+                点击以下链接快速访问相关页面进行测试：
+            </p>
+            <a href="http://localhost:5173/customers" class="link-button">打开客户列表页面</a>
+            <a href="http://localhost:5173/customers/1" class="link-button secondary">查看客户详情示例</a>
+        </div>
+
+        <div class="feature-section">
+            <h2 class="feature-title">📝 技术说明</h2>
+            <div class="feature-description">
+                <h4>数据模型更新</h4>
+                <div class="code-block">
+export interface ExtendedCustomer extends Customer {<br>
+&nbsp;&nbsp;// ... 其他字段<br>
+&nbsp;&nbsp;totalServiceFee: number // 累计服务费<br>
+&nbsp;&nbsp;serviceProjectCount: number // 服务项目数量<br>
+}
+                </div>
+
+                <h4>样式定义</h4>
+                <div class="code-block">
+.service-fee-text {<br>
+&nbsp;&nbsp;font-weight: var(--font-weight-medium);<br>
+&nbsp;&nbsp;color: var(--color-success); // 绿色<br>
+}<br><br>
+.project-count-text {<br>
+&nbsp;&nbsp;font-weight: var(--font-weight-medium);<br>
+&nbsp;&nbsp;color: var(--color-info); // 蓝色<br>
+}
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-section">
+            <h2 class="feature-title">✅ 完成状态</h2>
+            <div class="feature-description">
+                <ul>
+                    <li><span class="status-badge status-completed">完成</span> 数据模型更新</li>
+                    <li><span class="status-badge status-completed">完成</span> 表格视图增强</li>
+                    <li><span class="status-badge status-completed">完成</span> 网格视图增强</li>
+                    <li><span class="status-badge status-completed">完成</span> 排序功能实现</li>
+                    <li><span class="status-badge status-completed">完成</span> 导出功能更新</li>
+                    <li><span class="status-badge status-completed">完成</span> 样式和主题适配</li>
+                    <li><span class="status-badge status-completed">完成</span> 响应式设计</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

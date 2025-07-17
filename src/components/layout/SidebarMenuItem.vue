@@ -182,11 +182,16 @@ const getIcon = (iconName: string) => {
 }
 
 const toggleSubmenu = () => {
+  console.log('toggleSubmenu called for:', props.item.id, 'collapsed:', props.collapsed)
   if (!props.collapsed) {
     console.log('Toggling submenu for:', props.item.id)
+    console.log('Current open state:', menuStore.isMenuOpen(props.item.id))
     menuStore.toggleSubmenu(props.item.id)
+    console.log('New open state:', menuStore.isMenuOpen(props.item.id))
     // 也要触发选择事件，让父组件知道这个菜单项被点击了
     emit('select', props.item)
+  } else {
+    console.log('Submenu toggle blocked - sidebar is collapsed')
   }
 }
 
@@ -196,10 +201,20 @@ const handleClick = () => {
 }
 
 const handleHeaderClick = () => {
+  console.log('handleHeaderClick called for:', props.item.id, 'has path:', !!props.item.path, 'has children:', !!(props.item.children && props.item.children.length > 0))
+
   if (props.item.path) {
+    // 如果有路径，直接导航
+    console.log('Navigating to path:', props.item.path)
     emit('select', props.item)
-  } else {
+  } else if (props.item.children && props.item.children.length > 0) {
+    // 如果有子菜单，切换展开状态
+    console.log('Toggling submenu for item with children')
     toggleSubmenu()
+  } else {
+    // 普通菜单项
+    console.log('Selecting regular menu item')
+    emit('select', props.item)
   }
 }
 </script>

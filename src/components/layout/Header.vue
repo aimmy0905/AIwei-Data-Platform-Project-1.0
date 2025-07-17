@@ -2,29 +2,40 @@
   <header class="header" :class="{ 'header--collapsed': collapsed }">
     <div class="header__left">
       <!-- 移动端菜单按钮 -->
-      <button 
+      <button
         class="header__mobile-menu"
         @click="toggleMobileMenu"
       >
         <Menu :size="20" />
       </button>
-      
+
+      <!-- 返回按钮 -->
+      <button
+        v-if="showBackButton"
+        class="header__back-button"
+        @click="goBack"
+        :title="backButtonTitle"
+      >
+        <ArrowLeft :size="16" />
+        <span class="header__back-text">{{ backButtonText }}</span>
+      </button>
+
       <!-- 面包屑导航 -->
       <nav class="header__breadcrumb">
-        <div 
-          v-for="(item, index) in breadcrumb" 
+        <div
+          v-for="(item, index) in breadcrumb"
           :key="item.id"
           class="header__breadcrumb-item"
         >
-          <component 
-            :is="getIcon(item.icon)" 
-            :size="16" 
+          <component
+            :is="getIcon(item.icon)"
+            :size="16"
             class="header__breadcrumb-icon"
           />
           <span class="header__breadcrumb-text">{{ item.name }}</span>
-          <ChevronRight 
+          <ChevronRight
             v-if="index < breadcrumb.length - 1"
-            :size="14" 
+            :size="14"
             class="header__breadcrumb-separator"
           />
         </div>
@@ -35,8 +46,8 @@
       <!-- 搜索框 -->
       <div class="header__search">
         <Search :size="16" class="header__search-icon" />
-        <input 
-          type="text" 
+        <input
+          type="text"
           placeholder="搜索..."
           class="header__search-input"
           v-model="searchKeyword"
@@ -45,7 +56,7 @@
       </div>
 
       <!-- 主题切换 -->
-      <button 
+      <button
         class="header__theme-toggle"
         @click="toggleTheme"
         :title="currentTheme === 'light' ? '切换到深色模式' : '切换到浅色模式'"
@@ -56,7 +67,7 @@
 
       <!-- 通知中心 -->
       <div class="header__notifications">
-        <button 
+        <button
           class="header__notification-btn"
           @click="toggleNotifications"
           :class="{ 'header__notification-btn--active': showNotifications }"
@@ -66,7 +77,7 @@
             {{ unreadCount > 99 ? '99+' : unreadCount }}
           </span>
         </button>
-        
+
         <!-- 通知面板 -->
         <Transition name="slide-down">
           <div v-show="showNotifications" class="header__notification-panel">
@@ -77,8 +88,8 @@
               </button>
             </div>
             <div class="header__notification-list">
-              <div 
-                v-for="alert in recentAlerts" 
+              <div
+                v-for="alert in recentAlerts"
                 :key="alert.id"
                 class="header__notification-item"
                 :class="{ 'header__notification-item--unread': !alert.isRead }"
@@ -89,7 +100,7 @@
                   <div class="header__notification-message">{{ alert.message }}</div>
                   <div class="header__notification-time">{{ formatTime(alert.createdAt) }}</div>
                 </div>
-                <div 
+                <div
                   class="header__notification-indicator"
                   :class="`header__notification-indicator--${alert.level}`"
                 ></div>
@@ -106,26 +117,26 @@
 
       <!-- 用户菜单 -->
       <div class="header__user">
-        <button 
+        <button
           class="header__user-btn"
           @click="toggleUserMenu"
           :class="{ 'header__user-btn--active': showUserMenu }"
         >
-          <img 
-            :src="getUserAvatarUrl()" 
+          <img
+            :src="getUserAvatarUrl()"
             :alt="userName"
             class="header__user-avatar"
           />
           <span class="header__user-name">{{ userName }}</span>
           <ChevronDown :size="16" class="header__user-arrow" />
         </button>
-        
+
         <!-- 用户菜单面板 -->
         <Transition name="slide-down">
           <div v-show="showUserMenu" class="header__user-panel">
             <div class="header__user-info">
-              <img 
-                :src="getUserAvatarUrl()" 
+              <img
+                :src="getUserAvatarUrl()"
                 :alt="userName"
                 class="header__user-info-avatar"
               />
@@ -159,16 +170,16 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { 
-  Menu, 
-  ChevronRight, 
-  Search, 
-  Sun, 
-  Moon, 
-  Bell, 
-  ChevronDown, 
-  User, 
-  Palette, 
+import {
+  Menu,
+  ChevronRight,
+  Search,
+  Sun,
+  Moon,
+  Bell,
+  ChevronDown,
+  User,
+  Palette,
   LogOut,
   BarChart3,
   PieChart,
@@ -191,7 +202,8 @@ import {
   FolderOpen,
   Settings,
   Shield,
-  Cog
+  Cog,
+  ArrowLeft
 } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { useMenuStore } from '@/stores/menu'
@@ -218,6 +230,33 @@ const breadcrumb = computed(() => menuStore.getBreadcrumb)
 const currentTheme = computed(() => themeMode.value)
 const unreadCount = computed(() => recentAlerts.value.filter(a => !a.isRead).length)
 const collapsed = computed(() => menuStore.collapsed)
+
+// 返回按钮相关
+const showBackButton = computed(() => {
+  // 检查当前路由是否为特定的子页面
+  const routeName = router.currentRoute.value.name
+  if (typeof routeName === 'string') {
+    return routeName.includes('bing-dashboard') ||
+           routeName.includes('google-dashboard') ||
+           routeName.includes('meta-dashboard') ||
+           routeName.includes('criteo-dashboard')
+  }
+  return false
+})
+
+const backButtonTitle = computed(() => {
+  return '返回数据看板'
+})
+
+const backButtonText = computed(() => {
+  const routeName = router.currentRoute.value.name
+  if (typeof routeName === 'string') {
+    if (routeName.includes('dashboard')) {
+      return '返回数据看板'
+    }
+  }
+  return '返回'
+})
 
 // 图标映射
 const iconMap = {
@@ -308,7 +347,7 @@ const formatTime = (time: string): string => {
   const minutes = Math.floor(diff / 60000)
   const hours = Math.floor(diff / 3600000)
   const days = Math.floor(diff / 86400000)
-  
+
   if (days > 0) return `${days}天前`
   if (hours > 0) return `${hours}小时前`
   if (minutes > 0) return `${minutes}分钟前`
@@ -320,7 +359,7 @@ const getUserAvatarUrl = (): string => {
   if (userAvatar.value) {
     return userAvatar.value
   }
-  
+
   // 根据用户角色返回对应的头像
   const role = user.value?.role || 'default'
   const roleAvatarMap: Record<string, string> = {
@@ -331,8 +370,13 @@ const getUserAvatarUrl = (): string => {
     superAdmin: '/avatars/admin.svg',
     sales: '/avatars/staff.svg'
   }
-  
+
   return roleAvatarMap[role] || '/avatars/default.svg'
+}
+
+const goBack = () => {
+  // 直接返回到主数据看板页面
+  router.push({ name: 'dashboard' })
 }
 
 // 点击外部关闭下拉菜单
@@ -349,7 +393,7 @@ const handleClickOutside = (event: Event) => {
 // 生命周期
 onMounted(async () => {
   document.addEventListener('click', handleClickOutside)
-  
+
   // 加载预警数据
   try {
     const response = await mockGetAlerts()
@@ -411,6 +455,29 @@ onUnmounted(() => {
 .header__mobile-menu:hover {
   background: var(--color-background);
   color: var(--color-primary);
+}
+
+.header__back-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  background: none;
+  border: none;
+  border-radius: var(--border-radius-md);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+
+.header__back-button:hover {
+  background: var(--color-background);
+  color: var(--color-primary);
+}
+
+.header__back-text {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
 }
 
 .header__breadcrumb {
@@ -714,19 +781,19 @@ onUnmounted(() => {
     left: 0;
     padding: 0 var(--spacing-md);
   }
-  
+
   .header__mobile-menu {
     display: flex;
   }
-  
+
   .header__search {
     display: none;
   }
-  
+
   .header__breadcrumb {
     display: none;
   }
-  
+
   .header__user-name {
     display: none;
   }
