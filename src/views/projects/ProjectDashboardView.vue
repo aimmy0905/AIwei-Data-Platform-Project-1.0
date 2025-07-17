@@ -488,7 +488,6 @@ const openRenewalRecords = () => {
 
 <style scoped>
 .project-dashboard-view {
-  padding: 24px;
   background: var(--color-background);
   min-height: 100vh;
 }
@@ -986,7 +985,7 @@ const openRenewalRecords = () => {
 
 @media (max-width: 768px) {
   .project-dashboard-view {
-    padding: 16px;
+    /* 移动端边距由MainLayout统一管理 */
   }
 
   .dashboard-header {

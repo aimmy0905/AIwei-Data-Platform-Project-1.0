@@ -91,14 +91,14 @@
           <table>
             <thead>
               <tr>
-                <th>
+                <th class="fixed-column checkbox-col">
                   <input
                     type="checkbox"
                     v-model="selectAll"
                     @change="handleSelectAll"
                   />
                 </th>
-                <th @click="handleSort('project_name')" class="sortable">
+                <th @click="handleSort('project_name')" class="sortable fixed-column name-col">
                   项目名称
                   <ChevronUp v-if="sortField === 'project_name' && sortOrder === 'asc'" :size="14" />
                   <ChevronDown v-if="sortField === 'project_name' && sortOrder === 'desc'" :size="14" />
@@ -178,14 +178,14 @@
                 :key="project.id"
                 :class="{ 'selected': selectedProjects.includes(project.id) }"
               >
-                <td>
+                <td class="fixed-column checkbox-col">
                   <input
                     type="checkbox"
                     :value="project.id"
                     v-model="selectedProjects"
                   />
                 </td>
-                <td class="project-name">
+                <td class="fixed-column name-col">
                   <div class="project-name-cell">
                     <span class="name">{{ project.project_name }}</span>
                   </div>
@@ -834,157 +834,228 @@ const handleExport = (exportData: any) => {
 
 <style scoped>
 .project-management-view {
-  padding: 24px;
-  background: var(--color-background);
-  min-height: 100vh;
+  position: relative;
+  padding: 0;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 32px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--spacing-xl);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
 }
 
-.page-header__main h1 {
-  font-size: 28px;
-  font-weight: 600;
+.page-header__main {
+  flex: 1;
+  min-width: 300px;
+}
+
+.page-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
-  margin: 0 0 8px 0;
+  margin: 0 0 var(--spacing-sm) 0;
 }
 
-.page-header__main p {
+.page-description {
+  font-size: var(--font-size-lg);
   color: var(--color-text-secondary);
   margin: 0;
-  font-size: 14px;
 }
 
 .page-header__actions {
   display: flex;
-  gap: 12px;
+  gap: var(--spacing-sm);
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .action-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border-radius: 6px;
-  border: none;
-  font-size: 14px;
-  font-weight: 500;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast);
+  text-decoration: none;
 }
 
 .action-btn--primary {
   background: var(--color-primary);
+  border-color: var(--color-primary);
   color: white;
 }
 
 .action-btn--primary:hover {
   background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
 }
 
 .action-btn--secondary {
-  background: var(--color-background-secondary);
+  background: var(--color-surface);
   color: var(--color-text-primary);
-  border: 1px solid var(--color-border);
 }
 
 .action-btn--secondary:hover {
-  background: var(--color-background-hover);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.action-btn--small {
+  padding: var(--spacing-xs);
+  border-radius: var(--border-radius-sm);
 }
 
 .project-content {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--spacing-xl);
 }
 
 .search-filter-section {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: var(--spacing-lg);
+  align-items: start;
 }
 
 .search-section {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
 }
 
 .project-search {
-  width: 100%;
+  max-width: 500px;
 }
 
 .search-stats {
-  margin-top: 8px;
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
-}
-
-.filter-section {
-  flex-shrink: 0;
 }
 
 .project-table-section {
-  background: var(--color-background-secondary);
-  border-radius: 8px;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .table-header {
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 2px solid var(--color-border-light);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-background);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  position: relative;
+}
+
+.table-header::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+}
+
+.table-header__left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }
 
 .table-header__left h3 {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
-  margin: 0 0 4px 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.table-header__left h3::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: var(--color-primary);
+  border-radius: 2px;
 }
 
 .record-count {
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: var(--border-radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.record-count::before {
+  content: '📊';
+  font-size: 12px;
 }
 
 .table-controls {
   display: flex;
+  gap: var(--spacing-md);
   align-items: center;
-  gap: 16px;
 }
 
 .view-options {
   display: flex;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 6px;
+  border-radius: var(--border-radius-md);
   overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .view-btn {
-  padding: 8px 12px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: transparent;
   border: none;
-  background: var(--color-background);
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 36px;
 }
 
 .view-btn:hover {
-  background: var(--color-background-hover);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  transform: translateY(-1px);
 }
 
 .view-btn--active {
   background: var(--color-primary);
   color: white;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.view-btn--active:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
 }
 
 .project-table {
@@ -994,15 +1065,18 @@ const handleExport = (exportData: any) => {
 .project-table table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 1200px;
+  min-width: 1800px;
+  table-layout: fixed;
 }
 
 .project-table th,
 .project-table td {
-  padding: 12px 16px;
+  padding: 12px 8px;
   text-align: left;
   border-bottom: 1px solid var(--color-border);
-  font-size: 14px;
+  font-size: 13px;
+  word-wrap: break-word;
+  overflow: hidden;
 }
 
 .project-table th {
@@ -1014,17 +1088,84 @@ const handleExport = (exportData: any) => {
   z-index: 1;
 }
 
+/* 表头固定列需要更高的z-index和明确的position */
+.project-table th.sticky-column {
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+/* 强制第一列和第二列固定 */
+.project-table th:nth-child(1),
+.project-table td:nth-child(1) {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
+}
+
+.project-table th:nth-child(2),
+.project-table td:nth-child(2) {
+  position: sticky;
+  left: 50px;
+  z-index: 10;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
+}
+
+/* 表头的固定列需要更高的z-index */
+.project-table th:nth-child(1) {
+  z-index: 12;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.project-table th:nth-child(2) {
+  z-index: 12;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
 .project-table th.sortable {
   cursor: pointer;
   user-select: none;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  position: relative;
 }
 
 .project-table th.sortable:hover {
   background: var(--color-background-hover);
 }
+
+.project-table th.sortable svg {
+  display: inline-block;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+/* 列宽设置 - 重写版本 */
+.project-table th:nth-child(1), .project-table td:nth-child(1) { width: 60px; min-width: 60px; max-width: 60px; } /* 复选框 */
+.project-table th:nth-child(2), .project-table td:nth-child(2) { width: 220px; min-width: 220px; max-width: 220px; } /* 项目名称 */
+.project-table th:nth-child(3), .project-table td:nth-child(3) { width: 160px; } /* 项目时间 */
+.project-table th:nth-child(4), .project-table td:nth-child(4) { width: 80px; } /* 项目类型 */
+.project-table th:nth-child(5), .project-table td:nth-child(5) { width: 80px; } /* 项目状态 */
+.project-table th:nth-child(6), .project-table td:nth-child(6) { width: 80px; } /* 合作周期 */
+.project-table th:nth-child(7), .project-table td:nth-child(7) { width: 120px; } /* 合作平台 */
+.project-table th:nth-child(8), .project-table td:nth-child(8) { width: 100px; } /* 合同编号 */
+.project-table th:nth-child(9), .project-table td:nth-child(9) { width: 80px; } /* 核算新单数 */
+.project-table th:nth-child(10), .project-table td:nth-child(10) { width: 120px; } /* 首次到账服务费 */
+.project-table th:nth-child(11), .project-table td:nth-child(11) { width: 100px; } /* 首次到账日期 */
+.project-table th:nth-child(12), .project-table td:nth-child(12) { width: 140px; } /* 所属客户 */
+.project-table th:nth-child(13), .project-table td:nth-child(13) { width: 100px; } /* 项目服务费 */
+.project-table th:nth-child(14), .project-table td:nth-child(14) { width: 80px; } /* 余额信息 */
+.project-table th:nth-child(15), .project-table td:nth-child(15) { width: 120px; } /* 负责运营团队 */
+.project-table th:nth-child(16), .project-table td:nth-child(16) { width: 80px; } /* 销售人员 */
+.project-table th:nth-child(17), .project-table td:nth-child(17) { width: 240px; } /* 操作 */
 
 .project-table td {
   color: var(--color-text-secondary);
@@ -1271,31 +1412,164 @@ const handleExport = (exportData: any) => {
   cursor: not-allowed;
 }
 
-@media (max-width: 768px) {
-  .project-management-view {
-    padding: 16px;
-  }
+/* 固定列样式 - 重写版本 */
+.fixed-column {
+  position: sticky;
+  z-index: 10;
+  background: var(--color-surface);
+  border-right: 2px solid var(--color-border);
+}
 
+.checkbox-col {
+  left: 0;
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
+  text-align: center;
+}
+
+.name-col {
+  left: 60px;
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+}
+
+/* 表头固定列样式 */
+.project-table th.fixed-column {
+  z-index: 12;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  position: sticky;
+  top: 0;
+}
+
+/* 悬停状态 */
+.project-row:hover .fixed-column {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.project-row.selected .fixed-column {
+  background: var(--color-primary-light);
+}
+
+.project-row.selected:hover .fixed-column {
+  background: var(--color-primary-light);
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .search-filter-section {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+}
+
+@media (max-width: 768px) {
   .page-header {
     flex-direction: column;
-    gap: 16px;
     align-items: stretch;
+    gap: var(--spacing-lg);
+  }
+
+  .page-header__actions {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .action-btn {
+    flex: 1;
+    justify-content: center;
   }
 
   .search-filter-section {
+    gap: var(--spacing-md);
+  }
+
+  .search-section {
     flex-direction: column;
-    gap: 12px;
+    gap: var(--spacing-sm);
+  }
+
+  .project-search {
+    max-width: none;
+  }
+
+  .table-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+  }
+
+  .table-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+  }
+
+  .view-options {
+    align-self: center;
   }
 
   .project-grid {
     grid-template-columns: 1fr;
-    padding: 16px;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+  }
+
+  .project-card {
+    padding: var(--spacing-md);
+  }
+
+  .project-table {
+    font-size: var(--font-size-sm);
+  }
+
+  .project-table th,
+  .project-table td {
+    padding: var(--spacing-sm);
   }
 
   .pagination-section {
     flex-direction: column;
-    gap: 12px;
+    align-items: stretch;
     text-align: center;
+    gap: var(--spacing-sm);
+  }
+
+  .pagination-controls {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: var(--font-size-2xl);
+  }
+
+  .project-card {
+    padding: var(--spacing-sm);
+  }
+
+  .project-table {
+    font-size: var(--font-size-xs);
+  }
+
+  .project-table th,
+  .project-table td {
+    padding: var(--spacing-xs);
+  }
+
+  .action-btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+  }
+
+  .pagination-number {
+    width: 28px;
+    height: 28px;
+    font-size: var(--font-size-xs);
   }
 }
 </style>
