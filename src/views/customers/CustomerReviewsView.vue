@@ -114,14 +114,19 @@
                 </th>
                 <th>问题处理</th>
                 <th>专业能力</th>
-                <th>服务态度</th>
-                <th>评价人</th>
-                <th class="sortable" @click="handleSort('createTime')">
-                  创建时间
-                  <ChevronUp v-if="sortField === 'createTime' && sortOrder === 'asc'" :size="14" />
-                  <ChevronDown v-if="sortField === 'createTime' && sortOrder === 'desc'" :size="14" />
-                </th>
-                <th class="table-actions">操作</th>
+                                 <th>服务态度</th>
+                 <th>评价人</th>
+                 <th class="sortable" @click="handleSort('responsibleTeam')">
+                   负责团队
+                   <ChevronUp v-if="sortField === 'responsibleTeam' && sortOrder === 'asc'" :size="14" />
+                   <ChevronDown v-if="sortField === 'responsibleTeam' && sortOrder === 'desc'" :size="14" />
+                 </th>
+                 <th class="sortable" @click="handleSort('createTime')">
+                   创建时间
+                   <ChevronUp v-if="sortField === 'createTime' && sortOrder === 'asc'" :size="14" />
+                   <ChevronDown v-if="sortField === 'createTime' && sortOrder === 'desc'" :size="14" />
+                 </th>
+                 <th class="table-actions">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -137,9 +142,10 @@
                 </td>
                 <td class="rating-score">{{ review.problemHandlingRating }}</td>
                 <td class="rating-score">{{ review.professionalRating }}</td>
-                <td class="rating-score">{{ review.serviceAttitudeRating }}</td>
-                <td class="evaluator">{{ review.evaluator }}</td>
-                <td class="create-time">{{ formatDate(review.createTime) }}</td>
+                                 <td class="rating-score">{{ review.serviceAttitudeRating }}</td>
+                 <td class="evaluator">{{ review.evaluator }}</td>
+                 <td class="responsible-team">{{ review.responsibleTeam }}</td>
+                 <td class="create-time">{{ formatDate(review.createTime) }}</td>
                 <td class="table-actions">
                   <div class="action-buttons">
                     <button class="action-btn-sm action-btn-sm--info" @click="viewReview(review)" title="查看详情">
@@ -709,6 +715,15 @@ watch([searchQuery, filters], () => {
 .rating-score {
   font-weight: 500;
   color: #374151;
+}
+
+.responsible-team {
+  font-weight: 500;
+  color: #3b82f6;
+  background-color: #eff6ff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
 }
 
 .action-buttons {

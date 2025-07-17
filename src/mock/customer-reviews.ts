@@ -66,6 +66,7 @@ export const customerReviews: CustomerReview[] = [
     professionalRating: 8,
     serviceAttitudeRating: 10,
     improvementSuggestions: '希望能在数据分析报告中增加更多竞品对比分析，帮助我们更好地了解市场位置。',
+    responsibleTeam: '数字营销团队',
     createTime: '2025-01-05 14:30:00',
     createdBy: '李销售'
   },
@@ -83,6 +84,7 @@ export const customerReviews: CustomerReview[] = [
     professionalRating: 9,
     serviceAttitudeRating: 8,
     improvementSuggestions: '团队专业能力很强，建议在紧急情况下的响应速度可以再快一些。',
+    responsibleTeam: '电商运营团队',
     createTime: '2024-12-03 16:20:00',
     createdBy: '张销售'
   },
@@ -100,6 +102,7 @@ export const customerReviews: CustomerReview[] = [
     professionalRating: 10,
     serviceAttitudeRating: 9,
     improvementSuggestions: '非常满意，希望继续保持这种高质量的服务水准。',
+    responsibleTeam: '短视频营销团队',
     createTime: '2025-01-08 10:15:00',
     createdBy: '王销售'
   },
@@ -117,6 +120,7 @@ export const customerReviews: CustomerReview[] = [
     professionalRating: 8,
     serviceAttitudeRating: 7,
     improvementSuggestions: '整体表现良好，建议在创意素材方面能够更加贴合我们的品牌调性。',
+    responsibleTeam: '本地生活团队',
     createTime: '2025-01-04 11:45:00',
     createdBy: '赵销售'
   },
@@ -134,6 +138,7 @@ export const customerReviews: CustomerReview[] = [
     professionalRating: 9,
     serviceAttitudeRating: 8,
     improvementSuggestions: '在大促期间的配合度很高，数据监控及时，希望能在预算优化建议方面提供更多支持。',
+    responsibleTeam: '电商运营团队',
     createTime: '2024-07-02 15:30:00',
     createdBy: '李销售'
   },
@@ -151,6 +156,7 @@ export const customerReviews: CustomerReview[] = [
     professionalRating: 9,
     serviceAttitudeRating: 8,
     improvementSuggestions: '专业能力很强，建议在周报的数据解读部分能更加详细一些。',
+    responsibleTeam: '搜索广告团队',
     createTime: '2024-12-01 13:20:00',
     createdBy: '钱销售'
   },
@@ -168,6 +174,7 @@ export const customerReviews: CustomerReview[] = [
     professionalRating: 9,
     serviceAttitudeRating: 9,
     improvementSuggestions: '团队很专业，服务态度也很好，希望在海外市场推广方面能提供更多经验分享。',
+    responsibleTeam: '科技产品团队',
     createTime: '2025-01-06 14:10:00',
     createdBy: '孙销售'
   },
@@ -185,6 +192,7 @@ export const customerReviews: CustomerReview[] = [
     professionalRating: 8,
     serviceAttitudeRating: 8,
     improvementSuggestions: '在海外市场的本地化策略方面给出了很好的建议，希望能在文化适应性方面继续深入。',
+    responsibleTeam: '海外营销团队',
     createTime: '2024-12-05 16:40:00',
     createdBy: '何销售'
   },
@@ -202,6 +210,7 @@ export const customerReviews: CustomerReview[] = [
     professionalRating: 8,
     serviceAttitudeRating: 7,
     improvementSuggestions: '在音乐行业的理解还需要加强，建议团队多了解音乐产业的特点。',
+    responsibleTeam: '娱乐营销团队',
     createTime: '2024-12-02 10:25:00',
     createdBy: '李销售'
   },
@@ -219,6 +228,7 @@ export const customerReviews: CustomerReview[] = [
     professionalRating: 9,
     serviceAttitudeRating: 9,
     improvementSuggestions: '整体表现优秀，数据分析能力强，希望在用户画像分析方面能更加精细化。',
+    responsibleTeam: '金融科技团队',
     createTime: '2025-01-03 15:50:00',
     createdBy: '张销售'
   }

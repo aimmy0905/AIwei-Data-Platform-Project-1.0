@@ -27,14 +27,18 @@
               <label class="info-label">评价月份</label>
               <div class="info-value">{{ review.evaluationMonth }}</div>
             </div>
-            <div class="info-item">
-              <label class="info-label">评价人</label>
-              <div class="info-value">{{ review.evaluator }}</div>
-            </div>
-            <div class="info-item">
-              <label class="info-label">评价日期</label>
-              <div class="info-value">{{ formatDate(review.evaluationDate) }}</div>
-            </div>
+                         <div class="info-item">
+               <label class="info-label">评价人</label>
+               <div class="info-value">{{ review.evaluator }}</div>
+             </div>
+             <div class="info-item">
+               <label class="info-label">负责团队</label>
+               <div class="info-value">{{ review.responsibleTeam }}</div>
+             </div>
+             <div class="info-item">
+               <label class="info-label">评价日期</label>
+               <div class="info-value">{{ formatDate(review.evaluationDate) }}</div>
+             </div>
             <div class="info-item">
               <label class="info-label">创建时间</label>
               <div class="info-value">{{ formatDateTime(review.createTime) }}</div>

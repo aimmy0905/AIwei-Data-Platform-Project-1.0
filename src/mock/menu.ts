@@ -229,16 +229,16 @@ export const mockMenuItems: MenuItem[] = [
         icon: 'FileText',
         path: '/performance/reports',
         roles: ['superAdmin', 'manager', 'staff', 'sales']
-      },
-      {
-        id: 'projects',
-        name: '项目管理',
-        icon: 'FolderOpen',
-        path: '/performance/projects',
-        roles: ['superAdmin', 'manager', 'staff']
       }
     ],
     roles: ['superAdmin', 'manager', 'staff', 'sales']
+  },
+  {
+    id: 'projects',
+    name: '项目管理',
+    icon: 'FolderOpen',
+    path: '/projects',
+    roles: ['superAdmin', 'manager', 'staff']
   },
   {
     id: 'settings',

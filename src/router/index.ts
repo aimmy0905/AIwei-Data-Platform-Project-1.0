@@ -98,6 +98,25 @@ const router = createRouter({
       ]
     },
 
+    // 项目管理路由
+    {
+      path: '/projects',
+      component: () => import('@/components/layout/MainLayout.vue'),
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          name: 'projects',
+          component: () => import('@/views/projects/ProjectManagementView.vue')
+        },
+        {
+          path: ':id(\\d+)/dashboard',
+          name: 'project-dashboard',
+          component: () => import('@/views/projects/ProjectDashboardView.vue')
+        }
+      ]
+    },
+
     // 活动详情路由
     {
       path: '/campaign/:id',
