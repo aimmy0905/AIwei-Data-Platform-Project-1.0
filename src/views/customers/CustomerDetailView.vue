@@ -1377,10 +1377,16 @@
                   <RefreshCw :size="20" />
                   服务费管理
                 </h3>
-                <button class="action-btn action-btn--primary" @click="goToServiceFee">
-                  <DollarSign :size="16" />
-                  查看完整服务费记录
-                </button>
+                <div class="section-actions">
+                  <button class="action-btn action-btn--primary" @click="showAddPaymentModal = true">
+                    <Plus :size="16" />
+                    添加服务费
+                  </button>
+                  <button class="action-btn action-btn--secondary" @click="goToServiceFee">
+                    <DollarSign :size="16" />
+                    查看完整服务费记录
+                  </button>
+                </div>
               </div>
 
               <div class="service-fee-summary">
@@ -1415,28 +1421,88 @@
 
                 <div class="recent-payments">
                   <h4 class="subsection-title">最近收款记录</h4>
-                  <div class="payment-list">
-                    <div class="payment-item">
-                      <div class="payment-info">
-                        <div class="payment-type">2025年上半年续费</div>
-                        <div class="payment-date">2025/3/10</div>
-                      </div>
-                      <div class="payment-amount">$18,000</div>
-                    </div>
-                    <div class="payment-item">
-                      <div class="payment-info">
-                        <div class="payment-type">2024年度服务费</div>
-                        <div class="payment-date">2024/9/10</div>
-                      </div>
-                      <div class="payment-amount">$30,000</div>
-                    </div>
-                  </div>
-
-                  <div class="view-all-link">
-                    <button class="link-btn" @click="goToServiceFee">
-                      查看全部服务费记录
-                      <ExternalLink :size="14" />
-                    </button>
+                  <div class="payment-table-container">
+                    <table class="payment-table">
+                      <thead>
+                        <tr>
+                          <th>客户名称</th>
+                          <th>项目名称</th>
+                          <th>收款日期</th>
+                          <th>收款金额</th>
+                          <th>服务周期</th>
+                          <th>收款类型</th>
+                          <th>备注</th>
+                          <th>创建人</th>
+                          <th>创建时间</th>
+                          <th>操作</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>时尚潮流服饰有限公司</td>
+                          <td>春季新品推广</td>
+                          <td>2024/12/15</td>
+                          <td class="amount-cell">¥32,000.00</td>
+                          <td>1年</td>
+                          <td><span class="payment-type-badge续费">续费</span></td>
+                          <td>2025年度服务费续费</td>
+                          <td>张财务</td>
+                          <td>2024/12/15 13:30:00</td>
+                          <td>
+                            <button class="table-action-btn">
+                              <Edit :size="14" />
+                              编辑
+                            </button>
+                            <button class="table-action-btn table-action-btn--danger">
+                              <X :size="14" />
+                              删除
+                            </button>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>有机食品专营</td>
+                          <td>有机蔬菜推广</td>
+                          <td>2024/10/25</td>
+                          <td class="amount-cell">¥24,000.00</td>
+                          <td>6个月</td>
+                          <td><span class="payment-type-badge首次付款">首次付款</span></td>
+                          <td>有机蔬菜推广服务</td>
+                          <td>何财务</td>
+                          <td>2024/10/25 11:20:00</td>
+                          <td>
+                            <button class="table-action-btn">
+                              <Edit :size="14" />
+                              编辑
+                            </button>
+                            <button class="table-action-btn table-action-btn--danger">
+                              <X :size="14" />
+                              删除
+                            </button>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>智能家电科技</td>
+                          <td>智能音箱营销</td>
+                          <td>2024/10/5</td>
+                          <td class="amount-cell">¥16,000.00</td>
+                          <td>3个月</td>
+                          <td><span class="payment-type-badge续费">续费</span></td>
+                          <td>智能音箱营销续费</td>
+                          <td>刘财务</td>
+                          <td>2024/10/5 09:30:00</td>
+                          <td>
+                            <button class="table-action-btn">
+                              <Edit :size="14" />
+                              编辑
+                            </button>
+                            <button class="table-action-btn table-action-btn--danger">
+                              <X :size="14" />
+                              删除
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
@@ -1579,6 +1645,113 @@
         </div>
       </div>
     </div>
+
+    <!-- 添加服务费模态框 -->
+    <div v-if="showAddPaymentModal" class="modal-overlay" @click="closeAddPaymentModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3>新建收款记录</h3>
+          <button class="modal-close" @click="closeAddPaymentModal">
+            <X :size="20" />
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label required">客户名称</label>
+              <select v-model="paymentForm.customerName" class="form-select">
+                <option value="">请选择客户</option>
+                <option value="时尚潮流服饰有限公司">时尚潮流服饰有限公司</option>
+                <option value="有机食品专营">有机食品专营</option>
+                <option value="智能家电科技">智能家电科技</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label required">项目名称</label>
+              <select v-model="paymentForm.projectName" class="form-select">
+                <option value="">请选择项目</option>
+                <option value="春季新品推广">春季新品推广</option>
+                <option value="有机蔬菜推广">有机蔬菜推广</option>
+                <option value="智能音箱营销">智能音箱营销</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label required">收款日期</label>
+              <input
+                v-model="paymentForm.paymentDate"
+                type="date"
+                class="form-input"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label required">收款金额</label>
+              <input
+                v-model.number="paymentForm.paymentAmount"
+                type="number"
+                class="form-input"
+                placeholder="0"
+                min="0"
+                step="0.01"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label required">服务周期</label>
+              <select v-model="paymentForm.servicePeriod" class="form-select">
+                <option value="">请选择服务周期</option>
+                <option value="1个月">1个月</option>
+                <option value="3个月">3个月</option>
+                <option value="6个月">6个月</option>
+                <option value="1年">1年</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label required">收款类型</label>
+              <div class="radio-group">
+                <label class="radio-item">
+                  <input
+                    v-model="paymentForm.paymentType"
+                    type="radio"
+                    value="首次付款"
+                    class="radio-input"
+                  />
+                  <span class="radio-label">首次付款</span>
+                </label>
+                <label class="radio-item">
+                  <input
+                    v-model="paymentForm.paymentType"
+                    type="radio"
+                    value="续费"
+                    class="radio-input"
+                  />
+                  <span class="radio-label">续费</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group form-group--full">
+            <label class="form-label">备注</label>
+            <textarea
+              v-model="paymentForm.notes"
+              class="form-textarea"
+              placeholder="请输入备注信息（可选）"
+              rows="3"
+              maxlength="200"
+            ></textarea>
+            <div class="character-count">{{ paymentForm.notes.length }}/200</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="action-btn action-btn--secondary" @click="closeAddPaymentModal">
+            取消
+          </button>
+          <button class="action-btn action-btn--primary" @click="savePayment">
+            保存
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -1633,6 +1806,18 @@ const competitorForm = reactive({
   id: 0,
   websiteUrl: '',
   companyName: '',
+  notes: ''
+})
+
+// 服务费管理
+const showAddPaymentModal = ref(false)
+const paymentForm = reactive({
+  customerName: '',
+  projectName: '',
+  paymentDate: '',
+  paymentAmount: 0,
+  servicePeriod: '',
+  paymentType: '首次付款',
   notes: ''
 })
 
@@ -2043,6 +2228,27 @@ const closeCompetitorModal = () => {
     companyName: '',
     notes: ''
   })
+}
+
+// 服务费管理方法
+const closeAddPaymentModal = () => {
+  showAddPaymentModal.value = false
+  Object.assign(paymentForm, {
+    customerName: '',
+    projectName: '',
+    paymentDate: '',
+    paymentAmount: 0,
+    servicePeriod: '',
+    paymentType: '首次付款',
+    notes: ''
+  })
+}
+
+const savePayment = () => {
+  // 这里应该添加保存逻辑
+  console.log('保存服务费记录:', paymentForm)
+  // 模拟保存成功
+  closeAddPaymentModal()
 }
 
 // 网址验证
@@ -2717,6 +2923,19 @@ onMounted(() => {
   margin-bottom: var(--spacing-lg);
 }
 
+.section-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.character-count {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  text-align: right;
+  margin-top: var(--spacing-xs);
+}
+
 .info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -3321,44 +3540,89 @@ onMounted(() => {
   padding: var(--spacing-lg);
 }
 
-.payment-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
+.payment-table-container {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
   margin-bottom: var(--spacing-lg);
 }
 
-.payment-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-md);
+.payment-table {
+  width: 100%;
+  border-collapse: collapse;
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-md);
-}
-
-.payment-info {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.payment-type {
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+}
+
+.payment-table th {
+  background: var(--color-background);
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
 }
 
-.payment-date {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
+.payment-table td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
 }
 
-.payment-amount {
-  font-size: var(--font-size-lg);
+.payment-table tr:hover {
+  background: var(--color-background);
+}
+
+.amount-cell {
   font-weight: var(--font-weight-semibold);
   color: var(--color-success);
+  text-align: right;
+}
+
+.payment-type-badge续费 {
+  padding: 2px var(--spacing-xs);
+  background: rgba(82, 196, 26, 0.1);
+  color: var(--color-success);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.payment-type-badge首次付款 {
+  padding: 2px var(--spacing-xs);
+  background: rgba(24, 144, 255, 0.1);
+  color: var(--color-info);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.table-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  margin-right: var(--spacing-xs);
+}
+
+.table-action-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.table-action-btn--danger:hover {
+  border-color: var(--color-error);
+  color: var(--color-error);
+  background: rgba(239, 68, 68, 0.05);
 }
 
 .view-all-link {

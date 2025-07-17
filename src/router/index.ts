@@ -138,6 +138,11 @@ const router = createRouter({
           path: 'service-fees',
           name: 'service-fees',
           component: () => import('@/views/finance/ServiceFeeManagementView.vue')
+        },
+        {
+          path: 'reviews',
+          name: 'customer-reviews',
+          component: () => import('@/views/customers/CustomerReviewsView.vue')
         }
       ]
     },
