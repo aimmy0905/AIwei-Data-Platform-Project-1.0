@@ -1634,3 +1634,252 @@ export interface CustomerGoalRanking {
   totalCount: number
   averageValue: number
 }
+
+// ============ 活动管理模块类型定义 ============
+
+// 活动基础信息类型
+export interface Activity {
+  id: number
+  name: string // 活动名称
+  type: 'promotion' | 'brand' | 'holiday' | 'other' // 活动类型
+  stage: 'warm_up' | 'formal' // 活动阶段
+  status: 'warm_up' | 'running' | 'ended' | 'cancelled' // 活动状态
+  targetMarket: string // 目标市场
+  content: string // 活动内容
+  channels: string[] // 参与渠道
+  projectId: number // 关联项目ID
+  projectName?: string // 关联项目名称
+  ownerId: number // 负责人ID
+  ownerName?: string // 负责人姓名
+  startTime: string // 开始时间
+  endTime: string // 结束时间
+  budget: number // 活动预算
+  targetSales: number // 目标销售额
+  targetROI: number // 目标ROI
+  targetConversionRate: number // 目标转化率
+  createdBy: number // 创建人ID
+  createdAt: string // 创建时间
+  updatedAt: string // 更新时间
+}
+
+// 活动数据统计类型
+export interface ActivityData {
+  id: number
+  activityId: number // 活动ID
+  date: string // 数据日期
+  totalSales: number // 总销售额
+  totalCost: number // 总成本
+  adSpend: number // 广告花费
+  roi: number // 投资回报率
+  conversionRate: number // 转化率
+  orderCount: number // 订单数量
+  userCount: number // 用户数量
+  avgOrderValue: number // 平均客单价
+  returnRate: number // 退货率
+  returnAmount: number // 退货金额
+
+  // 平台分解数据
+  googleSpend: number
+  googleRevenue: number
+  googleROI: number
+  facebookSpend: number
+  facebookRevenue: number
+  facebookROI: number
+  bingSpend: number
+  bingRevenue: number
+  bingROI: number
+  criteoSpend: number
+  criteoRevenue: number
+  criteoROI: number
+
+  updatedAt: string // 更新时间
+}
+
+// 活动产品数据类型
+export interface ActivityProductData {
+  id: number
+  activityId: number // 活动ID
+  productId: string // 产品ID
+  productTitle: string // 产品标题
+  productCategory: string // 产品品类
+  userCount: number // 用户数
+  salesVolume: number // 销量
+  salesAmount: number // 销售额
+  conversionRate: number // 转化率
+  avgOrderValue: number // 客单价
+  returnCount: number // 退货数
+  returnAmount: number // 退款金额
+  addToCartCount: number // 加购数
+  checkoutCount: number // 发起结账数
+  addToCartRate: number // 加购率
+  checkoutRate: number // 发起结账率
+  date: string // 数据日期
+  updatedAt: string // 更新时间
+
+  // 环比数据
+  momData?: {
+    userCountChange: number
+    salesVolumeChange: number
+    salesAmountChange: number
+    conversionRateChange: number
+    avgOrderValueChange: number
+    returnRateChange: number
+    addToCartRateChange: number
+    checkoutRateChange: number
+  }
+}
+
+// 活动页面数据类型
+export interface ActivityPageData {
+  id: number
+  activityId: number // 活动ID
+  pageUrl: string // 页面链接
+  visitCount: number // 访问数
+  userCount: number // 用户数
+  newUserCount: number // 新客户数
+  conversionRate: number // 转化率
+  addToCartCount: number // 加购数
+  addToCartRate: number // 加购率
+  checkoutCount: number // 发起结账数
+  checkoutRate: number // 发起结账率
+  bounceRate: number // 跳出率
+  avgStayTime: number // 停留时长（秒）
+  pageViewsPerVisit: number // 每次访问页面浏览量
+  date: string // 数据日期
+  updatedAt: string // 更新时间
+
+  // 环比数据
+  momData?: {
+    visitCountChange: number
+    userCountChange: number
+    newUserCountChange: number
+    conversionRateChange: number
+    addToCartRateChange: number
+    checkoutRateChange: number
+    bounceRateChange: number
+    avgStayTimeChange: number
+    pageViewsPerVisitChange: number
+  }
+}
+
+// 活动详情类型（聚合数据）
+export interface ActivityDetail extends Activity {
+  // 数据概览
+  overview: {
+    totalSales: number
+    totalCost: number
+    roi: number
+    conversionRate: number
+    orderCount: number
+    userCount: number
+    avgOrderValue: number
+    returnRate: number
+    returnAmount: number
+
+    // 广告数据
+    adSpend: number
+    adRevenue: number
+    adROI: number
+    adRevenueRatio: number
+
+    // 环比对比
+    salesChange?: number
+    costChange?: number
+    roiChange?: number
+    conversionRateChange?: number
+    orderCountChange?: number
+  }
+
+  // 单日数据
+  dailyData: ActivityData[]
+
+  // 产品数据
+  productData: ActivityProductData[]
+
+  // 页面数据
+  pageData: ActivityPageData[]
+}
+
+// 活动筛选条件类型
+export interface ActivityFilter {
+  status?: string // 活动状态
+  type?: string // 活动类型
+  stage?: string // 活动阶段
+  projectId?: number // 项目ID
+  ownerId?: number // 负责人ID
+  startDate?: string // 开始时间
+  endDate?: string // 结束时间
+  search?: string // 搜索关键词
+
+  // 数据筛选
+  roiMin?: number // 最小ROI
+  roiMax?: number // 最大ROI
+  salesMin?: number // 最小销售额
+  salesMax?: number // 最大销售额
+  budgetMin?: number // 最小预算
+  budgetMax?: number // 最大预算
+  conversionRateMin?: number // 最小转化率
+  conversionRateMax?: number // 最大转化率
+}
+
+// 活动列表响应类型
+export interface ActivityListResponse {
+  activities: Activity[]
+  total: number
+  page: number
+  pageSize: number
+}
+
+// 活动操作记录类型
+export interface ActivityOperationRecord {
+  id: number
+  activityId: number
+  operationType: 'create' | 'update' | 'delete' | 'status_change'
+  operatorId: number
+  operatorName: string
+  operationTime: string
+  changeContent: string // 变更内容
+  changeReason?: string // 变更原因
+  beforeData?: any // 变更前数据
+  afterData?: any // 变更后数据
+}
+
+// 活动模板类型
+export interface ActivityTemplate {
+  id: number
+  name: string // 模板名称
+  type: 'promotion' | 'brand' | 'holiday' | 'custom' // 模板类型
+  description: string // 模板描述
+  config: Partial<Activity> // 模板配置
+  createdBy: number
+  createdAt: string
+  isPublic: boolean // 是否公开模板
+}
+
+// 活动汇总统计类型
+export interface ActivitySummary {
+  totalActivities: number // 总活动数
+  activeActivities: number // 进行中活动数
+  completedActivities: number // 已完成活动数
+  totalBudget: number // 总预算
+  totalSpent: number // 总花费
+  totalRevenue: number // 总收入
+  averageROI: number // 平均ROI
+  topPerformingActivity: string // 表现最佳活动
+  totalConversions: number // 总转化数
+}
+
+// 活动数据导出配置类型
+export interface ActivityExportConfig {
+  activityIds: number[] // 要导出的活动ID
+  dateRange: {
+    startDate: string
+    endDate: string
+  }
+  exportType: 'overview' | 'daily' | 'product' | 'page' | 'all' // 导出类型
+  format: 'excel' | 'csv' | 'pdf' // 导出格式
+  includeCharts: boolean // 是否包含图表
+  customFields?: string[] // 自定义字段
+}
+
+// ============ 结束活动管理模块类型定义 ============

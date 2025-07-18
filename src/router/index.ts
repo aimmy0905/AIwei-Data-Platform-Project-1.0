@@ -120,6 +120,11 @@ const router = createRouter({
           component: () => import('@/views/projects/ActivityManagementView.vue')
         },
         {
+          path: 'activities/:id(\\d+)',
+          name: 'activity-detail',
+          component: () => import('@/views/projects/ActivityDetailView.vue')
+        },
+        {
           path: 'competitors',
           name: 'competitor-management',
           component: () => import('@/views/projects/CompetitorManagementView.vue')
