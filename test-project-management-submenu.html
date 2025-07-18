@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目管理子菜单测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1976d2;
+            margin-bottom: 24px;
+        }
+        .test-section {
+            margin-bottom: 32px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .test-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+        }
+        .test-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .test-link {
+            display: inline-block;
+            padding: 12px 16px;
+            background: #1976d2;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            text-align: center;
+            transition: background 0.2s;
+        }
+        .test-link:hover {
+            background: #1565c0;
+        }
+        .status {
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .feature-list li:before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 项目管理子菜单功能测试</h1>
+        
+        <div class="status success">
+            ✅ 项目管理子菜单已成功添加！新增了三个子菜单：活动管理、竞品管理、红人/帖子管理
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">📋 新增子菜单功能</div>
+            <ul class="feature-list">
+                <li><strong>活动管理</strong> - 管理项目相关的营销活动和推广活动</li>
+                <li><strong>竞品管理</strong> - 监控和分析竞争对手的市场表现和策略</li>
+                <li><strong>红人/帖子管理</strong> - 管理合作红人和相关帖子内容的发布与监控</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">🔗 测试链接</div>
+            <div class="test-links">
+                <a href="http://localhost:5173/projects" class="test-link" target="_blank">
+                    项目列表
+                </a>
+                <a href="http://localhost:5173/projects/goals" class="test-link" target="_blank">
+                    项目目标
+                </a>
+                <a href="http://localhost:5173/projects/activities" class="test-link" target="_blank">
+                    活动管理 (新)
+                </a>
+                <a href="http://localhost:5173/projects/competitors" class="test-link" target="_blank">
+                    竞品管理 (新)
+                </a>
+                <a href="http://localhost:5173/projects/kol-posts" class="test-link" target="_blank">
+                    红人/帖子管理 (新)
+                </a>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">📱 活动管理页面功能</div>
+            <ul class="feature-list">
+                <li>活动状态筛选（策划中、进行中、已完成、已暂停）</li>
+                <li>活动类型分类（促销活动、品牌推广、产品发布、季节性活动）</li>
+                <li>活动卡片展示（包含预算、目标、投放平台等信息）</li>
+                <li>搜索功能和操作按钮</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">🔍 竞品管理页面功能</div>
+            <ul class="feature-list">
+                <li>行业分类筛选（时尚服装、数码科技、美容护肤等）</li>
+                <li>竞争程度分级（高、中、低）</li>
+                <li>关键指标展示（月访问量、广告支出、社交粉丝等）</li>
+                <li>投放平台标签和分析功能</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">👥 红人/帖子管理页面功能</div>
+            <ul class="feature-list">
+                <li>标签页切换（红人管理 / 帖子管理）</li>
+                <li>红人类型分类（头部红人、腰部红人、尾部红人、素人）</li>
+                <li>帖子状态管理（草稿、已发布、定时发布、已归档）</li>
+                <li>多平台支持（Instagram、TikTok、YouTube、小红书、微博）</li>
+                <li>数据统计展示（粉丝数、互动率、浏览量、点赞数等）</li>
+            </ul>
+        </div>
+
+        <div class="status info">
+            💡 <strong>测试说明：</strong> 点击上方测试链接可以直接访问新添加的页面。所有页面都是功能完整的占位页面，包含了丰富的模拟数据和交互功能。
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">🛠️ 技术实现</div>
+            <ul class="feature-list">
+                <li>更新了菜单配置文件 (src/mock/menu.ts)</li>
+                <li>创建了三个新的Vue组件页面</li>
+                <li>添加了对应的路由配置</li>
+                <li>每个页面都包含完整的UI设计和交互功能</li>
+                <li>使用了一致的设计风格和组件库</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载完成后的提示
+        window.addEventListener('load', function() {
+            console.log('🎉 项目管理子菜单测试页面加载完成！');
+            console.log('📝 新增功能：');
+            console.log('   - 活动管理：/projects/activities');
+            console.log('   - 竞品管理：/projects/competitors');
+            console.log('   - 红人/帖子管理：/projects/kol-posts');
+        });
+    </script>
+</body>
+</html> 

@@ -110,6 +110,36 @@ const router = createRouter({
           component: () => import('@/views/projects/ProjectManagementView.vue')
         },
         {
+          path: 'goals',
+          name: 'project-goals',
+          component: () => import('@/views/projects/ProjectGoalsView.vue')
+        },
+        {
+          path: 'activities',
+          name: 'activity-management',
+          component: () => import('@/views/projects/ActivityManagementView.vue')
+        },
+        {
+          path: 'activities/:id(\\d+)',
+          name: 'activity-detail',
+          component: () => import('@/views/projects/ActivityDetailView.vue')
+        },
+        {
+          path: 'competitors',
+          name: 'competitor-management',
+          component: () => import('@/views/projects/CompetitorManagementView.vue')
+        },
+        {
+          path: 'kol-posts',
+          name: 'kol-post-management',
+          component: () => import('@/views/projects/KolPostManagementView.vue')
+        },
+        {
+          path: 'reports',
+          name: 'reports',
+          component: () => import('@/views/reports/ReportsView.vue')
+        },
+        {
           path: ':id(\\d+)/dashboard',
           name: 'project-dashboard',
           component: () => import('@/views/projects/ProjectDashboardView.vue')

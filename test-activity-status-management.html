@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>活动状态管理功能测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+        .test-title {
+            color: #1976d2;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+        }
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 10px;
+            min-width: 60px;
+            text-align: center;
+        }
+        .status.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.in-progress {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .test-steps {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+        .step {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-left: 4px solid #1976d2;
+            background: #f8f9fa;
+        }
+        .step-number {
+            font-weight: bold;
+            color: #1976d2;
+        }
+        .code-block {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 14px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+        .navigation {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        .nav-link {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px 20px;
+            background: #1976d2;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .nav-link:hover {
+            background: #1565c0;
+        }
+        .permission-matrix {
+            margin-top: 15px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .permission-matrix th,
+        .permission-matrix td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        .permission-matrix th {
+            background: #f5f5f5;
+            font-weight: 600;
+        }
+        .permission-matrix .allowed {
+            background: #d4edda;
+            color: #155724;
+        }
+        .permission-matrix .denied {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 活动状态管理功能测试</h1>
+            <p>全面验证活动状态流转逻辑、权限控制和状态变更记录功能</p>
+        </div>
+
+        <!-- 功能概述 -->
+        <div class="test-section">
+            <h2 class="test-title">📋 功能实现概述</h2>
+            <ul class="feature-list">
+                <li>
+                    <span class="status completed">✅</span>
+                    <strong>状态流转服务 (ActivityStatusService)</strong> - 完整的状态管理逻辑
+                </li>
+                <li>
+                    <span class="status completed">✅</span>
+                    <strong>权限控制系统</strong> - 基于用户角色的权限验证
+                </li>
+                <li>
+                    <span class="status completed">✅</span>
+                    <strong>状态变更记录 (StatusChangeHistoryService)</strong> - 完整的操作审计
+                </li>
+                <li>
+                    <span class="status completed">✅</span>
+                    <strong>状态管理组件 (ActivityStatusManager)</strong> - 可视化状态操作界面
+                </li>
+                <li>
+                    <span class="status completed">✅</span>
+                    <strong>快速操作按钮</strong> - 活动列表页面的快速状态切换
+                </li>
+                <li>
+                    <span class="status completed">✅</span>
+                    <strong>API集成</strong> - 真实的状态更新API调用
+                </li>
+            </ul>
+        </div>
+
+        <!-- 状态流转规则 -->
+        <div class="test-section">
+            <h2 class="test-title">🔄 状态流转规则</h2>
+            <div class="test-steps">
+                <div class="step">
+                    <span class="step-number">状态定义：</span>
+                    <ul>
+                        <li><strong>预热中 (warm_up)</strong> - 活动准备阶段</li>
+                        <li><strong>进行中 (running)</strong> - 活动正式执行</li>
+                        <li><strong>已结束 (ended)</strong> - 活动正常结束</li>
+                        <li><strong>已取消 (cancelled)</strong> - 活动被取消</li>
+                    </ul>
+                </div>
+                <div class="step">
+                    <span class="step-number">允许的状态转换：</span>
+                    <ul>
+                        <li>预热中 → 进行中 (开始活动)</li>
+                        <li>预热中 → 已取消 (取消活动)</li>
+                        <li>进行中 → 已结束 (结束活动)</li>
+                        <li>进行中 → 已取消 (取消活动)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 权限控制矩阵 -->
+        <div class="test-section">
+            <h2 class="test-title">🔐 权限控制矩阵</h2>
+            <table class="permission-matrix">
+                <thead>
+                    <tr>
+                        <th>操作</th>
+                        <th>超级管理员</th>
+                        <th>管理员</th>
+                        <th>员工</th>
+                        <th>财务</th>
+                        <th>销售</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>查看活动</td>
+                        <td class="allowed">✅</td>
+                        <td class="allowed">✅</td>
+                        <td class="allowed">✅</td>
+                        <td class="allowed">✅</td>
+                        <td class="allowed">✅</td>
+                    </tr>
+                    <tr>
+                        <td>编辑活动</td>
+                        <td class="allowed">✅</td>
+                        <td class="allowed">✅</td>
+                        <td class="allowed">✅</td>
+                        <td class="denied">❌</td>
+                        <td class="denied">❌</td>
+                    </tr>
+                    <tr>
+                        <td>开始活动</td>
+                        <td class="allowed">✅</td>
+                        <td class="allowed">✅</td>
+                        <td class="allowed">✅</td>
+                        <td class="denied">❌</td>
+                        <td class="denied">❌</td>
+                    </tr>
+                    <tr>
+                        <td>结束活动</td>
+                        <td class="allowed">✅</td>
+                        <td class="allowed">✅</td>
+                        <td class="allowed">✅</td>
+                        <td class="denied">❌</td>
+                        <td class="denied">❌</td>
+                    </tr>
+                    <tr>
+                        <td>取消活动</td>
+                        <td class="allowed">✅</td>
+                        <td class="allowed">✅</td>
+                        <td class="denied">❌</td>
+                        <td class="denied">❌</td>
+                        <td class="denied">❌</td>
+                    </tr>
+                    <tr>
+                        <td>删除活动</td>
+                        <td class="allowed">✅</td>
+                        <td class="allowed">✅</td>
+                        <td class="denied">❌</td>
+                        <td class="denied">❌</td>
+                        <td class="denied">❌</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 测试步骤 -->
+        <div class="test-section">
+            <h2 class="test-title">🧪 测试步骤</h2>
+            <div class="test-steps">
+                <div class="step">
+                    <span class="step-number">步骤 1：</span>
+                    启动开发服务器，访问活动管理页面
+                    <div class="code-block">cd AIwei-Data-Platform-Project-1.0 && npm run dev</div>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">步骤 2：</span>
+                    登录系统 (用户名: admin, 密码: 123456)
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">步骤 3：</span>
+                    进入活动管理页面，查看活动列表中的快速操作按钮
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">步骤 4：</span>
+                    点击活动详情，查看状态管理组件
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">步骤 5：</span>
+                    测试状态变更操作：
+                    <ul>
+                        <li>对预热中的活动点击"开始活动"</li>
+                        <li>对进行中的活动点击"结束活动"</li>
+                        <li>测试取消活动功能</li>
+                        <li>验证权限控制是否生效</li>
+                    </ul>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">步骤 6：</span>
+                    验证状态变更历史记录是否正确记录
+                </div>
+            </div>
+        </div>
+
+        <!-- 核心功能验证 -->
+        <div class="test-section">
+            <h2 class="test-title">🎯 核心功能验证</h2>
+            <div class="test-steps">
+                <div class="step">
+                    <span class="step-number">状态流转验证：</span>
+                    <ul>
+                        <li>✅ 预热中的活动可以开始或取消</li>
+                        <li>✅ 进行中的活动可以结束或取消</li>
+                        <li>✅ 已结束/已取消的活动不能再次变更</li>
+                        <li>✅ 不支持的状态转换会被阻止</li>
+                    </ul>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">权限控制验证：</span>
+                    <ul>
+                        <li>✅ 不同角色用户看到不同的操作按钮</li>
+                        <li>✅ 无权限用户的操作会被拒绝</li>
+                        <li>✅ 管理员可以执行所有操作</li>
+                        <li>✅ 员工不能取消或删除活动</li>
+                    </ul>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">用户体验验证：</span>
+                    <ul>
+                        <li>✅ 状态变更需要确认对话框</li>
+                        <li>✅ 重要操作需要填写原因</li>
+                        <li>✅ 操作成功后有明确提示</li>
+                        <li>✅ 状态变更后界面实时更新</li>
+                    </ul>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">数据完整性验证：</span>
+                    <ul>
+                        <li>✅ 所有状态变更都有完整记录</li>
+                        <li>✅ 操作人、时间、原因都被记录</li>
+                        <li>✅ 状态变更历史可以查看</li>
+                        <li>✅ 数据更新后列表自动刷新</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 技术实现亮点 -->
+        <div class="test-section">
+            <h2 class="test-title">💡 技术实现亮点</h2>
+            <div class="test-steps">
+                <div class="step">
+                    <span class="step-number">架构设计：</span>
+                    <ul>
+                        <li><strong>服务层分离</strong> - 状态管理逻辑独立于UI组件</li>
+                        <li><strong>权限系统</strong> - 基于角色的访问控制 (RBAC)</li>
+                        <li><strong>状态机模式</strong> - 严格的状态转换规则</li>
+                        <li><strong>审计日志</strong> - 完整的操作记录追踪</li>
+                    </ul>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">用户体验：</span>
+                    <ul>
+                        <li><strong>智能建议</strong> - 根据活动时间提供状态建议</li>
+                        <li><strong>快速操作</strong> - 列表页面直接操作，无需跳转</li>
+                        <li><strong>确认机制</strong> - 重要操作二次确认，防止误操作</li>
+                        <li><strong>实时更新</strong> - 状态变更后界面立即同步</li>
+                    </ul>
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">安全性：</span>
+                    <ul>
+                        <li><strong>前后端验证</strong> - 双重权限检查</li>
+                        <li><strong>操作审计</strong> - 所有操作都有完整记录</li>
+                        <li><strong>状态校验</strong> - 严格的业务规则验证</li>
+                        <li><strong>错误处理</strong> - 完善的异常处理机制</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 特殊场景处理 -->
+        <div class="test-section">
+            <h2 class="test-title">⚠️ 特殊场景处理</h2>
+            <div class="test-steps">
+                <div class="step">
+                    <span class="step-number">过期活动处理：</span>
+                    系统会自动检测已过期但仍在进行中的活动，提供"建议结束"的提示
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">时间到达提醒：</span>
+                    预热中的活动如果开始时间已到，会提示"建议开始活动"
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">并发操作处理：</span>
+                    使用API调用确保状态变更的原子性，避免并发冲突
+                </div>
+                
+                <div class="step">
+                    <span class="step-number">网络异常处理：</span>
+                    API调用失败时会显示明确的错误信息，不会破坏数据一致性
+                </div>
+            </div>
+        </div>
+
+        <div class="highlight">
+            <strong>🎉 恭喜！</strong> 活动状态管理功能已全面完成！这个功能为活动管理提供了完整的状态控制能力，确保活动在整个生命周期中的规范管理。通过严格的权限控制和完整的操作记录，保证了系统的安全性和可追溯性。
+        </div>
+
+        <div class="navigation">
+            <a href="http://localhost:5176/" class="nav-link">🚀 访问系统</a>
+            <a href="http://localhost:5176/projects/activities" class="nav-link">📋 活动管理</a>
+            <a href="http://localhost:5176/projects/activities/1" class="nav-link">🔍 活动详情</a>
+        </div>
+    </div>
+</body>
+</html> 

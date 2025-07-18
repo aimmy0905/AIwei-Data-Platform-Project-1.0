@@ -222,13 +222,6 @@ export const mockMenuItems: MenuItem[] = [
         icon: 'BarChart3',
         path: '/performance/dashboard',
         roles: ['superAdmin', 'manager', 'staff', 'sales']
-      },
-      {
-        id: 'reports',
-        name: '周报月报',
-        icon: 'FileText',
-        path: '/performance/reports',
-        roles: ['superAdmin', 'manager', 'staff', 'sales']
       }
     ],
     roles: ['superAdmin', 'manager', 'staff', 'sales']
@@ -237,7 +230,50 @@ export const mockMenuItems: MenuItem[] = [
     id: 'projects',
     name: '项目管理',
     icon: 'FolderOpen',
-    path: '/projects',
+    children: [
+      {
+        id: 'project-list',
+        name: '项目列表',
+        icon: 'List',
+        path: '/projects',
+        roles: ['superAdmin', 'manager', 'staff']
+      },
+      {
+        id: 'project-goals',
+        name: '项目目标',
+        icon: 'Target',
+        path: '/projects/goals',
+        roles: ['superAdmin', 'manager', 'staff']
+      },
+      {
+        id: 'reports',
+        name: '周报月报',
+        icon: 'FileText',
+        path: '/projects/reports',
+        roles: ['superAdmin', 'manager', 'staff', 'sales']
+      },
+      {
+        id: 'activity-management',
+        name: '活动管理',
+        icon: 'Calendar',
+        path: '/projects/activities',
+        roles: ['superAdmin', 'manager', 'staff']
+      },
+      {
+        id: 'competitor-management',
+        name: '竞品管理',
+        icon: 'Search',
+        path: '/projects/competitors',
+        roles: ['superAdmin', 'manager', 'staff']
+      },
+      {
+        id: 'kol-post-management',
+        name: '红人/帖子管理',
+        icon: 'Users',
+        path: '/projects/kol-posts',
+        roles: ['superAdmin', 'manager', 'staff']
+      }
+    ],
     roles: ['superAdmin', 'manager', 'staff']
   },
   {
