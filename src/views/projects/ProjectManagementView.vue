@@ -776,7 +776,19 @@ const createProject = () => {
 }
 
 const viewProjectDashboard = (projectId: number) => {
-  router.push(`/projects/${projectId}/dashboard`)
+  // 找到对应的项目信息
+  const project = projects.value.find(p => p.id === projectId)
+  if (project) {
+    // 跳转到主dashboard页面，并传递项目筛选参数
+    router.push({
+      name: 'dashboard',
+      query: {
+        projectId: projectId.toString(),
+        projectName: project.project_name,
+        customerName: project.customer_name
+      }
+    })
+  }
 }
 
 const manageProjectGoals = (projectId: number) => {

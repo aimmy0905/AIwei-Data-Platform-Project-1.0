@@ -88,6 +88,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { useRoute } from 'vue-router'
 import {
   BarChart3,
   TrendingUp,
@@ -691,6 +692,17 @@ const handleFilterReset = () => {
   loadDashboardData()
 }
 
+// 从URL参数初始化筛选器
+const initializeFiltersFromQuery = () => {
+  const route = useRoute()
+  const { projectId, projectName, customerName } = route.query
+
+  if (projectId) {
+    filters.value.projectId = projectId as string
+    console.log('从URL参数初始化项目筛选:', projectId, projectName, customerName)
+  }
+}
+
 
 
 // 生命周期
@@ -699,6 +711,9 @@ onMounted(() => {
   loadDashboardData()
   setupScrollObserver()
   initializeMenuState()
+
+  // 从URL参数中初始化筛选器
+  initializeFiltersFromQuery()
 })
 
 onUnmounted(() => {
