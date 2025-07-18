@@ -4,23 +4,19 @@
     <div class="page-header">
       <div class="header-content">
         <div class="header-left">
-          <h1 class="page-title">红人/帖子管理</h1>
-          <p class="page-description">管理合作红人和相关帖子内容的发布与监控</p>
+          <h1 class="page-title">红人/帖子数据管理</h1>
+          <p class="page-description">记录和管理每月红人合作数据和发帖效果数据</p>
         </div>
         <div class="header-right">
-          <button v-if="activeTab === 'data'" class="btn btn-primary" @click="showAddDataModal">
+          <button v-if="activeTab === 'influencer-data'" class="btn btn-primary" @click="showAddDataModal">
             <Plus :size="16" />
             添加红人数据
           </button>
-          <button v-if="activeTab === 'kols'" class="btn btn-primary">
+          <button v-if="activeTab === 'post-data'" class="btn btn-primary" @click="showAddPostModal">
             <Plus :size="16" />
-            添加红人
+            添加发帖数据
           </button>
-          <button v-if="activeTab === 'posts'" class="btn btn-primary" @click="showAddPostModal">
-            <Plus :size="16" />
-            新建帖子
-          </button>
-          <button v-if="activeTab === 'data'" class="btn btn-secondary">
+          <button class="btn btn-secondary">
             <FileText :size="16" />
             导出数据
           </button>
@@ -33,27 +29,19 @@
       <div class="tabs">
         <button
           class="tab-button"
-          :class="{ active: activeTab === 'data' }"
-          @click="activeTab = 'data'"
-        >
-          <BarChart3 :size="16" />
-          红人数据管理
-        </button>
-        <button
-          class="tab-button"
-          :class="{ active: activeTab === 'kols' }"
-          @click="activeTab = 'kols'"
+          :class="{ active: activeTab === 'influencer-data' }"
+          @click="activeTab = 'influencer-data'"
         >
           <Users :size="16" />
-          红人管理
+          红人数据
         </button>
         <button
           class="tab-button"
-          :class="{ active: activeTab === 'posts' }"
-          @click="activeTab = 'posts'"
+          :class="{ active: activeTab === 'post-data' }"
+          @click="activeTab = 'post-data'"
         >
           <FileText :size="16" />
-          帖子管理
+          发帖数据
         </button>
       </div>
     </div>
@@ -61,8 +49,8 @@
     <!-- 筛选器 -->
     <div class="filter-section">
       <div class="filter-row">
-        <!-- 红人数据管理筛选 -->
-        <div v-if="activeTab === 'data'" class="filter-group">
+        <!-- 红人数据筛选 -->
+        <div v-if="activeTab === 'influencer-data'" class="filter-group">
           <div class="filter-item">
             <label>客户：</label>
             <select v-model="dataFilters.customer" class="form-select">
@@ -130,36 +118,37 @@
           </div>
         </div>
 
-        <!-- 帖子管理筛选 -->
-        <div v-if="activeTab === 'posts'" class="filter-group">
+        <!-- 发帖数据筛选 -->
+        <div v-if="activeTab === 'post-data'" class="filter-group">
           <div class="filter-item">
-            <label>帖子状态：</label>
-            <select v-model="filters.postStatus" class="form-select">
-              <option value="">全部状态</option>
-              <option value="draft">草稿</option>
-              <option value="published">已发布</option>
-              <option value="scheduled">定时发布</option>
-              <option value="archived">已归档</option>
+            <label>客户：</label>
+            <select v-model="dataFilters.customer" class="form-select">
+              <option value="">全部客户</option>
+              <option v-for="customer in mockCustomers" :key="customer.id" :value="customer.id">
+                {{ customer.name }}
+              </option>
             </select>
           </div>
           <div class="filter-item">
-            <label>平台：</label>
-            <select v-model="filters.platform" class="form-select">
-              <option value="">全部平台</option>
-              <option value="instagram">Instagram</option>
-              <option value="tiktok">TikTok</option>
-              <option value="youtube">YouTube</option>
-              <option value="xiaohongshu">小红书</option>
-              <option value="weibo">微博</option>
+            <label>项目：</label>
+            <select v-model="dataFilters.project" class="form-select">
+              <option value="">全部项目</option>
+              <option v-for="project in filteredProjects" :key="project.id" :value="project.id">
+                {{ project.name }}
+              </option>
             </select>
+          </div>
+          <div class="filter-item">
+            <label>月份：</label>
+            <input v-model="dataFilters.month" type="month" class="form-input" />
           </div>
           <div class="filter-item">
             <label>搜索：</label>
             <input
-              v-model="filters.search"
+              v-model="dataFilters.search"
               type="text"
               class="form-input"
-              placeholder="搜索帖子内容..."
+              placeholder="搜索客户、项目或录入人..."
             />
           </div>
         </div>
@@ -167,7 +156,7 @@
     </div>
 
     <!-- 红人数据管理内容 -->
-    <div v-if="activeTab === 'data'" class="content-section">
+    <div v-if="activeTab === 'influencer-data'" class="content-section">
       <!-- 数据统计概览 -->
       <div class="stats-overview">
         <div class="stat-card">
@@ -343,69 +332,74 @@
       </div>
     </div>
 
-    <!-- 帖子管理内容 -->
-    <div v-if="activeTab === 'posts'" class="content-section">
-      <div class="post-list">
-        <div v-for="post in mockPostData" :key="post.id" class="post-card">
-          <div class="post-thumbnail">
-            <img :src="post.thumbnailUrl" :alt="post.contentSummary" />
-            <span class="post-type">{{ getPostTypeText(post.postType) }}</span>
+    <!-- 发帖数据内容 -->
+    <div v-if="activeTab === 'post-data'" class="content-section">
+      <!-- 发帖数据列表表格 -->
+      <div class="data-table-container">
+        <div class="table-header">
+          <h3>发帖数据列表</h3>
+          <div class="table-actions">
+            <button class="btn btn-primary" @click="showAddPostModal">
+              <Plus :size="16" />
+              添加发帖数据
+            </button>
+            <button class="btn btn-secondary">
+              <FileText :size="16" />
+              导出数据
+            </button>
           </div>
+        </div>
 
-          <div class="post-content">
-            <div class="post-header">
-              <h3 class="post-title">{{ post.contentSummary }}</h3>
-              <span class="status-badge published">
-                已发布
-              </span>
-            </div>
-
-            <div class="post-meta">
-              <div class="meta-item">
-                <User :size="16" />
-                <span>{{ post.influencerName }}</span>
-              </div>
-              <div class="meta-item">
-                <Calendar :size="16" />
-                <span>{{ post.postDate }}</span>
-              </div>
-              <div class="meta-item">
-                <Globe :size="16" />
-                <span>{{ getPlatformText(post.platform) }}</span>
-              </div>
-            </div>
-
-            <div class="post-stats">
-              <div class="stat-item">
-                <Eye :size="16" />
-                <span>{{ formatNumber(post.viewsCount) }} 浏览</span>
-              </div>
-              <div class="stat-item">
-                <Heart :size="16" />
-                <span>{{ formatNumber(post.likesCount) }} 点赞</span>
-              </div>
-              <div class="stat-item">
-                <MessageCircle :size="16" />
-                <span>{{ formatNumber(post.commentsCount) }} 评论</span>
-              </div>
-              <div class="stat-item">
-                <Share :size="16" />
-                <span>{{ formatNumber(post.sharesCount) }} 分享</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="post-actions">
-            <button class="btn btn-outline">查看详情</button>
-            <button class="btn btn-outline" @click="showEditPostModal(post)">编辑</button>
-            <button class="btn btn-outline">数据分析</button>
-          </div>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>月份</th>
+                <th>总发帖数</th>
+                <th>评论数</th>
+                <th>点赞数及互动率</th>
+                <th>客户</th>
+                <th>项目</th>
+                <th>录入时间</th>
+                <th>录入人</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="data in filteredPostData" :key="data.id">
+                <td>{{ data.month }}</td>
+                <td>{{ data.totalPosts }}</td>
+                <td>{{ formatNumber(data.commentsCount) }}</td>
+                <td>{{ formatNumber(data.likesCount) }}/{{ data.interactionRate }}%</td>
+                <td>{{ data.customerName }}</td>
+                <td>{{ data.projectName }}</td>
+                <td>{{ formatDate(data.createdAt) }}</td>
+                <td>{{ data.createdBy }}</td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn btn-sm btn-outline" title="查看详情">
+                      <Eye :size="14" />
+                    </button>
+                    <button class="btn btn-sm btn-outline" title="编辑" @click="showEditPostModal(data)">
+                      <Settings :size="14" />
+                    </button>
+                    <button class="btn btn-sm btn-outline" title="数据分析">
+                      <BarChart3 :size="14" />
+                    </button>
+                    <button class="btn btn-sm btn-outline btn-danger" title="删除" @click="handleDeletePostData(data)">
+                      <X :size="14" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
 
     <!-- 空状态 -->
-    <div v-if="(activeTab === 'data' && filteredInfluencerData.length === 0) || (activeTab === 'kols' && mockKOLs.length === 0) || (activeTab === 'posts' && mockPostData.length === 0)" class="empty-state">
+    <div v-if="(activeTab === 'influencer-data' && filteredInfluencerData.length === 0) || (activeTab === 'post-data' && filteredPostData.length === 0)" class="empty-state">
       <component :is="getEmptyStateIcon()" :size="64" class="empty-icon" />
       <h3>{{ getEmptyStateTitle() }}</h3>
       <p>{{ getEmptyStateDescription() }}</p>
@@ -428,6 +422,7 @@
       :is-visible="showPostModal"
       :is-edit="isPostEditMode"
       :edit-data="editingPostData"
+      :customers="mockCustomers"
       :projects="mockProjects"
       @close="closePostModal"
       @save="handleSavePostData"
@@ -455,7 +450,7 @@ import PostDataModal from '@/components/projects/PostDataModal.vue'
 import type { InfluencerDataForm, PostDataForm } from '@/types'
 
 // 活跃标签页
-const activeTab = ref('data')
+const activeTab = ref('influencer-data')
 
 // 红人数据管理筛选器
 const dataFilters = ref({
@@ -686,25 +681,21 @@ const getPlatformText = (platform: string): string => {
 // 空状态相关方法
 const getEmptyStateIcon = () => {
   switch (activeTab.value) {
-    case 'data':
-      return BarChart3
-    case 'kols':
+    case 'influencer-data':
       return Users
-    case 'posts':
+    case 'post-data':
       return FileText
     default:
-      return BarChart3
+      return Users
   }
 }
 
 const getEmptyStateTitle = (): string => {
   switch (activeTab.value) {
-    case 'data':
+    case 'influencer-data':
       return '暂无红人数据'
-    case 'kols':
-      return '暂无红人'
-    case 'posts':
-      return '暂无帖子'
+    case 'post-data':
+      return '暂无发帖数据'
     default:
       return '暂无数据'
   }
@@ -712,12 +703,10 @@ const getEmptyStateTitle = (): string => {
 
 const getEmptyStateDescription = (): string => {
   switch (activeTab.value) {
-    case 'data':
+    case 'influencer-data':
       return '还没有录入任何红人数据，点击上方按钮开始添加'
-    case 'kols':
-      return '还没有添加任何红人，点击上方按钮开始添加'
-    case 'posts':
-      return '还没有创建任何帖子，点击上方按钮开始创建'
+    case 'post-data':
+      return '还没有录入任何发帖数据，点击上方按钮开始添加'
     default:
       return '暂无相关数据'
   }
@@ -804,23 +793,18 @@ const handleSavePostData = (formData: PostDataForm) => {
   // 模拟添加到数据列表
   const newPostData = {
     id: Date.now().toString(),
-    postDate: formData.postDate,
-    influencerName: formData.influencerName,
-    platform: formData.platform as 'instagram' | 'tiktok' | 'youtube' | 'xiaohongshu' | 'weibo' | 'other',
-    contentSummary: formData.contentSummary,
-    postType: formData.postType as 'image' | 'video' | 'story' | 'live' | 'other',
+    month: formData.month,
+    totalPosts: formData.totalPosts || 0,
+    commentsCount: formData.commentsCount || 0,
+    likesCount: formData.likesCount || 0,
+    interactionRate: formData.interactionRate || 0,
+    customerId: formData.customerId,
+    customerName: mockCustomers.find(c => c.id === formData.customerId)?.name || '',
     projectId: formData.projectId,
     projectName: mockProjects.find(p => p.id === formData.projectId)?.name || '',
-    likesCount: formData.likesCount || 0,
-    commentsCount: formData.commentsCount || 0,
-    sharesCount: formData.sharesCount || 0,
-    viewsCount: formData.viewsCount || 0,
-    clickCount: formData.clickCount || 0,
-    conversionCount: formData.conversionCount || 0,
-    effectScore: formData.effectScore || 0,
-    thumbnailUrl: '/posts/default.jpg',
     createdBy: '当前用户',
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 
   mockPostData.push(newPostData)
@@ -846,6 +830,49 @@ const handleDeleteData = (data: any) => {
     }
   }
 }
+
+// 删除发帖数据
+const handleDeletePostData = (data: any) => {
+  if (confirm(`确定要删除 ${data.customerName} - ${data.projectName} 的发帖数据吗？`)) {
+    const index = mockPostData.findIndex(item => item.id === data.id)
+    if (index > -1) {
+      mockPostData.splice(index, 1)
+      alert('删除成功！')
+    }
+  }
+}
+
+// 筛选后的发帖数据
+const filteredPostData = computed(() => {
+  let filtered = mockPostData
+
+  // 客户筛选
+  if (dataFilters.value.customer) {
+    filtered = filtered.filter(data => data.customerId === dataFilters.value.customer)
+  }
+
+  // 项目筛选
+  if (dataFilters.value.project) {
+    filtered = filtered.filter(data => data.projectId === dataFilters.value.project)
+  }
+
+  // 月份筛选
+  if (dataFilters.value.month) {
+    filtered = filtered.filter(data => data.month === dataFilters.value.month)
+  }
+
+  // 搜索筛选
+  if (dataFilters.value.search) {
+    const searchTerm = dataFilters.value.search.toLowerCase()
+    filtered = filtered.filter(data =>
+      data.customerName.toLowerCase().includes(searchTerm) ||
+      data.projectName.toLowerCase().includes(searchTerm) ||
+      data.createdBy.toLowerCase().includes(searchTerm)
+    )
+  }
+
+  return filtered
+})
 </script>
 
 <style scoped>

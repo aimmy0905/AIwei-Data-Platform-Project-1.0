@@ -2,7 +2,7 @@
   <div v-if="isVisible" class="modal-overlay" @click="handleOverlayClick">
     <div class="modal-container" @click.stop>
       <div class="modal-header">
-        <h2>{{ isEdit ? '编辑发帖数据' : '新建帖子' }}</h2>
+        <h2>{{ isEdit ? '编辑发帖数据' : '添加发帖数据' }}</h2>
         <button class="close-button" @click="$emit('close')">
           <X :size="20" />
         </button>
@@ -14,108 +14,63 @@
           <h3 class="section-title">基础信息</h3>
           <div class="form-row">
             <div class="form-item">
-              <label class="required">红人姓名</label>
-              <input
-                v-model="formData.influencerName"
-                type="text"
-                class="form-input"
-                placeholder="请输入红人姓名或昵称"
-                maxlength="50"
-              />
-              <span v-if="errors.influencerName" class="error-text">{{ errors.influencerName }}</span>
-            </div>
-
-            <div class="form-item">
-              <label class="required">发帖平台</label>
-              <select v-model="formData.platform" class="form-select">
-                <option value="">请选择平台</option>
-                <option v-for="platform in platformOptions" :key="platform.value" :value="platform.value">
-                  {{ platform.label }}
+              <label class="required">客户</label>
+              <select
+                v-model="formData.customerId"
+                class="form-select"
+                @change="onCustomerChange"
+              >
+                <option value="">请选择客户</option>
+                <option v-for="customer in customers" :key="customer.id" :value="customer.id">
+                  {{ customer.name }}
                 </option>
               </select>
-              <span v-if="errors.platform" class="error-text">{{ errors.platform }}</span>
+              <span v-if="errors.customerId" class="error-text">{{ errors.customerId }}</span>
             </div>
 
             <div class="form-item">
-              <label class="required">发帖日期</label>
-              <input
-                v-model="formData.postDate"
-                type="date"
-                class="form-input"
-                :max="currentDate"
-              />
-              <span v-if="errors.postDate" class="error-text">{{ errors.postDate }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 内容信息区域 -->
-        <div class="section">
-          <h3 class="section-title">内容信息</h3>
-          <div class="form-row">
-            <div class="form-item">
-              <label class="required">发帖类型</label>
-              <select v-model="formData.postType" class="form-select">
-                <option value="">请选择类型</option>
-                <option v-for="type in postTypeOptions" :key="type.value" :value="type.value">
-                  {{ type.label }}
-                </option>
-              </select>
-              <span v-if="errors.postType" class="error-text">{{ errors.postType }}</span>
-            </div>
-
-            <div class="form-item">
-              <label class="required">关联项目</label>
-              <select v-model="formData.projectId" class="form-select">
+              <label class="required">项目</label>
+              <select
+                v-model="formData.projectId"
+                class="form-select"
+                :disabled="!formData.customerId"
+              >
                 <option value="">请选择项目</option>
-                <option v-for="project in projects" :key="project.id" :value="project.id">
+                <option v-for="project in filteredProjects" :key="project.id" :value="project.id">
                   {{ project.name }}
                 </option>
               </select>
               <span v-if="errors.projectId" class="error-text">{{ errors.projectId }}</span>
             </div>
-          </div>
 
-          <div class="form-item">
-            <label class="required">发帖内容摘要</label>
-            <textarea
-              v-model="formData.contentSummary"
-              class="form-textarea"
-              placeholder="请输入发帖内容摘要或标题（10-500字符）"
-              rows="3"
-              maxlength="500"
-            ></textarea>
-            <div class="char-count">{{ formData.contentSummary.length }}/500</div>
-            <span v-if="errors.contentSummary" class="error-text">{{ errors.contentSummary }}</span>
+            <div class="form-item">
+              <label class="required">统计月份</label>
+              <input
+                v-model="formData.month"
+                type="month"
+                class="form-input"
+                :max="currentMonth"
+              />
+              <span v-if="errors.month" class="error-text">{{ errors.month }}</span>
+            </div>
           </div>
         </div>
 
-        <!-- 数据信息区域 -->
+        <!-- 发帖数据录入区域 -->
         <div class="section">
-          <h3 class="section-title">互动数据</h3>
+          <h3 class="section-title">发帖数据录入</h3>
           <div class="form-grid">
             <div class="form-item">
-              <label class="required">观看量</label>
+              <label class="required">总发帖数</label>
               <input
-                v-model.number="formData.viewsCount"
+                v-model.number="formData.totalPosts"
                 type="number"
                 class="form-input"
-                placeholder="观看量"
+                placeholder="请输入总发帖数"
                 min="0"
+                max="9999"
               />
-              <span v-if="errors.viewsCount" class="error-text">{{ errors.viewsCount }}</span>
-            </div>
-
-            <div class="form-item">
-              <label class="required">点赞数</label>
-              <input
-                v-model.number="formData.likesCount"
-                type="number"
-                class="form-input"
-                placeholder="点赞数"
-                min="0"
-              />
-              <span v-if="errors.likesCount" class="error-text">{{ errors.likesCount }}</span>
+              <span v-if="errors.totalPosts" class="error-text">{{ errors.totalPosts }}</span>
             </div>
 
             <div class="form-item">
@@ -124,87 +79,38 @@
                 v-model.number="formData.commentsCount"
                 type="number"
                 class="form-input"
-                placeholder="评论数"
+                placeholder="请输入评论数"
                 min="0"
+                max="999999"
               />
               <span v-if="errors.commentsCount" class="error-text">{{ errors.commentsCount }}</span>
             </div>
 
             <div class="form-item">
-              <label class="required">分享数</label>
+              <label class="required">点赞数</label>
               <input
-                v-model.number="formData.sharesCount"
+                v-model.number="formData.likesCount"
                 type="number"
                 class="form-input"
-                placeholder="分享数"
+                placeholder="请输入点赞数"
                 min="0"
+                max="999999999"
               />
-              <span v-if="errors.sharesCount" class="error-text">{{ errors.sharesCount }}</span>
+              <span v-if="errors.likesCount" class="error-text">{{ errors.likesCount }}</span>
             </div>
 
             <div class="form-item">
-              <label>点击数</label>
+              <label class="required">互动率 (%)</label>
               <input
-                v-model.number="formData.clickCount"
+                v-model.number="formData.interactionRate"
                 type="number"
                 class="form-input"
-                placeholder="点击数"
+                placeholder="请输入互动率"
                 min="0"
+                max="100"
+                step="0.1"
               />
-            </div>
-
-            <div class="form-item">
-              <label>转化数</label>
-              <input
-                v-model.number="formData.conversionCount"
-                type="number"
-                class="form-input"
-                placeholder="转化数"
-                min="0"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- 效果评估区域 -->
-        <div class="section">
-          <h3 class="section-title">效果评估</h3>
-          <div class="form-row">
-            <div class="form-item">
-              <label class="required">效果评分</label>
-              <div class="score-input">
-                <input
-                  v-model.number="formData.effectScore"
-                  type="number"
-                  class="form-input"
-                  placeholder="评分"
-                  min="1"
-                  max="10"
-                  step="1"
-                />
-                <span class="score-unit">分 (1-10分)</span>
-              </div>
-              <span v-if="errors.effectScore" class="error-text">{{ errors.effectScore }}</span>
-            </div>
-          </div>
-
-          <!-- 评分说明 -->
-          <div class="score-guide">
-            <div class="score-item">
-              <span class="score-range">9-10分</span>
-              <span class="score-desc">优秀：超出预期效果</span>
-            </div>
-            <div class="score-item">
-              <span class="score-range">7-8分</span>
-              <span class="score-desc">良好：达到预期效果</span>
-            </div>
-            <div class="score-item">
-              <span class="score-range">5-6分</span>
-              <span class="score-desc">一般：基本达到效果</span>
-            </div>
-            <div class="score-item">
-              <span class="score-range">1-4分</span>
-              <span class="score-desc">较差：未达到预期</span>
+              <span v-if="errors.interactionRate" class="error-text">{{ errors.interactionRate }}</span>
             </div>
           </div>
         </div>
@@ -214,16 +120,16 @@
           <h3 class="section-title">数据预览</h3>
           <div class="preview-card">
             <div class="preview-row">
-              <span class="preview-label">红人平台：</span>
-              <span class="preview-value">{{ formData.influencerName }} - {{ getPlatformText(formData.platform) }}</span>
+              <span class="preview-label">客户项目：</span>
+              <span class="preview-value">{{ selectedCustomerName }} - {{ selectedProjectName }}</span>
             </div>
             <div class="preview-row">
-              <span class="preview-label">互动数据：</span>
-              <span class="preview-value">{{ formatNumber(formData.viewsCount || 0) }}观看 / {{ formatNumber(formData.likesCount || 0) }}点赞 / {{ formatNumber(formData.commentsCount || 0) }}评论</span>
+              <span class="preview-label">统计月份：</span>
+              <span class="preview-value">{{ formData.month }}</span>
             </div>
             <div class="preview-row">
-              <span class="preview-label">效果评分：</span>
-              <span class="preview-value">{{ formData.effectScore }}/10分</span>
+              <span class="preview-label">点赞及互动率：</span>
+              <span class="preview-value">{{ formData.likesCount?.toLocaleString() }}/{{ formData.interactionRate }}%</span>
             </div>
           </div>
         </div>
@@ -234,7 +140,7 @@
           取消
         </button>
         <button class="btn btn-primary" @click="handleSave" :disabled="!isFormValid">
-          {{ isEdit ? '保存修改' : '保存帖子' }}
+          {{ isEdit ? '保存修改' : '保存数据' }}
         </button>
         <button v-if="!isEdit" class="btn btn-success" @click="handleSaveAndContinue" :disabled="!isFormValid">
           保存并继续
@@ -248,13 +154,13 @@
 import { ref, computed, watch } from 'vue'
 import { X } from 'lucide-vue-next'
 import type { PostDataForm } from '@/types'
-import { platformOptions, postTypeOptions } from '@/mock/influencer-data'
 
 interface Props {
   isVisible: boolean
   isEdit?: boolean
   editData?: any
-  projects: Array<{ id: string; name: string }>
+  customers: Array<{ id: string; name: string }>
+  projects: Array<{ id: string; name: string; customerId: string }>
 }
 
 interface Emits {
@@ -271,101 +177,99 @@ const emit = defineEmits<Emits>()
 
 // 表单数据
 const formData = ref<PostDataForm>({
-  postDate: '',
-  influencerName: '',
-  platform: '',
-  contentSummary: '',
-  postType: '',
-  projectId: '',
-  likesCount: null,
+  month: '',
+  totalPosts: null,
   commentsCount: null,
-  sharesCount: null,
-  viewsCount: null,
-  clickCount: null,
-  conversionCount: null,
-  effectScore: null
+  likesCount: null,
+  interactionRate: null,
+  customerId: '',
+  projectId: ''
 })
 
 // 错误信息
 const errors = ref<Record<string, string>>({})
 
-// 当前日期（用于限制选择）
-const currentDate = computed(() => {
+// 当前月份（用于限制选择）
+const currentMonth = computed(() => {
   const now = new Date()
-  return now.toISOString().split('T')[0]
+  return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`
+})
+
+// 根据选择的客户筛选项目
+const filteredProjects = computed(() => {
+  if (!formData.value.customerId) return []
+  return props.projects.filter(project => project.customerId === formData.value.customerId)
+})
+
+// 选中的客户名称
+const selectedCustomerName = computed(() => {
+  const customer = props.customers.find(c => c.id === formData.value.customerId)
+  return customer?.name || ''
+})
+
+// 选中的项目名称
+const selectedProjectName = computed(() => {
+  const project = filteredProjects.value.find(p => p.id === formData.value.projectId)
+  return project?.name || ''
 })
 
 // 数据是否完整
 const isDataComplete = computed(() => {
-  return formData.value.influencerName &&
-         formData.value.platform &&
-         formData.value.viewsCount !== null &&
+  return formData.value.customerId &&
+         formData.value.projectId &&
+         formData.value.month &&
+         formData.value.totalPosts !== null &&
          formData.value.likesCount !== null &&
-         formData.value.effectScore !== null
+         formData.value.interactionRate !== null
 })
 
 // 表单是否有效
 const isFormValid = computed(() => {
   return Object.keys(errors.value).length === 0 &&
-         formData.value.postDate &&
-         formData.value.influencerName &&
-         formData.value.platform &&
-         formData.value.contentSummary &&
-         formData.value.postType &&
+         formData.value.customerId &&
          formData.value.projectId &&
-         formData.value.viewsCount !== null &&
-         formData.value.likesCount !== null &&
+         formData.value.month &&
+         formData.value.totalPosts !== null &&
          formData.value.commentsCount !== null &&
-         formData.value.sharesCount !== null &&
-         formData.value.effectScore !== null
+         formData.value.likesCount !== null &&
+         formData.value.interactionRate !== null
 })
+
+// 客户改变时重置项目选择
+const onCustomerChange = () => {
+  formData.value.projectId = ''
+}
 
 // 验证表单
 const validateForm = () => {
   errors.value = {}
 
-  if (!formData.value.postDate) {
-    errors.value.postDate = '请选择发帖日期'
-  }
-
-  if (!formData.value.influencerName || formData.value.influencerName.length < 2) {
-    errors.value.influencerName = '红人姓名至少2个字符'
-  }
-
-  if (!formData.value.platform) {
-    errors.value.platform = '请选择发帖平台'
-  }
-
-  if (!formData.value.contentSummary || formData.value.contentSummary.length < 10) {
-    errors.value.contentSummary = '内容摘要至少10个字符'
-  }
-
-  if (!formData.value.postType) {
-    errors.value.postType = '请选择发帖类型'
+  if (!formData.value.customerId) {
+    errors.value.customerId = '请选择客户'
   }
 
   if (!formData.value.projectId) {
-    errors.value.projectId = '请选择关联项目'
+    errors.value.projectId = '请选择项目'
   }
 
-  if (formData.value.viewsCount === null || formData.value.viewsCount < 0) {
-    errors.value.viewsCount = '观看量不能为负数'
+  if (!formData.value.month) {
+    errors.value.month = '请选择统计月份'
   }
 
-  if (formData.value.likesCount === null || formData.value.likesCount < 0) {
-    errors.value.likesCount = '点赞数不能为负数'
+  if (formData.value.totalPosts === null || formData.value.totalPosts < 0) {
+    errors.value.totalPosts = '总发帖数不能为负数'
   }
 
   if (formData.value.commentsCount === null || formData.value.commentsCount < 0) {
     errors.value.commentsCount = '评论数不能为负数'
   }
 
-  if (formData.value.sharesCount === null || formData.value.sharesCount < 0) {
-    errors.value.sharesCount = '分享数不能为负数'
+  if (formData.value.likesCount === null || formData.value.likesCount < 0) {
+    errors.value.likesCount = '点赞数不能为负数'
   }
 
-  if (formData.value.effectScore === null || formData.value.effectScore < 1 || formData.value.effectScore > 10) {
-    errors.value.effectScore = '效果评分必须在1-10之间'
+  if (formData.value.interactionRate === null || formData.value.interactionRate < 0 || formData.value.interactionRate > 100) {
+    errors.value.interactionRate = '互动率必须在0-100之间'
   }
 }
 
@@ -393,43 +297,15 @@ const handleOverlayClick = () => {
 // 重置表单
 const resetForm = () => {
   formData.value = {
-    postDate: '',
-    influencerName: '',
-    platform: '',
-    contentSummary: '',
-    postType: '',
-    projectId: '',
-    likesCount: null,
+    month: '',
+    totalPosts: null,
     commentsCount: null,
-    sharesCount: null,
-    viewsCount: null,
-    clickCount: null,
-    conversionCount: null,
-    effectScore: null
+    likesCount: null,
+    interactionRate: null,
+    customerId: '',
+    projectId: ''
   }
   errors.value = {}
-}
-
-// 获取平台文本
-const getPlatformText = (platform: string): string => {
-  const platformMap: Record<string, string> = {
-    instagram: 'Instagram',
-    tiktok: 'TikTok',
-    youtube: 'YouTube',
-    xiaohongshu: '小红书',
-    weibo: '微博'
-  }
-  return platformMap[platform] || platform
-}
-
-// 格式化数字
-const formatNumber = (num: number): string => {
-  if (num >= 1000000) {
-    return (num / 1000000).toFixed(1) + 'M'
-  } else if (num >= 1000) {
-    return (num / 1000).toFixed(1) + 'K'
-  }
-  return num.toLocaleString()
 }
 
 // 监听模态框显示状态
@@ -471,7 +347,7 @@ watch(formData, () => {
   background: white;
   border-radius: 12px;
   width: 90%;
-  max-width: 900px;
+  max-width: 800px;
   max-height: 90vh;
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -558,78 +434,26 @@ watch(formData, () => {
 }
 
 .form-input,
-.form-select,
-.form-textarea {
+.form-select {
   padding: 10px 12px;
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 14px;
   transition: border-color 0.2s;
-  font-family: inherit;
 }
 
 .form-input:focus,
-.form-select:focus,
-.form-textarea:focus {
+.form-select:focus {
   outline: none;
   border-color: #1976d2;
   box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
 }
 
-.form-textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-.char-count {
-  font-size: 12px;
-  color: #666;
-  text-align: right;
-  margin-top: -4px;
-}
-
-.score-input {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.score-input .form-input {
-  flex: 1;
-}
-
-.score-unit {
-  font-size: 14px;
-  color: #666;
-  white-space: nowrap;
-}
-
-.score-guide {
-  background: #f8f9fa;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  padding: 12px;
-  margin-top: 12px;
-}
-
-.score-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 6px;
-  font-size: 12px;
-}
-
-.score-item:last-child {
-  margin-bottom: 0;
-}
-
-.score-range {
-  font-weight: 600;
-  color: #1976d2;
-}
-
-.score-desc {
-  color: #666;
+.form-input:disabled,
+.form-select:disabled {
+  background: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
 }
 
 .error-text {

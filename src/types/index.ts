@@ -2008,19 +2008,30 @@ export interface InfluencerDataForm {
   projectId: string
 }
 
+// 发帖数据（月度统计）类型
+export interface MonthlyPostData {
+  id: string
+  month: string // 统计月份，格式：YYYY-MM
+  totalPosts: number // 总发帖数
+  commentsCount: number // 评论数
+  likesCount: number // 点赞数
+  interactionRate: number // 互动率（百分比）
+  customerId: string // 客户ID
+  customerName: string // 客户名称
+  projectId: string // 项目ID
+  projectName: string // 项目名称
+  createdBy: string // 录入人
+  createdAt: string // 录入时间
+  updatedAt: string // 更新时间
+}
+
 // 发帖数据录入表单类型
 export interface PostDataForm {
-  postDate: string
-  influencerName: string
-  platform: string
-  contentSummary: string
-  postType: string
-  projectId: string
-  likesCount: number | null
+  month: string
+  totalPosts: number | null
   commentsCount: number | null
-  sharesCount: number | null
-  viewsCount: number | null
-  clickCount: number | null
-  conversionCount: number | null
-  effectScore: number | null
+  likesCount: number | null
+  interactionRate: number | null
+  customerId: string
+  projectId: string
 }
