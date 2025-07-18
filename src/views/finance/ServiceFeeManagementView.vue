@@ -3,8 +3,20 @@
     <!-- 页面头部 -->
     <div class="page-header">
       <div class="page-header__main">
-        <h1 class="page-title">服务费管理</h1>
-        <p class="page-description">管理客户项目的服务费收款记录</p>
+        <div class="page-header__title">
+          <button
+            v-if="showBackButton"
+            class="back-btn"
+            @click="goBack"
+            title="返回项目管理"
+          >
+            <ArrowLeft :size="20" />
+          </button>
+          <div>
+            <h1 class="page-title">服务费管理</h1>
+            <p class="page-description">管理客户项目的服务费收款记录</p>
+          </div>
+        </div>
       </div>
       <div class="page-header__actions">
         <button class="btn btn--primary" @click="showCreateModal = true">
@@ -337,10 +349,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import {
   Plus, Search, RotateCcw, ChevronUp, ChevronDown, Edit, Trash2,
-  FileX, X
+  FileX, X, ArrowLeft
 } from 'lucide-vue-next'
 import {
   type ServiceFeeRecord,
@@ -355,6 +367,7 @@ import {
 } from '@/mock/service-fees'
 
 const route = useRoute()
+const router = useRouter()
 
 // 响应式数据
 const loading = ref(false)
@@ -411,6 +424,16 @@ const creators = computed(() => {
 const hasActiveFilters = computed(() => {
   return filters.customerId || filters.projectId || filters.paymentType || filters.startDate || filters.endDate || filters.creator
 })
+
+// 是否显示返回按钮（当有来源页面参数时显示）
+const showBackButton = computed(() => {
+  return Boolean(route.query.projectId || route.query.projectName)
+})
+
+// 返回方法
+const goBack = () => {
+  router.push('/projects')
+}
 
 const filteredRecords = computed(() => {
   let filtered = [...records.value]
@@ -732,6 +755,28 @@ onMounted(async () => {
 .page-header__main {
   flex: 1;
   min-width: 300px;
+}
+
+.page-header__title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: var(--spacing-xs);
+  border-radius: var(--border-radius-md);
+  transition: all var(--duration-fast);
+}
+
+.back-btn:hover {
+  background: var(--color-background);
+  color: var(--color-text-primary);
 }
 
 .page-title {
