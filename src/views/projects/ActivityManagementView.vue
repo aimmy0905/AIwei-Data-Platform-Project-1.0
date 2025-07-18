@@ -168,6 +168,28 @@
     <!-- 排序和视图切换 -->
     <div class="toolbar-section">
       <div class="toolbar-left">
+        <div class="batch-controls" v-if="viewMode === 'list'">
+          <label class="checkbox-container">
+            <input
+              type="checkbox"
+              :checked="selectedActivities.size === activities.length && activities.length > 0"
+              :indeterminate="selectedActivities.size > 0 && selectedActivities.size < activities.length"
+              @change="selectAllActivities"
+            />
+            <span class="checkmark"></span>
+            <span class="checkbox-label">
+              {{ selectedActivities.size > 0 ? `已选择 ${selectedActivities.size} 个` : '全选' }}
+            </span>
+          </label>
+          <button
+            v-if="selectedActivities.size > 0"
+            class="btn btn-text btn-sm"
+            @click="clearSelection"
+          >
+            清空选择
+          </button>
+        </div>
+
         <div class="sort-controls">
           <label>排序：</label>
           <select v-model="sortBy" class="form-select" @change="handleSortChange">
@@ -205,6 +227,66 @@
             <List :size="16" />
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- 批量操作栏 -->
+    <div v-if="showBatchActions" class="batch-actions-bar">
+      <div class="batch-actions-content">
+        <div class="batch-info">
+          <CheckSquare :size="16" />
+          <span>已选择 {{ selectedActivities.size }} 个活动</span>
+        </div>
+        <div class="batch-operations">
+          <div class="batch-status-group">
+            <label>批量状态变更：</label>
+            <button
+              class="btn btn-sm btn-outline"
+              @click="batchChangeStatus('running')"
+              :disabled="batchOperationLoading"
+            >
+              <Play :size="14" />
+              开始活动
+            </button>
+            <button
+              class="btn btn-sm btn-outline"
+              @click="batchChangeStatus('ended')"
+              :disabled="batchOperationLoading"
+            >
+              <Square :size="14" />
+              结束活动
+            </button>
+            <button
+              class="btn btn-sm btn-outline"
+              @click="batchChangeStatus('cancelled')"
+              :disabled="batchOperationLoading"
+            >
+              <XCircle :size="14" />
+              取消活动
+            </button>
+          </div>
+          <div class="batch-action-group">
+            <button
+              class="btn btn-sm btn-outline"
+              @click="batchExportActivities"
+              :disabled="batchOperationLoading"
+            >
+              <Download :size="14" />
+              导出数据
+            </button>
+            <button
+              class="btn btn-sm btn-outline btn-danger"
+              @click="batchDeleteActivities"
+              :disabled="batchOperationLoading"
+            >
+              <Trash2 :size="14" />
+              批量删除
+            </button>
+          </div>
+        </div>
+        <button class="btn btn-icon" @click="clearSelection">
+          <X :size="16" />
+        </button>
       </div>
     </div>
 
@@ -301,6 +383,13 @@
         <table>
           <thead>
             <tr>
+              <th class="checkbox-column">
+                <input
+                  type="checkbox"
+                  :checked="selectedActivities.size === activities.length && activities.length > 0"
+                  @change="selectAllActivities"
+                />
+              </th>
               <th @click="handleSort('name')">
                 活动名称
                 <ArrowUpDown :size="14" />
@@ -330,6 +419,13 @@
           </thead>
           <tbody>
             <tr v-for="activity in activities" :key="activity.id">
+              <td class="checkbox-column">
+                <input
+                  type="checkbox"
+                  :checked="selectedActivities.has(activity.id)"
+                  @change="toggleActivitySelection(activity.id)"
+                />
+              </td>
               <td>
                 <div class="activity-name-cell">
                   <strong @click="viewActivityDetail(activity.id)">{{ activity.name }}</strong>
@@ -445,7 +541,7 @@ import { useRouter, useRoute } from 'vue-router'
 import {
   Plus, Calendar, DollarSign, Target, User, Eye, Edit, Trash2, X,
   BarChart3, TrendingUp, ChevronDown, ArrowUpDown, Grid, List,
-  ChevronLeft, ChevronRight, Play, Square, XCircle
+  ChevronLeft, ChevronRight, Play, Square, XCircle, CheckSquare, Download
 } from 'lucide-vue-next'
 import type { Activity, ActivitySummary, ActivityFilter } from '@/types'
 import {
@@ -494,6 +590,11 @@ const pagination = ref({
   pageSize: 12,
   total: 0
 })
+
+// 批量操作状态
+const selectedActivities = ref<Set<number>>(new Set())
+const showBatchActions = ref(false)
+const batchOperationLoading = ref(false)
 
 // 搜索防抖
 let searchTimeout: number | null = null
@@ -800,6 +901,151 @@ const quickStatusChange = async (activity: Activity, action: any) => {
   } catch (error) {
     console.error('状态变更失败:', error)
     alert('状态变更失败，请重试')
+  }
+}
+
+// 批量操作方法
+const toggleActivitySelection = (activityId: number) => {
+  if (selectedActivities.value.has(activityId)) {
+    selectedActivities.value.delete(activityId)
+  } else {
+    selectedActivities.value.add(activityId)
+  }
+  showBatchActions.value = selectedActivities.value.size > 0
+}
+
+const selectAllActivities = () => {
+  if (selectedActivities.value.size === activities.value.length) {
+    selectedActivities.value.clear()
+  } else {
+    activities.value.forEach(activity => {
+      selectedActivities.value.add(activity.id)
+    })
+  }
+  showBatchActions.value = selectedActivities.value.size > 0
+}
+
+const clearSelection = () => {
+  selectedActivities.value.clear()
+  showBatchActions.value = false
+}
+
+const batchDeleteActivities = async () => {
+  if (selectedActivities.value.size === 0) return
+
+  const selectedIds = Array.from(selectedActivities.value)
+  const selectedNames = activities.value
+    .filter(a => selectedIds.includes(a.id))
+    .map(a => a.name)
+    .join('、')
+
+  if (!confirm(`确定要删除以下活动吗？\n${selectedNames}`)) {
+    return
+  }
+
+  batchOperationLoading.value = true
+  try {
+    const deletePromises = selectedIds.map(id => mockDeleteActivity(id))
+    const results = await Promise.all(deletePromises)
+
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.length - successCount
+
+    if (failCount === 0) {
+      alert(`成功删除 ${successCount} 个活动`)
+    } else {
+      alert(`删除完成：成功 ${successCount} 个，失败 ${failCount} 个`)
+    }
+
+    // 重新加载数据
+    loadActivities()
+    loadSummary()
+    clearSelection()
+
+  } catch (error) {
+    console.error('批量删除失败:', error)
+    alert('批量删除失败，请重试')
+  } finally {
+    batchOperationLoading.value = false
+  }
+}
+
+const batchChangeStatus = async (newStatus: string) => {
+  if (selectedActivities.value.size === 0) return
+
+  const selectedIds = Array.from(selectedActivities.value)
+  const selectedActivitiesData = activities.value.filter(a => selectedIds.includes(a.id))
+
+  // 检查状态变更的合法性
+  const invalidActivities = selectedActivitiesData.filter(activity => {
+    const currentUser = authStore.user
+    if (!currentUser) return true
+
+    return !ActivityStatusService.canTransition(activity.status, newStatus as any, currentUser.role)
+  })
+
+  if (invalidActivities.length > 0) {
+    alert(`以下活动无法变更为该状态：\n${invalidActivities.map(a => a.name).join('、')}`)
+    return
+  }
+
+  const statusText = ActivityStatusService.getStatusText(newStatus as any)
+  if (!confirm(`确定要将选中的 ${selectedIds.length} 个活动状态变更为"${statusText}"吗？`)) {
+    return
+  }
+
+  batchOperationLoading.value = true
+  try {
+    const updatePromises = selectedIds.map(id => mockUpdateActivityStatus(id, newStatus))
+    const results = await Promise.all(updatePromises)
+
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.length - successCount
+
+    if (failCount === 0) {
+      alert(`成功更新 ${successCount} 个活动状态`)
+    } else {
+      alert(`状态更新完成：成功 ${successCount} 个，失败 ${failCount} 个`)
+    }
+
+    // 重新加载数据
+    loadActivities()
+    loadSummary()
+    clearSelection()
+
+  } catch (error) {
+    console.error('批量状态变更失败:', error)
+    alert('批量状态变更失败，请重试')
+  } finally {
+    batchOperationLoading.value = false
+  }
+}
+
+const batchExportActivities = async () => {
+  if (selectedActivities.value.size === 0) return
+
+  try {
+    const { DataExportService } = await import('@/services/dataExportService')
+    const selectedActivitiesData = activities.value.filter(a =>
+      selectedActivities.value.has(a.id)
+    )
+
+    const csvContent = await DataExportService.exportActivities(selectedActivitiesData, {
+      format: 'csv',
+      filename: `选中活动数据_${new Date().toISOString().split('T')[0]}.csv`
+    })
+
+    DataExportService.downloadFile(
+      csvContent,
+      `选中活动数据_${new Date().toISOString().split('T')[0]}.csv`,
+      'text/csv'
+    )
+
+    alert(`成功导出 ${selectedActivities.value.size} 个活动的数据`)
+
+  } catch (error) {
+    console.error('批量导出失败:', error)
+    alert('批量导出失败，请重试')
   }
 }
 
@@ -1435,6 +1681,134 @@ watch(
 .btn-quick-action.btn-danger:hover {
   background: #d32f2f;
   color: white;
+}
+
+/* 批量操作样式 */
+.batch-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: 20px;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-container input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.checkbox-label {
+  font-size: 14px;
+  color: #333;
+}
+
+.batch-actions-bar {
+  background: #e3f2fd;
+  border: 1px solid #bbdefb;
+  border-radius: 8px;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.batch-actions-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.batch-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1976d2;
+  font-weight: 500;
+}
+
+.batch-operations {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+}
+
+.batch-status-group,
+.batch-action-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.batch-status-group label,
+.batch-action-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+}
+
+.checkbox-column {
+  width: 40px;
+  text-align: center;
+  padding: 8px !important;
+}
+
+.checkbox-column input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+/* 复选框样式增强 */
+.checkmark {
+  position: relative;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ddd;
+  border-radius: 3px;
+  background: white;
+  transition: all 0.2s;
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark {
+  background: #1976d2;
+  border-color: #1976d2;
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-container input[type="checkbox"]:indeterminate + .checkmark {
+  background: #1976d2;
+  border-color: #1976d2;
+}
+
+.checkbox-container input[type="checkbox"]:indeterminate + .checkmark::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 6px;
+  width: 8px;
+  height: 2px;
+  background: white;
+  border-radius: 1px;
 }
 
 /* 分页样式 */

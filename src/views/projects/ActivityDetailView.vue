@@ -320,10 +320,19 @@
         <div v-else-if="activeTab === 'product'" class="data-table-container">
           <div class="table-header">
             <h3>产品数据表</h3>
-            <button class="btn btn-outline btn-sm" @click="exportProductData">
-              <Download :size="14" />
-              导出
-            </button>
+            <div class="table-actions">
+              <select v-model="productSortBy" class="form-select" @change="sortProductData">
+                <option value="salesAmount">按销售额排序</option>
+                <option value="salesVolume">按销量排序</option>
+                <option value="conversionRate">按转化率排序</option>
+                <option value="avgOrderValue">按客单价排序</option>
+                <option value="userCount">按用户数排序</option>
+              </select>
+              <button class="btn btn-outline btn-sm" @click="exportProductData">
+                <Download :size="14" />
+                导出
+              </button>
+            </div>
           </div>
           <div class="data-table">
             <table>
@@ -394,10 +403,19 @@
         <div v-else-if="activeTab === 'page'" class="data-table-container">
           <div class="table-header">
             <h3>页面数据表</h3>
-            <button class="btn btn-outline btn-sm" @click="exportPageData">
-              <Download :size="14" />
-              导出
-            </button>
+            <div class="table-actions">
+              <select v-model="pageSortBy" class="form-select" @change="sortPageData">
+                <option value="visitCount">按访问数排序</option>
+                <option value="userCount">按用户数排序</option>
+                <option value="conversionRate">按转化率排序</option>
+                <option value="bounceRate">按跳出率排序</option>
+                <option value="avgStayTime">按停留时长排序</option>
+              </select>
+              <button class="btn btn-outline btn-sm" @click="exportPageData">
+                <Download :size="14" />
+                导出
+              </button>
+            </div>
           </div>
           <div class="data-table">
             <table>
@@ -473,7 +491,8 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   ArrowLeft, Edit, Download, DollarSign, Target, ShoppingCart, Users, Percent, CreditCard,
-  TrendingUp, TrendingDown, Calendar, Package, Globe, AlertCircle
+  TrendingUp, TrendingDown, Calendar, Package, Globe, AlertCircle, RefreshCw, Minus,
+  Filter, SortAsc, SortDesc
 } from 'lucide-vue-next'
 import type { ActivityDetail, Activity } from '@/types'
 import { mockGetActivityDetail } from '@/mock/activities'
@@ -487,6 +506,14 @@ const router = useRouter()
 const loading = ref(false)
 const activityDetail = ref<ActivityDetail | null>(null)
 const activeTab = ref('daily')
+
+// 排序和筛选状态
+const productSortBy = ref('salesAmount')
+const productSortOrder = ref<'asc' | 'desc'>('desc')
+const pageSortBy = ref('visitCount')
+const pageSortOrder = ref<'asc' | 'desc'>('desc')
+const dailySortBy = ref('date')
+const dailySortOrder = ref<'asc' | 'desc'>('desc')
 
 // 方法
 const loadActivityDetail = async () => {
@@ -613,6 +640,89 @@ const handleStatusChanged = (updatedActivity: Activity) => {
     activityDetail.value.updatedAt = updatedActivity.updatedAt
   }
 }
+
+// 数据排序方法
+const sortProductData = () => {
+  if (!activityDetail.value?.productData) return
+
+  const sortField = productSortBy.value
+  const order = productSortOrder.value
+
+  activityDetail.value.productData.sort((a, b) => {
+    let aValue: any = a[sortField as keyof typeof a]
+    let bValue: any = b[sortField as keyof typeof b]
+
+    if (aValue === undefined) aValue = 0
+    if (bValue === undefined) bValue = 0
+
+    if (typeof aValue === 'string') {
+      aValue = aValue.toLowerCase()
+      bValue = (bValue as string).toLowerCase()
+    }
+
+    if (order === 'asc') {
+      return aValue > bValue ? 1 : -1
+    } else {
+      return aValue < bValue ? 1 : -1
+    }
+  })
+}
+
+const sortPageData = () => {
+  if (!activityDetail.value?.pageData) return
+
+  const sortField = pageSortBy.value
+  const order = pageSortOrder.value
+
+  activityDetail.value.pageData.sort((a, b) => {
+    let aValue: any = a[sortField as keyof typeof a]
+    let bValue: any = b[sortField as keyof typeof b]
+
+    if (aValue === undefined) aValue = 0
+    if (bValue === undefined) bValue = 0
+
+    if (typeof aValue === 'string') {
+      aValue = aValue.toLowerCase()
+      bValue = (bValue as string).toLowerCase()
+    }
+
+    if (order === 'asc') {
+      return aValue > bValue ? 1 : -1
+    } else {
+      return aValue < bValue ? 1 : -1
+    }
+  })
+}
+
+const sortDailyData = () => {
+  if (!activityDetail.value?.dailyData) return
+
+  const sortField = dailySortBy.value
+  const order = dailySortOrder.value
+
+  activityDetail.value.dailyData.sort((a, b) => {
+    let aValue = a[sortField as keyof typeof a]
+    let bValue = b[sortField as keyof typeof b]
+
+    if (sortField === 'date') {
+      aValue = new Date(aValue as string).getTime()
+      bValue = new Date(bValue as string).getTime()
+    }
+
+    if (order === 'asc') {
+      return aValue > bValue ? 1 : -1
+    } else {
+      return aValue < bValue ? 1 : -1
+    }
+  })
+}
+
+// 数据刷新方法
+const refreshDailyData = async () => {
+  await loadActivityDetail()
+}
+
+
 
 // 生命周期
 onMounted(() => {
@@ -1087,6 +1197,226 @@ onMounted(() => {
 /* 状态管理区域样式 */
 .status-section {
   margin-bottom: 24px;
+}
+
+/* 数据表格增强样式 */
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.table-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.form-select {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+}
+
+/* 数据表格样式增强 */
+.data-table table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.data-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+  padding: 12px 8px;
+  text-align: left;
+  border-bottom: 2px solid #e0e0e0;
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: top;
+}
+
+.data-table tr:hover {
+  background: #f8f9fa;
+}
+
+/* 数据单元格样式 */
+.number-cell {
+  text-align: right;
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 13px;
+}
+
+.percentage-cell {
+  text-align: right;
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 13px;
+}
+
+.ratio-cell {
+  text-align: right;
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.date-cell {
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 13px;
+}
+
+.time-cell {
+  text-align: right;
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 13px;
+}
+
+/* 数据质量指示器 */
+.ratio-excellent {
+  color: #2e7d32;
+  background: #e8f5e8;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.ratio-good {
+  color: #1976d2;
+  background: #e3f2fd;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.ratio-average {
+  color: #f57c00;
+  background: #fff3e0;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.ratio-poor {
+  color: #d32f2f;
+  background: #ffebee;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.percentage-excellent {
+  color: #2e7d32;
+}
+
+.percentage-good {
+  color: #1976d2;
+}
+
+.percentage-average {
+  color: #f57c00;
+}
+
+.percentage-poor {
+  color: #d32f2f;
+}
+
+.bounce-rate-excellent {
+  color: #2e7d32;
+}
+
+.bounce-rate-good {
+  color: #1976d2;
+}
+
+.bounce-rate-average {
+  color: #f57c00;
+}
+
+.bounce-rate-poor {
+  color: #d32f2f;
+}
+
+/* 产品和页面信息样式 */
+.product-title {
+  max-width: 200px;
+}
+
+.product-info strong {
+  display: block;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.product-info small {
+  color: #666;
+  font-size: 12px;
+}
+
+.category-cell {
+  font-size: 13px;
+  color: #666;
+}
+
+.page-url {
+  max-width: 250px;
+}
+
+.url-info .page-link {
+  display: block;
+  font-weight: 500;
+  color: #1976d2;
+  text-decoration: none;
+  margin-bottom: 4px;
+}
+
+.url-info .page-link:hover {
+  text-decoration: underline;
+}
+
+.url-info small {
+  color: #666;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.change-cell {
+  text-align: center;
+}
+
+.change-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.change-indicator.positive {
+  color: #2e7d32;
+  background: #e8f5e8;
+}
+
+.change-indicator.negative {
+  color: #d32f2f;
+  background: #ffebee;
+}
+
+.change-indicator.neutral {
+  color: #666;
+  background: #f5f5f5;
 }
 
 /* 响应式设计 */
