@@ -812,7 +812,13 @@ const manageAdAccounts = (projectId: number) => {
 
 const viewProjectReports = (projectId: number) => {
   console.log('查看周报/月报:', projectId)
-  // TODO: 打开周报/月报弹窗
+  // 跳转到周报月报页面，并传递项目ID参数
+  router.push({
+    name: 'reports',
+    query: {
+      projectId: projectId.toString()
+    }
+  })
 }
 
 const manageProjectActivities = (projectId: number) => {

@@ -164,6 +164,12 @@ onMounted(async () => {
         console.log('Auto expanding departments menu')
         menuStore.toggleSubmenu('departments')
       }
+    } else if (currentPath.startsWith('/projects/')) {
+      // 展开项目管理菜单
+      if (!menuStore.isMenuOpen('projects')) {
+        console.log('Auto expanding projects menu')
+        menuStore.toggleSubmenu('projects')
+      }
     } else if (currentPath.startsWith('/performance/')) {
       // 展开业绩管理菜单
       if (!menuStore.isMenuOpen('performance-management')) {

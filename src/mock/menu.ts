@@ -222,13 +222,6 @@ export const mockMenuItems: MenuItem[] = [
         icon: 'BarChart3',
         path: '/performance/dashboard',
         roles: ['superAdmin', 'manager', 'staff', 'sales']
-      },
-      {
-        id: 'reports',
-        name: '周报月报',
-        icon: 'FileText',
-        path: '/performance/reports',
-        roles: ['superAdmin', 'manager', 'staff', 'sales']
       }
     ],
     roles: ['superAdmin', 'manager', 'staff', 'sales']
@@ -251,6 +244,13 @@ export const mockMenuItems: MenuItem[] = [
         icon: 'Target',
         path: '/projects/goals',
         roles: ['superAdmin', 'manager', 'staff']
+      },
+      {
+        id: 'reports',
+        name: '周报月报',
+        icon: 'FileText',
+        path: '/projects/reports',
+        roles: ['superAdmin', 'manager', 'staff', 'sales']
       },
       {
         id: 'activity-management',
