@@ -98,6 +98,25 @@ const router = createRouter({
       ]
     },
 
+    // 项目管理路由
+    {
+      path: '/projects',
+      component: () => import('@/components/layout/MainLayout.vue'),
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          name: 'projects',
+          component: () => import('@/views/projects/ProjectManagementView.vue')
+        },
+        {
+          path: ':id(\\d+)/dashboard',
+          name: 'project-dashboard',
+          component: () => import('@/views/projects/ProjectDashboardView.vue')
+        }
+      ]
+    },
+
     // 活动详情路由
     {
       path: '/campaign/:id',
@@ -133,6 +152,16 @@ const router = createRouter({
           path: ':id(\\d+)',
           name: 'customer-detail',
           component: () => import('@/views/customers/CustomerDetailView.vue')
+        },
+        {
+          path: 'service-fees',
+          name: 'service-fees',
+          component: () => import('@/views/finance/ServiceFeeManagementView.vue')
+        },
+        {
+          path: 'reviews',
+          name: 'customer-reviews',
+          component: () => import('@/views/customers/CustomerReviewsView.vue')
         }
       ]
     },

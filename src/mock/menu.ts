@@ -159,13 +159,6 @@ export const mockMenuItems: MenuItem[] = [
         roles: ['superAdmin', 'manager', 'staff', 'sales']
       },
       {
-        id: 'customer-data',
-        name: '客户数据',
-        icon: 'BarChart',
-        path: '/customers/data',
-        roles: ['superAdmin', 'manager', 'staff', 'sales']
-      },
-      {
         id: 'service-fees',
         name: '服务费管理',
         icon: 'DollarSign',
@@ -236,16 +229,16 @@ export const mockMenuItems: MenuItem[] = [
         icon: 'FileText',
         path: '/performance/reports',
         roles: ['superAdmin', 'manager', 'staff', 'sales']
-      },
-      {
-        id: 'projects',
-        name: '项目管理',
-        icon: 'FolderOpen',
-        path: '/performance/projects',
-        roles: ['superAdmin', 'manager', 'staff']
       }
     ],
     roles: ['superAdmin', 'manager', 'staff', 'sales']
+  },
+  {
+    id: 'projects',
+    name: '项目管理',
+    icon: 'FolderOpen',
+    path: '/projects',
+    roles: ['superAdmin', 'manager', 'staff']
   },
   {
     id: 'settings',

@@ -1121,7 +1121,7 @@ const validateField = (fieldName: string) => {
 }
 
 const validateStep = (step: number): boolean => {
-  const stepValidations = [
+  const stepValidations: string[][] = [
     // 第一步：合作信息
     ['customerName', 'cooperationType', 'signingSales', 'cooperationStartTime', 'serviceStartTime'],
     // 第二步：基础信息
@@ -1137,7 +1137,7 @@ const validateStep = (step: number): boolean => {
   const fieldsToValidate = stepValidations[step] || []
   let isValid = true
 
-  fieldsToValidate.forEach(field => {
+  fieldsToValidate.forEach((field: string) => {
     validateField(field)
     if (errors[field]) {
       isValid = false

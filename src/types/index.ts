@@ -56,6 +56,8 @@ export interface CustomerDetail {
   projects: Project[]
   // 广告账户
   adAccounts: AdAccount[]
+  // 续费记录
+  renewalRecords?: RenewalRecord[]
   // 创建和更新时间
   createdAt: string
   lastUpdated: string
@@ -175,6 +177,7 @@ export interface AdAccount {
   accountName: string
   status: 'active' | 'paused' | 'limited' | 'suspended'
   balance: number
+  dailySpend?: number
   lastUpdated: string
 }
 
@@ -197,12 +200,18 @@ export interface Project {
   id: string
   name: string
   customerId: number
-  status: 'active' | 'completed' | 'paused'
+  status: 'active' | 'completed' | 'paused' | 'cancelled'
   startDate: string
   endDate?: string
   budget: number
   revenue: number
   roi: number
+  projectType?: 'new_customer' | 'redevelopment' | 'reactivation'
+  contractNumber?: string
+  serviceFee?: number
+  balance?: number
+  operationTeam?: string
+  cooperationPlatforms?: string[]
 }
 
 // 渠道数据类型

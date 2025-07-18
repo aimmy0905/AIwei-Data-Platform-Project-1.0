@@ -967,7 +967,7 @@ export const mockCustomerDetails: { [key: number]: CustomerDetail } = {
       customerStatus: 'active'
     },
     basicInfo: {
-      serviceTeam: '家居组',
+      serviceTeam: '运营1组',
       contactPersons: [
         {
           id: 9,
@@ -1051,16 +1051,127 @@ export const mockCustomerDetails: { [key: number]: CustomerDetail } = {
       }
     ],
     renewalNotes: '价格敏感型客户，需要展示明确的ROI数据',
-    projects: [],
+    projects: [
+      {
+        id: 'proj-009',
+        name: '儿童玩具推广项目',
+        customerId: 9,
+        status: 'active',
+        startDate: '2024-09-20',
+        budget: 25000,
+        revenue: 35000,
+        roi: 1.4,
+        projectType: 'new_customer',
+        contractNumber: 'CT-2024-009',
+        serviceFee: 30000,
+        balance: 15000,
+        operationTeam: '运营1组',
+        cooperationPlatforms: ['Google', 'Meta', 'Bing']
+      },
+      {
+        id: 'proj-010',
+        name: '安全座椅营销项目',
+        customerId: 9,
+        status: 'completed',
+        startDate: '2024-08-01',
+        endDate: '2024-10-31',
+        budget: 15000,
+        revenue: 22000,
+        roi: 1.47,
+        projectType: 'redevelopment',
+        contractNumber: 'CT-2024-010',
+        serviceFee: 18000,
+        balance: 3000,
+        operationTeam: '运营1组',
+        cooperationPlatforms: ['Google', 'Criteo']
+      }
+    ],
     adAccounts: [
       {
         id: 1,
         platform: 'google',
         accountId: 'GA-901234567',
-        accountName: '儿童玩具-Google广告',
+        accountName: '儿童玩具-Google广告1',
+        status: 'active',
+        balance: 9000,
+        dailySpend: 300,
+        lastUpdated: '2024-12-12T10:45:00Z'
+      },
+      {
+        id: 2,
+        platform: 'google',
+        accountId: 'GA-901234568',
+        accountName: '儿童玩具-Google广告2',
+        status: 'active',
+        balance: 15000,
+        dailySpend: 450,
+        lastUpdated: '2024-12-12T10:45:00Z'
+      },
+      {
+        id: 3,
+        platform: 'facebook',
+        accountId: 'FB-123456789',
+        accountName: '儿童玩具-Meta广告1',
         status: 'active',
         balance: 8500,
-        lastUpdated: '2024-12-20T10:30:00Z'
+        dailySpend: 280,
+        lastUpdated: '2024-12-12T10:45:00Z'
+      },
+      {
+        id: 4,
+        platform: 'facebook',
+        accountId: 'FB-123456790',
+        accountName: '儿童玩具-Meta广告2',
+        status: 'paused',
+        balance: 12000,
+        dailySpend: 0,
+        lastUpdated: '2024-12-12T10:45:00Z'
+      },
+      {
+        id: 5,
+        platform: 'bing',
+        accountId: 'BG-567890123',
+        accountName: '儿童玩具-Bing广告1',
+        status: 'active',
+        balance: 6500,
+        dailySpend: 200,
+        lastUpdated: '2024-12-12T10:45:00Z'
+      },
+      {
+        id: 6,
+        platform: 'criteo',
+        accountId: 'CR-789012345',
+        accountName: '儿童玩具-Criteo广告1',
+        status: 'active',
+        balance: 11000,
+        dailySpend: 350,
+        lastUpdated: '2024-12-12T10:45:00Z'
+      }
+    ],
+    renewalRecords: [
+      {
+        id: 1,
+        customerId: 9,
+        renewalType: '年度续费',
+        renewalAmount: 30000,
+        renewalPeriod: '2024年度',
+        renewalDate: '2024-09-10T12:15:00Z',
+        expiryDate: '2025-09-10T12:15:00Z',
+        status: 'completed',
+        salesPerson: '孙丽',
+        notes: '首次续费，价格优惠10%'
+      },
+      {
+        id: 2,
+        customerId: 9,
+        renewalType: '半年续费',
+        renewalAmount: 18000,
+        renewalPeriod: '2025年上半年',
+        renewalDate: '2025-03-10T12:15:00Z',
+        expiryDate: '2025-09-10T12:15:00Z',
+        status: 'pending',
+        salesPerson: '孙丽',
+        notes: '等待客户确认续费方案'
       }
     ],
     createdAt: '2024-09-10T12:15:00Z',
