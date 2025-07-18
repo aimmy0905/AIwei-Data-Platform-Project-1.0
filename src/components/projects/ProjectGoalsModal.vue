@@ -33,31 +33,36 @@
           <div class="section-header">
             <h5>{{ getGoalTypeLabel(activeGoalType) }}目标</h5>
             <div class="section-actions">
-              <div class="update-status">
-                <div v-if="dataServiceState.isUpdating" class="updating-indicator">
-                  <RefreshCw :size="14" class="spin" />
-                  <span>更新中...</span>
-                </div>
-                <div v-else class="last-update">
-                  最后更新: {{ formatLastUpdateTime() }}
-                </div>
+              <div class="view-toggle">
+                <button
+                  class="toggle-btn"
+                  :class="{ 'toggle-btn--active': viewMode === 'current' }"
+                  @click="viewMode = 'current'"
+                >
+                  当前目标
+                </button>
+                <button
+                  class="toggle-btn"
+                  :class="{ 'toggle-btn--active': viewMode === 'historical' }"
+                  @click="viewMode = 'historical'"
+                >
+                  历史目标
+                </button>
               </div>
-                            <button
-                class="action-btn action-btn--secondary"
-                @click="refreshData"
-                :disabled="dataServiceState.isUpdating.value"
+
+              <button
+                v-if="viewMode === 'current'"
+                class="action-btn action-btn--primary"
+                @click="showCreateGoal = true"
               >
-                <RefreshCw :size="16" :class="{ 'spin': dataServiceState.isUpdating }" />
-                刷新数据
-              </button>
-              <button class="action-btn action-btn--primary" @click="showCreateGoal = true">
                 <Plus :size="16" />
                 新建目标
               </button>
             </div>
           </div>
 
-          <div class="goals-list">
+          <!-- 当前目标视图 -->
+          <div v-if="viewMode === 'current'" class="goals-list">
             <div
               v-for="goal in filteredGoals"
               :key="goal.id"
@@ -85,7 +90,10 @@
 
               <div class="goal-metrics">
                 <div class="metric-item">
-                  <div class="metric-label">销量目标</div>
+                  <div class="metric-label">
+                    <span class="metric-icon sales-icon">💰</span>
+                    销量目标
+                  </div>
                   <div class="metric-value">
                     <span class="target">¥{{ formatNumber(goal.sales_target) }}</span>
                     <span class="actual" v-if="goal.actual_sales">
@@ -97,17 +105,20 @@
                       <div
                         class="progress-fill"
                         :style="{ width: Math.min(goal.completion_rate.sales, 100) + '%' }"
-                        :class="getCompletionClass(goal.completion_rate.sales)"
+                        :class="getMetricColorClass('sales', goal.completion_rate.sales)"
                       ></div>
                     </div>
-                    <span class="rate-text" :class="getCompletionClass(goal.completion_rate.sales)">
+                    <span class="rate-text" :class="getMetricColorClass('sales', goal.completion_rate.sales)">
                       {{ goal.completion_rate.sales }}%
                     </span>
                   </div>
                 </div>
 
                 <div class="metric-item">
-                  <div class="metric-label">成本目标</div>
+                  <div class="metric-label">
+                    <span class="metric-icon cost-icon">📊</span>
+                    成本目标
+                  </div>
                   <div class="metric-value">
                     <span class="target">¥{{ formatNumber(goal.cost_target) }}</span>
                     <span class="actual" v-if="goal.actual_cost">
@@ -119,17 +130,20 @@
                       <div
                         class="progress-fill"
                         :style="{ width: Math.min(goal.completion_rate.cost, 100) + '%' }"
-                        :class="getCompletionClass(goal.completion_rate.cost)"
+                        :class="getMetricColorClass('cost', goal.completion_rate.cost)"
                       ></div>
                     </div>
-                    <span class="rate-text" :class="getCompletionClass(goal.completion_rate.cost)">
+                    <span class="rate-text" :class="getMetricColorClass('cost', goal.completion_rate.cost)">
                       {{ goal.completion_rate.cost }}%
                     </span>
                   </div>
                 </div>
 
                 <div class="metric-item">
-                  <div class="metric-label">ROI目标</div>
+                  <div class="metric-label">
+                    <span class="metric-icon roi-icon">📈</span>
+                    ROI目标
+                  </div>
                   <div class="metric-value">
                     <span class="target">{{ goal.roi_target }}</span>
                     <span class="actual" v-if="goal.actual_roi">
@@ -141,17 +155,20 @@
                       <div
                         class="progress-fill"
                         :style="{ width: Math.min(goal.completion_rate.roi, 100) + '%' }"
-                        :class="getCompletionClass(goal.completion_rate.roi)"
+                        :class="getMetricColorClass('roi', goal.completion_rate.roi)"
                       ></div>
                     </div>
-                    <span class="rate-text" :class="getCompletionClass(goal.completion_rate.roi)">
+                    <span class="rate-text" :class="getMetricColorClass('roi', goal.completion_rate.roi)">
                       {{ goal.completion_rate.roi }}%
                     </span>
                   </div>
                 </div>
 
                 <div class="metric-item" v-if="goal.profit_target">
-                  <div class="metric-label">利润目标</div>
+                  <div class="metric-label">
+                    <span class="metric-icon profit-icon">💚</span>
+                    利润目标
+                  </div>
                   <div class="metric-value">
                     <span class="target">¥{{ formatNumber(goal.profit_target) }}</span>
                     <span class="actual" v-if="goal.actual_profit">
@@ -163,17 +180,20 @@
                       <div
                         class="progress-fill"
                         :style="{ width: Math.min(goal.completion_rate.profit, 100) + '%' }"
-                        :class="getCompletionClass(goal.completion_rate.profit)"
+                        :class="getMetricColorClass('profit', goal.completion_rate.profit)"
                       ></div>
                     </div>
-                    <span class="rate-text" :class="getCompletionClass(goal.completion_rate.profit)">
+                    <span class="rate-text" :class="getMetricColorClass('profit', goal.completion_rate.profit)">
                       {{ goal.completion_rate.profit }}%
                     </span>
                   </div>
                 </div>
 
                 <div class="metric-item" v-if="goal.user_count_target">
-                  <div class="metric-label">用户数目标</div>
+                  <div class="metric-label">
+                    <span class="metric-icon user-icon">👥</span>
+                    用户数目标
+                  </div>
                   <div class="metric-value">
                     <span class="target">{{ formatNumber(goal.user_count_target) }}</span>
                     <span class="actual" v-if="goal.actual_user_count">
@@ -185,10 +205,10 @@
                       <div
                         class="progress-fill"
                         :style="{ width: Math.min(goal.completion_rate.user_count, 100) + '%' }"
-                        :class="getCompletionClass(goal.completion_rate.user_count)"
+                        :class="getMetricColorClass('user_count', goal.completion_rate.user_count)"
                       ></div>
                     </div>
-                    <span class="rate-text" :class="getCompletionClass(goal.completion_rate.user_count)">
+                    <span class="rate-text" :class="getMetricColorClass('user_count', goal.completion_rate.user_count)">
                       {{ goal.completion_rate.user_count }}%
                     </span>
                   </div>
@@ -215,6 +235,209 @@
               <button class="action-btn action-btn--primary" @click="showCreateGoal = true">
                 创建第一个目标
               </button>
+            </div>
+          </div>
+
+          <!-- 历史目标视图 -->
+          <div v-if="viewMode === 'historical'" class="goals-list">
+            <!-- 历史目标统计概览 -->
+            <div v-if="historicalGoals.length > 0" class="historical-summary">
+              <h6>历史表现概览</h6>
+              <div class="summary-metrics">
+                <div class="summary-item">
+                  <div class="summary-label">平均销量完成率</div>
+                  <div class="summary-value" :class="getCompletionClass(averageCompletionRates.sales)">
+                    {{ averageCompletionRates.sales }}%
+                  </div>
+                </div>
+                <div class="summary-item">
+                  <div class="summary-label">平均成本控制率</div>
+                  <div class="summary-value" :class="getCompletionClass(100 - averageCompletionRates.cost + 100)">
+                    {{ (200 - averageCompletionRates.cost).toFixed(1) }}%
+                  </div>
+                </div>
+                <div class="summary-item">
+                  <div class="summary-label">平均ROI完成率</div>
+                  <div class="summary-value" :class="getCompletionClass(averageCompletionRates.roi)">
+                    {{ averageCompletionRates.roi }}%
+                  </div>
+                </div>
+                <div class="summary-item">
+                  <div class="summary-label">历史记录数</div>
+                  <div class="summary-value">{{ historicalGoals.length }}个</div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              v-for="goal in historicalGoals"
+              :key="goal.id"
+              class="goal-card"
+            >
+              <div class="goal-card__header">
+                <div class="goal-period">{{ goal.goal_period }}</div>
+                <div class="goal-actions">
+                  <button
+                    class="action-btn-small action-btn-small--secondary"
+                    @click="editGoal(goal)"
+                    title="编辑"
+                  >
+                    <Edit :size="14" />
+                  </button>
+                  <button
+                    class="action-btn-small action-btn-small--danger"
+                    @click="deleteGoal(goal.id)"
+                    title="删除"
+                  >
+                    <Trash2 :size="14" />
+                  </button>
+                </div>
+              </div>
+
+              <div class="goal-metrics">
+                <div class="metric-item">
+                  <div class="metric-label">
+                    <span class="metric-icon sales-icon">💰</span>
+                    销量目标
+                  </div>
+                  <div class="metric-value">
+                    <span class="target">¥{{ formatNumber(goal.sales_target) }}</span>
+                    <span class="actual" v-if="goal.actual_sales">
+                      / ¥{{ formatNumber(goal.actual_sales) }}
+                    </span>
+                  </div>
+                  <div class="completion-rate" v-if="goal.completion_rate?.sales">
+                    <div class="progress-bar">
+                      <div
+                        class="progress-fill"
+                        :style="{ width: Math.min(goal.completion_rate.sales, 100) + '%' }"
+                        :class="getMetricColorClass('sales', goal.completion_rate.sales)"
+                      ></div>
+                    </div>
+                    <span class="rate-text" :class="getMetricColorClass('sales', goal.completion_rate.sales)">
+                      {{ goal.completion_rate.sales }}%
+                    </span>
+                  </div>
+                </div>
+
+                <div class="metric-item">
+                  <div class="metric-label">
+                    <span class="metric-icon cost-icon">📊</span>
+                    成本目标
+                  </div>
+                  <div class="metric-value">
+                    <span class="target">¥{{ formatNumber(goal.cost_target) }}</span>
+                    <span class="actual" v-if="goal.actual_cost">
+                      / ¥{{ formatNumber(goal.actual_cost) }}
+                    </span>
+                  </div>
+                  <div class="completion-rate" v-if="goal.completion_rate?.cost">
+                    <div class="progress-bar">
+                      <div
+                        class="progress-fill"
+                        :style="{ width: Math.min(goal.completion_rate.cost, 100) + '%' }"
+                        :class="getMetricColorClass('cost', goal.completion_rate.cost)"
+                      ></div>
+                    </div>
+                    <span class="rate-text" :class="getMetricColorClass('cost', goal.completion_rate.cost)">
+                      {{ goal.completion_rate.cost }}%
+                    </span>
+                  </div>
+                </div>
+
+                <div class="metric-item">
+                  <div class="metric-label">
+                    <span class="metric-icon roi-icon">📈</span>
+                    ROI目标
+                  </div>
+                  <div class="metric-value">
+                    <span class="target">{{ goal.roi_target }}</span>
+                    <span class="actual" v-if="goal.actual_roi">
+                      / {{ goal.actual_roi }}
+                    </span>
+                  </div>
+                  <div class="completion-rate" v-if="goal.completion_rate?.roi">
+                    <div class="progress-bar">
+                      <div
+                        class="progress-fill"
+                        :style="{ width: Math.min(goal.completion_rate.roi, 100) + '%' }"
+                        :class="getMetricColorClass('roi', goal.completion_rate.roi)"
+                      ></div>
+                    </div>
+                    <span class="rate-text" :class="getMetricColorClass('roi', goal.completion_rate.roi)">
+                      {{ goal.completion_rate.roi }}%
+                    </span>
+                  </div>
+                </div>
+
+                <div class="metric-item" v-if="goal.profit_target">
+                  <div class="metric-label">
+                    <span class="metric-icon profit-icon">💚</span>
+                    利润目标
+                  </div>
+                  <div class="metric-value">
+                    <span class="target">¥{{ formatNumber(goal.profit_target) }}</span>
+                    <span class="actual" v-if="goal.actual_profit">
+                      / ¥{{ formatNumber(goal.actual_profit) }}
+                    </span>
+                  </div>
+                  <div class="completion-rate" v-if="goal.completion_rate?.profit">
+                    <div class="progress-bar">
+                      <div
+                        class="progress-fill"
+                        :style="{ width: Math.min(goal.completion_rate.profit, 100) + '%' }"
+                        :class="getMetricColorClass('profit', goal.completion_rate.profit)"
+                      ></div>
+                    </div>
+                    <span class="rate-text" :class="getMetricColorClass('profit', goal.completion_rate.profit)">
+                      {{ goal.completion_rate.profit }}%
+                    </span>
+                  </div>
+                </div>
+
+                <div class="metric-item" v-if="goal.user_count_target">
+                  <div class="metric-label">
+                    <span class="metric-icon user-icon">👥</span>
+                    用户数目标
+                  </div>
+                  <div class="metric-value">
+                    <span class="target">{{ formatNumber(goal.user_count_target) }}</span>
+                    <span class="actual" v-if="goal.actual_user_count">
+                      / {{ formatNumber(goal.actual_user_count) }}
+                    </span>
+                  </div>
+                  <div class="completion-rate" v-if="goal.completion_rate?.user_count">
+                    <div class="progress-bar">
+                      <div
+                        class="progress-fill"
+                        :style="{ width: Math.min(goal.completion_rate.user_count, 100) + '%' }"
+                        :class="getMetricColorClass('user_count', goal.completion_rate.user_count)"
+                      ></div>
+                    </div>
+                    <span class="rate-text" :class="getMetricColorClass('user_count', goal.completion_rate.user_count)">
+                      {{ goal.completion_rate.user_count }}%
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="goal-remarks" v-if="goal.remarks">
+                <div class="remarks-label">备注：</div>
+                <div class="remarks-text">{{ goal.remarks }}</div>
+              </div>
+
+              <div class="goal-meta">
+                <span class="created-info">
+                  创建人：{{ goal.created_by }} | 创建时间：{{ formatDate(goal.created_at) }}
+                </span>
+              </div>
+            </div>
+
+            <div v-if="historicalGoals.length === 0" class="empty-state">
+              <div class="empty-icon">
+                <Target :size="48" />
+              </div>
+              <div class="empty-text">暂无{{ getGoalTypeLabel(activeGoalType) }}历史目标</div>
             </div>
           </div>
         </div>
@@ -359,6 +582,7 @@ const goals = ref<ProjectGoal[]>([])
 const activeGoalType = ref<'月度' | '季度' | '年度'>('月度')
 const showCreateGoal = ref(false)
 const editingGoal = ref<ProjectGoal | null>(null)
+const viewMode = ref<'current' | 'historical'>('current')
 
 // 数据服务状态
 const dataServiceState = useGoalDataService()
@@ -404,12 +628,79 @@ onUnmounted(() => {
   }
 })
 
+// 获取当前周期
+const getCurrentPeriod = (goalType: '月度' | '季度' | '年度') => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = now.getMonth() + 1
+
+  console.log('当前日期:', now, '年:', year, '月:', month)
+
+  switch (goalType) {
+    case '月度':
+      return `${year}年${month}月`
+    case '季度':
+      const quarter = Math.ceil(month / 3)
+      return `${year}年Q${quarter}`
+    case '年度':
+      return `${year}年`
+    default:
+      return ''
+  }
+}
+
 // 计算属性
 const filteredGoals = computed(() => {
-  return goals.value.filter(goal =>
+  const currentGoals = goals.value.filter(goal =>
     goal.project_id === props.projectId && goal.goal_type === activeGoalType.value
   )
+
+  // 获取当前周期
+  const currentPeriod = getCurrentPeriod(activeGoalType.value)
+
+  // 调试输出
+  console.log('当前目标类型:', activeGoalType.value)
+  console.log('当前周期:', currentPeriod)
+  console.log('所有目标:', currentGoals.map(g => ({ period: g.goal_period, type: g.goal_type })))
+
+  // 只返回当前周期的目标
+  return currentGoals.filter(goal => goal.goal_period === currentPeriod)
 })
+
+    const historicalGoals = computed(() => {
+    const currentPeriod = getCurrentPeriod(activeGoalType.value)
+    return goals.value.filter(goal =>
+      goal.goal_type === activeGoalType.value &&
+      goal.goal_period !== currentPeriod
+    ).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  })
+
+  // 计算历史目标的平均完成率
+  const averageCompletionRates = computed(() => {
+    if (historicalGoals.value.length === 0) {
+      return { sales: 0, cost: 0, roi: 0, profit: 0, user_count: 0 }
+    }
+
+    const totals = historicalGoals.value.reduce((acc, goal) => {
+      if (goal.completion_rate) {
+        acc.sales += goal.completion_rate.sales || 0
+        acc.cost += goal.completion_rate.cost || 0
+        acc.roi += goal.completion_rate.roi || 0
+        acc.profit += goal.completion_rate.profit || 0
+        acc.user_count += goal.completion_rate.user_count || 0
+        acc.count++
+      }
+      return acc
+    }, { sales: 0, cost: 0, roi: 0, profit: 0, user_count: 0, count: 0 })
+
+    return {
+      sales: Math.round(totals.sales / totals.count),
+      cost: Math.round(totals.cost / totals.count),
+      roi: Math.round(totals.roi / totals.count),
+      profit: Math.round(totals.profit / totals.count),
+      user_count: Math.round(totals.user_count / totals.count)
+    }
+  })
 
 // 方法
 const loadGoals = () => {
@@ -431,6 +722,12 @@ const getCompletionClass = (rate: number) => {
   if (rate >= 90) return 'good'
   if (rate >= 70) return 'warning'
   return 'danger'
+}
+
+// 为不同指标设置不同的颜色类
+const getMetricColorClass = (metricType: string, rate: number) => {
+  const baseClass = getCompletionClass(rate)
+  return `${metricType}-${baseClass}`
 }
 
 const formatNumber = (num: number) => {
@@ -674,6 +971,108 @@ const formatLastUpdateTime = () => {
   gap: 12px;
 }
 
+.view-toggle {
+  display: flex;
+  gap: 10px;
+  background: var(--color-background-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.toggle-btn {
+  padding: 6px 12px;
+  border: none;
+  background: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.toggle-btn:hover {
+  background: var(--color-background-hover);
+  color: var(--color-text-primary);
+}
+
+.toggle-btn--active {
+  background: var(--color-primary);
+  color: white;
+  border-radius: 4px;
+}
+
+.historical-summary {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid var(--color-border-light);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.historical-summary h6 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.historical-summary h6::before {
+  content: '📊';
+  font-size: 18px;
+}
+
+.summary-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.summary-item {
+  background: white;
+  border: 1px solid var(--color-border-light);
+  border-radius: 6px;
+  padding: 12px 16px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.summary-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.summary-label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-bottom: 4px;
+}
+
+.summary-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.summary-value.excellent {
+  color: var(--color-success);
+}
+
+.summary-value.good {
+  color: var(--color-primary);
+}
+
+.summary-value.warning {
+  color: var(--color-warning);
+}
+
+.summary-value.poor {
+  color: var(--color-danger);
+}
+
 .update-status {
   font-size: 12px;
   color: var(--color-text-secondary);
@@ -819,6 +1218,41 @@ const formatLastUpdateTime = () => {
   font-size: 12px;
   color: var(--color-text-secondary);
   margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.metric-icon {
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.sales-icon {
+  background: linear-gradient(135deg, #e6f7ff, #bae7ff);
+}
+
+.cost-icon {
+  background: linear-gradient(135deg, #fff7e6, #ffd591);
+}
+
+.roi-icon {
+  background: linear-gradient(135deg, #f9f0ff, #efdbff);
+}
+
+.profit-icon {
+  background: linear-gradient(135deg, #f6ffed, #d9f7be);
+}
+
+.user-icon {
+  background: linear-gradient(135deg, #e6fffb, #b5f5ec);
 }
 
 .metric-value {
@@ -856,20 +1290,89 @@ const formatLastUpdateTime = () => {
   transition: width 0.3s ease;
 }
 
-.progress-fill.excellent {
-  background: var(--color-success);
+/* 销量目标颜色 - 蓝色系 */
+.progress-fill.sales-excellent {
+  background: linear-gradient(90deg, #1890ff, #40a9ff);
 }
 
-.progress-fill.good {
-  background: var(--color-primary);
+.progress-fill.sales-good {
+  background: #1890ff;
 }
 
-.progress-fill.warning {
-  background: var(--color-warning);
+.progress-fill.sales-warning {
+  background: #69c0ff;
 }
 
-.progress-fill.danger {
-  background: var(--color-danger);
+.progress-fill.sales-danger {
+  background: #91d5ff;
+}
+
+/* 成本目标颜色 - 橙色系 */
+.progress-fill.cost-excellent {
+  background: linear-gradient(90deg, #fa8c16, #ffa940);
+}
+
+.progress-fill.cost-good {
+  background: #fa8c16;
+}
+
+.progress-fill.cost-warning {
+  background: #ffc069;
+}
+
+.progress-fill.cost-danger {
+  background: #ffd591;
+}
+
+/* ROI目标颜色 - 紫色系 */
+.progress-fill.roi-excellent {
+  background: linear-gradient(90deg, #722ed1, #9254de);
+}
+
+.progress-fill.roi-good {
+  background: #722ed1;
+}
+
+.progress-fill.roi-warning {
+  background: #b37feb;
+}
+
+.progress-fill.roi-danger {
+  background: #d3adf7;
+}
+
+/* 利润目标颜色 - 绿色系 */
+.progress-fill.profit-excellent {
+  background: linear-gradient(90deg, #52c41a, #73d13d);
+}
+
+.progress-fill.profit-good {
+  background: #52c41a;
+}
+
+.progress-fill.profit-warning {
+  background: #95de64;
+}
+
+.progress-fill.profit-danger {
+  background: #b7eb8f;
+}
+
+/* 用户数目标颜色 - 青色系 */
+.progress-fill.user_count-excellent {
+  background: linear-gradient(90deg, #13c2c2, #36cfc9);
+}
+
+.progress-fill.user_count-good {
+  background: #13c2c2;
+}
+
+.progress-fill.user_count-warning {
+  background: #5cdbd3;
+}
+
+.progress-fill.user_count-danger {
+  background: #87e8de;
 }
 
 .rate-text {
@@ -879,20 +1382,74 @@ const formatLastUpdateTime = () => {
   text-align: right;
 }
 
-.rate-text.excellent {
-  color: var(--color-success);
+/* 销量目标文字颜色 */
+.rate-text.sales-excellent,
+.rate-text.sales-good {
+  color: #1890ff;
 }
 
-.rate-text.good {
-  color: var(--color-primary);
+.rate-text.sales-warning {
+  color: #69c0ff;
 }
 
-.rate-text.warning {
-  color: var(--color-warning);
+.rate-text.sales-danger {
+  color: #91d5ff;
 }
 
-.rate-text.danger {
-  color: var(--color-danger);
+/* 成本目标文字颜色 */
+.rate-text.cost-excellent,
+.rate-text.cost-good {
+  color: #fa8c16;
+}
+
+.rate-text.cost-warning {
+  color: #ffc069;
+}
+
+.rate-text.cost-danger {
+  color: #ffd591;
+}
+
+/* ROI目标文字颜色 */
+.rate-text.roi-excellent,
+.rate-text.roi-good {
+  color: #722ed1;
+}
+
+.rate-text.roi-warning {
+  color: #b37feb;
+}
+
+.rate-text.roi-danger {
+  color: #d3adf7;
+}
+
+/* 利润目标文字颜色 */
+.rate-text.profit-excellent,
+.rate-text.profit-good {
+  color: #52c41a;
+}
+
+.rate-text.profit-warning {
+  color: #95de64;
+}
+
+.rate-text.profit-danger {
+  color: #b7eb8f;
+}
+
+/* 用户数目标文字颜色 */
+.rate-text.user_count-excellent,
+.rate-text.user_count-good {
+  color: #13c2c2;
+}
+
+.rate-text.user_count-warning {
+  color: #5cdbd3;
+}
+
+.rate-text.user_count-danger {
+  color: #87e8de;
 }
 
 .goal-remarks {

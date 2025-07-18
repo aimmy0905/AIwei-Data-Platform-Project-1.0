@@ -1,488 +1,237 @@
 <template>
-  <div class="project-goals-view">
-    <!-- 页面头部 -->
-    <div class="page-header">
-      <div class="page-header__main">
-        <h1 class="page-title">项目目标管理</h1>
-        <p class="page-description">查看和管理所有项目的目标设定与完成情况</p>
-      </div>
-      <div class="page-header__actions">
-        <button
-          class="action-btn action-btn--secondary"
-          @click="showDashboard = !showDashboard"
-        >
-          <BarChart3 :size="16" />
-          {{ showDashboard ? '隐藏看板' : '显示看板' }}
-        </button>
-        <button
-          class="action-btn action-btn--secondary"
-          @click="exportGoals"
-        >
-          <Download :size="16" />
-          导出数据
-        </button>
-        <button class="action-btn action-btn--primary" @click="createGoal">
-          <Plus :size="16" />
-          新建目标
-        </button>
-      </div>
-    </div>
-
-    <!-- 目标管理看板 -->
-    <div v-if="showDashboard" class="dashboard-section">
-      <ProjectGoalsDashboard />
-    </div>
-
-    <!-- 趋势分析 -->
-    <div class="trend-analysis-section">
-      <div class="section-header">
-        <h3>趋势分析</h3>
-        <button
-          class="toggle-btn"
-          @click="showTrendAnalysis = !showTrendAnalysis"
-        >
-          {{ showTrendAnalysis ? '收起分析' : '展开分析' }}
-          <ChevronDown :size="16" :class="{ 'rotate-180': showTrendAnalysis }" />
-        </button>
-      </div>
-      <div v-if="showTrendAnalysis" class="trend-analysis-content">
-        <ProjectGoalsTrendAnalysis />
-      </div>
-    </div>
-
-    <!-- 筛选区域 -->
-    <div class="filter-section">
-      <div class="filter-header">
-        <h3>筛选条件</h3>
-        <button
-          class="filter-toggle"
-          @click="showAdvancedFilter = !showAdvancedFilter"
-        >
-          <Filter :size="16" />
-          {{ showAdvancedFilter ? '收起筛选' : '展开筛选' }}
-          <ChevronDown :size="16" :class="{ 'rotate-180': showAdvancedFilter }" />
-        </button>
+  <div class="dashboard-content">
+    <!-- 筛选项部分 -->
+    <div class="dashboard-filter-container">
+      <div class="page-header">
+        <div class="page-header__main">
+          <h1 class="page-title">项目目标管理</h1>
+          <p class="page-description">查看和管理所有项目的目标设定与完成情况</p>
+        </div>
+        <div class="page-header__actions">
+          <button class="action-btn action-btn--primary" @click="createGoal">
+            <Plus :size="16" />
+            新建目标
+          </button>
+        </div>
       </div>
 
-      <div class="filter-content" :class="{ 'filter-content--expanded': showAdvancedFilter }">
+      <!-- 筛选区域 -->
+      <div class="filter-section">
         <div class="filter-row">
-          <!-- 基础筛选 -->
           <div class="filter-group">
-            <label class="filter-label">目标类型</label>
-            <select v-model="filters.goalType" @change="handleFilterChange" class="filter-select">
-              <option value="">全部类型</option>
-              <option value="月度">月度目标</option>
-              <option value="季度">季度目标</option>
-              <option value="年度">年度目标</option>
+            <label class="filter-label">客户名称:</label>
+            <select v-model="filters.customerId" @change="handleCustomerChange" class="filter-select">
+              <option value="">全部客户</option>
+              <option v-for="customer in customers" :key="customer.id" :value="customer.id">
+                {{ customer.name }}
+              </option>
             </select>
           </div>
 
           <div class="filter-group">
-            <label class="filter-label">完成状态</label>
-            <select v-model="filters.completionStatus" @change="handleFilterChange" class="filter-select">
-              <option value="">全部状态</option>
-              <option value="excellent">超额完成 (≥110%)</option>
-              <option value="good">达成目标 (90-109%)</option>
-              <option value="warning">接近目标 (70-89%)</option>
-              <option value="danger">未达目标 (<70%)</option>
+            <label class="filter-label">项目名称:</label>
+            <select v-model="filters.projectId" @change="handleFilterChange" class="filter-select">
+              <option value="">全部项目</option>
+              <option v-for="project in availableProjects" :key="project.id" :value="project.id">
+                {{ project.project_name }}
+              </option>
             </select>
           </div>
 
           <div class="filter-group">
-            <label class="filter-label">目标周期</label>
+            <label class="filter-label">目标月份:</label>
             <input
-              type="text"
+              type="month"
               v-model="filters.goalPeriod"
               @input="handleFilterChange"
-              placeholder="例如：2024年12月"
+              placeholder="——年——月"
               class="filter-input"
             />
           </div>
         </div>
-
-        <!-- 高级筛选 -->
-        <div v-if="showAdvancedFilter" class="advanced-filters">
-          <div class="filter-row">
-            <div class="filter-group">
-              <label class="filter-label">客户名称</label>
-              <select v-model="filters.customerId" @change="handleCustomerChange" class="filter-select">
-                <option value="">全部客户</option>
-                <option v-for="customer in customers" :key="customer.id" :value="customer.id">
-                  {{ customer.name }}
-                </option>
-              </select>
-            </div>
-
-            <div class="filter-group">
-              <label class="filter-label">项目名称</label>
-              <select v-model="filters.projectId" @change="handleFilterChange" class="filter-select">
-                <option value="">全部项目</option>
-                <option v-for="project in availableProjects" :key="project.id" :value="project.id">
-                  {{ project.project_name }}
-                </option>
-              </select>
-            </div>
-
-            <div class="filter-group">
-              <label class="filter-label">创建人</label>
-              <select v-model="filters.createdBy" @change="handleFilterChange" class="filter-select">
-                <option value="">全部创建人</option>
-                <option v-for="creator in creators" :key="creator" :value="creator">
-                  {{ creator }}
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <div class="filter-row">
-            <div class="filter-group">
-              <label class="filter-label">创建时间范围</label>
-              <div class="date-range">
-                <input
-                  type="date"
-                  v-model="filters.startDate"
-                  @change="handleFilterChange"
-                  class="filter-input"
-                />
-                <span class="date-separator">至</span>
-                <input
-                  type="date"
-                  v-model="filters.endDate"
-                  @change="handleFilterChange"
-                  class="filter-input"
-                />
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <label class="filter-label">销量目标范围</label>
-              <div class="amount-range">
-                <input
-                  type="number"
-                  v-model.number="filters.minSalesTarget"
-                  @input="handleFilterChange"
-                  placeholder="最小值"
-                  class="filter-input"
-                />
-                <span class="range-separator">-</span>
-                <input
-                  type="number"
-                  v-model.number="filters.maxSalesTarget"
-                  @input="handleFilterChange"
-                  placeholder="最大值"
-                  class="filter-input"
-                />
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <label class="filter-label">完成率范围</label>
-              <div class="amount-range">
-                <input
-                  type="number"
-                  v-model.number="filters.minCompletionRate"
-                  @input="handleFilterChange"
-                  placeholder="最小值(%)"
-                  class="filter-input"
-                />
-                <span class="range-separator">-</span>
-                <input
-                  type="number"
-                  v-model.number="filters.maxCompletionRate"
-                  @input="handleFilterChange"
-                  placeholder="最大值(%)"
-                  class="filter-input"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div class="filter-actions">
-            <button class="action-btn action-btn--secondary" @click="resetFilters">
-              <RotateCcw :size="16" />
-              重置筛选
-            </button>
-            <button class="action-btn action-btn--primary" @click="applyFilters">
-              <Search :size="16" />
-              应用筛选
-            </button>
-          </div>
-        </div>
       </div>
     </div>
 
-    <!-- 目标列表 -->
-    <div class="goals-section">
-      <div class="section-header">
-        <div class="section-info">
-          <h3>目标列表</h3>
-          <span class="record-count">共 {{ filteredGoals.length }} 条记录</span>
+    <!-- 项目目标内容部分 -->
+    <section class="dashboard-section">
+      <div class="section-card">
+        <!-- 目标类型标签页 -->
+        <div class="goal-type-tabs">
+          <button
+            v-for="type in goalTypes"
+            :key="type.value"
+            class="goal-type-tab"
+            :class="{ 'goal-type-tab--active': filters.goalType === type.value }"
+            @click="selectGoalType(type.value)"
+          >
+            {{ type.label }}
+          </button>
         </div>
-        <div class="section-actions">
-          <div class="view-options">
-            <button
-              class="view-btn"
-              :class="{ 'view-btn--active': viewMode === 'table' }"
-              @click="viewMode = 'table'"
-              title="表格视图"
-            >
-              <List :size="16" />
-            </button>
-            <button
-              class="view-btn"
-              :class="{ 'view-btn--active': viewMode === 'card' }"
-              @click="viewMode = 'card'"
-              title="卡片视图"
-            >
-              <Grid :size="16" />
-            </button>
-          </div>
-          <div class="sort-options">
-            <select v-model="sortBy" @change="handleSort" class="sort-select">
-              <option value="created_at">创建时间</option>
-              <option value="goal_period">目标周期</option>
-              <option value="sales_target">销量目标</option>
-              <option value="completion_rate">完成率</option>
-            </select>
-            <button
-              class="sort-direction"
-              @click="toggleSortDirection"
-              :title="sortDirection === 'asc' ? '升序' : '降序'"
-            >
-              <ChevronUp v-if="sortDirection === 'asc'" :size="16" />
-              <ChevronDown v-if="sortDirection === 'desc'" :size="16" />
-            </button>
-          </div>
-        </div>
-      </div>
 
-      <!-- 表格视图 -->
-      <div v-if="viewMode === 'table'" class="goals-table">
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>客户名称</th>
-                <th>项目名称</th>
-                <th>目标类型</th>
-                <th>目标周期</th>
-                <th>销量目标</th>
-                <th>成本目标</th>
-                <th>ROI目标</th>
-                <th>销量完成率</th>
-                <th>ROI完成率</th>
-                <th>综合状态</th>
-                <th>创建人</th>
-                <th>创建时间</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="goal in paginatedGoals" :key="goal.id" class="goal-row">
-                <td>{{ goal.customer_name }}</td>
-                <td>{{ goal.project_name }}</td>
-                <td>
-                  <span class="goal-type-badge" :class="getGoalTypeClass(goal.goal_type)">
-                    {{ goal.goal_type }}
-                  </span>
-                </td>
-                <td>{{ goal.goal_period }}</td>
-                <td>¥{{ formatNumber(goal.sales_target) }}</td>
-                <td>¥{{ formatNumber(goal.cost_target) }}</td>
-                <td>{{ goal.roi_target }}x</td>
-                <td>
-                  <div class="completion-cell">
-                    <span class="completion-rate" :class="getCompletionClass(goal.completion_rate?.sales || 0)">
-                      {{ goal.completion_rate?.sales || 0 }}%
-                    </span>
-                    <div class="mini-progress">
-                      <div
-                        class="mini-progress-fill"
-                        :style="{ width: Math.min(goal.completion_rate?.sales || 0, 100) + '%' }"
-                        :class="getCompletionClass(goal.completion_rate?.sales || 0)"
-                      ></div>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div class="completion-cell">
-                    <span class="completion-rate" :class="getCompletionClass(goal.completion_rate?.roi || 0)">
-                      {{ goal.completion_rate?.roi || 0 }}%
-                    </span>
-                    <div class="mini-progress">
-                      <div
-                        class="mini-progress-fill"
-                        :style="{ width: Math.min(goal.completion_rate?.roi || 0, 100) + '%' }"
-                        :class="getCompletionClass(goal.completion_rate?.roi || 0)"
-                      ></div>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <span class="status-badge" :class="getOverallStatusClass(goal)">
-                    {{ getOverallStatusText(goal) }}
-                  </span>
-                </td>
-                <td>{{ goal.created_by }}</td>
-                <td>{{ formatDate(goal.created_at) }}</td>
-                <td>
-                  <div class="action-buttons">
-                    <button
-                      class="action-btn-small action-btn-small--primary"
-                      @click="viewGoalDetail(goal)"
-                      title="查看详情"
-                    >
-                      <Eye :size="14" />
-                    </button>
-                    <button
-                      class="action-btn-small action-btn-small--secondary"
-                      @click="editGoal(goal)"
-                      title="编辑"
-                    >
-                      <Edit :size="14" />
-                    </button>
-                    <button
-                      class="action-btn-small action-btn-small--danger"
-                      @click="deleteGoal(goal)"
-                      title="删除"
-                    >
-                      <Trash2 :size="14" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- 卡片视图 -->
-      <div v-if="viewMode === 'card'" class="goals-cards">
-        <div
-          v-for="goal in paginatedGoals"
-          :key="goal.id"
-          class="goal-card"
-          @click="viewGoalDetail(goal)"
-        >
-          <div class="goal-card__header">
-            <div class="goal-card__title">
-              <h4>{{ goal.project_name }}</h4>
-              <p>{{ goal.customer_name }}</p>
+        <!-- 目标列表 -->
+        <div class="goals-section">
+          <div class="section-header">
+            <div class="section-info">
+              <h3>目标列表</h3>
+              <span class="record-count">共 {{ filteredGoals.length }} 条记录</span>
             </div>
-            <div class="goal-card__type">
-              <span class="goal-type-badge" :class="getGoalTypeClass(goal.goal_type)">
-                {{ goal.goal_type }}
-              </span>
+
+          </div>
+
+          <!-- 表格视图 -->
+          <div class="goals-table">
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>项目名称</th>
+                    <th>所属客户</th>
+                    <th>销售额目标</th>
+                    <th>利润目标</th>
+                    <th>成本目标</th>
+                    <th>ROI目标</th>
+                    <th>用户数目标</th>
+                    <th>目标周期</th>
+                    <th>目标月份</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="goal in paginatedGoals" :key="goal.id" class="goal-row">
+                    <td>{{ goal.project_name }}</td>
+                    <td>{{ goal.customer_name }}</td>
+                    <td>
+                      <div class="target-cell">
+                        <div class="target-amount">¥{{ formatNumber(goal.sales_target) }}</div>
+                        <div class="progress-container">
+                          <div class="progress-bar">
+                            <div
+                              class="progress-fill progress-fill--sales"
+                              :style="{ width: Math.min(goal.completion_rate?.sales || 0, 100) + '%' }"
+                            ></div>
+                          </div>
+                          <span class="progress-percentage">{{ goal.completion_rate?.sales || 0 }}%</span>
+                        </div>
+                        <div class="current-amount">当前: ¥{{ formatNumber(goal.actual_sales || 0) }}</div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="target-cell">
+                        <div class="target-amount">¥{{ formatNumber(goal.profit_target || 0) }}</div>
+                        <div class="progress-container">
+                          <div class="progress-bar">
+                            <div
+                              class="progress-fill progress-fill--profit"
+                              :style="{ width: Math.min(goal.completion_rate?.profit || 0, 100) + '%' }"
+                            ></div>
+                          </div>
+                          <span class="progress-percentage">{{ goal.completion_rate?.profit || 0 }}%</span>
+                        </div>
+                        <div class="current-amount">当前: ¥{{ formatNumber(goal.actual_profit || 0) }}</div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="target-cell">
+                        <div class="target-amount">¥{{ formatNumber(goal.cost_target) }}</div>
+                        <div class="progress-container">
+                          <div class="progress-bar">
+                            <div
+                              class="progress-fill progress-fill--cost"
+                              :style="{ width: Math.min(goal.completion_rate?.cost || 0, 100) + '%' }"
+                            ></div>
+                          </div>
+                          <span class="progress-percentage">{{ goal.completion_rate?.cost || 0 }}%</span>
+                        </div>
+                        <div class="current-amount">当前: ¥{{ formatNumber(goal.actual_cost || 0) }}</div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="target-cell">
+                        <div class="target-amount">{{ goal.roi_target }}%</div>
+                        <div class="progress-container">
+                          <div class="progress-bar">
+                            <div
+                              class="progress-fill progress-fill--roi"
+                              :style="{ width: Math.min(goal.completion_rate?.roi || 0, 100) + '%' }"
+                            ></div>
+                          </div>
+                          <span class="progress-percentage">{{ goal.completion_rate?.roi || 0 }}%</span>
+                        </div>
+                        <div class="current-amount">当前: {{ (goal.actual_roi || 0) }}%</div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="target-cell">
+                        <div class="target-amount">{{ formatNumber(goal.user_count_target || 0) }}</div>
+                        <div class="progress-container">
+                          <div class="progress-bar">
+                            <div
+                              class="progress-fill progress-fill--users"
+                              :style="{ width: Math.min(goal.completion_rate?.user_count || 0, 100) + '%' }"
+                            ></div>
+                          </div>
+                          <span class="progress-percentage">{{ goal.completion_rate?.user_count || 0 }}%</span>
+                        </div>
+                        <div class="current-amount">当前: {{ formatNumber(goal.actual_user_count || 0) }}</div>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="goal-type-badge" :class="getGoalTypeClass(goal.goal_type)">
+                        {{ goal.goal_type }}目标
+                      </span>
+                    </td>
+                    <td>{{ goal.goal_period }}</td>
+                    <td>
+                      <div class="action-buttons">
+                        <button
+                          class="action-btn-small action-btn-small--primary"
+                          @click="editGoal(goal)"
+                          title="编辑"
+                        >
+                          编辑
+                        </button>
+                        <button
+                          class="action-btn-small action-btn-small--danger"
+                          @click="deleteGoal(goal)"
+                          title="删除"
+                        >
+                          删除
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
-          <div class="goal-card__period">
-            <span class="period-text">{{ goal.goal_period }}</span>
-          </div>
-
-          <div class="goal-card__metrics">
-            <div class="metric-row">
-              <div class="metric-item">
-                <span class="metric-label">销量完成率</span>
-                <div class="metric-progress">
-                  <div class="progress-bar">
-                    <div
-                      class="progress-fill"
-                      :style="{ width: Math.min(goal.completion_rate?.sales || 0, 100) + '%' }"
-                      :class="getCompletionClass(goal.completion_rate?.sales || 0)"
-                    ></div>
-                  </div>
-                  <span class="progress-text" :class="getCompletionClass(goal.completion_rate?.sales || 0)">
-                    {{ goal.completion_rate?.sales || 0 }}%
-                  </span>
-                </div>
-              </div>
-
-              <div class="metric-item">
-                <span class="metric-label">ROI完成率</span>
-                <div class="metric-progress">
-                  <div class="progress-bar">
-                    <div
-                      class="progress-fill"
-                      :style="{ width: Math.min(goal.completion_rate?.roi || 0, 100) + '%' }"
-                      :class="getCompletionClass(goal.completion_rate?.roi || 0)"
-                    ></div>
-                  </div>
-                  <span class="progress-text" :class="getCompletionClass(goal.completion_rate?.roi || 0)">
-                    {{ goal.completion_rate?.roi || 0 }}%
-                  </span>
-                </div>
-              </div>
+          <!-- 分页 -->
+          <div class="pagination-section">
+            <div class="pagination-info">
+              显示第 {{ (currentPage - 1) * pageSize + 1 }} - {{ Math.min(currentPage * pageSize, filteredGoals.length) }} 条，
+              共 {{ filteredGoals.length }} 条记录
             </div>
-          </div>
-
-          <div class="goal-card__footer">
-            <div class="goal-card__status">
-              <span class="status-badge" :class="getOverallStatusClass(goal)">
-                {{ getOverallStatusText(goal) }}
-              </span>
-            </div>
-            <div class="goal-card__actions" @click.stop>
+            <div class="pagination-controls">
               <button
-                class="action-btn-small action-btn-small--secondary"
-                @click="editGoal(goal)"
-                title="编辑"
+                class="pagination-btn"
+                :disabled="currentPage === 1"
+                @click="currentPage = currentPage - 1"
               >
-                <Edit :size="14" />
+                上一页
               </button>
+              <span class="pagination-current">{{ currentPage }} / {{ totalPages }}</span>
               <button
-                class="action-btn-small action-btn-small--danger"
-                @click="deleteGoal(goal)"
-                title="删除"
+                class="pagination-btn"
+                :disabled="currentPage === totalPages"
+                @click="currentPage = currentPage + 1"
               >
-                <Trash2 :size="14" />
+                下一页
               </button>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- 分页 -->
-      <div class="pagination-section">
-        <div class="pagination-info">
-          显示第 {{ (currentPage - 1) * pageSize + 1 }} - {{ Math.min(currentPage * pageSize, filteredGoals.length) }} 条，
-          共 {{ filteredGoals.length }} 条记录
-        </div>
-        <div class="pagination-controls">
-          <button
-            class="pagination-btn"
-            :disabled="currentPage === 1"
-            @click="currentPage = 1"
-          >
-            首页
-          </button>
-          <button
-            class="pagination-btn"
-            :disabled="currentPage === 1"
-            @click="currentPage--"
-          >
-            上一页
-          </button>
-          <span class="pagination-info">
-            第 {{ currentPage }} 页，共 {{ totalPages }} 页
-          </span>
-          <button
-            class="pagination-btn"
-            :disabled="currentPage === totalPages"
-            @click="currentPage++"
-          >
-            下一页
-          </button>
-          <button
-            class="pagination-btn"
-            :disabled="currentPage === totalPages"
-            @click="currentPage = totalPages"
-          >
-            末页
-          </button>
-        </div>
-      </div>
-    </div>
+    </section>
 
     <!-- 目标详情弹窗 -->
     <div v-if="showGoalDetail && selectedGoal" class="modal-overlay" @click="closeGoalDetail">
@@ -494,26 +243,25 @@
           </button>
         </div>
         <div class="modal-content">
-          <!-- 目标详情内容 -->
-          <div class="goal-detail">
+          <div class="detail-grid">
             <div class="detail-section">
               <h4>基本信息</h4>
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <span class="detail-label">客户名称</span>
-                  <span class="detail-value">{{ selectedGoal.customer_name }}</span>
+              <div class="detail-info">
+                <div class="info-item">
+                  <span class="info-label">项目名称</span>
+                  <span class="info-value">{{ selectedGoal.project_name }}</span>
                 </div>
-                <div class="detail-item">
-                  <span class="detail-label">项目名称</span>
-                  <span class="detail-value">{{ selectedGoal.project_name }}</span>
+                <div class="info-item">
+                  <span class="info-label">客户名称</span>
+                  <span class="info-value">{{ selectedGoal.customer_name }}</span>
                 </div>
-                <div class="detail-item">
-                  <span class="detail-label">目标类型</span>
-                  <span class="detail-value">{{ selectedGoal.goal_type }}</span>
+                <div class="info-item">
+                  <span class="info-label">目标类型</span>
+                  <span class="info-value">{{ selectedGoal.goal_type }}</span>
                 </div>
-                <div class="detail-item">
-                  <span class="detail-label">目标周期</span>
-                  <span class="detail-value">{{ selectedGoal.goal_period }}</span>
+                <div class="info-item">
+                  <span class="info-label">目标周期</span>
+                  <span class="info-value">{{ selectedGoal.goal_period }}</span>
                 </div>
               </div>
             </div>
@@ -521,15 +269,15 @@
             <div class="detail-section">
               <h4>目标设定</h4>
               <div class="targets-grid">
-                <div class="target-item">
+                <div class="target-item" v-if="selectedGoal.sales_target">
                   <span class="target-label">销量目标</span>
                   <span class="target-value">¥{{ formatNumber(selectedGoal.sales_target) }}</span>
                 </div>
-                <div class="target-item">
+                <div class="target-item" v-if="selectedGoal.cost_target">
                   <span class="target-label">成本目标</span>
                   <span class="target-value">¥{{ formatNumber(selectedGoal.cost_target) }}</span>
                 </div>
-                <div class="target-item">
+                <div class="target-item" v-if="selectedGoal.roi_target">
                   <span class="target-label">ROI目标</span>
                   <span class="target-value">{{ selectedGoal.roi_target }}x</span>
                 </div>
@@ -621,29 +369,19 @@ import {
   Plus,
   Filter,
   ChevronDown,
-  ChevronUp,
   RotateCcw,
   Search,
-  List,
-  Grid,
   Eye,
   Edit,
   Trash2,
   X
 } from 'lucide-vue-next'
-import ProjectGoalsDashboard from '@/components/projects/ProjectGoalsDashboard.vue'
-import ProjectGoalsTrendAnalysis from '@/components/projects/ProjectGoalsTrendAnalysis.vue'
+
 import { mockProjectGoals, mockProjects, type ProjectGoal, type Project } from '@/mock/projects'
 
 const router = useRouter()
 
 // 响应式数据
-const showDashboard = ref(true)
-const showTrendAnalysis = ref(false)
-const showAdvancedFilter = ref(false)
-const viewMode = ref<'table' | 'card'>('table')
-const sortBy = ref('created_at')
-const sortDirection = ref<'asc' | 'desc'>('desc')
 const currentPage = ref(1)
 const pageSize = ref(10)
 const showGoalDetail = ref(false)
@@ -654,19 +392,17 @@ const customers = ref<Array<{id: number, name: string}>>([])
 const projects = ref<Project[]>([])
 const creators = ref<string[]>([])
 
+const goalTypes = ref([
+  { value: '月度', label: '月度目标' },
+  { value: '季度', label: '季度目标' },
+  { value: '年度', label: '年度目标' }
+])
+
 const filters = reactive({
   goalType: '',
-  completionStatus: '',
   goalPeriod: '',
   customerId: '',
-  projectId: '',
-  createdBy: '',
-  startDate: '',
-  endDate: '',
-  minSalesTarget: null as number | null,
-  maxSalesTarget: null as number | null,
-  minCompletionRate: null as number | null,
-  maxCompletionRate: null as number | null
+  projectId: ''
 })
 
 // 初始化数据
@@ -693,20 +429,6 @@ const filteredGoals = computed(() => {
     result = result.filter(goal => goal.goal_type === filters.goalType)
   }
 
-  // 完成状态筛选
-  if (filters.completionStatus) {
-    result = result.filter(goal => {
-      const avgCompletion = getAverageCompletion(goal)
-      switch (filters.completionStatus) {
-        case 'excellent': return avgCompletion >= 110
-        case 'good': return avgCompletion >= 90 && avgCompletion < 110
-        case 'warning': return avgCompletion >= 70 && avgCompletion < 90
-        case 'danger': return avgCompletion < 70
-        default: return true
-      }
-    })
-  }
-
   // 目标周期筛选
   if (filters.goalPeriod) {
     result = result.filter(goal =>
@@ -724,78 +446,6 @@ const filteredGoals = computed(() => {
   if (filters.projectId) {
     result = result.filter(goal => goal.project_id === parseInt(filters.projectId))
   }
-
-  // 创建人筛选
-  if (filters.createdBy) {
-    result = result.filter(goal => goal.created_by === filters.createdBy)
-  }
-
-  // 创建时间范围筛选
-  if (filters.startDate) {
-    result = result.filter(goal =>
-      new Date(goal.created_at) >= new Date(filters.startDate)
-    )
-  }
-  if (filters.endDate) {
-    result = result.filter(goal =>
-      new Date(goal.created_at) <= new Date(filters.endDate)
-    )
-  }
-
-  // 销量目标范围筛选
-  if (filters.minSalesTarget !== null) {
-    result = result.filter(goal => goal.sales_target >= filters.minSalesTarget!)
-  }
-  if (filters.maxSalesTarget !== null) {
-    result = result.filter(goal => goal.sales_target <= filters.maxSalesTarget!)
-  }
-
-  // 完成率范围筛选
-  if (filters.minCompletionRate !== null) {
-    result = result.filter(goal => {
-      const avgCompletion = getAverageCompletion(goal)
-      return avgCompletion >= filters.minCompletionRate!
-    })
-  }
-  if (filters.maxCompletionRate !== null) {
-    result = result.filter(goal => {
-      const avgCompletion = getAverageCompletion(goal)
-      return avgCompletion <= filters.maxCompletionRate!
-    })
-  }
-
-  // 排序
-  result.sort((a, b) => {
-    let aValue: any, bValue: any
-
-    switch (sortBy.value) {
-      case 'created_at':
-        aValue = new Date(a.created_at).getTime()
-        bValue = new Date(b.created_at).getTime()
-        break
-      case 'goal_period':
-        aValue = a.goal_period
-        bValue = b.goal_period
-        break
-      case 'sales_target':
-        aValue = a.sales_target
-        bValue = b.sales_target
-        break
-      case 'completion_rate':
-        aValue = getAverageCompletion(a)
-        bValue = getAverageCompletion(b)
-        break
-      default:
-        aValue = a.created_at
-        bValue = b.created_at
-    }
-
-    if (sortDirection.value === 'asc') {
-      return aValue > bValue ? 1 : -1
-    } else {
-      return aValue < bValue ? 1 : -1
-    }
-  })
 
   return result
 })
@@ -886,14 +536,16 @@ const handleCustomerChange = () => {
   handleFilterChange()
 }
 
+const selectGoalType = (type: string) => {
+  filters.goalType = type
+  currentPage.value = 1
+}
+
 const resetFilters = () => {
-  Object.keys(filters).forEach(key => {
-    if (typeof filters[key as keyof typeof filters] === 'string') {
-      (filters[key as keyof typeof filters] as string) = ''
-    } else {
-      (filters[key as keyof typeof filters] as number | null) = null
-    }
-  })
+  filters.goalType = ''
+  filters.goalPeriod = ''
+  filters.customerId = ''
+  filters.projectId = ''
   currentPage.value = 1
 }
 
@@ -902,14 +554,7 @@ const applyFilters = () => {
   // 筛选逻辑已在computed中处理
 }
 
-const handleSort = () => {
-  currentPage.value = 1
-}
 
-const toggleSortDirection = () => {
-  sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
-  currentPage.value = 1
-}
 
 const createGoal = () => {
   console.log('创建新目标')
@@ -938,76 +583,123 @@ const closeGoalDetail = () => {
   selectedGoal.value = null
 }
 
-const exportGoals = () => {
-  console.log('导出目标数据')
-  // TODO: 实现导出功能
-}
+
 </script>
 
 <style scoped>
-.project-goals-view {
-  padding: 24px;
-  background: var(--color-background);
-  min-height: 100vh;
+.dashboard-content {
+  padding-top: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.dashboard-filter-container {
+  position: sticky;
+  top: 64px;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.98);
+  border-bottom: 1px solid var(--color-border-light);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  margin-bottom: var(--spacing-2xl);
+  backdrop-filter: blur(12px);
+  border-radius: 8px;
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 24px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
 }
 
-.page-header__main h1 {
-  font-size: 28px;
-  font-weight: 600;
+.dashboard-section {
+  margin-bottom: var(--spacing-2xl);
+  scroll-margin-top: 80px;
+}
+
+.section-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.page-header__main {
+  flex: 1;
+  min-width: 300px;
+}
+
+.page-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
-  margin: 0 0 8px 0;
+  margin: 0 0 var(--spacing-sm) 0;
 }
 
-.page-header__main p {
+.page-description {
+  font-size: var(--font-size-lg);
   color: var(--color-text-secondary);
   margin: 0;
-  font-size: 16px;
 }
 
 .page-header__actions {
   display: flex;
-  gap: 12px;
+  gap: var(--spacing-sm);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.project-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
 }
 
 .action-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border-radius: 6px;
-  border: none;
-  font-size: 14px;
-  font-weight: 500;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast);
+  text-decoration: none;
 }
 
 .action-btn--primary {
   background: var(--color-primary);
+  border-color: var(--color-primary);
   color: white;
 }
 
 .action-btn--primary:hover {
   background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
 }
 
 .action-btn--secondary {
-  background: var(--color-background-secondary);
+  background: var(--color-surface);
   color: var(--color-text-primary);
-  border: 1px solid var(--color-border);
 }
 
 .action-btn--secondary:hover {
-  background: var(--color-background-hover);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .dashboard-section {
@@ -1020,73 +712,26 @@ const exportGoals = () => {
 
 /* 筛选区域 */
 .filter-section {
-  background: var(--color-background-secondary);
+  background: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  margin-bottom: 24px;
-  overflow: hidden;
-}
-
-.filter-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.filter-header h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0;
-}
-
-.filter-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  border: 1px solid var(--color-border);
-  background: var(--color-background);
-  color: var(--color-text-secondary);
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.filter-toggle:hover {
-  background: var(--color-background-hover);
-  color: var(--color-text-primary);
-}
-
-.filter-toggle .rotate-180 {
-  transform: rotate(180deg);
-}
-
-.filter-content {
   padding: 20px;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
+  margin-bottom: 24px;
 }
 
-.filter-content--expanded {
-  max-height: 1000px;
-}
+
 
 .filter-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
 .filter-group {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
 }
 
 .filter-label {
@@ -1784,6 +1429,154 @@ const exportGoals = () => {
   color: var(--color-text-secondary);
 }
 
+/* 目标单元格样式 */
+.target-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 120px;
+}
+
+.target-amount {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: 14px;
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 6px;
+  background: #f0f0f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progress-fill.excellent {
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+}
+
+.progress-fill.good {
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+}
+
+.progress-fill.warning {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.progress-fill.danger {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+/* 不同目标类型的进度条颜色 */
+.progress-fill--sales {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.progress-fill--profit {
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+}
+
+.progress-fill--cost {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.progress-fill--roi {
+  background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+}
+
+.progress-fill--users {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.progress-percentage {
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 35px;
+  text-align: right;
+}
+
+.progress-percentage.excellent {
+  color: #16a34a;
+}
+
+.progress-percentage.good {
+  color: #2563eb;
+}
+
+.progress-percentage.warning {
+  color: #d97706;
+}
+
+.progress-percentage.danger {
+  color: #dc2626;
+}
+
+.current-amount {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+/* 目标类型标签页样式 */
+.goal-type-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  background: var(--color-background);
+  padding: 6px;
+  border-radius: 12px;
+  width: fit-content;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.goal-type-tab {
+  padding: 12px 20px;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.goal-type-tab:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.goal-type-tab--active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.goal-type-tab--active:hover {
+  background: var(--color-primary);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
 @media (max-width: 768px) {
   .page-header {
     flex-direction: column;
@@ -1826,6 +1619,14 @@ const exportGoals = () => {
   .create-info {
     flex-direction: column;
     gap: 8px;
+  }
+
+  .target-cell {
+    min-width: 100px;
+  }
+
+  .target-amount {
+    font-size: 12px;
   }
 }
 </style>
