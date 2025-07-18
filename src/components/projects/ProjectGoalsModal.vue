@@ -32,10 +32,29 @@
         <div class="goals-section">
           <div class="section-header">
             <h5>{{ getGoalTypeLabel(activeGoalType) }}目标</h5>
-            <button class="action-btn action-btn--primary" @click="showCreateGoal = true">
-              <Plus :size="16" />
-              新建目标
-            </button>
+            <div class="section-actions">
+              <div class="update-status">
+                <div v-if="dataServiceState.isUpdating" class="updating-indicator">
+                  <RefreshCw :size="14" class="spin" />
+                  <span>更新中...</span>
+                </div>
+                <div v-else class="last-update">
+                  最后更新: {{ formatLastUpdateTime() }}
+                </div>
+              </div>
+                            <button
+                class="action-btn action-btn--secondary"
+                @click="refreshData"
+                :disabled="dataServiceState.isUpdating.value"
+              >
+                <RefreshCw :size="16" :class="{ 'spin': dataServiceState.isUpdating }" />
+                刷新数据
+              </button>
+              <button class="action-btn action-btn--primary" @click="showCreateGoal = true">
+                <Plus :size="16" />
+                新建目标
+              </button>
+            </div>
           </div>
 
           <div class="goals-list">
@@ -320,9 +339,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { X, Plus, Edit, Trash2, Target } from 'lucide-vue-next'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { X, Plus, Edit, Trash2, Target, RefreshCw } from 'lucide-vue-next'
 import { mockProjectGoals, type ProjectGoal, type Project } from '@/mock/projects'
+import { goalDataService, useGoalDataService, updateGoalCompletion } from '@/services/goalDataService'
 
 interface Props {
   projectId: number
@@ -339,6 +359,10 @@ const goals = ref<ProjectGoal[]>([])
 const activeGoalType = ref<'月度' | '季度' | '年度'>('月度')
 const showCreateGoal = ref(false)
 const editingGoal = ref<ProjectGoal | null>(null)
+
+// 数据服务状态
+const dataServiceState = useGoalDataService()
+let unsubscribe: (() => void) | null = null
 
 const goalTypes = [
   { label: '月度', value: '月度' },
@@ -360,6 +384,24 @@ const goalForm = ref({
 // 初始化数据
 onMounted(() => {
   loadGoals()
+
+  // 启动实时数据更新
+  goalDataService.startRealTimeUpdates([props.projectId])
+
+  // 订阅数据更新
+  unsubscribe = goalDataService.subscribe(`project-goals-${props.projectId}`, (update) => {
+    handleDataUpdate(update)
+  })
+})
+
+onUnmounted(() => {
+  // 停止实时数据更新
+  goalDataService.stopRealTimeUpdates([props.projectId])
+
+  // 取消订阅
+  if (unsubscribe) {
+    unsubscribe()
+  }
 })
 
 // 计算属性
@@ -468,6 +510,45 @@ const saveGoal = () => {
   }
 
   closeGoalForm()
+}
+
+// 数据更新相关方法
+const handleDataUpdate = (update: { projectId: number; data: any }) => {
+  if (update.projectId === props.projectId) {
+    // 更新目标的实际完成情况
+    goals.value = goals.value.map(goal => {
+      if (goal.project_id === update.projectId) {
+        return updateGoalCompletion(goal, update.data)
+      }
+      return goal
+    })
+  }
+}
+
+const refreshData = async () => {
+  try {
+    await goalDataService.refreshData(props.projectId)
+  } catch (error) {
+    console.error('刷新数据失败:', error)
+  }
+}
+
+const formatLastUpdateTime = () => {
+  const lastUpdate = dataServiceState.lastUpdateTime.value.get(props.projectId)
+  if (!lastUpdate) return '从未更新'
+
+  const now = Date.now()
+  const diff = now - lastUpdate
+  const minutes = Math.floor(diff / 60000)
+
+  if (minutes < 1) return '刚刚'
+  if (minutes < 60) return `${minutes}分钟前`
+
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}小时前`
+
+  const days = Math.floor(hours / 24)
+  return `${days}天前`
 }
 </script>
 
@@ -585,6 +666,37 @@ const saveGoal = () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.update-status {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.updating-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-primary);
+}
+
+.updating-indicator .spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.last-update {
+  color: var(--color-text-tertiary);
 }
 
 .section-header h5 {

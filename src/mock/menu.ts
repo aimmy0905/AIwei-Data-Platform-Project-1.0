@@ -237,7 +237,22 @@ export const mockMenuItems: MenuItem[] = [
     id: 'projects',
     name: '项目管理',
     icon: 'FolderOpen',
-    path: '/projects',
+    children: [
+      {
+        id: 'project-list',
+        name: '项目列表',
+        icon: 'List',
+        path: '/projects',
+        roles: ['superAdmin', 'manager', 'staff']
+      },
+      {
+        id: 'project-goals',
+        name: '项目目标',
+        icon: 'Target',
+        path: '/projects/goals',
+        roles: ['superAdmin', 'manager', 'staff']
+      }
+    ],
     roles: ['superAdmin', 'manager', 'staff']
   },
   {

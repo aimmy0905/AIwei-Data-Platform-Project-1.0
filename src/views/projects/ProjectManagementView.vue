@@ -8,6 +8,13 @@
       <div class="page-header__actions">
         <button
           class="action-btn action-btn--secondary"
+          @click="router.push('/projects/goals')"
+        >
+          <Target :size="16" />
+          目标管理
+        </button>
+        <button
+          class="action-btn action-btn--secondary"
           @click="showExportModal = true"
         >
           <Download :size="16" />
@@ -155,11 +162,7 @@
                   <ChevronUp v-if="sortField === 'service_fee' && sortOrder === 'asc'" :size="14" />
                   <ChevronDown v-if="sortField === 'service_fee' && sortOrder === 'desc'" :size="14" />
                 </th>
-                <th @click="handleSort('balance_info')" class="sortable">
-                  余额信息
-                  <ChevronUp v-if="sortField === 'balance_info' && sortOrder === 'asc'" :size="14" />
-                  <ChevronDown v-if="sortField === 'balance_info' && sortOrder === 'desc'" :size="14" />
-                </th>
+
                 <th @click="handleSort('operation_team')" class="sortable">
                   负责运营团队
                   <ChevronUp v-if="sortField === 'operation_team' && sortOrder === 'asc'" :size="14" />
@@ -227,7 +230,7 @@
                 <td class="first-payment-date">{{ formatDate(project.first_payment_date) }}</td>
                 <td class="customer-name">{{ project.customer_name }}</td>
                 <td class="service-fee">¥{{ formatNumber(project.service_fee) }}</td>
-                <td class="balance-info">¥{{ formatNumber(project.balance_info) }}</td>
+
                 <td class="operation-team">{{ project.operation_team }}</td>
                 <td class="sales-person">{{ project.sales_person }}</td>
                 <td class="actions">
@@ -690,7 +693,7 @@ const exportFields = computed(() => [
   { key: 'cooperation_period', label: '合作周期' },
   { key: 'contract_number', label: '合同编号' },
   { key: 'service_fee', label: '项目服务费' },
-  { key: 'balance_info', label: '余额信息' },
+
   { key: 'operation_team', label: '负责运营团队' },
   { key: 'sales_person', label: '销售人员' }
 ])
@@ -1225,10 +1228,9 @@ onUnmounted(() => {
 .project-table th:nth-child(11), .project-table td:nth-child(11) { width: 100px; } /* 首次到账日期 */
 .project-table th:nth-child(12), .project-table td:nth-child(12) { width: 140px; } /* 所属客户 */
 .project-table th:nth-child(13), .project-table td:nth-child(13) { width: 100px; } /* 项目服务费 */
-.project-table th:nth-child(14), .project-table td:nth-child(14) { width: 80px; } /* 余额信息 */
-.project-table th:nth-child(15), .project-table td:nth-child(15) { width: 120px; } /* 负责运营团队 */
-.project-table th:nth-child(16), .project-table td:nth-child(16) { width: 80px; } /* 销售人员 */
-.project-table th:nth-child(17), .project-table td:nth-child(17) { width: 280px; } /* 操作 */
+.project-table th:nth-child(14), .project-table td:nth-child(14) { width: 120px; } /* 负责运营团队 */
+.project-table th:nth-child(15), .project-table td:nth-child(15) { width: 80px; } /* 销售人员 */
+.project-table th:nth-child(16), .project-table td:nth-child(16) { width: 280px; } /* 操作 */
 
 .project-table td {
   color: var(--color-text-secondary);
