@@ -22,7 +22,7 @@
             :key="platform.value"
             class="tab-btn"
             :class="{ 'tab-btn--active': activePlatform === platform.value }"
-            @click="activePlatform = platform.value"
+            @click="activePlatform = platform.value as 'Google' | 'Meta' | 'Criteo' | 'Bing'"
           >
             <component :is="platform.icon" :size="16" />
             {{ platform.label }}

@@ -479,15 +479,22 @@ const filteredRecords = computed(() => {
     let aValue = a[sortField.value as keyof ServiceFeeRecord]
     let bValue = b[sortField.value as keyof ServiceFeeRecord]
 
+    // 处理undefined值
+    if (aValue === undefined || bValue === undefined) {
+      if (aValue === undefined && bValue === undefined) return 0
+      if (aValue === undefined) return 1
+      if (bValue === undefined) return -1
+    }
+
     if (typeof aValue === 'string') {
       aValue = aValue.toLowerCase()
       bValue = (bValue as string).toLowerCase()
     }
 
     if (sortOrder.value === 'asc') {
-      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0
+      return aValue! < bValue! ? -1 : aValue! > bValue! ? 1 : 0
     } else {
-      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0
+      return aValue! > bValue! ? -1 : aValue! < bValue! ? 1 : 0
     }
   })
 

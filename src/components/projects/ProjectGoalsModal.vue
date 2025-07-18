@@ -22,7 +22,7 @@
             :key="type.value"
             class="tab-btn"
             :class="{ 'tab-btn--active': activeGoalType === type.value }"
-            @click="activeGoalType = type.value"
+            @click="activeGoalType = type.value as '月度' | '季度' | '年度'"
           >
             {{ type.label }}
           </button>
@@ -347,7 +347,7 @@ const goalTypes = [
 ]
 
 const goalForm = ref({
-  goal_type: '',
+  goal_type: '' as '月度' | '季度' | '年度' | '',
   goal_period: '',
   sales_target: 0,
   cost_target: 0,
@@ -447,7 +447,7 @@ const saveGoal = () => {
       goals.value[index] = {
         ...goals.value[index],
         ...goalForm.value,
-        updated_at: new Date().toISOString()
+        goal_type: goalForm.value.goal_type as '月度' | '季度' | '年度'
       }
     }
     console.log('更新目标:', editingGoal.value.id)

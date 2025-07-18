@@ -215,7 +215,8 @@ const formData = ref({
   problemHandlingRating: 0,
   professionalRating: 0,
   serviceAttitudeRating: 0,
-  improvementSuggestions: ''
+  improvementSuggestions: '',
+  responsibleTeam: ''
 })
 
 const errors = ref<Record<string, string>>({})
@@ -253,7 +254,8 @@ const initFormData = () => {
       problemHandlingRating: props.review.problemHandlingRating,
       professionalRating: props.review.professionalRating,
       serviceAttitudeRating: props.review.serviceAttitudeRating,
-      improvementSuggestions: props.review.improvementSuggestions || ''
+      improvementSuggestions: props.review.improvementSuggestions || '',
+      responsibleTeam: props.review.responsibleTeam || ''
     }
   } else {
     // 新建模式
@@ -272,7 +274,8 @@ const initFormData = () => {
       problemHandlingRating: 0,
       professionalRating: 0,
       serviceAttitudeRating: 0,
-      improvementSuggestions: ''
+      improvementSuggestions: '',
+      responsibleTeam: ''
     }
   }
 
@@ -395,7 +398,8 @@ const handleSubmit = async () => {
         problemHandlingRating: formData.value.problemHandlingRating,
         professionalRating: formData.value.professionalRating,
         serviceAttitudeRating: formData.value.serviceAttitudeRating,
-        improvementSuggestions: formData.value.improvementSuggestions
+        improvementSuggestions: formData.value.improvementSuggestions,
+        responsibleTeam: formData.value.responsibleTeam
       })
     }
 
