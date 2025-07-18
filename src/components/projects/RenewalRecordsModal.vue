@@ -25,93 +25,75 @@
             </button>
           </div>
 
-          <div class="renewals-list">
-            <div
-              v-for="renewal in renewals"
-              :key="renewal.id"
-              class="renewal-card"
-            >
-              <div class="renewal-card__header">
-                <div class="renewal-date">
-                  <Calendar :size="16" />
-                  {{ formatDate(renewal.renewal_date) }}
+          <!-- 数据表格 -->
+          <div class="table-section">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>续费日期</th>
+                    <th>续费金额</th>
+                    <th>续费周期</th>
+                    <th>续费类型</th>
+                    <th>付款方式</th>
+                    <th>收款确认</th>
+                    <th>操作人</th>
+                    <th>创建时间</th>
+                    <th>备注</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="renewal in renewals" :key="renewal.id" class="table-row">
+                    <td class="renewal-date">
+                      <div class="date-display">
+                        <Calendar :size="16" />
+                        {{ formatDate(renewal.renewal_date) }}
+                      </div>
+                    </td>
+                    <td class="renewal-amount">¥{{ formatNumber(renewal.renewal_amount) }}</td>
+                    <td class="renewal-period">{{ renewal.renewal_period }}</td>
+                    <td>
+                      <span class="type-badge" :class="getRenewalTypeClass(renewal.renewal_type)">
+                        {{ renewal.renewal_type }}
+                      </span>
+                    </td>
+                    <td class="payment-method">{{ renewal.payment_method }}</td>
+                    <td>
+                      <span class="status-badge" :class="getConfirmationClass(renewal.payment_confirmed)">
+                        {{ renewal.payment_confirmed }}
+                      </span>
+                    </td>
+                    <td class="operator">{{ renewal.operator }}</td>
+                    <td class="created-at">{{ formatDate(renewal.created_at) }}</td>
+                    <td class="remark" :title="renewal.remarks">{{ renewal.remarks || '-' }}</td>
+                    <td class="actions">
+                      <div class="action-buttons">
+                        <button class="btn btn--small btn--outline" @click="editRenewal(renewal)" title="编辑">
+                          <Edit :size="14" />
+                          编辑
+                        </button>
+                        <button class="btn btn--small btn--danger-outline" @click="deleteRenewal(renewal.id)" title="删除">
+                          <Trash2 :size="14" />
+                          删除
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <!-- 空状态 -->
+              <div v-if="renewals.length === 0" class="empty-state">
+                <div class="empty-icon">
+                  <DollarSign :size="48" />
                 </div>
-                <div class="renewal-amount">
-                  ¥{{ formatNumber(renewal.renewal_amount) }}
-                </div>
-                <div class="renewal-actions">
-                  <button
-                    class="action-btn-small action-btn-small--secondary"
-                    @click="editRenewal(renewal)"
-                    title="编辑"
-                  >
-                    <Edit :size="14" />
-                  </button>
-                  <button
-                    class="action-btn-small action-btn-small--danger"
-                    @click="deleteRenewal(renewal.id)"
-                    title="删除"
-                  >
-                    <Trash2 :size="14" />
-                  </button>
-                </div>
+                <div class="empty-text">暂无续费记录</div>
+                <button class="btn btn--primary" @click="showCreateRenewal = true">
+                  <Plus :size="16" />
+                  添加第一条续费记录
+                </button>
               </div>
-
-              <div class="renewal-details">
-                <div class="detail-row">
-                  <div class="detail-item">
-                    <span class="label">续费周期：</span>
-                    <span class="value">{{ renewal.renewal_period }}</span>
-                  </div>
-                  <div class="detail-item">
-                    <span class="label">续费类型：</span>
-                    <span class="value type-badge" :class="getRenewalTypeClass(renewal.renewal_type)">
-                      {{ renewal.renewal_type }}
-                    </span>
-                  </div>
-                </div>
-
-                <div class="detail-row">
-                  <div class="detail-item">
-                    <span class="label">付款方式：</span>
-                    <span class="value">{{ renewal.payment_method }}</span>
-                  </div>
-                  <div class="detail-item">
-                    <span class="label">收款确认：</span>
-                    <span class="value status-badge" :class="getConfirmationClass(renewal.payment_confirmed)">
-                      {{ renewal.payment_confirmed }}
-                    </span>
-                  </div>
-                </div>
-
-                <div class="detail-row">
-                  <div class="detail-item">
-                    <span class="label">操作人：</span>
-                    <span class="value">{{ renewal.operator }}</span>
-                  </div>
-                  <div class="detail-item">
-                    <span class="label">创建时间：</span>
-                    <span class="value">{{ formatDate(renewal.created_at) }}</span>
-                  </div>
-                </div>
-
-                <div class="detail-row" v-if="renewal.remarks">
-                  <div class="detail-item full-width">
-                    <span class="label">备注：</span>
-                    <span class="value remarks">{{ renewal.remarks }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div v-if="renewals.length === 0" class="empty-state">
-              <div class="empty-icon">
-                <DollarSign :size="48" />
-              </div>
-              <div class="empty-text">暂无续费记录</div>
-              <button class="action-btn action-btn--primary" @click="showCreateRenewal = true">
-                添加第一条续费记录
-              </button>
             </div>
           </div>
 
@@ -525,114 +507,71 @@ const saveRenewal = () => {
   background: var(--color-background-hover);
 }
 
-.renewals-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.table-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
   margin-bottom: 24px;
 }
 
-.renewal-card {
-  background: var(--color-background-secondary);
+.table-container {
+  overflow-x: auto;
   border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 20px;
+  border-radius: var(--border-radius-lg);
+  margin-bottom: var(--spacing-lg);
 }
 
-.renewal-card__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
 }
 
-.renewal-date {
+.data-table th {
+  background: var(--color-background);
+  padding: var(--spacing-md);
+  text-align: left;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+  vertical-align: top;
+}
+
+.table-row:hover {
+  background: var(--color-background);
+}
+
+.date-display {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 16px;
-  font-weight: 600;
+  font-weight: var(--font-weight-medium);
   color: var(--color-text-primary);
 }
 
 .renewal-amount {
-  font-size: 18px;
-  font-weight: 700;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-success);
 }
 
-.renewal-actions {
-  display: flex;
-  gap: 8px;
+.remark {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.action-btn-small {
-  padding: 6px 8px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.action-btn-small--secondary {
-  background: var(--color-background-tertiary);
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
-}
-
-.action-btn-small--secondary:hover {
-  background: var(--color-background-hover);
-  color: var(--color-text-primary);
-}
-
-.action-btn-small--danger {
-  background: var(--color-danger-light);
-  color: var(--color-danger);
-}
-
-.action-btn-small--danger:hover {
-  background: var(--color-danger);
-  color: white;
-}
-
-.renewal-details {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.detail-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-.detail-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-}
-
-.detail-item.full-width {
-  grid-column: 1 / -1;
-}
-
-.detail-item .label {
-  color: var(--color-text-secondary);
-  min-width: 80px;
-}
-
-.detail-item .value {
-  color: var(--color-text-primary);
-  font-weight: 500;
-}
-
-.detail-item .value.remarks {
-  line-height: 1.5;
+.actions {
+  min-width: 150px;
 }
 
 .type-badge,
@@ -668,6 +607,57 @@ const saveRenewal = () => {
   color: var(--color-warning);
 }
 
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: center;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  text-decoration: none;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.btn--small {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+}
+
+.btn--outline:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.btn--danger-outline:hover {
+  border-color: var(--color-error);
+  color: var(--color-error);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.btn--primary:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
 .renewal-stats {
   background: var(--color-background-secondary);
   border: 1px solid var(--color-border);
@@ -695,9 +685,14 @@ const saveRenewal = () => {
 }
 
 .empty-state {
-  text-align: center;
-  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-2xl);
   color: var(--color-text-secondary);
+  text-align: center;
 }
 
 .empty-icon {
@@ -800,29 +795,39 @@ const saveRenewal = () => {
   margin-top: 24px;
 }
 
+@media (max-width: 1024px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
 @media (max-width: 768px) {
   .modal-container {
     width: 95%;
     max-height: 95vh;
   }
 
-  .detail-row {
-    grid-template-columns: 1fr;
-    gap: 8px;
+  .data-table {
+    font-size: var(--font-size-xs);
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: var(--spacing-sm);
   }
 
   .renewal-stats {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-
-  .renewal-card__header {
+  .action-buttons {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+    align-items: stretch;
   }
 }
 </style>

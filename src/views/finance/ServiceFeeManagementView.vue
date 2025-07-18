@@ -35,6 +35,13 @@
             </option>
           </select>
 
+          <select v-model="filters.projectId" class="filter-select">
+            <option value="">全部项目</option>
+            <option v-for="project in projects" :key="project.id" :value="project.id">
+              {{ project.name }}
+            </option>
+          </select>
+
           <select v-model="filters.paymentType" class="filter-select">
             <option value="">全部类型</option>
             <option value="首次付款">首次付款</option>
@@ -330,6 +337,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import {
   Plus, Search, RotateCcw, ChevronUp, ChevronDown, Edit, Trash2,
   FileX, X
@@ -345,6 +353,8 @@ import {
   mockUpdateServiceFeeRecord,
   mockDeleteServiceFeeRecord
 } from '@/mock/service-fees'
+
+const route = useRoute()
 
 // 响应式数据
 const loading = ref(false)
@@ -366,6 +376,7 @@ const projects = ref<ServiceFeeProject[]>([])
 // 筛选条件
 const filters = reactive({
   customerId: '',
+  projectId: '',
   paymentType: '',
   startDate: '',
   endDate: '',
@@ -398,7 +409,7 @@ const creators = computed(() => {
 })
 
 const hasActiveFilters = computed(() => {
-  return filters.customerId || filters.paymentType || filters.startDate || filters.endDate || filters.creator
+  return filters.customerId || filters.projectId || filters.paymentType || filters.startDate || filters.endDate || filters.creator
 })
 
 const filteredRecords = computed(() => {
@@ -416,6 +427,10 @@ const filteredRecords = computed(() => {
   // 条件过滤
   if (filters.customerId) {
     filtered = filtered.filter(record => record.customerId === parseInt(filters.customerId))
+  }
+
+  if (filters.projectId) {
+    filtered = filtered.filter(record => record.projectId === parseInt(filters.projectId))
   }
 
   if (filters.paymentType) {
@@ -501,6 +516,7 @@ const sortBy = (field: string) => {
 
 const resetFilters = () => {
   filters.customerId = ''
+  filters.projectId = ''
   filters.paymentType = ''
   filters.startDate = ''
   filters.endDate = ''
@@ -665,14 +681,36 @@ const loadData = async () => {
   }
 }
 
+// 处理路由查询参数
+const applyRouteFilters = () => {
+  const query = route.query
+
+  // 如果有项目ID参数，应用项目筛选
+  if (query.projectId) {
+    filters.projectId = query.projectId as string
+  }
+
+  // 如果有项目名称参数，更新搜索查询
+  if (query.projectName) {
+    searchQuery.value = query.projectName as string
+  }
+
+  // 如果有支付类型参数，应用支付类型筛选
+  if (query.paymentType) {
+    filters.paymentType = query.paymentType as string
+  }
+}
+
 // 监听筛选条件变化，重置分页
 watch([searchQuery, filters], () => {
   currentPage.value = 1
 }, { deep: true })
 
 // 生命周期
-onMounted(() => {
-  loadData()
+onMounted(async () => {
+  await loadData()
+  // 数据加载完成后应用路由筛选参数
+  applyRouteFilters()
 })
 </script>
 

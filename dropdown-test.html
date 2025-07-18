@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>下拉菜单测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .table-container {
+            position: relative;
+            overflow-x: auto;
+            overflow-y: visible;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .test-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        
+        .test-table th,
+        .test-table td {
+            padding: 12px 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 13px;
+        }
+        
+        .test-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        
+        /* 固定列 */
+        .test-table th:nth-child(1),
+        .test-table td:nth-child(1) {
+            position: sticky;
+            left: 0;
+            z-index: 10;
+            background: white;
+            border-right: 1px solid #ddd;
+            width: 200px;
+        }
+        
+        .test-table th:nth-child(1) {
+            z-index: 12;
+            background: #f8f9fa;
+        }
+        
+        .test-table td.actions {
+            overflow: visible;
+        }
+        
+        .action-buttons {
+            position: relative;
+            overflow: visible;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .action-btn:hover {
+            background: #f5f5f5;
+        }
+        
+        /* 下拉菜单样式 */
+        .dropdown-menu {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 99999;
+            min-width: 150px;
+            padding: 8px 0;
+        }
+        
+        .dropdown-menu--active .dropdown-content {
+            display: block;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 8px 16px;
+            border: none;
+            background: none;
+            color: #333;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            white-space: nowrap;
+        }
+        
+        .dropdown-item:hover {
+            background: #f5f5f5;
+        }
+        
+        .dropdown-item--danger {
+            color: #dc3545;
+        }
+        
+        .dropdown-item--danger:hover {
+            background: #ffeaea;
+        }
+        
+        .status-active {
+            color: #28a745;
+            font-weight: 500;
+        }
+        
+        .test-info {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 4px;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .test-info h3 {
+            margin: 0 0 10px 0;
+            color: #1976d2;
+        }
+        
+        .test-info p {
+            margin: 5px 0;
+            color: #424242;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-info">
+            <h3>下拉菜单可见性测试</h3>
+            <p><strong>测试目的：</strong>验证下拉菜单在固定列表格中的可见性</p>
+            <p><strong>修复内容：</strong>将下拉菜单的 z-index 从 9999 提升到 99999</p>
+            <p><strong>测试方法：</strong>点击"更多"按钮，检查下拉菜单是否完全可见，不被固定列遮挡</p>
+        </div>
+        
+        <div class="table-container">
+            <table class="test-table">
+                <thead>
+                    <tr>
+                        <th>项目名称</th>
+                        <th>项目状态</th>
+                        <th>合作周期</th>
+                        <th>服务费</th>
+                        <th>销售人员</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>美妆品牌海外推广项目</td>
+                        <td><span class="status-active">活跃</span></td>
+                        <td>12个月</td>
+                        <td>¥200,000</td>
+                        <td>张三</td>
+                        <td class="actions">
+                            <div class="action-buttons">
+                                <button class="action-btn">数据面板</button>
+                                <button class="action-btn">项目目标</button>
+                                <div class="dropdown-menu" id="dropdown1">
+                                    <button class="action-btn" onclick="toggleDropdown('dropdown1')">更多</button>
+                                    <div class="dropdown-content">
+                                        <button class="dropdown-item">
+                                            <span>投放账号</span>
+                                        </button>
+                                        <button class="dropdown-item">
+                                            <span>续费记录</span>
+                                        </button>
+                                        <button class="dropdown-item">
+                                            <span>周报/月报</span>
+                                        </button>
+                                        <button class="dropdown-item">
+                                            <span>活动管理</span>
+                                        </button>
+                                        <button class="dropdown-item">
+                                            <span>客户评价</span>
+                                        </button>
+                                        <button class="dropdown-item">
+                                            <span>红人数据</span>
+                                        </button>
+                                        <button class="dropdown-item">
+                                            <span>编辑</span>
+                                        </button>
+                                        <button class="dropdown-item dropdown-item--danger">
+                                            <span>删除</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>时尚服装品牌数字化营销</td>
+                        <td><span class="status-active">活跃</span></td>
+                        <td>9个月</td>
+                        <td>¥120,000</td>
+                        <td>李四</td>
+                        <td class="actions">
+                            <div class="action-buttons">
+                                <button class="action-btn">数据面板</button>
+                                <button class="action-btn">项目目标</button>
+                                <div class="dropdown-menu" id="dropdown2">
+                                    <button class="action-btn" onclick="toggleDropdown('dropdown2')">更多</button>
+                                    <div class="dropdown-content">
+                                        <button class="dropdown-item">
+                                            <span>投放账号</span>
+                                        </button>
+                                        <button class="dropdown-item">
+                                            <span>续费记录</span>
+                                        </button>
+                                        <button class="dropdown-item">
+                                            <span>周报/月报</span>
+                                        </button>
+                                        <button class="dropdown-item">
+                                            <span>活动管理</span>
+                                        </button>
+                                        <button class="dropdown-item">
+                                            <span>客户评价</span>
+                                        </button>
+                                        <button class="dropdown-item">
+                                            <span>红人数据</span>
+                                        </button>
+                                        <button class="dropdown-item">
+                                            <span>编辑</span>
+                                        </button>
+                                        <button class="dropdown-item dropdown-item--danger">
+                                            <span>删除</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>健康食品品牌全球扩张</td>
+                        <td><span class="status-active">活跃</span></td>
+                        <td>12个月</td>
+                        <td>¥300,000</td>
+                        <td>王五</td>
+                        <td class="actions">
+                            <div class="action-buttons">
+                                <button class="action-btn">数据面板</button>
+                                <button class="action-btn">项目目标</button>
+                                <div class="dropdown-menu" id="dropdown3">
+                                    <button class="action-btn" onclick="toggleDropdown('dropdown3')">更多</button>
+                                    <div class="dropdown-content">
+                                        <button class="dropdown-item">
+                                            <span>投放账号</span>
+                                        </button>
+                                        <button class="dropdown-item">
+                                            <span>续费记录</span>
+                                        </button>
+                                        <button class="dropdown-item">
+                                            <span>周报/月报</span>
+                                        </button>
+                                        <button class="dropdown-item">
+                                            <span>活动管理</span>
+                                        </button>
+                                        <button class="dropdown-item">
+                                            <span>客户评价</span>
+                                        </button>
+                                        <button class="dropdown-item">
+                                            <span>红人数据</span>
+                                        </button>
+                                        <button class="dropdown-item">
+                                            <span>编辑</span>
+                                        </button>
+                                        <button class="dropdown-item dropdown-item--danger">
+                                            <span>删除</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        let activeDropdown = null;
+        
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            
+            // 关闭其他下拉菜单
+            if (activeDropdown && activeDropdown !== dropdown) {
+                activeDropdown.classList.remove('dropdown-menu--active');
+            }
+            
+            // 切换当前下拉菜单
+            if (dropdown.classList.contains('dropdown-menu--active')) {
+                dropdown.classList.remove('dropdown-menu--active');
+                activeDropdown = null;
+            } else {
+                dropdown.classList.add('dropdown-menu--active');
+                activeDropdown = dropdown;
+            }
+        }
+        
+        // 点击外部关闭下拉菜单
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.dropdown-menu')) {
+                if (activeDropdown) {
+                    activeDropdown.classList.remove('dropdown-menu--active');
+                    activeDropdown = null;
+                }
+            }
+        });
+        
+        // 下拉菜单项点击处理
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const action = this.textContent.trim();
+                alert(`执行操作: ${action}`);
+                
+                // 关闭下拉菜单
+                if (activeDropdown) {
+                    activeDropdown.classList.remove('dropdown-menu--active');
+                    activeDropdown = null;
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

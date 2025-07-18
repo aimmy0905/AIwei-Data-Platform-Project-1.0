@@ -88,7 +88,8 @@
 
         <!-- 表格视图 -->
         <div v-if="viewMode === 'table'" class="project-table">
-          <table>
+          <div class="table-wrapper">
+            <table>
             <thead>
               <tr>
                 <th class="fixed-column checkbox-col">
@@ -232,80 +233,92 @@
                 <td class="actions">
                   <div class="action-buttons">
                     <button
-                      class="action-btn-small action-btn-small--primary"
+                      class="action-btn-text action-btn-text--primary"
                       @click="viewProjectDashboard(project.id)"
-                      title="查看面板数据"
                     >
                       <BarChart3 :size="14" />
+                      <span>数据面板</span>
                     </button>
                     <button
-                      class="action-btn-small action-btn-small--secondary"
+                      class="action-btn-text action-btn-text--secondary"
                       @click="manageProjectGoals(project.id)"
-                      title="项目目标"
                     >
                       <Target :size="14" />
+                      <span>项目目标</span>
                     </button>
-                    <button
-                      class="action-btn-small action-btn-small--secondary"
-                      @click="manageAdAccounts(project.id)"
-                      title="投放账号"
-                    >
-                      <Monitor :size="14" />
-                    </button>
-                    <button
-                      class="action-btn-small action-btn-small--secondary"
-                      @click="viewRenewalRecords(project.id)"
-                      title="服务续费记录"
-                    >
-                      <DollarSign :size="14" />
-                    </button>
-                    <button
-                      class="action-btn-small action-btn-small--secondary"
-                      @click="viewProjectReports(project.id)"
-                      title="项目周报/月报"
-                    >
-                      <FileText :size="14" />
-                    </button>
-                    <button
-                      class="action-btn-small action-btn-small--secondary"
-                      @click="manageProjectActivities(project.id)"
-                      title="项目活动"
-                    >
-                      <Calendar :size="14" />
-                    </button>
-                    <button
-                      class="action-btn-small action-btn-small--secondary"
-                      @click="viewCustomerReviews(project.id)"
-                      title="客户评价记录"
-                    >
-                      <Star :size="14" />
-                    </button>
-                    <button
-                      class="action-btn-small action-btn-small--secondary"
-                      @click="manageInfluencerData(project.id)"
-                      title="红人数据"
-                    >
-                      <Users :size="14" />
-                    </button>
-                    <button
-                      class="action-btn-small action-btn-small--warning"
-                      @click="editProject(project.id)"
-                      title="项目编辑"
-                    >
-                      <Edit :size="14" />
-                    </button>
-                    <button
-                      class="action-btn-small action-btn-small--danger"
-                      @click="deleteProject(project.id)"
-                      title="项目删除"
-                    >
-                      <Trash2 :size="14" />
-                    </button>
+                    <div class="dropdown-menu" :class="{ 'dropdown-menu--active': activeDropdown === project.id }">
+                      <button
+                        class="action-btn-text action-btn-text--secondary"
+                        @click="toggleDropdown(project.id)"
+                      >
+                        <MoreHorizontal :size="14" />
+                        <span>更多</span>
+                      </button>
+                      <div class="dropdown-content">
+                        <button
+                          class="dropdown-item"
+                          @click="manageAdAccounts(project.id)"
+                        >
+                          <Monitor :size="14" />
+                          <span>投放账号</span>
+                        </button>
+                        <button
+                          class="dropdown-item"
+                          @click="viewRenewalRecords(project.id)"
+                        >
+                          <DollarSign :size="14" />
+                          <span>续费记录</span>
+                        </button>
+                        <button
+                          class="dropdown-item"
+                          @click="viewProjectReports(project.id)"
+                        >
+                          <FileText :size="14" />
+                          <span>周报/月报</span>
+                        </button>
+                        <button
+                          class="dropdown-item"
+                          @click="manageProjectActivities(project.id)"
+                        >
+                          <Calendar :size="14" />
+                          <span>活动管理</span>
+                        </button>
+                        <button
+                          class="dropdown-item"
+                          @click="viewCustomerReviews(project.id)"
+                        >
+                          <Star :size="14" />
+                          <span>客户评价</span>
+                        </button>
+                        <button
+                          class="dropdown-item"
+                          @click="manageInfluencerData(project.id)"
+                        >
+                          <Users :size="14" />
+                          <span>红人数据</span>
+                        </button>
+                        <button
+                          class="dropdown-item"
+                          @click="editProject(project.id)"
+                        >
+                          <Edit :size="14" />
+                          <span>编辑</span>
+                        </button>
+                        <button
+                          class="dropdown-item dropdown-item--danger"
+                          @click="deleteProject(project.id)"
+                        >
+                          <Trash2 :size="14" />
+                          <span>删除</span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </td>
               </tr>
             </tbody>
           </table>
+          </div>
         </div>
 
         <!-- 网格视图 -->
@@ -450,9 +463,15 @@
     <!-- 导出弹窗 -->
     <ExportModal
       v-if="showExportModal"
-      title="导出项目数据"
-      :fields="exportFields"
-      :data="filteredProjects"
+      :visible="showExportModal"
+      :data="projects"
+      :filtered-data="filteredProjects"
+      :selected-data="selectedProjects.map(id => projects.find(p => p.id === id)).filter(p => p !== undefined)"
+      :columns="exportFields"
+      :total-count="projects.length"
+      :filtered-count="filteredProjects.length"
+      :selected-count="selectedProjects.length"
+      default-filename="项目数据导出"
       @close="showExportModal = false"
       @export="handleExport"
     />
@@ -472,19 +491,11 @@
       :project-info="selectedProject"
       @close="showAdAccountsModal = false"
     />
-
-    <!-- 续费记录管理弹窗 -->
-    <RenewalRecordsModal
-      v-if="showRenewalRecordsModal && selectedProject"
-      :project-id="selectedProject.id"
-      :project-info="selectedProject"
-      @close="showRenewalRecordsModal = false"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   Download,
@@ -510,7 +521,6 @@ import FilterPanel from '@/components/common/FilterPanel.vue'
 import ExportModal from '@/components/common/ExportModal.vue'
 import ProjectGoalsModal from '@/components/projects/ProjectGoalsModal.vue'
 import AdAccountsModal from '@/components/projects/AdAccountsModal.vue'
-import RenewalRecordsModal from '@/components/projects/RenewalRecordsModal.vue'
 
 import {
   mockProjects,
@@ -534,11 +544,11 @@ const sortOrder = ref<'asc' | 'desc'>('asc')
 const currentPage = ref(1)
 const pageSize = ref(10)
 const showExportModal = ref(false)
+const activeDropdown = ref<number | null>(null)
 
 // 弹窗状态
 const showProjectGoalsModal = ref(false)
 const showAdAccountsModal = ref(false)
-const showRenewalRecordsModal = ref(false)
 const selectedProject = ref<Project | null>(null)
 
 // 筛选相关
@@ -551,10 +561,7 @@ const filters = ref({
   salesPerson: [] as string[]
 })
 
-// 初始化数据
-onMounted(() => {
-  projects.value = [...mockProjects]
-})
+// 初始化数据已移至上面的 onMounted 函数中
 
 // 计算属性
 const searchSuggestions = computed(() => {
@@ -575,14 +582,14 @@ const customFilterOptions = computed(() => [
   {
     key: 'operationTeam',
     label: '运营团队',
-    type: 'select',
+    type: 'select' as const,
     multiple: true,
     options: operationTeamOptions
   },
   {
     key: 'salesPerson',
     label: '销售人员',
-    type: 'select',
+    type: 'select' as const,
     multiple: true,
     options: salesPersonOptions
   }
@@ -788,17 +795,9 @@ const manageAdAccounts = (projectId: number) => {
   }
 }
 
-const viewRenewalRecords = (projectId: number) => {
-  const project = projects.value.find(p => p.id === projectId)
-  if (project) {
-    selectedProject.value = project
-    showRenewalRecordsModal.value = true
-  }
-}
-
 const viewProjectReports = (projectId: number) => {
-  console.log('查看项目报告:', projectId)
-  // TODO: 打开项目报告弹窗
+  console.log('查看周报/月报:', projectId)
+  // TODO: 打开周报/月报弹窗
 }
 
 const manageProjectActivities = (projectId: number) => {
@@ -830,6 +829,44 @@ const handleExport = (exportData: any) => {
   console.log('导出数据:', exportData)
   // TODO: 实现数据导出功能
 }
+
+const toggleDropdown = (projectId: number) => {
+  activeDropdown.value = activeDropdown.value === projectId ? null : projectId
+}
+
+const viewRenewalRecords = (projectId: number) => {
+  const project = projects.value.find(p => p.id === projectId)
+  if (project) {
+    // 跳转到服务费管理页面，并传递项目筛选参数
+    router.push({
+      name: 'service-fees',
+      query: {
+        projectId: projectId.toString(),
+        projectName: project.project_name,
+        paymentType: '续费' // 只显示续费记录
+      }
+    })
+  }
+}
+
+// 点击外部关闭下拉菜单
+const handleClickOutside = (event: MouseEvent) => {
+  const target = event.target as HTMLElement
+  if (!target.closest('.dropdown-menu')) {
+    activeDropdown.value = null
+  }
+}
+
+// 监听点击事件
+onMounted(() => {
+  projects.value = [...mockProjects]
+  document.addEventListener('click', handleClickOutside)
+})
+
+// 组件卸载时移除监听
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <style scoped>
@@ -944,7 +981,7 @@ const handleExport = (exportData: any) => {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-lg);
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -1059,7 +1096,12 @@ const handleExport = (exportData: any) => {
 }
 
 .project-table {
+  position: relative;
+}
+
+.table-wrapper {
   overflow-x: auto;
+  overflow-y: visible;
 }
 
 .project-table table {
@@ -1077,6 +1119,15 @@ const handleExport = (exportData: any) => {
   font-size: 13px;
   word-wrap: break-word;
   overflow: hidden;
+}
+
+.project-table td.actions {
+  overflow: visible;
+}
+
+.action-buttons {
+  position: relative;
+  overflow: visible;
 }
 
 .project-table th {
@@ -1165,11 +1216,12 @@ const handleExport = (exportData: any) => {
 .project-table th:nth-child(14), .project-table td:nth-child(14) { width: 80px; } /* 余额信息 */
 .project-table th:nth-child(15), .project-table td:nth-child(15) { width: 120px; } /* 负责运营团队 */
 .project-table th:nth-child(16), .project-table td:nth-child(16) { width: 80px; } /* 销售人员 */
-.project-table th:nth-child(17), .project-table td:nth-child(17) { width: 240px; } /* 操作 */
+.project-table th:nth-child(17), .project-table td:nth-child(17) { width: 280px; } /* 操作 */
 
 .project-table td {
   color: var(--color-text-secondary);
   vertical-align: top;
+  position: relative;
 }
 
 .project-table tr:hover {
@@ -1246,8 +1298,10 @@ const handleExport = (exportData: any) => {
 
 .action-buttons {
   display: flex;
-  gap: 4px;
+  gap: 6px;
   flex-wrap: wrap;
+  align-items: center;
+  position: relative;
 }
 
 .action-btn-small {
@@ -1299,6 +1353,119 @@ const handleExport = (exportData: any) => {
 .action-btn-small--danger:hover {
   background: var(--color-danger);
   color: white;
+}
+
+/* 带文字的操作按钮样式 */
+.action-btn-text {
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-text-secondary);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.action-btn-text:hover {
+  background: var(--color-background-hover);
+}
+
+.action-btn-text--primary {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.action-btn-text--primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.action-btn-text--secondary {
+  background: var(--color-background-secondary);
+  color: var(--color-text-primary);
+}
+
+.action-btn-text--secondary:hover {
+  background: var(--color-background-hover);
+  color: var(--color-primary);
+}
+
+.action-btn-text--warning {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+  border-color: var(--color-warning);
+}
+
+.action-btn-text--warning:hover {
+  background: var(--color-warning);
+  color: white;
+}
+
+.action-btn-text--danger {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.action-btn-text--danger:hover {
+  background: var(--color-danger);
+  color: white;
+}
+
+/* 下拉菜单样式 */
+.dropdown-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 99999;
+  min-width: 150px;
+  padding: 8px 0;
+}
+
+.dropdown-menu--active .dropdown-content {
+  display: block;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.dropdown-item:hover {
+  background: var(--color-background-hover);
+}
+
+.dropdown-item--danger {
+  color: var(--color-danger);
+}
+
+.dropdown-item--danger:hover {
+  background: var(--color-danger-light);
 }
 
 .project-grid {
