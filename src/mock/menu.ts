@@ -251,6 +251,27 @@ export const mockMenuItems: MenuItem[] = [
         icon: 'Target',
         path: '/projects/goals',
         roles: ['superAdmin', 'manager', 'staff']
+      },
+      {
+        id: 'activity-management',
+        name: '活动管理',
+        icon: 'Calendar',
+        path: '/projects/activities',
+        roles: ['superAdmin', 'manager', 'staff']
+      },
+      {
+        id: 'competitor-management',
+        name: '竞品管理',
+        icon: 'Search',
+        path: '/projects/competitors',
+        roles: ['superAdmin', 'manager', 'staff']
+      },
+      {
+        id: 'kol-post-management',
+        name: '红人/帖子管理',
+        icon: 'Users',
+        path: '/projects/kol-posts',
+        roles: ['superAdmin', 'manager', 'staff']
       }
     ],
     roles: ['superAdmin', 'manager', 'staff']
