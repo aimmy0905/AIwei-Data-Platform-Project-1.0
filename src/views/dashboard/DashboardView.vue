@@ -1,14 +1,19 @@
 <template>
     <div class="dashboard-content">
-    <!-- 筛选项部分 - 固定在顶部 -->
-    <div class="dashboard-filter-container">
-      <DashboardFilter
-        :customer-options="customers"
-        :initial-filters="filters"
-        @filter-change="handleFilterChange"
-        @filter-apply="handleFilterApply"
-        @filter-reset="handleFilterReset"
-      />
+    <!-- 筛选项部分 - 固定在顶部，吸顶滚动 -->
+    <div class="dashboard-filter-wrapper">
+      <!-- 占位空间，防止吸顶时内容跳跃 -->
+      <div v-if="isSticky" class="dashboard-filter-placeholder"></div>
+
+      <div class="dashboard-filter-container" :class="{ 'dashboard-filter-sticky': isSticky }">
+        <DashboardFilter
+          :customer-options="customers"
+          :initial-filters="filters"
+          @filter-change="handleFilterChange"
+          @filter-apply="handleFilterApply"
+          @filter-reset="handleFilterReset"
+        />
+      </div>
     </div>
 
     <!-- 预警提醒部分 -->
@@ -127,6 +132,7 @@ const menuStore = useMenuStore()
 // 滚动监听相关
 const activeSection = ref('alerts')
 const sectionObserver = ref<IntersectionObserver | null>(null)
+const isSticky = ref(false)
 
 // 定义所有section的配置（按照设计文档顺序）
 const dashboardSections = [
@@ -572,6 +578,78 @@ const setupScrollObserver = () => {
   })
 }
 
+// 设置筛选器吸顶滚动监听
+const setupFilterStickyObserver = () => {
+  let filterOriginalTop = 0
+
+  const updateFilterPosition = () => {
+    const filterContainer = document.querySelector('.dashboard-filter-container')
+    if (filterContainer) {
+      const rect = filterContainer.getBoundingClientRect()
+      filterOriginalTop = rect.top + window.pageYOffset
+    }
+
+    // 动态更新侧边栏宽度CSS变量
+    updateSidebarWidth()
+  }
+
+  const updateSidebarWidth = () => {
+    const sidebar = document.querySelector('.sidebar') as HTMLElement
+    if (sidebar) {
+      const sidebarWidth = sidebar.offsetWidth
+      document.documentElement.style.setProperty('--sidebar-width', `${sidebarWidth}px`)
+    }
+  }
+
+  const handleScroll = () => {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+    const headerHeight = 64 // 头部导航栏高度
+
+    // 当滚动位置超过筛选器原始位置减去头部高度时，启用吸顶
+    isSticky.value = scrollTop > (filterOriginalTop - headerHeight)
+  }
+
+  // 初始化筛选器位置
+  nextTick(() => {
+    updateFilterPosition()
+  })
+
+  // 监听窗口大小变化，重新计算位置
+  const handleResize = () => {
+    updateFilterPosition()
+  }
+
+  // 监听侧边栏变化（使用MutationObserver）
+  const observeSidebarChanges = () => {
+    const sidebar = document.querySelector('.sidebar')
+    if (sidebar) {
+      const observer = new MutationObserver(() => {
+        updateSidebarWidth()
+      })
+      observer.observe(sidebar, {
+        attributes: true,
+        attributeFilter: ['class']
+      })
+      return observer
+    }
+    return null
+  }
+
+  const sidebarObserver = observeSidebarChanges()
+
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  window.addEventListener('resize', handleResize, { passive: true })
+
+  // 返回清理函数
+  return () => {
+    window.removeEventListener('scroll', handleScroll)
+    window.removeEventListener('resize', handleResize)
+    if (sidebarObserver) {
+      sidebarObserver.disconnect()
+    }
+  }
+}
+
 // 更新侧边栏活跃状态
 const updateSidebarActiveState = (sectionId: string) => {
   // 根据sectionId构建菜单ID，匹配菜单配置中的ID格式
@@ -706,11 +784,16 @@ const initializeFiltersFromQuery = () => {
 
 
 // 生命周期
+let cleanupFilterSticky: (() => void) | null = null
+
 onMounted(() => {
   loadCustomers()
   loadDashboardData()
   setupScrollObserver()
   initializeMenuState()
+
+  // 设置筛选器吸顶监听
+  cleanupFilterSticky = setupFilterStickyObserver()
 
   // 从URL参数中初始化筛选器
   initializeFiltersFromQuery()
@@ -719,6 +802,11 @@ onMounted(() => {
 onUnmounted(() => {
   if (sectionObserver.value) {
     sectionObserver.value.disconnect()
+  }
+
+  // 清理筛选器吸顶监听
+  if (cleanupFilterSticky) {
+    cleanupFilterSticky()
   }
 })
 </script>
@@ -732,22 +820,55 @@ onUnmounted(() => {
   padding-right: 20px;
 }
 
+/* 筛选项包装器 */
+.dashboard-filter-wrapper {
+  position: relative;
+}
+
+/* 占位空间 */
+.dashboard-filter-placeholder {
+  height: 80px; /* 筛选器的大概高度 */
+  margin-bottom: var(--spacing-2xl);
+}
+
 /* 筛选项容器样式 */
 .dashboard-filter-container {
-  position: sticky;
-  top: 64px;
+  position: relative;
   z-index: 1000;
-  background-color: rgba(255, 255, 255, 0.98);
+  background-color: rgba(255, 255, 255, 0.95);
   border-bottom: 1px solid var(--color-border-light);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   margin-bottom: var(--spacing-2xl);
-  backdrop-filter: blur(12px);
   border-radius: 8px;
   margin-left: -20px;
   margin-right: -20px;
   padding-left: 20px;
   padding-right: 20px;
+}
+
+/* 吸顶状态样式 */
+.dashboard-filter-sticky {
+  position: fixed;
+  top: 64px; /* 头部导航栏高度 */
+  left: var(--sidebar-width, 260px); /* 侧边栏宽度，支持动态变化 */
+  right: 0;
+  background-color: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 0;
+  margin-left: 0;
+  margin-right: 0;
+  margin-bottom: 0;
+  padding-left: 20px;
+  padding-right: 20px;
+  z-index: 999; /* 低于侧边栏的z-index 1000 */
+  transition: left 0.3s ease; /* 平滑过渡侧边栏变化 */
+}
+
+/* 确保在侧边栏折叠状态下也能正确显示 */
+body:has(.sidebar--collapsed) .dashboard-filter-sticky,
+.sidebar--collapsed ~ * .dashboard-filter-sticky {
+  left: 80px; /* 折叠状态下的侧边栏宽度 */
 }
 
 
@@ -762,9 +883,18 @@ onUnmounted(() => {
     padding-left: 20px;
     padding-right: 20px;
   }
+
+  .dashboard-filter-sticky {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
 }
 
 @media (max-width: 768px) {
+  .dashboard-filter-placeholder {
+    height: 90px; /* 移动端筛选器可能更高 */
+  }
+
   .dashboard-filter-container {
     margin-left: -20px;
     margin-right: -20px;
@@ -773,12 +903,12 @@ onUnmounted(() => {
     margin-bottom: var(--spacing-2xl);
   }
 
-  .dashboard-filter-container.sticky {
-    top: 60px;
+  .dashboard-filter-sticky {
+    top: 60px; /* 移动端头部导航栏高度 */
+    left: 0; /* 移动端侧边栏通常隐藏，从左边开始 */
     padding-left: 20px;
     padding-right: 20px;
-    max-width: none;
-    z-index: 1001;
+    z-index: 999;
   }
 }
 
@@ -790,11 +920,11 @@ onUnmounted(() => {
     padding-right: 20px;
   }
 
-  .dashboard-section {
-    scroll-margin-top: 140px; /* 考虑筛选项高度 */
+@media (max-width: 480px) {
+  .dashboard-filter-placeholder {
+    height: 100px; /* 小屏幕筛选器可能更高 */
   }
 
-@media (max-width: 480px) {
   .dashboard-filter-container {
     margin-left: -20px;
     margin-right: -20px;
@@ -803,12 +933,12 @@ onUnmounted(() => {
     margin-bottom: var(--spacing-2xl);
   }
 
-  .dashboard-filter-container.sticky {
-    top: 56px;
+  .dashboard-filter-sticky {
+    top: 56px; /* 小屏幕头部导航栏高度 */
+    left: 0; /* 小屏幕侧边栏通常隐藏，从左边开始 */
     padding-left: 20px;
     padding-right: 20px;
-    max-width: none;
-    z-index: 1002;
+    z-index: 999;
   }
 }
 
@@ -822,7 +952,7 @@ onUnmounted(() => {
 
 .dashboard-section {
   margin-bottom: var(--spacing-2xl);
-  scroll-margin-top: 80px; /* 头部导航的高度 */
+  scroll-margin-top: 160px; /* 头部导航高度 + 吸顶筛选器高度 */
 }
 
 .section-card {

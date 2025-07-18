@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>筛选器吸顶效果测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        /* 模拟侧边栏 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: #ffffff;
+            border-right: 1px solid #e0e0e0;
+            z-index: 1000;
+            transition: width 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+        }
+
+        .sidebar--collapsed {
+            width: 80px;
+        }
+
+        .sidebar h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .sidebar button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        /* 模拟头部导航 */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 260px;
+            right: 0;
+            height: 64px;
+            background: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
+            z-index: 998;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            transition: left 0.3s ease;
+        }
+
+        .sidebar--collapsed ~ .header {
+            left: 80px;
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            margin-left: 260px;
+            margin-top: 64px;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar--collapsed ~ .main-content {
+            margin-left: 80px;
+        }
+
+        /* 筛选器容器 */
+        .filter-wrapper {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .filter-placeholder {
+            height: 80px;
+            margin-bottom: 30px;
+        }
+
+        .filter-container {
+            position: relative;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-sticky {
+            position: fixed;
+            top: 64px;
+            left: var(--sidebar-width, 260px);
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            border-radius: 0;
+            margin: 0;
+            z-index: 999;
+            transition: left 0.3s ease;
+        }
+
+        /* 内容区域 */
+        .content-section {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            min-height: 300px;
+        }
+
+        .content-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .content-section p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        /* 测试按钮 */
+        .test-controls {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+        }
+
+        .test-controls button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .test-controls button:hover {
+            background: #218838;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .header {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .filter-sticky {
+                left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <div class="sidebar" id="sidebar">
+        <h3>侧边栏</h3>
+        <button onclick="toggleSidebar()">切换折叠</button>
+        <p style="margin-top: 20px; font-size: 12px; color: #666;">
+            z-index: 1000
+        </p>
+    </div>
+
+    <!-- 头部导航 -->
+    <div class="header">
+        <h2>艾维数据平台 - 筛选器吸顶测试</h2>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="main-content">
+        <!-- 筛选器 -->
+        <div class="filter-wrapper">
+            <div id="filterPlaceholder" class="filter-placeholder" style="display: none;"></div>
+            <div class="filter-container" id="filterContainer">
+                <h3>筛选条件</h3>
+                <div style="display: flex; gap: 20px; align-items: center; margin-top: 15px;">
+                    <select style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option>全部客户</option>
+                        <option>客户A</option>
+                        <option>客户B</option>
+                    </select>
+                    <select style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option>今天</option>
+                        <option>昨天</option>
+                        <option>过去7天</option>
+                    </select>
+                    <button style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px;">
+                        应用筛选
+                    </button>
+                </div>
+                <p style="margin-top: 10px; font-size: 12px; color: #666;">
+                    z-index: 999 (低于侧边栏)
+                </p>
+            </div>
+        </div>
+
+        <!-- 内容区域 -->
+        <div class="content-section">
+            <h2>数据看板内容区域 1</h2>
+            <p>这里是数据看板的内容。当你向下滚动时，筛选器会吸附在页面顶部，但不会遮挡侧边栏。</p>
+            <p>筛选器的 z-index 设置为 999，低于侧边栏的 z-index 1000，确保不会覆盖侧边栏。</p>
+            <p>同时，筛选器在吸顶状态下会自动避开侧边栏的宽度，从侧边栏右侧开始显示。</p>
+        </div>
+
+        <div class="content-section">
+            <h2>数据看板内容区域 2</h2>
+            <p>继续滚动查看吸顶效果。筛选器应该始终停留在页面顶部，方便用户随时调整筛选条件。</p>
+            <p>在移动端，侧边栏通常会隐藏，筛选器会占据整个宽度。</p>
+        </div>
+
+        <div class="content-section">
+            <h2>数据看板内容区域 3</h2>
+            <p>测试不同的滚动位置，确保筛选器的吸顶效果正常工作。</p>
+            <p>点击右侧的测试按钮可以切换侧边栏的折叠状态，观察筛选器如何自适应。</p>
+        </div>
+
+        <div class="content-section">
+            <h2>数据看板内容区域 4</h2>
+            <p>这是更多的内容，用于测试长页面的滚动效果。</p>
+            <p>筛选器应该在滚动过程中平滑地切换到吸顶状态。</p>
+        </div>
+
+        <div class="content-section">
+            <h2>数据看板内容区域 5</h2>
+            <p>最后一个内容区域，确保所有功能都正常工作。</p>
+            <p>测试完成后，可以回到顶部查看筛选器恢复到正常状态。</p>
+        </div>
+    </div>
+
+    <!-- 测试控制面板 -->
+    <div class="test-controls">
+        <h4 style="margin-bottom: 15px;">测试控制</h4>
+        <button onclick="toggleSidebar()">切换侧边栏</button>
+        <button onclick="scrollToTop()">回到顶部</button>
+        <button onclick="scrollToBottom()">滚动到底部</button>
+        <button onclick="toggleFilter()">切换筛选器吸顶</button>
+    </div>
+
+    <script>
+        let isSticky = false;
+        let filterOriginalTop = 0;
+
+        // 初始化
+        function init() {
+            updateFilterPosition();
+            updateSidebarWidth();
+            setupScrollListener();
+        }
+
+        // 更新筛选器位置
+        function updateFilterPosition() {
+            const filterContainer = document.getElementById('filterContainer');
+            if (filterContainer) {
+                const rect = filterContainer.getBoundingClientRect();
+                filterOriginalTop = rect.top + window.pageYOffset;
+            }
+        }
+
+        // 更新侧边栏宽度CSS变量
+        function updateSidebarWidth() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                const sidebarWidth = sidebar.offsetWidth;
+                document.documentElement.style.setProperty('--sidebar-width', `${sidebarWidth}px`);
+            }
+        }
+
+        // 设置滚动监听
+        function setupScrollListener() {
+            window.addEventListener('scroll', handleScroll, { passive: true });
+            window.addEventListener('resize', () => {
+                updateFilterPosition();
+                updateSidebarWidth();
+            }, { passive: true });
+        }
+
+        // 处理滚动
+        function handleScroll() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const headerHeight = 64;
+            
+            const shouldSticky = scrollTop > (filterOriginalTop - headerHeight);
+            
+            if (shouldSticky !== isSticky) {
+                isSticky = shouldSticky;
+                toggleFilterSticky(isSticky);
+            }
+        }
+
+        // 切换筛选器吸顶状态
+        function toggleFilterSticky(sticky) {
+            const filterContainer = document.getElementById('filterContainer');
+            const filterPlaceholder = document.getElementById('filterPlaceholder');
+            
+            if (sticky) {
+                filterContainer.classList.add('filter-sticky');
+                filterPlaceholder.style.display = 'block';
+            } else {
+                filterContainer.classList.remove('filter-sticky');
+                filterPlaceholder.style.display = 'none';
+            }
+        }
+
+        // 切换侧边栏
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('sidebar--collapsed');
+            
+            // 延迟更新宽度，等待CSS过渡完成
+            setTimeout(() => {
+                updateSidebarWidth();
+            }, 300);
+        }
+
+        // 滚动到顶部
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 滚动到底部
+        function scrollToBottom() {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        // 手动切换筛选器状态（用于测试）
+        function toggleFilter() {
+            isSticky = !isSticky;
+            toggleFilterSticky(isSticky);
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html> 
