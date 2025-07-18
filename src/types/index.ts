@@ -1883,3 +1883,144 @@ export interface ActivityExportConfig {
 }
 
 // ============ 结束活动管理模块类型定义 ============
+
+// 红人数据管理相关类型定义
+export interface InfluencerData {
+  id: string
+  month: string // 统计月份，格式：YYYY-MM
+  totalInfluencers: number // 总网红数
+  contentMentions: number // 提及内容总数
+  totalViews: number // 总观看量
+  commentsCount: number // 评论数
+  likesCount: number // 点赞数
+  interactionRate: number // 互动率（百分比）
+  customerId: string // 客户ID
+  customerName: string // 客户名称
+  projectId: string // 项目ID
+  projectName: string // 项目名称
+  createdBy: string // 录入人
+  createdAt: string // 录入时间
+  updatedAt: string // 更新时间
+}
+
+// 发帖数据管理类型
+export interface KOLPostData {
+  id: string
+  postDate: string // 发帖日期
+  influencerName: string // 红人姓名
+  platform: 'instagram' | 'tiktok' | 'youtube' | 'xiaohongshu' | 'weibo' | 'other' // 发帖平台
+  contentSummary: string // 发帖内容摘要
+  postType: 'image' | 'video' | 'story' | 'live' | 'other' // 发帖类型
+  projectId: string // 关联项目ID
+  projectName: string // 项目名称
+  likesCount: number // 点赞数
+  commentsCount: number // 评论数
+  sharesCount: number // 分享数
+  viewsCount: number // 观看量
+  clickCount: number // 点击数
+  conversionCount: number // 转化数
+  effectScore: number // 效果评分 (1-10)
+  thumbnailUrl: string // 缩略图
+  createdBy: string // 录入人
+  createdAt: string // 录入时间
+}
+
+// 红人基础信息类型
+export interface KOLBasicInfo {
+  id: string
+  name: string // 红人姓名
+  type: 'mega' | 'macro' | 'micro' | 'nano' // 红人类型
+  status: 'active' | 'pending' | 'inactive' // 合作状态
+  avatar?: string // 头像
+  followers: string // 粉丝数
+  engagementRate: number // 互动率
+  price: number // 单帖价格
+  platforms: string[] // 合作平台
+  categories: string[] // 内容分类
+  contactInfo?: string // 联系方式
+  description?: string // 红人简介
+}
+
+// 筛选条件类型
+export interface InfluencerDataFilters {
+  search: string // 搜索关键词
+  monthRange: {
+    start: string
+    end: string
+  } // 月份范围
+  customers: string[] // 客户筛选
+  projects: string[] // 项目筛选
+  influencerCountRange: {
+    min: number
+    max: number
+  } // 红人数量范围
+  viewsRange: {
+    min: number
+    max: number
+  } // 观看量范围
+  interactionRateRange: {
+    min: number
+    max: number
+  } // 互动率范围
+  createdBy: string[] // 录入人筛选
+  createdTimeRange: {
+    start: string
+    end: string
+  } // 录入时间范围
+}
+
+// 发帖数据筛选条件
+export interface PostDataFilters {
+  search: string // 搜索关键词
+  postStatus: string // 帖子状态
+  platform: string // 平台筛选
+  postType: string // 帖子类型
+  dateRange: {
+    start: string
+    end: string
+  } // 发帖日期范围
+  influencers: string[] // 红人筛选
+  projects: string[] // 项目筛选
+  effectScoreRange: {
+    min: number
+    max: number
+  } // 效果评分范围
+}
+
+// 红人数据统计概览
+export interface InfluencerDataStats {
+  totalInfluencers: number // 总红人数
+  monthlyNewInfluencers: number // 本月新增红人数
+  totalViews: number // 总观看量
+  averageInteractionRate: number // 平均互动率
+}
+
+// 数据录入表单类型
+export interface InfluencerDataForm {
+  month: string
+  totalInfluencers: number | null
+  contentMentions: number | null
+  totalViews: number | null
+  commentsCount: number | null
+  likesCount: number | null
+  interactionRate: number | null
+  customerId: string
+  projectId: string
+}
+
+// 发帖数据录入表单类型
+export interface PostDataForm {
+  postDate: string
+  influencerName: string
+  platform: string
+  contentSummary: string
+  postType: string
+  projectId: string
+  likesCount: number | null
+  commentsCount: number | null
+  sharesCount: number | null
+  viewsCount: number | null
+  clickCount: number | null
+  conversionCount: number | null
+  effectScore: number | null
+}
