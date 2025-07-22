@@ -14,7 +14,10 @@ import type {
   FinancialAnalysisData,
   BudgetExecutionData,
   AccountsReceivableData,
-  FinancialRiskAlert
+  FinancialRiskAlert,
+  TeamMetrics,
+  TeamMemberPerformance,
+  TeamSalesStatistics
 } from '@/types'
 
 // 业务角色数据
@@ -525,6 +528,381 @@ export const financialRiskAlerts: FinancialRiskAlert[] = [
   }
 ]
 
+// ============ 销售经理看板模拟数据 ============
+
+// 团队指标数据
+export const teamMetrics: TeamMetrics = {
+  teamId: 'team_001',
+  teamName: '华东销售团队',
+  memberCount: 8,
+  totalServiceFee: 1850000,
+  totalNewOrders: 95,
+  totalCustomers: 185,
+  averageCompletionRate: 87.5,
+  teamRanking: 2,
+  topPerformer: {
+    employeeId: 'emp_001',
+    employeeName: '张明',
+    completionRate: 125.8
+  }
+}
+
+// 团队成员绩效数据
+export const teamMemberPerformance: TeamMemberPerformance[] = [
+  {
+    employeeId: 'emp_001',
+    employeeName: '张明',
+    serviceFeeTarget: 300000,
+    serviceFeeActual: 377400,
+    newOrdersTarget: 15,
+    newOrdersActual: 19,
+    serviceFeeCompletionRate: 125.8,
+    newOrdersCompletionRate: 126.7,
+    overallCompletionRate: 126.25,
+    performanceLevel: 'excellent',
+    monthlyTrend: {
+      currentMonth: 126.25,
+      lastMonth: 118.5,
+      trendDirection: 'up'
+    },
+    customerCount: 28,
+    avgCustomerValue: 13478
+  },
+  {
+    employeeId: 'emp_002',
+    employeeName: '李红',
+    serviceFeeTarget: 280000,
+    serviceFeeActual: 295200,
+    newOrdersTarget: 14,
+    newOrdersActual: 15,
+    serviceFeeCompletionRate: 105.4,
+    newOrdersCompletionRate: 107.1,
+    overallCompletionRate: 106.25,
+    performanceLevel: 'good',
+    monthlyTrend: {
+      currentMonth: 106.25,
+      lastMonth: 102.8,
+      trendDirection: 'up'
+    },
+    customerCount: 25,
+    avgCustomerValue: 11808
+  },
+  {
+    employeeId: 'emp_003',
+    employeeName: '王强',
+    serviceFeeTarget: 290000,
+    serviceFeeActual: 261000,
+    newOrdersTarget: 15,
+    newOrdersActual: 13,
+    serviceFeeCompletionRate: 90.0,
+    newOrdersCompletionRate: 86.7,
+    overallCompletionRate: 88.35,
+    performanceLevel: 'good',
+    monthlyTrend: {
+      currentMonth: 88.35,
+      lastMonth: 92.1,
+      trendDirection: 'down'
+    },
+    customerCount: 22,
+    avgCustomerValue: 11864
+  },
+  {
+    employeeId: 'emp_004',
+    employeeName: '陈燕',
+    serviceFeeTarget: 260000,
+    serviceFeeActual: 187200,
+    newOrdersTarget: 13,
+    newOrdersActual: 9,
+    serviceFeeCompletionRate: 72.0,
+    newOrdersCompletionRate: 69.2,
+    overallCompletionRate: 70.6,
+    performanceLevel: 'needImprovement',
+    monthlyTrend: {
+      currentMonth: 70.6,
+      lastMonth: 75.2,
+      trendDirection: 'down'
+    },
+    customerCount: 18,
+    avgCustomerValue: 10400
+  },
+  {
+    employeeId: 'emp_005',
+    employeeName: '刘涛',
+    serviceFeeTarget: 275000,
+    serviceFeeActual: 291500,
+    newOrdersTarget: 14,
+    newOrdersActual: 15,
+    serviceFeeCompletionRate: 106.0,
+    newOrdersCompletionRate: 107.1,
+    overallCompletionRate: 106.55,
+    performanceLevel: 'good',
+    monthlyTrend: {
+      currentMonth: 106.55,
+      lastMonth: 104.2,
+      trendDirection: 'up'
+    },
+    customerCount: 26,
+    avgCustomerValue: 11211
+  },
+  {
+    employeeId: 'emp_006',
+    employeeName: '赵敏',
+    serviceFeeTarget: 240000,
+    serviceFeeActual: 312000,
+    newOrdersTarget: 12,
+    newOrdersActual: 16,
+    serviceFeeCompletionRate: 130.0,
+    newOrdersCompletionRate: 133.3,
+    overallCompletionRate: 131.65,
+    performanceLevel: 'excellent',
+    monthlyTrend: {
+      currentMonth: 131.65,
+      lastMonth: 128.9,
+      trendDirection: 'up'
+    },
+    customerCount: 24,
+    avgCustomerValue: 13000
+  },
+  {
+    employeeId: 'emp_007',
+    employeeName: '孙华',
+    serviceFeeTarget: 220000,
+    serviceFeeActual: 176000,
+    newOrdersTarget: 11,
+    newOrdersActual: 8,
+    serviceFeeCompletionRate: 80.0,
+    newOrdersCompletionRate: 72.7,
+    overallCompletionRate: 76.35,
+    performanceLevel: 'needImprovement',
+    monthlyTrend: {
+      currentMonth: 76.35,
+      lastMonth: 78.5,
+      trendDirection: 'down'
+    },
+    customerCount: 20,
+    avgCustomerValue: 8800
+  },
+  {
+    employeeId: 'emp_008',
+    employeeName: '钱飞',
+    serviceFeeTarget: 255000,
+    serviceFeeActual: 229500,
+    newOrdersTarget: 13,
+    newOrdersActual: 11,
+    serviceFeeCompletionRate: 90.0,
+    newOrdersCompletionRate: 84.6,
+    overallCompletionRate: 87.3,
+    performanceLevel: 'good',
+    monthlyTrend: {
+      currentMonth: 87.3,
+      lastMonth: 89.1,
+      trendDirection: 'down'
+    },
+    customerCount: 22,
+    avgCustomerValue: 10432
+  }
+]
+
+// 团队销售统计数据
+export const teamSalesStatistics: TeamSalesStatistics = {
+  teamCompletionRate: 87.5,
+  teamRanking: 2,
+  totalTeams: 5,
+  memberDistribution: {
+    excellent: 2,      // >120% (张明、赵敏)
+    good: 4,          // 80-120% (李红、王强、刘涛、钱飞)
+    needImprovement: 2 // <80% (陈燕、孙华)
+  },
+  monthlyTrend: {
+    currentMonth: 87.5,
+    lastMonth: 84.2,
+    trendDirection: 'up'
+  }
+}
+
+// 销售经理看板核心指标
+export const salesManagerMetrics: MetricCardProps[] = [
+  {
+    title: '团队服务费完成',
+    value: 1850000,
+    target: 2112000,
+    unit: '¥',
+    trend: 'up',
+    trendValue: 12.8,
+    trendPeriod: '环比上月',
+    color: '#1890ff',
+    icon: 'DollarSign'
+  },
+  {
+    title: '团队新单完成',
+    value: 95,
+    target: 112,
+    unit: '单',
+    trend: 'up',
+    trendValue: 6.7,
+    trendPeriod: '环比上月',
+    color: '#52c41a',
+    icon: 'Target'
+  },
+  {
+    title: '团队客户数',
+    value: 185,
+    unit: '家',
+    trend: 'up',
+    trendValue: 4.2,
+    trendPeriod: '环比上月',
+    color: '#fa8c16',
+    icon: 'Users'
+  },
+  {
+    title: '团队平均完成率',
+    value: 87.5,
+    unit: '%',
+    trend: 'up',
+    trendValue: 3.3,
+    trendPeriod: '环比上月',
+    color: '#722ed1',
+    icon: 'TrendingUp'
+  }
+]
+
+// 团队平台分布数据
+export const teamPlatformDistribution: PlatformData[] = [
+  {
+    platform: 'Google',
+    serviceFee: 720000,
+    orderCount: 38,
+    percentage: 38.9,
+    color: '#4285f4'
+  },
+  {
+    platform: 'Meta',
+    serviceFee: 580000,
+    orderCount: 31,
+    percentage: 31.4,
+    color: '#1877f2'
+  },
+  {
+    platform: 'Criteo',
+    serviceFee: 320000,
+    orderCount: 18,
+    percentage: 17.3,
+    color: '#ff6900'
+  },
+  {
+    platform: 'Bing',
+    serviceFee: 180000,
+    orderCount: 8,
+    percentage: 9.7,
+    color: '#00c4cc'
+  },
+  {
+    platform: '其他',
+    serviceFee: 50000,
+    orderCount: 5,
+    percentage: 2.7,
+    color: '#8c8c8c'
+  }
+]
+
+// 简化的客户毛利详情数据
+export const teamCustomerProfitDetails: CustomerProfitDetail[] = [
+  {
+    id: 1,
+    customerName: '华为技术有限公司',
+    industry: '科技',
+    salesPerson: '张明',
+    cooperationStartDate: '2023-03-15',
+    totalProfit: 180000,
+    totalServiceFee: 150000,
+    totalConsumption: 120000,
+    totalRebate: 30000,
+    profitMargin: 25.0,
+    platformDistribution: [],
+    quarterlyTrend: [],
+    status: 'active',
+    grade: 'A'
+  },
+  {
+    id: 2,
+    customerName: '阿里巴巴集团',
+    industry: '电商',
+    salesPerson: '李红',
+    cooperationStartDate: '2023-05-20',
+    totalProfit: 220000,
+    totalServiceFee: 200000,
+    totalConsumption: 180000,
+    totalRebate: 20000,
+    profitMargin: 22.2,
+    platformDistribution: [],
+    quarterlyTrend: [],
+    status: 'active',
+    grade: 'A'
+  },
+  {
+    id: 3,
+    customerName: '腾讯科技',
+    industry: '互联网',
+    salesPerson: '王强',
+    cooperationStartDate: '2023-01-10',
+    totalProfit: 150000,
+    totalServiceFee: 140000,
+    totalConsumption: 130000,
+    totalRebate: 10000,
+    profitMargin: 15.4,
+    platformDistribution: [],
+    quarterlyTrend: [],
+    status: 'at_risk',
+    grade: 'B'
+  }
+]
+
+// 简化的续费客户数据
+export const teamRenewalCustomers: RenewalCustomerData[] = [
+  {
+    id: 1,
+    customerName: '字节跳动',
+    contractEndDate: '2025-02-15',
+    renewalStatus: 'negotiating',
+    lastYearRevenue: 280000,
+    estimatedRenewalValue: 320000,
+    renewalProbability: 85,
+    salesPerson: '张明',
+    lastContactDate: '2025-01-18',
+    nextFollowUpDate: '2025-01-25',
+    priority: 'high',
+    notes: '客户满意度较高，续费意向强烈'
+  },
+  {
+    id: 2,
+    customerName: '小米集团',
+    contractEndDate: '2025-03-01',
+    renewalStatus: 'contacted',
+    lastYearRevenue: 180000,
+    estimatedRenewalValue: 200000,
+    renewalProbability: 70,
+    salesPerson: '李红',
+    lastContactDate: '2025-01-15',
+    nextFollowUpDate: '2025-01-22',
+    priority: 'medium',
+    notes: '需要进一步商谈价格和服务内容'
+  },
+  {
+    id: 3,
+    customerName: '美团',
+    contractEndDate: '2025-01-30',
+    renewalStatus: 'pending',
+    lastYearRevenue: 150000,
+    estimatedRenewalValue: 160000,
+    renewalProbability: 60,
+    salesPerson: '王强',
+    lastContactDate: '2025-01-10',
+    nextFollowUpDate: '2025-01-20',
+    priority: 'high',
+    notes: '合同即将到期，需要紧急跟进'
+  }
+]
+
 // API 模拟函数
 export const businessAPI = {
   // 获取角色列表
@@ -570,7 +948,30 @@ export const businessAPI = {
   getAccountsReceivableData: () => Promise.resolve(accountsReceivableData),
   
   // 获取财务风险预警
-  getFinancialRiskAlerts: () => Promise.resolve(financialRiskAlerts)
+  getFinancialRiskAlerts: () => Promise.resolve(financialRiskAlerts),
+
+  // ============ 销售经理看板 API 函数 ============
+  
+  // 获取销售经理看板核心指标
+  getSalesManagerMetrics: () => Promise.resolve(salesManagerMetrics),
+  
+  // 获取团队指标数据
+  getTeamMetrics: () => Promise.resolve(teamMetrics),
+  
+  // 获取团队成员绩效数据
+  getTeamMemberPerformance: () => Promise.resolve(teamMemberPerformance),
+  
+  // 获取团队销售统计
+  getTeamSalesStatistics: () => Promise.resolve(teamSalesStatistics),
+  
+  // 获取团队平台分布数据
+  getTeamPlatformDistribution: () => Promise.resolve(teamPlatformDistribution),
+  
+  // 获取团队客户毛利详情
+  getTeamCustomerProfitDetails: () => Promise.resolve(teamCustomerProfitDetails),
+  
+  // 获取团队续费客户数据
+  getTeamRenewalCustomers: () => Promise.resolve(teamRenewalCustomers)
 }
 
 export default businessAPI

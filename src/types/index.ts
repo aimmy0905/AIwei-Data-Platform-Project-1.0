@@ -2236,6 +2236,70 @@ export interface BusinessDashboardFilter {
   customerId?: number
 }
 
+// ============ 销售经理看板特定类型 ============
+
+// 团队指标概览
+export interface TeamMetrics {
+  teamId: string
+  teamName: string
+  memberCount: number
+  totalServiceFee: number
+  totalNewOrders: number
+  totalCustomers: number
+  averageCompletionRate: number
+  teamRanking: number
+  topPerformer: {
+    employeeId: string
+    employeeName: string
+    completionRate: number
+  }
+}
+
+// 团队成员绩效数据
+export interface TeamMemberPerformance {
+  employeeId: string
+  employeeName: string
+  serviceFeeTarget: number
+  serviceFeeActual: number
+  newOrdersTarget: number
+  newOrdersActual: number
+  serviceFeeCompletionRate: number
+  newOrdersCompletionRate: number
+  overallCompletionRate: number
+  performanceLevel: 'excellent' | 'good' | 'needImprovement'
+  monthlyTrend: {
+    currentMonth: number
+    lastMonth: number
+    trendDirection: 'up' | 'down' | 'stable'
+  }
+  customerCount: number
+  avgCustomerValue: number
+}
+
+// 团队销售统计
+export interface TeamSalesStatistics {
+  teamCompletionRate: number
+  teamRanking: number
+  totalTeams: number
+  memberDistribution: {
+    excellent: number      // >120% 完成率
+    good: number          // 80-120% 完成率
+    needImprovement: number // <80% 完成率
+  }
+  monthlyTrend: {
+    currentMonth: number
+    lastMonth: number
+    trendDirection: 'up' | 'down' | 'stable'
+  }
+}
+
+// 模块时间筛选器
+export interface ModuleTimeFilter {
+  moduleId: string
+  timeRange: TimeRange
+  isSynced: boolean
+}
+
 // ============ 结束业务看板模块类型定义 ============
 
 // 红人数据管理相关类型定义
