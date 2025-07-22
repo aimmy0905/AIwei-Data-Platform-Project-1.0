@@ -2300,6 +2300,99 @@ export interface ModuleTimeFilter {
   isSynced: boolean
 }
 
+// ============ 销售人员看板特定类型 ============
+
+// 个人绩效概览
+export interface PersonalPerformance {
+  employeeId: string
+  employeeName: string
+  serviceFeeTarget: number
+  serviceFeeActual: number
+  newOrdersTarget: number
+  newOrdersActual: number
+  serviceFeeCompletionRate: number
+  newOrdersCompletionRate: number
+  overallCompletionRate: number
+  teamRanking: number
+  totalTeamMembers: number
+  assignedCustomerCount: number
+  monthlyTrend: {
+    currentMonth: number
+    lastMonth: number
+    trendDirection: 'up' | 'down' | 'stable'
+  }
+}
+
+// 个人客户分类
+export interface PersonalCustomerCategory {
+  categoryType: 'key' | 'growth' | 'maintenance' | 'risk'
+  customerCount: number
+  totalServiceFee: number
+  totalProfit: number
+  averageProfitMargin: number
+}
+
+// 个人平台绩效
+export interface PersonalPlatformPerformance {
+  platform: string
+  serviceFee: number
+  orderCount: number
+  customerCount: number
+  averageOrderValue: number
+  profitMargin: number
+  performanceLevel: 'excellent' | 'good' | 'average' | 'needImprovement'
+  color: string
+}
+
+// 个人客户详情
+export interface PersonalCustomerDetail {
+  id: number
+  customerName: string
+  industry: string
+  cooperationStartDate: string
+  category: 'key' | 'growth' | 'maintenance' | 'risk'
+  totalProfit: number
+  totalServiceFee: number
+  profitMargin: number
+  lastContactDate: string
+  nextFollowUpDate: string
+  communicationFrequency: 'high' | 'medium' | 'low'
+  satisfactionScore: number
+  churnRisk: 'high' | 'medium' | 'low'
+  platforms: string[]
+  notes: string
+}
+
+// 个人续费任务
+export interface PersonalRenewalTask {
+  id: number
+  customerName: string
+  contractEndDate: string
+  renewalStatus: 'pending' | 'contacted' | 'negotiating' | 'confirmed' | 'declined'
+  taskType: 'call' | 'email' | 'meeting' | 'proposal'
+  priority: 'high' | 'medium' | 'low'
+  lastYearRevenue: number
+  estimatedRenewalValue: number
+  renewalProbability: number
+  lastContactDate: string
+  nextFollowUpDate: string
+  daysUntilExpiry: number
+  notes: string
+  reminderSet: boolean
+}
+
+// 个人日常任务
+export interface PersonalDailyTask {
+  id: number
+  taskType: 'customer_follow_up' | 'renewal_contact' | 'proposal_preparation' | 'meeting_schedule'
+  customerName: string
+  description: string
+  priority: 'high' | 'medium' | 'low'
+  dueDate: string
+  completed: boolean
+  estimatedDuration: number // minutes
+}
+
 // ============ 结束业务看板模块类型定义 ============
 
 // 红人数据管理相关类型定义

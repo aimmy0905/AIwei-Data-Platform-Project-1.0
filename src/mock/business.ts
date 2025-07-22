@@ -17,7 +17,12 @@ import type {
   FinancialRiskAlert,
   TeamMetrics,
   TeamMemberPerformance,
-  TeamSalesStatistics
+  TeamSalesStatistics,
+  PersonalPerformance,
+  PersonalCustomerCategory,
+  PersonalPlatformPerformance,
+  PersonalCustomerDetail,
+  PersonalRenewalTask
 } from '@/types'
 
 // 业务角色数据
@@ -903,6 +908,196 @@ export const teamRenewalCustomers: RenewalCustomerData[] = [
   }
 ]
 
+// ============ 销售人员看板模拟数据 ============
+
+// 个人绩效数据
+export const personalPerformance: PersonalPerformance = {
+  employeeId: 'emp_001',
+  employeeName: '张明',
+  serviceFeeTarget: 300000,
+  serviceFeeActual: 377400,
+  newOrdersTarget: 15,
+  newOrdersActual: 19,
+  serviceFeeCompletionRate: 125.8,
+  newOrdersCompletionRate: 126.7,
+  overallCompletionRate: 126.25,
+  teamRanking: 1,
+  totalTeamMembers: 8,
+  assignedCustomerCount: 28,
+  monthlyTrend: {
+    currentMonth: 126.25,
+    lastMonth: 118.5,
+    trendDirection: 'up'
+  }
+}
+
+// 个人客户分类数据
+export const personalCustomerCategories: PersonalCustomerCategory[] = [
+  {
+    categoryType: 'key',
+    customerCount: 8,
+    totalServiceFee: 180000,
+    totalProfit: 54000,
+    averageProfitMargin: 30.0
+  },
+  {
+    categoryType: 'growth',
+    customerCount: 12,
+    totalServiceFee: 120000,
+    totalProfit: 24000,
+    averageProfitMargin: 20.0
+  },
+  {
+    categoryType: 'maintenance',
+    customerCount: 6,
+    totalServiceFee: 60000,
+    totalProfit: 9000,
+    averageProfitMargin: 15.0
+  },
+  {
+    categoryType: 'risk',
+    customerCount: 2,
+    totalServiceFee: 17400,
+    totalProfit: 1740,
+    averageProfitMargin: 10.0
+  }
+]
+
+// 个人平台绩效数据
+export const personalPlatformPerformance: PersonalPlatformPerformance[] = [
+  {
+    platform: 'Google',
+    serviceFee: 150000,
+    orderCount: 8,
+    customerCount: 12,
+    averageOrderValue: 18750,
+    profitMargin: 32.5,
+    performanceLevel: 'excellent',
+    color: '#4285f4'
+  },
+  {
+    platform: 'Meta',
+    serviceFee: 120000,
+    orderCount: 6,
+    customerCount: 10,
+    averageOrderValue: 20000,
+    profitMargin: 28.0,
+    performanceLevel: 'good',
+    color: '#1877f2'
+  },
+  {
+    platform: 'Criteo',
+    serviceFee: 80000,
+    orderCount: 4,
+    customerCount: 4,
+    averageOrderValue: 20000,
+    profitMargin: 22.5,
+    performanceLevel: 'good',
+    color: '#ff6900'
+  },
+  {
+    platform: 'Bing',
+    serviceFee: 27400,
+    orderCount: 1,
+    customerCount: 2,
+    averageOrderValue: 27400,
+    profitMargin: 15.0,
+    performanceLevel: 'needImprovement',
+    color: '#00c4cc'
+  }
+]
+
+// 个人客户详情数据
+export const personalCustomerDetails: PersonalCustomerDetail[] = [
+  {
+    id: 1,
+    customerName: '华为技术有限公司',
+    industry: '科技',
+    cooperationStartDate: '2023-03-15',
+    category: 'key',
+    totalProfit: 25000,
+    totalServiceFee: 80000,
+    profitMargin: 31.25,
+    lastContactDate: '2025-01-15',
+    nextFollowUpDate: '2025-01-22',
+    communicationFrequency: 'high',
+    satisfactionScore: 9.2,
+    churnRisk: 'low',
+    platforms: ['Google', 'Meta'],
+    notes: '重要客户，合作顺利，有扩大合作意向'
+  },
+  {
+    id: 2,
+    customerName: '小米集团',
+    industry: '消费电子',
+    cooperationStartDate: '2023-06-20',
+    category: 'growth',
+    totalProfit: 18000,
+    totalServiceFee: 60000,
+    profitMargin: 30.0,
+    lastContactDate: '2025-01-10',
+    nextFollowUpDate: '2025-01-25',
+    communicationFrequency: 'medium',
+    satisfactionScore: 8.5,
+    churnRisk: 'low',
+    platforms: ['Google', 'Criteo'],
+    notes: '成长客户，业务发展迅速'
+  },
+  {
+    id: 3,
+    customerName: '美团',
+    industry: '电商',
+    cooperationStartDate: '2023-01-10',
+    category: 'risk',
+    totalProfit: 5000,
+    totalServiceFee: 25000,
+    profitMargin: 20.0,
+    lastContactDate: '2024-12-20',
+    nextFollowUpDate: '2025-01-18',
+    communicationFrequency: 'low',
+    satisfactionScore: 6.5,
+    churnRisk: 'high',
+    platforms: ['Meta'],
+    notes: '需要紧急关注，近期沟通较少'
+  }
+]
+
+// 个人续费任务数据
+export const personalRenewalTasks: PersonalRenewalTask[] = [
+  {
+    id: 1,
+    customerName: '华为技术有限公司',
+    contractEndDate: '2025-03-15',
+    renewalStatus: 'negotiating',
+    taskType: 'meeting',
+    priority: 'high',
+    lastYearRevenue: 80000,
+    estimatedRenewalValue: 100000,
+    renewalProbability: 90,
+    lastContactDate: '2025-01-15',
+    nextFollowUpDate: '2025-01-22',
+    daysUntilExpiry: 53,
+    notes: '客户满意度高，续费意向强烈',
+    reminderSet: true
+  },
+  {
+    id: 2,
+    customerName: '小米集团',
+    contractEndDate: '2025-06-20',
+    renewalStatus: 'contacted',
+    taskType: 'proposal',
+    priority: 'medium',
+    lastYearRevenue: 60000,
+    estimatedRenewalValue: 75000,
+    renewalProbability: 75,
+    lastContactDate: '2025-01-10',
+    nextFollowUpDate: '2025-01-25',
+    daysUntilExpiry: 150,
+    notes: '需要准备新的合作方案',
+    reminderSet: true
+  }
+]
+
 // API 模拟函数
 export const businessAPI = {
   // 获取角色列表
@@ -971,7 +1166,24 @@ export const businessAPI = {
   getTeamCustomerProfitDetails: () => Promise.resolve(teamCustomerProfitDetails),
   
   // 获取团队续费客户数据
-  getTeamRenewalCustomers: () => Promise.resolve(teamRenewalCustomers)
+  getTeamRenewalCustomers: () => Promise.resolve(teamRenewalCustomers),
+
+  // ============ 销售人员看板 API 函数 ============
+  
+  // 获取个人绩效数据
+  getPersonalPerformance: () => Promise.resolve(personalPerformance),
+  
+  // 获取个人客户分类数据
+  getPersonalCustomerCategories: () => Promise.resolve(personalCustomerCategories),
+  
+  // 获取个人平台绩效数据
+  getPersonalPlatformPerformance: () => Promise.resolve(personalPlatformPerformance),
+  
+  // 获取个人客户详情数据
+  getPersonalCustomerDetails: () => Promise.resolve(personalCustomerDetails),
+  
+  // 获取个人续费任务数据
+  getPersonalRenewalTasks: () => Promise.resolve(personalRenewalTasks)
 }
 
 export default businessAPI
