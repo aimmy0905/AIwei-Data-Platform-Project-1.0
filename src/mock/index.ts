@@ -5,6 +5,7 @@ export * from './bing-dashboard'
 export * from './menu'
 export * from './customer'
 export * from './service-fees'
+export * from './business'
 
 // Mock菜单数据
 import type { MenuItem, UserRole } from '@/types'

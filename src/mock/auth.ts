@@ -56,6 +56,117 @@ export const mockUsers: User[] = [
     avatar: '/avatars/staff.svg',
     lastLoginTime: '2025-01-05 20:10:00',
     status: 'active'
+  },
+  // 业务看板角色用户
+  {
+    id: 6,
+    username: 'sales_director',
+    email: 'sales.director@aiwei.com',
+    phone: '188****0001',
+    role: 'sales_director',
+    department: '销售部',
+    avatar: '/avatars/admin.svg',
+    lastLoginTime: '2025-01-22 09:00:00',
+    status: 'active'
+  },
+  {
+    id: 7,
+    username: 'sales_manager',
+    email: 'sales.manager@aiwei.com',
+    phone: '188****0002',
+    role: 'sales_manager',
+    department: '销售部',
+    avatar: '/avatars/manager.svg',
+    lastLoginTime: '2025-01-22 09:15:00',
+    status: 'active'
+  },
+  {
+    id: 8,
+    username: 'sales_person',
+    email: 'sales.person@aiwei.com',
+    phone: '188****0003',
+    role: 'sales_person',
+    department: '销售部',
+    avatar: '/avatars/staff.svg',
+    lastLoginTime: '2025-01-22 09:30:00',
+    status: 'active'
+  },
+  {
+    id: 9,
+    username: 'project_director',
+    email: 'project.director@aiwei.com',
+    phone: '188****0004',
+    role: 'project_director',
+    department: '运营部',
+    avatar: '/avatars/admin.svg',
+    lastLoginTime: '2025-01-22 08:45:00',
+    status: 'active'
+  },
+  {
+    id: 10,
+    username: 'project_manager',
+    email: 'project.manager@aiwei.com',
+    phone: '188****0005',
+    role: 'project_manager',
+    department: '运营部',
+    avatar: '/avatars/manager.svg',
+    lastLoginTime: '2025-01-22 09:00:00',
+    status: 'active'
+  },
+  {
+    id: 11,
+    username: 'google_optimizer',
+    email: 'google.optimizer@aiwei.com',
+    phone: '188****0006',
+    role: 'google_optimizer',
+    department: '运营部',
+    avatar: '/avatars/staff.svg',
+    lastLoginTime: '2025-01-22 09:20:00',
+    status: 'active'
+  },
+  {
+    id: 12,
+    username: 'meta_optimizer',
+    email: 'meta.optimizer@aiwei.com',
+    phone: '188****0007',
+    role: 'meta_optimizer',
+    department: '运营部',
+    avatar: '/avatars/staff.svg',
+    lastLoginTime: '2025-01-22 09:25:00',
+    status: 'active'
+  },
+  {
+    id: 13,
+    username: 'criteo_optimizer',
+    email: 'criteo.optimizer@aiwei.com',
+    phone: '188****0008',
+    role: 'criteo_optimizer',
+    department: '运营部',
+    avatar: '/avatars/staff.svg',
+    lastLoginTime: '2025-01-22 09:30:00',
+    status: 'active'
+  },
+  {
+    id: 14,
+    username: 'bing_optimizer',
+    email: 'bing.optimizer@aiwei.com',
+    phone: '188****0009',
+    role: 'bing_optimizer',
+    department: '运营部',
+    avatar: '/avatars/staff.svg',
+    lastLoginTime: '2025-01-22 09:35:00',
+    status: 'active'
+  },
+  {
+    id: 15,
+    username: 'finance_director',
+    email: 'finance.director@aiwei.com',
+    phone: '188****0010',
+    role: 'finance_director',
+    department: '财务部',
+    avatar: '/avatars/finance.svg',
+    lastLoginTime: '2025-01-22 08:30:00',
+    status: 'active'
   }
 ]
 
@@ -134,7 +245,18 @@ const validatePassword = (username: string, password: string): boolean => {
     manager: 'manager123',
     staff: 'staff123',
     finance: 'finance123',
-    sales: 'sales123'
+    sales: 'sales123',
+    // 业务看板角色用户密码
+    sales_director: 'sales123',
+    sales_manager: 'sales123',
+    sales_person: 'sales123',
+    project_director: 'project123',
+    project_manager: 'project123',
+    google_optimizer: 'optimizer123',
+    meta_optimizer: 'optimizer123',
+    criteo_optimizer: 'optimizer123',
+    bing_optimizer: 'optimizer123',
+    finance_director: 'finance123'
   }
   return passwordMap[username] === password
 }

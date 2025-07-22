@@ -1,87 +1,59 @@
 <template>
   <div class="menu-item">
     <!-- 有子菜单的项目 -->
-    <div
-      v-if="item.children && item.children.length > 0"
-      class="menu-item__group"
-    >
+    <div v-if="item.children && item.children.length > 0">
       <div
         class="menu-item__header"
-        :class="{ 'menu-item__header--active': isOpen }"
-        @click="handleHeaderClick"
+        :class="{
+          'menu-item__header--active': isExpanded,
+          'menu-item__header--selected': isSelected
+        }"
+        :style="{ paddingLeft: `${16 + level * 20}px` }"
+        @click.stop="handleToggle"
       >
         <div class="menu-item__content">
-          <component
-            :is="getIcon(item.icon)"
-            :size="20"
-            class="menu-item__icon"
-          />
-          <transition name="fade">
-            <span v-show="!collapsed" class="menu-item__text">
-              {{ item.name }}
-            </span>
-          </transition>
-          <span v-if="item.badge && !collapsed" class="menu-item__badge">
-            {{ item.badge }}
-          </span>
+          <component :is="getIcon(item.icon)" :size="20" />
+          <span v-if="!isCollapsed" class="menu-item__text">{{ item.name }}</span>
+          <span v-if="item.badge && !isCollapsed" class="menu-item__badge">{{ item.badge }}</span>
         </div>
-        <transition name="fade">
-          <ChevronDown
-            v-show="!collapsed"
-            :size="16"
-            class="menu-item__arrow"
-            :class="{ 'menu-item__arrow--open': isOpen }"
-          />
-        </transition>
+        <ChevronDown
+          v-if="!isCollapsed"
+          :size="16"
+          class="menu-item__arrow"
+          :class="{ 'menu-item__arrow--expanded': isExpanded }"
+        />
       </div>
 
       <!-- 子菜单 -->
-      <Transition name="slide-down">
-        <div v-show="isOpen && !collapsed" class="menu-item__submenu">
-          <SidebarMenuItem
-            v-for="child in item.children"
-            :key="child.id"
-            :item="child"
-            :collapsed="false"
-            :level="level + 1"
-            @select="$emit('select', $event)"
-          />
-        </div>
-      </Transition>
+      <div
+        v-if="isExpanded && !isCollapsed"
+        class="submenu"
+      >
+        <SidebarMenuItem
+          v-for="child in item.children"
+          :key="child.id"
+          :item="child"
+          :level="level + 1"
+          :is-collapsed="isCollapsed"
+          :open-menus="openMenus"
+          @toggle-menu="$emit('toggle-menu', $event)"
+          @select-menu="$emit('select-menu', $event)"
+        />
+      </div>
     </div>
 
     <!-- 普通菜单项 -->
     <div
       v-else
       class="menu-item__link"
-      :class="{
-        'menu-item__link--active': isActive,
-        'menu-item__link--collapsed': collapsed
-      }"
-      @click="handleClick"
+      :class="{ 'menu-item__link--selected': isSelected }"
+      :style="{ paddingLeft: `${16 + level * 20}px` }"
+      @click="handleSelect"
     >
       <div class="menu-item__content">
-        <component
-          :is="getIcon(item.icon)"
-          :size="20"
-          class="menu-item__icon"
-        />
-        <transition name="fade">
-          <span v-show="!collapsed" class="menu-item__text">
-            {{ item.name }}
-          </span>
-        </transition>
-        <span v-if="item.badge && !collapsed" class="menu-item__badge">
-          {{ item.badge }}
-        </span>
-      </div>
-
-      <!-- 折叠状态下的提示 -->
-      <div v-if="collapsed" class="menu-item__tooltip">
-        {{ item.name }}
-        <span v-if="item.badge" class="menu-item__tooltip-badge">
-          {{ item.badge }}
-        </span>
+        <component :is="getIcon(item.icon)" :size="20" />
+        <span v-if="!isCollapsed" class="menu-item__text">{{ item.name }}</span>
+        <span v-if="item.badge && !isCollapsed" class="menu-item__badge">{{ item.badge }}</span>
       </div>
     </div>
   </div>
@@ -89,10 +61,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import type { MenuItem } from '@/types'
 import {
   ChevronDown,
   BarChart3,
-  PieChart,
   Target,
   Globe,
   TrendingUp,
@@ -116,64 +89,52 @@ import {
   Palette,
   Cog
 } from 'lucide-vue-next'
-import { useMenuStore } from '@/stores/menu'
-import type { MenuItem } from '@/types'
 
-// 属性定义
+// Props
 interface Props {
   item: MenuItem
-  collapsed?: boolean
   level?: number
+  isCollapsed: boolean
+  openMenus: string[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  collapsed: false,
   level: 0
 })
 
-// 事件定义
+// Emits
 const emit = defineEmits<{
-  select: [item: MenuItem]
+  'toggle-menu': [menuId: string]
+  'select-menu': [item: MenuItem]
 }>()
 
-// 组合式API
-const menuStore = useMenuStore()
+// Composables
+const route = useRoute()
 
-// 计算属性
-const isOpen = computed(() => menuStore.isMenuOpen(props.item.id))
-const isActive = computed(() => menuStore.isMenuActive(props.item.id))
+// Computed
+const isExpanded = computed(() => props.openMenus.includes(props.item.id))
+
+const isSelected = computed(() => {
+  if (props.item.path) {
+    return route.path === props.item.path
+  }
+  return false
+})
+
 
 // 图标映射
 const iconMap = {
-  BarChart3,
-  PieChart,
-  Target,
-  Globe,
-  TrendingUp,
-  Calendar,
-  Package,
-  Users,
-  MapPin,
-  FileText,
-  Search,
-  Megaphone,
-  Facebook: Monitor, // 用Monitor替代Facebook
-  Chrome: Monitor, // 用Monitor替代Chrome
-  Monitor,
-  UserCheck: Users, // 用Users替代UserCheck
-  List,
-  BarChart,
-  DollarSign,
-  Star,
-  Building,
-  Award,
-  FolderOpen,
-  Settings,
-  UserCog: Users, // 用Users替代UserCog
-  Shield,
-  Palette,
-  Cog,
-  Sitemap: Building // 用Building替代Sitemap
+  BarChart3, Target, Globe, TrendingUp, Calendar, Package, Users, MapPin,
+  FileText, Search, Megaphone, Monitor, List, BarChart, DollarSign, Star,
+  Building, Award, FolderOpen, Settings, Shield, Palette, Cog,
+  Facebook: Monitor,
+  Chrome: Monitor,
+  UserCheck: Users,
+  UserCog: Users,
+  Sitemap: Building,
+  AlertTriangle: Search,
+  Download: DollarSign,
+  Tool: Settings
 }
 
 // 方法
@@ -181,207 +142,73 @@ const getIcon = (iconName: string) => {
   return iconMap[iconName as keyof typeof iconMap] || BarChart3
 }
 
-const toggleSubmenu = () => {
-  console.log('toggleSubmenu called for:', props.item.id, 'collapsed:', props.collapsed)
-  if (!props.collapsed) {
-    console.log('Toggling submenu for:', props.item.id)
-    console.log('Current open state:', menuStore.isMenuOpen(props.item.id))
-    menuStore.toggleSubmenu(props.item.id)
-    console.log('New open state:', menuStore.isMenuOpen(props.item.id))
-    // 也要触发选择事件，让父组件知道这个菜单项被点击了
-    emit('select', props.item)
-  } else {
-    console.log('Submenu toggle blocked - sidebar is collapsed')
-  }
+const handleToggle = () => {
+  emit('toggle-menu', props.item.id)
 }
 
-const handleClick = () => {
-  console.log('Menu item clicked:', props.item.id, props.item.name)
-  emit('select', props.item)
-}
-
-const handleHeaderClick = () => {
-  console.log('handleHeaderClick called for:', props.item.id, 'has path:', !!props.item.path, 'has children:', !!(props.item.children && props.item.children.length > 0))
-
-  if (props.item.path) {
-    // 如果有路径，直接导航
-    console.log('Navigating to path:', props.item.path)
-    emit('select', props.item)
-  } else if (props.item.children && props.item.children.length > 0) {
-    // 如果有子菜单，切换展开状态
-    console.log('Toggling submenu for item with children')
-    toggleSubmenu()
-  } else {
-    // 普通菜单项
-    console.log('Selecting regular menu item')
-    emit('select', props.item)
-  }
+const handleSelect = () => {
+  emit('select-menu', props.item)
 }
 </script>
 
 <style scoped>
 .menu-item {
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: 4px;
 }
 
 .menu-item__header,
 .menu-item__link {
+  cursor: pointer;
+  padding: 12px 16px;
+  border-radius: 6px;
+  transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--border-radius-md);
-  cursor: pointer;
-  transition: all var(--duration-fast);
-  position: relative;
-  user-select: none;
 }
 
 .menu-item__header:hover,
 .menu-item__link:hover {
-  background: var(--color-background);
+  background: #f5f5f5;
 }
 
 .menu-item__header--active,
-.menu-item__link--active {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
+.menu-item__header--selected,
+.menu-item__link--selected {
+  background: #e3f2fd;
+  color: #1976d2;
 }
 
 .menu-item__content {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: 8px;
   flex: 1;
-  min-width: 0;
-}
-
-.menu-item__icon {
-  flex-shrink: 0;
-  color: currentColor;
 }
 
 .menu-item__text {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-normal);
-  color: var(--color-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.menu-item__link--active .menu-item__text {
-  color: var(--color-primary);
-  font-weight: var(--font-weight-medium);
+  flex: 1;
 }
 
 .menu-item__badge {
-  background: var(--color-error);
+  background: #ff4444;
   color: white;
-  font-size: var(--font-size-xs);
+  font-size: 12px;
   padding: 2px 6px;
   border-radius: 10px;
   min-width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: auto;
+  text-align: center;
 }
 
 .menu-item__arrow {
-  flex-shrink: 0;
-  transition: transform var(--duration-fast);
-  color: var(--color-text-secondary);
+  transition: transform 0.2s;
 }
 
-.menu-item__arrow--open {
+.menu-item__arrow--expanded {
   transform: rotate(180deg);
 }
 
-.menu-item__submenu {
-  padding-left: var(--spacing-lg);
-  margin-top: var(--spacing-xs);
-}
-
-/* 折叠状态下的提示框 */
-.menu-item__tooltip {
-  position: absolute;
-  left: calc(100% + var(--spacing-sm));
-  top: 50%;
-  transform: translateY(-50%);
-  background: var(--color-text-primary);
-  color: var(--color-text-inverse);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--border-radius-md);
-  font-size: var(--font-size-sm);
-  white-space: nowrap;
-  z-index: var(--z-tooltip);
-  opacity: 0;
-  visibility: hidden;
-  transition: all var(--duration-fast);
-  pointer-events: none;
-}
-
-.menu-item__tooltip::before {
-  content: '';
-  position: absolute;
-  left: -4px;
-  top: 50%;
-  transform: translateY(-50%);
-  border: 4px solid transparent;
-  border-right-color: var(--color-text-primary);
-}
-
-.menu-item__tooltip-badge {
-  background: var(--color-error);
-  color: white;
-  font-size: var(--font-size-xs);
-  padding: 2px 6px;
-  border-radius: 10px;
-  margin-left: var(--spacing-sm);
-}
-
-.menu-item__link--collapsed:hover .menu-item__tooltip {
-  opacity: 1;
-  visibility: visible;
-}
-
-/* 层级缩进 */
-.menu-item[data-level="1"] .menu-item__content {
-  padding-left: var(--spacing-md);
-}
-
-.menu-item[data-level="2"] .menu-item__content {
-  padding-left: var(--spacing-xl);
-}
-
-/* 动画 */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity var(--duration-fast);
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.slide-down-enter-active,
-.slide-down-leave-active {
-  transition: all var(--duration-normal);
-  overflow: hidden;
-}
-
-.slide-down-enter-from,
-.slide-down-leave-to {
-  max-height: 0;
-  opacity: 0;
-}
-
-.slide-down-enter-to,
-.slide-down-leave-from {
-  max-height: 500px;
-  opacity: 1;
+.submenu {
+  margin-top: 4px;
 }
 </style>

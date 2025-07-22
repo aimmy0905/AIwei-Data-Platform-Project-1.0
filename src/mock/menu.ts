@@ -1,4 +1,4 @@
-import type { MenuItem, UserRole } from '@/types'
+import type { MenuItem } from '@/types'
 
 // 菜单项定义
 export const mockMenuItems: MenuItem[] = [
@@ -144,6 +144,88 @@ export const mockMenuItems: MenuItem[] = [
       }
     ],
     roles: ['superAdmin', 'manager', 'staff', 'finance', 'sales']
+  },
+  {
+    id: 'business-dashboard',
+    name: '业务看板',
+    icon: 'PieChart',
+    children: [
+      // 销售部门看板
+      {
+        id: 'sales-director-dashboard',
+        name: '销售总监看板',
+        icon: 'Crown',
+        path: '/business/sales-director',
+        roles: ['superAdmin', 'sales_director']
+      },
+      {
+        id: 'sales-manager-dashboard',
+        name: '销售经理看板',
+        icon: 'Users',
+        path: '/business/sales-manager',
+        roles: ['superAdmin', 'sales_manager']
+      },
+      {
+        id: 'sales-person-dashboard',
+        name: '销售人员看板',
+        icon: 'User',
+        path: '/business/sales-person',
+        roles: ['superAdmin', 'sales_person']
+      },
+      // 运营部门看板
+      {
+        id: 'project-director-dashboard',
+        name: '项目总监看板',
+        icon: 'Crown',
+        path: '/business/project-director',
+        roles: ['superAdmin', 'project_director']
+      },
+      {
+        id: 'project-manager-dashboard',
+        name: '项目经理看板',
+        icon: 'Users',
+        path: '/business/project-manager',
+        roles: ['superAdmin', 'project_manager']
+      },
+      // 优化师看板
+      {
+        id: 'google-optimizer-dashboard',
+        name: 'Google优化师看板',
+        icon: 'Chrome',
+        path: '/business/google-optimizer',
+        roles: ['superAdmin', 'google_optimizer']
+      },
+      {
+        id: 'meta-optimizer-dashboard',
+        name: 'Meta优化师看板',
+        icon: 'Facebook',
+        path: '/business/meta-optimizer',
+        roles: ['superAdmin', 'meta_optimizer']
+      },
+      {
+        id: 'criteo-optimizer-dashboard',
+        name: 'Criteo优化师看板',
+        icon: 'Monitor',
+        path: '/business/criteo-optimizer',
+        roles: ['superAdmin', 'criteo_optimizer']
+      },
+      {
+        id: 'bing-optimizer-dashboard',
+        name: 'Bing优化师看板',
+        icon: 'Search',
+        path: '/business/bing-optimizer',
+        roles: ['superAdmin', 'bing_optimizer']
+      },
+      // 财务部门看板
+      {
+        id: 'finance-director-dashboard',
+        name: '财务总监看板',
+        icon: 'DollarSign',
+        path: '/business/finance-director',
+        roles: ['superAdmin', 'finance_director']
+      }
+    ],
+    roles: ['superAdmin', 'sales_director', 'sales_manager', 'sales_person', 'project_director', 'project_manager', 'google_optimizer', 'meta_optimizer', 'criteo_optimizer', 'bing_optimizer', 'finance_director']
   },
   {
     id: 'customers',

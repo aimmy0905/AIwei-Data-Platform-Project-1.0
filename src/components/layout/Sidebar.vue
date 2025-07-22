@@ -26,64 +26,16 @@
     <!-- 菜单列表 -->
     <nav class="sidebar__nav">
       <div class="sidebar__menu">
-        <div
+        <SidebarMenuItem
           v-for="item in menuItems"
           :key="item.id"
-          class="menu-item"
-        >
-          <!-- 有子菜单的项目 -->
-          <div v-if="item.children && item.children.length > 0">
-            <div
-              class="menu-item__header"
-              :class="{ 'menu-item__header--active': openMenus.includes(item.id) }"
-              @click.stop="toggleMenu(item.id)"
-              style="cursor: pointer; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-radius: 6px; transition: all 0.2s;"
-            >
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <component :is="getIcon(item.icon)" :size="20" />
-                <span v-if="!isCollapsed">{{ item.name }}</span>
-              </div>
-              <ChevronDown
-                v-if="!isCollapsed"
-                :size="16"
-                :style="{ transform: openMenus.includes(item.id) ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }"
-              />
-            </div>
-
-            <!-- 子菜单 -->
-            <div
-              v-if="openMenus.includes(item.id) && !isCollapsed"
-              class="submenu"
-              style="padding-left: 20px; margin-top: 4px;"
-            >
-              <div
-                v-for="child in item.children"
-                :key="child.id"
-                class="menu-item__link"
-                @click.stop="selectMenu(child)"
-                style="cursor: pointer; padding: 8px 16px; border-radius: 4px; margin-bottom: 2px; transition: all 0.2s;"
-              >
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <component :is="getIcon(child.icon)" :size="18" />
-                  <span>{{ child.name }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 普通菜单项 -->
-          <div
-            v-else
-            class="menu-item__link"
-            @click="selectMenu(item)"
-            style="cursor: pointer; padding: 12px 16px; border-radius: 6px; margin-bottom: 4px; transition: all 0.2s;"
-          >
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <component :is="getIcon(item.icon)" :size="20" />
-              <span v-if="!isCollapsed">{{ item.name }}</span>
-            </div>
-          </div>
-        </div>
+          :item="item"
+          :level="0"
+          :is-collapsed="isCollapsed"
+          :open-menus="openMenus"
+          @toggle-menu="toggleMenu"
+          @select-menu="selectMenu"
+        />
       </div>
     </nav>
 
@@ -103,37 +55,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronDown,
-  BarChart3,
-  Target,
-  Globe,
-  TrendingUp,
-  Calendar,
-  Package,
-  Users,
-  MapPin,
-  FileText,
-  Search,
-  Megaphone,
-  Monitor,
-  List,
-  BarChart,
-  DollarSign,
-  Star,
-  Building,
-  Award,
-  FolderOpen,
-  Settings,
-  Shield,
-  Palette,
-  Cog
-} from 'lucide-vue-next'
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { useMenuStore } from '@/stores/menu'
 import type { MenuItem } from '@/types'
+import SidebarMenuItem from './SidebarMenuItem.vue'
 
 // 组合式API
 const router = useRouter()
@@ -155,26 +81,6 @@ watch(() => menuStore.collapsed, (newValue) => {
 const currentUser = computed(() => authStore.user)
 const menuItems = computed(() => menuStore.visibleMenuItems)
 
-// 图标映射
-const iconMap = {
-  BarChart3, Target, Globe, TrendingUp, Calendar, Package, Users, MapPin,
-  FileText, Search, Megaphone, Monitor, List, BarChart, DollarSign, Star,
-  Building, Award, FolderOpen, Settings, Shield, Palette, Cog,
-  Facebook: Monitor,
-  Chrome: Monitor,
-  UserCheck: Users,
-  UserCog: Users,
-  Sitemap: Building,
-  AlertTriangle: Search,
-  Download: DollarSign,
-  Tool: Settings
-}
-
-// 方法
-const getIcon = (iconName: string) => {
-  return iconMap[iconName as keyof typeof iconMap] || BarChart3
-}
-
 const handleToggle = () => {
   clickCount.value++
   isCollapsed.value = !isCollapsed.value
@@ -194,13 +100,40 @@ const handleToggle = () => {
 const toggleMenu = (menuId: string) => {
   console.log('🔧 切换菜单:', menuId)
 
-  // 找到对应的菜单项
-  const menuItem = menuItems.value.find(item => item.id === menuId)
+  // 找到对应的菜单项（递归查找）
+  const findMenuItem = (items: MenuItem[], id: string): MenuItem | null => {
+    for (const item of items) {
+      if (item.id === id) return item
+      if (item.children) {
+        const found = findMenuItem(item.children, id)
+        if (found) return found
+      }
+    }
+    return null
+  }
+
+  const menuItem = findMenuItem(menuItems.value, menuId)
 
   // 处理子菜单展开/折叠
   const index = openMenus.value.indexOf(menuId)
   if (index > -1) {
+    // 折叠菜单时，也要折叠所有子菜单
     openMenus.value.splice(index, 1)
+    // 移除所有以该菜单ID开头的子菜单（递归折叠）
+    const closeChildMenus = (item: MenuItem) => {
+      if (item.children) {
+        item.children.forEach(child => {
+          const childIndex = openMenus.value.indexOf(child.id)
+          if (childIndex > -1) {
+            openMenus.value.splice(childIndex, 1)
+          }
+          closeChildMenus(child)
+        })
+      }
+    }
+    if (menuItem) {
+      closeChildMenus(menuItem)
+    }
   } else {
     openMenus.value.push(menuId)
   }
@@ -218,26 +151,60 @@ const toggleMenu = (menuId: string) => {
 }
 
 const selectMenu = (item: MenuItem) => {
-  console.log('🔧 选择菜单:', item.name, item.path, item.id)
+  console.log('🔧 [MENU CLICK] 选择菜单:', {
+    name: item.name,
+    path: item.path,
+    id: item.id,
+    hasChildren: !!(item.children && item.children.length > 0),
+    currentUser: authStore.user,
+    userRole: authStore.userRole,
+    isAuthenticated: authStore.isAuthenticated
+  })
 
-  if (item.path) {
-    console.log('🔧 准备跳转到路径:', item.path)
-
-    // 确保相关菜单展开
-    if (item.path.startsWith('/customers')) {
-      console.log('🔧 客户菜单点击，确保客户管理菜单展开')
-      if (!openMenus.value.includes('customers')) {
-        openMenus.value.push('customers')
+  // 自动展开父级菜单
+  const ensureParentMenusOpen = (menuId: string) => {
+    const findParentPath = (items: MenuItem[], targetId: string, path: string[] = []): string[] | null => {
+      for (const menuItem of items) {
+        const currentPath = [...path, menuItem.id]
+        if (menuItem.id === targetId) {
+          return currentPath.slice(0, -1) // 返回父级路径，不包含当前项
+        }
+        if (menuItem.children) {
+          const found = findParentPath(menuItem.children, targetId, currentPath)
+          if (found) return found
+        }
       }
+      return null
     }
 
+    const parentPath = findParentPath(menuItems.value, menuId)
+    if (parentPath) {
+      parentPath.forEach(parentId => {
+        if (!openMenus.value.includes(parentId)) {
+          openMenus.value.push(parentId)
+        }
+      })
+    }
+  }
+
+  // 确保父级菜单展开
+  ensureParentMenusOpen(item.id)
+
+  if (item.path) {
+    console.log('🔧 [NAVIGATION] 准备跳转到路径:', item.path)
+    console.log('🔧 [NAVIGATION] 当前路由状态:', {
+      currentPath: router.currentRoute.value.path,
+      routerReady: !!router.isReady
+    })
+
     // 检查是否是仪表板子模块，如果是则跳转到主仪表板并滚动到对应模块
-    if (item.path.startsWith('/dashboard/') && item.path !== '/dashboard') {
+    if (item.path.startsWith('/dashboard/') && item.path !== '/dashboard' && !item.path.startsWith('/dashboard/business')) {
       const sectionId = item.path.replace('/dashboard/', '')
-      console.log('🔧 仪表板子模块跳转:', sectionId)
+      console.log('🔧 [DASHBOARD] 仪表板子模块跳转:', sectionId)
 
       // 跳转到主仪表板
       router.push('/dashboard').then(() => {
+        console.log('🔧 [DASHBOARD] 主仪表板跳转成功，准备滚动到:', sectionId)
         // 等待页面渲染完成后滚动到对应模块
         setTimeout(() => {
           const element = document.getElementById(sectionId)
@@ -246,46 +213,41 @@ const selectMenu = (item: MenuItem) => {
               behavior: 'smooth',
               block: 'start'
             })
+            console.log('🔧 [DASHBOARD] 滚动到模块成功:', sectionId)
+          } else {
+            console.warn('🔧 [DASHBOARD] 找不到模块元素:', sectionId)
           }
         }, 100)
+      }).catch((error) => {
+        console.error('🔧 [DASHBOARD] 仪表板跳转失败:', error)
       })
     } else {
       // 直接跳转到指定路径
-      console.log('🔧 直接跳转到路径:', item.path)
-
-      // 特殊处理客户列表路径
-      if (item.path === '/customers' && item.id === 'customer-list') {
-        console.log('🔧 客户列表菜单点击，强制跳转到客户管理页面')
-        router.push('/customers').then(() => {
-          console.log('🔧 客户列表路由跳转成功')
-          // 设置活跃菜单
-          menuStore.setActiveMenu('customer-list')
-          // 确保客户管理菜单展开
-          if (!openMenus.value.includes('customers')) {
-            openMenus.value.push('customers')
-          }
-        }).catch((error) => {
-          console.error('🔧 客户列表路由跳转失败:', error)
-        })
-        return
-      }
+      console.log('🔧 [NAVIGATION] 直接跳转到路径:', item.path)
 
       router.push(item.path).then(() => {
-        console.log('🔧 路由跳转成功')
+        console.log('🔧 [NAVIGATION] 路由跳转成功到:', item.path)
         // 设置活跃菜单
         menuStore.setActiveMenu(item.id)
       }).catch((error) => {
-        console.error('🔧 路由跳转失败:', error)
+        console.error('🔧 [NAVIGATION] 路由跳转失败:', {
+          targetPath: item.path,
+          error: error,
+          errorMessage: error.message || '未知错误'
+        })
       })
     }
   } else {
-    console.log('🔧 菜单项没有路径，无法跳转')
+    console.log('🔧 [MENU] 菜单项没有路径，无法跳转')
+    // 如果没有路径但有子菜单，则切换展开状态
+    if (item.children && item.children.length > 0) {
+      console.log('🔧 [MENU] 有子菜单，切换展开状态')
+      toggleMenu(item.id)
+    }
   }
 
-  // 如果没有特殊处理，设置活跃菜单
-  if (!(item.path === '/customers' && item.id === 'customer-list')) {
-    menuStore.setActiveMenu(item.id)
-  }
+  // 设置活跃菜单
+  menuStore.setActiveMenu(item.id)
 }
 
 const getRoleText = (role: string): string => {
@@ -428,16 +390,6 @@ onMounted(async () => {
   overflow-y: auto;
 }
 
-.menu-item__header:hover,
-.menu-item__link:hover {
-  background: #f5f5f5 !important;
-}
-
-.menu-item__header--active {
-  background: #e3f2fd !important;
-  color: #1976d2 !important;
-}
-
 .sidebar__footer {
   padding: 16px;
   border-top: 1px solid #f0f0f0;
@@ -469,6 +421,4 @@ onMounted(async () => {
   font-size: 12px;
   color: #666;
 }
-
-
 </style>

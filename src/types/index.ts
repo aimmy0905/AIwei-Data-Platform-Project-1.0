@@ -11,7 +11,7 @@ export interface User {
   status: 'active' | 'disabled' | 'locked'
 }
 
-export type UserRole = 'superAdmin' | 'manager' | 'staff' | 'finance' | 'sales'
+export type UserRole = 'superAdmin' | 'manager' | 'staff' | 'finance' | 'sales' | 'sales_director' | 'sales_manager' | 'sales_person' | 'project_director' | 'project_manager' | 'google_optimizer' | 'meta_optimizer' | 'criteo_optimizer' | 'bing_optimizer' | 'finance_director'
 
 export interface LoginForm {
   username: string
@@ -1883,6 +1883,360 @@ export interface ActivityExportConfig {
 }
 
 // ============ 结束活动管理模块类型定义 ============
+
+// ============ 业务看板模块类型定义 ============
+
+// 业务角色定义
+export interface BusinessRole {
+  code: string
+  name: string
+  department: 'sales' | 'operations' | 'finance'
+  level: number
+  permissions: string[]
+}
+
+// 业务角色常量
+export const BUSINESS_ROLES = {
+  // 销售部门角色
+  SALES_DIRECTOR: {
+    code: 'sales_director',
+    name: '销售总监',
+    department: 'sales',
+    level: 1,
+    permissions: ['view_all_sales_data', 'view_team_performance', 'view_customer_details', 'export_reports']
+  },
+  SALES_MANAGER: {
+    code: 'sales_manager',
+    name: '销售经理',
+    department: 'sales',
+    level: 2,
+    permissions: ['view_team_sales_data', 'view_team_performance', 'view_customer_details', 'export_reports']
+  },
+  SALES_PERSON: {
+    code: 'sales_person',
+    name: '销售人员',
+    department: 'sales',
+    level: 3,
+    permissions: ['view_own_sales_data', 'view_own_performance', 'view_assigned_customers']
+  },
+
+  // 运营部门角色
+  PROJECT_DIRECTOR: {
+    code: 'project_director',
+    name: '项目总监',
+    department: 'operations',
+    level: 1,
+    permissions: ['view_all_operation_data', 'view_all_departments', 'view_platform_analysis', 'view_customer_quality', 'export_reports']
+  },
+  PROJECT_MANAGER: {
+    code: 'project_manager',
+    name: '项目经理',
+    department: 'operations',
+    level: 2,
+    permissions: ['view_department_operation_data', 'view_team_performance', 'view_customer_details', 'export_reports']
+  },
+
+  // 优化师角色
+  GOOGLE_OPTIMIZER: {
+    code: 'google_optimizer',
+    name: 'Google优化师',
+    department: 'operations',
+    level: 3,
+    permissions: ['view_own_customers', 'view_google_platform_data', 'view_customer_performance', 'manage_google_accounts']
+  },
+  META_OPTIMIZER: {
+    code: 'meta_optimizer',
+    name: 'Meta优化师',
+    department: 'operations',
+    level: 3,
+    permissions: ['view_own_customers', 'view_meta_platform_data', 'view_customer_performance', 'manage_meta_accounts']
+  },
+  CRITEO_OPTIMIZER: {
+    code: 'criteo_optimizer',
+    name: 'Criteo优化师',
+    department: 'operations',
+    level: 3,
+    permissions: ['view_own_customers', 'view_criteo_platform_data', 'view_customer_performance', 'manage_criteo_accounts']
+  },
+  BING_OPTIMIZER: {
+    code: 'bing_optimizer',
+    name: 'Bing优化师',
+    department: 'operations',
+    level: 3,
+    permissions: ['view_own_customers', 'view_bing_platform_data', 'view_customer_performance', 'manage_bing_accounts']
+  },
+
+  // 财务部门角色
+  FINANCE_DIRECTOR: {
+    code: 'finance_director',
+    name: '财务总监',
+    department: 'finance',
+    level: 1,
+    permissions: ['view_all_financial_data', 'view_revenue_analysis', 'view_cost_analysis', 'view_profit_analysis', 'export_financial_reports']
+  }
+} as const
+
+// 时间范围选择器
+export interface TimeRange {
+  type: 'quick' | 'custom' | 'period'
+  startDate: string             // 开始日期 YYYY-MM-DD
+  endDate: string               // 结束日期 YYYY-MM-DD
+  period: 'yearly' | 'quarterly' | 'monthly'  // 周期类型
+  label: string                 // 显示标签
+}
+
+// 核心指标卡片
+export interface MetricCardProps {
+  title: string                 // 指标标题
+  value: number                 // 当前值
+  target?: number               // 目标值
+  unit: string                  // 单位
+  trend: 'up' | 'down' | 'stable'  // 趋势
+  trendValue: number            // 趋势数值
+  trendPeriod: string           // 对比周期
+  color: string                 // 主题色
+  icon: string                  // 图标
+}
+
+// 季度选择器
+export interface Quarter {
+  year: number                  // 年份
+  quarter: number               // 季度 1-4
+  label: string                 // 显示标签 "2025年Q1"
+  isActive: boolean             // 是否为当前选中
+}
+
+// 目标与完成对比
+export interface TargetComparison {
+  targetType: 'service_fee' | 'new_orders'  // 目标类型
+  targetValue: number           // 目标值
+  actualValue: number           // 实际完成值
+  difference: number            // 差值
+  completionRate: number        // 完成百分比
+  unit: string                  // 单位
+}
+
+// 平台数据
+export interface PlatformData {
+  platform: string             // 平台名称
+  serviceFee: number            // 服务费
+  orderCount: number            // 单量
+  percentage: number            // 占比
+  color: string                 // 图表颜色
+}
+
+// 平台毛利数据
+export interface PlatformProfit {
+  orderCount: number            // 新单单量
+  serviceFee: number            // 服务费
+  consumption: number           // 消费
+  rebate: number                // 返点
+  profit: number                // 毛利 = 服务费 + 返点
+}
+
+// 客户毛利数据
+export interface CustomerProfitData {
+  quarter: string               // 季度
+  platforms: {
+    google: PlatformProfit
+    meta: PlatformProfit
+    criteo: PlatformProfit
+    bing: PlatformProfit
+    total: PlatformProfit
+  }
+}
+
+// 毛利汇总数据
+export interface ProfitSummaryData {
+  totalProfit: number           // 总毛利
+  totalServiceFee: number       // 总服务费
+  totalRebate: number           // 总返点
+  totalConsumption: number      // 总消费
+  profitMargin: number          // 毛利率
+  quarterTarget: number         // 季度目标
+  completionRate: number        // 完成率
+  yearOverYearGrowth: number    // 同比增长率
+}
+
+// 流失客户数据
+export interface ChurnData {
+  category: 'total' | 'new_customer' | 'old_customer'  // 流失类别
+  customerCount: number         // 客户数
+  estimatedProfitLoss: number   // 预估流失毛利
+  estimatedServiceFeeLoss: number // 预估流失服务费
+  estimatedRebateLoss: number   // 预估流失返点
+  quarter: string               // 季度
+  churnRate: number             // 流失率
+  avgCustomerValue: number      // 平均客户价值
+  riskLevel: 'high' | 'medium' | 'low'  // 风险等级
+}
+
+// 流失客户详情
+export interface ChurnCustomerDetail {
+  id: number
+  customerName: string          // 客户名称
+  lastActiveDate: string        // 最后活跃日期
+  churnDate: string            // 流失日期
+  churnReason: string          // 流失原因
+  lastQuarterProfit: number    // 上季度毛利
+  estimatedLoss: number        // 预估损失
+  riskLevel: 'high' | 'medium' | 'low'
+  platform: string            // 主要平台
+  salesPerson: string          // 负责销售
+}
+
+// 销售人员表现数据
+export interface SalesPersonPerformance {
+  id: number
+  name: string                 // 姓名
+  department: string           // 部门
+  totalServiceFee: number      // 总服务费
+  totalProfit: number          // 总毛利
+  targetCompletion: number     // 目标完成率
+  customerCount: number        // 客户数
+  newCustomerCount: number     // 新客户数
+  churnCustomerCount: number   // 流失客户数
+  rank: number                 // 排名
+  lastMonthGrowth: number      // 环比增长
+}
+
+// 客户毛利明细
+export interface CustomerProfitDetail {
+  id: number
+  customerName: string         // 客户名称
+  industry: string             // 行业
+  salesPerson: string          // 负责销售
+  cooperationStartDate: string // 合作开始时间
+  totalProfit: number          // 总毛利
+  totalServiceFee: number      // 总服务费
+  totalConsumption: number     // 总消费
+  totalRebate: number          // 总返点
+  profitMargin: number         // 毛利率
+  platformDistribution: PlatformData[]  // 平台分布
+  quarterlyTrend: number[]     // 季度趋势
+  status: 'active' | 'at_risk' | 'churned'  // 状态
+  grade: 'A' | 'B' | 'C'       // 客户分级
+}
+
+// 续费客户数据
+export interface RenewalCustomerData {
+  id: number
+  customerName: string         // 客户名称
+  contractEndDate: string      // 合同到期日期
+  renewalStatus: 'pending' | 'contacted' | 'negotiating' | 'confirmed' | 'declined'  // 续费状态
+  lastYearRevenue: number      // 去年收入
+  estimatedRenewalValue: number // 预估续费金额
+  renewalProbability: number   // 续费概率
+  salesPerson: string          // 负责销售
+  lastContactDate: string      // 最后联系日期
+  nextFollowUpDate: string     // 下次跟进日期
+  priority: 'high' | 'medium' | 'low'  // 优先级
+  notes: string                // 备注
+}
+
+// 财务分析数据
+export interface FinancialAnalysisData {
+  revenue: {
+    total: number
+    quarterlyGrowth: number
+    yearlyGrowth: number
+    byDepartment: { department: string; amount: number; percentage: number }[]
+    byPlatform: { platform: string; amount: number; percentage: number }[]
+  }
+  costs: {
+    total: number
+    operatingCosts: number
+    marketingCosts: number
+    personalCosts: number
+    quarterlyGrowth: number
+  }
+  profit: {
+    gross: number
+    net: number
+    margin: number
+    quarterlyGrowth: number
+  }
+  cashFlow: {
+    operating: number
+    investing: number
+    financing: number
+    netCashFlow: number
+  }
+  ratios: {
+    currentRatio: number
+    quickRatio: number
+    debtToEquity: number
+    returnOnAssets: number
+    returnOnEquity: number
+  }
+}
+
+// 预算执行分析
+export interface BudgetExecutionData {
+  department: string
+  budgetAmount: number         // 预算金额
+  actualAmount: number         // 实际支出
+  variance: number             // 差异
+  variancePercentage: number   // 差异百分比
+  executionRate: number        // 执行率
+  remainingBudget: number      // 剩余预算
+  projectedSpend: number       // 预计支出
+}
+
+// 应收账款分析
+export interface AccountsReceivableData {
+  customerName: string
+  invoiceAmount: number        // 发票金额
+  paidAmount: number          // 已收金额
+  outstandingAmount: number   // 未收金额
+  daysOutstanding: number     // 逾期天数
+  riskLevel: 'high' | 'medium' | 'low'
+  invoiceDate: string
+  dueDate: string
+  status: 'current' | 'overdue' | 'collection'
+}
+
+// 财务风险预警
+export interface FinancialRiskAlert {
+  id: number
+  type: 'cash_flow' | 'debt' | 'receivables' | 'budget_variance'
+  level: 'high' | 'medium' | 'low'
+  title: string
+  description: string
+  currentValue: number
+  thresholdValue: number
+  recommendation: string
+  createdAt: string
+  status: 'active' | 'resolved' | 'monitoring'
+}
+
+// 角色切换器属性
+export interface RoleSwitcherProps {
+  currentRole: string           // 当前角色代码
+  availableRoles: BusinessRole[] // 可切换的角色列表
+  onRoleChange: (role: string) => void  // 角色切换回调
+}
+
+// 角色信息
+export interface Role {
+  code: string                  // 角色代码
+  name: string                  // 角色名称
+  level: number                 // 权限级别
+  icon: string                  // 角色图标
+  color: string                 // 主题色
+}
+
+// 业务看板筛选条件
+export interface BusinessDashboardFilter {
+  timeRange: TimeRange
+  department?: string
+  platform?: string
+  customerGrade?: string
+  salesPerson?: string
+  customerId?: number
+}
+
+// ============ 结束业务看板模块类型定义 ============
 
 // 红人数据管理相关类型定义
 export interface InfluencerData {
