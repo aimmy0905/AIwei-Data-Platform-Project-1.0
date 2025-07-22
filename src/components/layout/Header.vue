@@ -20,6 +20,11 @@
         <span class="header__back-text">{{ backButtonText }}</span>
       </button>
 
+      <!-- 角色切换器 -->
+      <div class="header__role-switcher">
+        <RoleSwitcher />
+      </div>
+
       <!-- 面包屑导航 -->
       <nav class="header__breadcrumb">
         <div

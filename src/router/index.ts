@@ -196,6 +196,110 @@ const router = createRouter({
       ]
     },
 
+    // 业务看板路由
+    {
+      path: '/business',
+      component: () => import('@/components/layout/MainLayout.vue'),
+      meta: { requiresAuth: true },
+      children: [
+        // 销售部门看板
+        {
+          path: 'sales-director',
+          name: 'sales-director-dashboard',
+          component: () => import('@/views/business/SalesDirectorDashboard.vue'),
+          meta: { 
+            requiresAuth: true,
+            roles: ['sales_director']
+          }
+        },
+        {
+          path: 'sales-manager',
+          name: 'sales-manager-dashboard',
+          component: () => import('@/views/business/SalesManagerDashboard.vue'),
+          meta: { 
+            requiresAuth: true,
+            roles: ['sales_manager']
+          }
+        },
+        {
+          path: 'sales-person',
+          name: 'sales-person-dashboard',
+          component: () => import('@/views/business/SalesPersonDashboard.vue'),
+          meta: { 
+            requiresAuth: true,
+            roles: ['sales_person']
+          }
+        },
+
+        // 运营部门看板
+        {
+          path: 'project-director',
+          name: 'project-director-dashboard',
+          component: () => import('@/views/business/ProjectDirectorDashboard.vue'),
+          meta: { 
+            requiresAuth: true,
+            roles: ['project_director']
+          }
+        },
+        {
+          path: 'project-manager',
+          name: 'project-manager-dashboard',
+          component: () => import('@/views/business/ProjectManagerDashboard.vue'),
+          meta: { 
+            requiresAuth: true,
+            roles: ['project_manager']
+          }
+        },
+        {
+          path: 'google-optimizer',
+          name: 'google-optimizer-dashboard',
+          component: () => import('@/views/business/GoogleOptimizerDashboard.vue'),
+          meta: { 
+            requiresAuth: true,
+            roles: ['google_optimizer']
+          }
+        },
+        {
+          path: 'meta-optimizer',
+          name: 'meta-optimizer-dashboard',
+          component: () => import('@/views/business/MetaOptimizerDashboard.vue'),
+          meta: { 
+            requiresAuth: true,
+            roles: ['meta_optimizer']
+          }
+        },
+        {
+          path: 'criteo-optimizer',
+          name: 'criteo-optimizer-dashboard',
+          component: () => import('@/views/business/CriteoOptimizerDashboard.vue'),
+          meta: { 
+            requiresAuth: true,
+            roles: ['criteo_optimizer']
+          }
+        },
+        {
+          path: 'bing-optimizer',
+          name: 'bing-optimizer-dashboard',
+          component: () => import('@/views/business/BingOptimizerDashboard.vue'),
+          meta: { 
+            requiresAuth: true,
+            roles: ['bing_optimizer']
+          }
+        },
+
+        // 财务部门看板
+        {
+          path: 'finance-director',
+          name: 'finance-director-dashboard',
+          component: () => import('@/views/business/FinanceDirectorDashboard.vue'),
+          meta: { 
+            requiresAuth: true,
+            roles: ['finance_director']
+          }
+        }
+      ]
+    },
+
     // 系统设置路由
     {
       path: '/settings',
