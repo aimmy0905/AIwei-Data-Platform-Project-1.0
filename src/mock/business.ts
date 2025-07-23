@@ -2646,7 +2646,24 @@ export const businessAPI = {
   getGoogleAccountBalance: () => Promise.resolve(googleAccountBalance),
 
   // 获取Google广告数据总览
-  getGoogleAdsOverview: () => Promise.resolve(googleAdsOverview)
+  getGoogleAdsOverview: () => Promise.resolve(googleAdsOverview),
+
+  // ============ Meta优化师看板 API 函数 ============
+
+  // 获取Meta优化师个人指标
+  getMetaOptimizerMetrics: () => Promise.resolve({...googleOptimizerMetrics, platform: 'meta'}),
+
+  // 获取Meta优化师目标数据
+  getMetaOptimizerTargets: () => Promise.resolve(googleOptimizerTargets),
+
+  // 获取Meta优化师客户分析数据
+  getMetaOptimizerCustomerAnalysis: () => Promise.resolve(googleOptimizerCustomerAnalysis),
+
+  // 获取Meta优化师客户质量评估数据
+  getMetaOptimizerCustomerQuality: () => Promise.resolve(googleOptimizerCustomerQuality),
+
+  // 获取Meta账户余额数据
+  getMetaAccountBalance: () => Promise.resolve(googleAccountBalance)
 }
 
 export default businessAPI
