@@ -2663,7 +2663,15 @@ export const businessAPI = {
   getMetaOptimizerCustomerQuality: () => Promise.resolve(googleOptimizerCustomerQuality),
 
   // 获取Meta账户余额数据
-  getMetaAccountBalance: () => Promise.resolve(googleAccountBalance)
+  getMetaAccountBalance: () => Promise.resolve(googleAccountBalance),
+
+  // ============ Criteo优化师看板 API 函数 ============
+
+  // 获取Criteo优化师个人指标
+  getCriteoOptimizerMetrics: () => Promise.resolve({...googleOptimizerMetrics, platform: 'criteo'}),
+
+  // 获取Criteo账户余额数据
+  getCriteoAccountBalance: () => Promise.resolve(googleAccountBalance)
 }
 
 export default businessAPI
