@@ -2867,7 +2867,7 @@ export interface DepartmentProfitContribution {
   perCapitaOutput: number // 人均产出
   customerConversionRate: number // 客户转化率
   profitMargin: number // 毛利率
-  
+
   // 平台毛利分布
   platformProfit: {
     google: number
@@ -2875,7 +2875,7 @@ export interface DepartmentProfitContribution {
     amazon: number
     others: number
   }
-  
+
   // 服务毛利分布
   serviceProfit: {
     advertising: number // 广告投放
@@ -2883,14 +2883,14 @@ export interface DepartmentProfitContribution {
     analytics: number // 数据分析
     consulting: number // 咨询服务
   }
-  
+
   // 客户等级毛利分布
   customerProfit: {
     gradeA: number
     gradeB: number
     gradeC: number
   }
-  
+
   // 核心客户贡献
   topCustomers: Array<{
     customerId: string
@@ -2899,4 +2899,307 @@ export interface DepartmentProfitContribution {
     contributionPercentage: number // 贡献占比
     isCore: boolean // 是否核心客户
   }>
+}
+
+// ============ Google优化师看板特定类型 ============
+
+// Google优化师指标概览
+export interface OptimizerMetrics {
+  optimizerId: string // 优化师ID
+  optimizerName: string // 优化师姓名
+  platform: 'google' | 'meta' | 'criteo' | 'bing' // 主要平台
+  customerCount: number // 负责客户数
+  totalProfit: number // 个人毛利完成
+  platformROI: number // 主平台ROI
+  lowBalanceAccounts: number // 余额预警账户数
+  monthlyGrowth: {
+    profitGrowth: number
+    roiGrowth: number
+    customerGrowth: number
+  }
+  targetCompletion: number // 目标完成率
+}
+
+// Google优化师目标完成数据
+export interface OptimizerTargetData {
+  quarter: string // 季度标识
+  optimizerId: string // 优化师ID
+  quarterCompletion: number // 季度完成率
+  currentProfit: number // 当前毛利
+  targetProfit: number // 目标毛利
+  currentCustomers: number // 当前客户数
+  targetCustomers: number // 目标客户数
+  currentROI: number // 当前ROI
+  targetROI: number // 目标ROI
+  monthlyTrends: Array<{
+    month: string
+    profitCompletion: number
+    roiCompletion: number
+  }>
+  monthlyBreakdown: Array<{
+    period: string
+    target: number
+    actual: number
+    completionRate: number
+    variance: number
+  }>
+  weeklyBreakdown: Array<{
+    period: string
+    target: number
+    actual: number
+    completionRate: number
+    variance: number
+  }>
+  targets: {
+    totalProfitTarget: number // 合计毛利目标
+    serviceFeeTarget: number // 服务费目标
+    rebateTarget: number // 返点目标
+  }
+  achievements: {
+    totalProfitActual: number // 合计毛利完成
+    totalProfitGap: number // 毛利差额
+    totalProfitProgress: number // 毛利完成进度
+    serviceFeeActual: number // 服务费完成
+    serviceFeeGap: number // 服务费差额
+    serviceFeeProgress: number // 服务费完成进度
+    rebateActual: number // 返点完成
+    rebateGap: number // 返点差额
+    rebateProgress: number // 返点完成进度
+  }
+  teamRanking: number // 在团队中的排名
+}
+
+// Google优化师客户分析数据
+export interface OptimizerCustomerAnalysisData {
+  quarter: string // 季度标识
+  optimizerId: string // 优化师ID
+  newCustomerConversionRate: number // 新客转化率
+  newCustomers: {
+    count: number
+    conversionRate: number
+    avgSpend: number
+    avgROI: number
+  }
+  existingCustomers: {
+    count: number
+    retentionRate: number
+    avgSpend: number
+    avgROI: number
+  }
+  churnCustomers: {
+    count: number
+    churnRate: number
+    avgLifetime: number
+    avgValue: number
+  }
+  acquisitionFunnel: {
+    overallConversionRate: number
+    stages: Array<{
+      stageName: string
+      count: number
+      conversionRate: number
+      dropoffRate: number
+    }>
+  }
+  lifecycleStages: Array<{
+    stageName: string
+    count: number
+    percentage: number
+    avgValue: number
+    icon: string
+  }>
+  valueSegments: Array<{
+    segmentName: string
+    customerCount: number
+    percentage: number
+    totalValue: number
+  }>
+  customerDetails: Array<{
+    customerId: string
+    customerName: string
+    type: 'new' | 'existing' | 'churn'
+    spend: number
+    roi: number
+    lastActivity: string
+    status: string
+  }>
+  allProjects: {
+    activeCustomerCount: number // 活跃客户数
+    totalProfit: number // 总毛利
+    serviceFee: number // 服务费
+    rebate: number // 返点
+  }
+  oldCustomers: {
+    activeCustomerCount: number
+    totalProfit: number
+    serviceFee: number
+    rebate: number
+  }
+  churnedCustomers: {
+    customerCount: number
+    estimatedProfitLoss: number
+    estimatedServiceFeeLoss: number
+    estimatedRebateLoss: number
+  }
+}
+
+// Google优化师客户质量评估数据
+export interface OptimizerCustomerQualityData {
+  quarter: string // 季度标识
+  optimizerId: string // 优化师ID
+  averageQualityScore: number // 平均质量评分
+  qualitySegments: {
+    excellent: {
+      count: number
+      percentage: number
+      avgROI: number
+      retentionRate: number
+    }
+    good: {
+      count: number
+      percentage: number
+      avgROI: number
+      retentionRate: number
+    }
+    average: {
+      count: number
+      percentage: number
+      avgROI: number
+      retentionRate: number
+    }
+    poor: {
+      count: number
+      percentage: number
+      avgROI: number
+      retentionRate: number
+    }
+  }
+  radarData: {
+    current: {
+      spend: number
+      roi: number
+      conversion: number
+      retention: number
+      engagement: number
+      satisfaction: number
+    }
+    benchmark: {
+      spend: number
+      roi: number
+      conversion: number
+      retention: number
+      engagement: number
+      satisfaction: number
+    }
+  }
+  improvementSuggestions: Array<{
+    id: string
+    title: string
+    priority: 'high' | 'medium' | 'low'
+    impact: string
+    effort: string
+    description: string
+  }>
+  customerQualityDetails: Array<{
+    customerId: string
+    customerName: string
+    qualityScore: number
+    qualityLevel: 'excellent' | 'good' | 'average' | 'poor'
+    spend: number
+    roi: number
+    retentionRate: number
+    improvementAreas: string[]
+    lastEvaluation: string
+  }>
+  customerSegments: {
+    highValue: OptimizerCustomerSegment // 月消费10万美金以上
+    mediumHighValue: OptimizerCustomerSegment // 月消费5-10万美金
+    mediumValue: OptimizerCustomerSegment // 月消费3-5万美金
+    lowMediumValue: OptimizerCustomerSegment // 月消费1.5-3万美金
+    lowValue: OptimizerCustomerSegment // 月消费1.5万以下
+  }
+}
+
+export interface OptimizerCustomerSegment {
+  segmentName: string // 客户分段名称
+  customerCount: number // 客户数
+  salesAmount: number // 销售额
+  totalConsumption: number // 总消费（所有平台）
+  roi: number // ROI
+  segmentPercentage: number // 各类型客户占比
+  platformBreakdown: {
+    google: number
+    meta: number
+    criteo: number
+    bing: number
+  }
+}
+
+// 账户余额管理数据
+export interface AccountBalanceData {
+  optimizerId: string // 优化师ID
+  summary: {
+    totalAccounts: number // 总账户数
+    warningAccounts: number // 预警账户数
+    totalBalance: number // 总余额
+    averageRemainingDays: number // 平均剩余天数
+  }
+  customerAccounts: CustomerAccountBalance[]
+}
+
+export interface CustomerAccountBalance {
+  customerId: string // 客户ID
+  customerName: string // 客户名称
+  adAccount: string // 广告账户
+  accountBalance: number // 账户余额
+  past7DaysAvgSpend: number // 过去7天平均花费
+  estimatedDays: number // 预计使用天数
+  warningLevel: 'critical' | 'warning' | 'normal' // 预警级别
+  lastUpdated: string // 最后更新时间
+}
+
+// Google广告数据总览
+export interface GoogleAdsOverviewData {
+  optimizerId: string // 优化师ID
+  summary: {
+    totalSpend: number // 总花费
+    totalImpressions: number // 总展示
+    totalClicks: number // 总点击
+    totalConversions: number // 总转化
+    avgCPC: number // 平均CPC
+    avgCTR: number // 平均CTR
+    avgConversionRate: number // 平均转化率
+    totalROAS: number // 总ROAS
+  }
+  customerAdsData: CustomerGoogleAdsData[]
+  anomalyAlerts: AnomalyAlert[] // 异常数据提醒
+}
+
+export interface CustomerGoogleAdsData {
+  customerId: string // 客户ID
+  customerName: string // 客户名称
+  campaignCount: number // 广告系列数
+  spend: number // 花费
+  impressions: number // 展示
+  clicks: number // 点击
+  conversions: number // 转化
+  cpc: number // CPC
+  ctr: number // CTR
+  conversionRate: number // 转化率
+  roas: number // ROAS
+  lastOptimized: string // 最后优化时间
+  performanceStatus: 'excellent' | 'good' | 'needs_attention' | 'poor' // 表现状态
+}
+
+export interface AnomalyAlert {
+  alertId: string // 提醒ID
+  customerId: string // 客户ID
+  customerName: string // 客户名称
+  alertType: 'cpc_spike' | 'spend_drop' | 'conversion_drop' | 'roas_drop' // 提醒类型
+  severity: 'high' | 'medium' | 'low' // 严重程度
+  currentValue: number // 当前值
+  expectedValue: number // 预期值
+  deviation: number // 偏差百分比
+  detectedAt: string // 检测时间
+  description: string // 描述
 }

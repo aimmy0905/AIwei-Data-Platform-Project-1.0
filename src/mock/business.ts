@@ -1,7 +1,7 @@
-import type { 
-  BusinessRole, 
-  MetricCardProps, 
-  Quarter, 
+import type {
+  BusinessRole,
+  MetricCardProps,
+  Quarter,
   TargetComparison,
   PlatformData,
   CustomerProfitData,
@@ -1931,27 +1931,27 @@ export const departmentProfitContribution: DepartmentProfitContribution = {
   perCapitaOutput: 708333,
   customerConversionRate: 12.8,
   profitMargin: 28.5,
-  
+
   platformProfit: {
     google: 3400000,
     facebook: 2550000,
     amazon: 1700000,
     others: 850000
   },
-  
+
   serviceProfit: {
     advertising: 4250000,
     optimization: 2125000,
     analytics: 1275000,
     consulting: 850000
   },
-  
+
   customerProfit: {
     gradeA: 5100000,
     gradeB: 2550000,
     gradeC: 850000
   },
-  
+
   topCustomers: [
     {
       customerId: 'CUST_001',
@@ -2000,150 +2000,653 @@ export const allDepartmentsData = {
   departmentProfitContribution: [departmentProfitContribution]
 }
 
+// ============ Google优化师看板模拟数据 ============
+
+// Google优化师个人指标
+export const googleOptimizerMetrics: OptimizerMetrics = {
+  optimizerId: 'OPT_GOOGLE_001',
+  optimizerName: '张小明',
+  platform: 'google',
+  customerCount: 15,
+  totalProfit: 1200000, // 120万
+  platformROI: 3.8,
+  lowBalanceAccounts: 3,
+  monthlyGrowth: {
+    profitGrowth: 15.8,
+    roiGrowth: 8.2,
+    customerGrowth: 6.7
+  },
+  targetCompletion: 88.5
+}
+
+// Google优化师目标数据
+export const googleOptimizerTargets: OptimizerTargetData = {
+  quarter: '2024Q4',
+  optimizerId: 'OPT_GOOGLE_001',
+  quarterCompletion: 85.7,
+  currentProfit: 1200000,
+  targetProfit: 1400000,
+  currentCustomers: 15,
+  targetCustomers: 18,
+  currentROI: 4.2,
+  targetROI: 4.5,
+  monthlyTrends: [
+    { month: '10月', profitCompletion: 78, roiCompletion: 85 },
+    { month: '11月', profitCompletion: 82, roiCompletion: 88 },
+    { month: '12月', profitCompletion: 87, roiCompletion: 92 },
+    { month: '1月', profitCompletion: 86, roiCompletion: 90 }
+  ],
+  monthlyBreakdown: [
+    { period: '2024年10月', target: 350000, actual: 273000, completionRate: 78.0, variance: -77000 },
+    { period: '2024年11月', target: 350000, actual: 287000, completionRate: 82.0, variance: -63000 },
+    { period: '2024年12月', target: 350000, actual: 304500, completionRate: 87.0, variance: -45500 },
+    { period: '2025年1月', target: 350000, actual: 301000, completionRate: 86.0, variance: -49000 }
+  ],
+  weeklyBreakdown: [
+    { period: '第1周', target: 87500, actual: 78000, completionRate: 89.1, variance: -9500 },
+    { period: '第2周', target: 87500, actual: 82000, completionRate: 93.7, variance: -5500 },
+    { period: '第3周', target: 87500, actual: 85000, completionRate: 97.1, variance: -2500 },
+    { period: '第4周', target: 87500, actual: 91000, completionRate: 104.0, variance: 3500 }
+  ],
+  targets: {
+    totalProfitTarget: 1400000,
+    serviceFeeTarget: 500000,
+    rebateTarget: 120000
+  },
+  achievements: {
+    totalProfitActual: 1200000,
+    totalProfitGap: -200000,
+    totalProfitProgress: 85.7,
+    serviceFeeActual: 450000,
+    serviceFeeGap: -50000,
+    serviceFeeProgress: 90.0,
+    rebateActual: 110000,
+    rebateGap: -10000,
+    rebateProgress: 91.7
+  },
+  teamRanking: 3
+}
+
+// Google优化师客户分析数据
+export const googleOptimizerCustomerAnalysis: OptimizerCustomerAnalysisData = {
+  quarter: '2024Q4',
+  optimizerId: 'OPT_GOOGLE_001',
+  newCustomerConversionRate: 85.2,
+  newCustomers: {
+    count: 5,
+    conversionRate: 85.2,
+    avgSpend: 80000,
+    avgROI: 4.2
+  },
+  existingCustomers: {
+    count: 10,
+    retentionRate: 92.5,
+    avgSpend: 80000,
+    avgROI: 4.8
+  },
+  churnCustomers: {
+    count: 2,
+    churnRate: 7.5,
+    avgLifetime: 180,
+    avgValue: 75000
+  },
+  acquisitionFunnel: {
+    overallConversionRate: 85.2,
+    stages: [
+      { stageName: '潜在客户', count: 50, conversionRate: 60.0, dropoffRate: 40.0 },
+      { stageName: '意向客户', count: 30, conversionRate: 70.0, dropoffRate: 30.0 },
+      { stageName: '试用客户', count: 21, conversionRate: 85.0, dropoffRate: 15.0 },
+      { stageName: '付费客户', count: 18, conversionRate: 95.0, dropoffRate: 5.0 }
+    ]
+  },
+  lifecycleStages: [
+    { stageName: '新客户', count: 5, percentage: 33.3, avgValue: 80000, icon: 'user-plus' },
+    { stageName: '成长期', count: 4, percentage: 26.7, avgValue: 85000, icon: 'trending-up' },
+    { stageName: '成熟期', count: 4, percentage: 26.7, avgValue: 90000, icon: 'star' },
+    { stageName: '留存期', count: 2, percentage: 13.3, avgValue: 75000, icon: 'shield' }
+  ],
+  valueSegments: [
+    { segmentName: '高价值客户', customerCount: 3, percentage: 20.0, totalValue: 300000 },
+    { segmentName: '中价值客户', customerCount: 7, percentage: 46.7, totalValue: 560000 },
+    { segmentName: '低价值客户', customerCount: 5, percentage: 33.3, totalValue: 340000 }
+  ],
+  customerDetails: [
+    { customerId: 'CUST_001', customerName: 'TechCorp Solutions', type: 'existing', spend: 120000, roi: 5.2, lastActivity: '2024-07-22', status: 'active' },
+    { customerId: 'CUST_002', customerName: 'Global E-commerce Inc', type: 'new', spend: 85000, roi: 4.5, lastActivity: '2024-07-21', status: 'active' },
+    { customerId: 'CUST_003', customerName: 'Fashion Forward Ltd', type: 'existing', spend: 95000, roi: 4.8, lastActivity: '2024-07-20', status: 'active' },
+    { customerId: 'CUST_004', customerName: 'Home & Garden Pro', type: 'churn', spend: 0, roi: 0, lastActivity: '2024-06-15', status: 'churned' }
+  ],
+  allProjects: {
+    activeCustomerCount: 15,
+    totalProfit: 1200000,
+    serviceFee: 450000,
+    rebate: 110000
+  },
+  oldCustomers: {
+    activeCustomerCount: 10,
+    totalProfit: 800000,
+    serviceFee: 300000,
+    rebate: 75000
+  },
+  churnedCustomers: {
+    customerCount: 2,
+    estimatedProfitLoss: 150000,
+    estimatedServiceFeeLoss: 55000,
+    estimatedRebateLoss: 13000
+  }
+}
+
+// Google优化师客户质量评估
+export const googleOptimizerCustomerQuality: OptimizerCustomerQualityData = {
+  quarter: '2024Q4',
+  optimizerId: 'OPT_GOOGLE_001',
+  averageQualityScore: 78.5,
+  qualitySegments: {
+    excellent: {
+      count: 3,
+      percentage: 20.0,
+      avgROI: 5.2,
+      retentionRate: 95.0
+    },
+    good: {
+      count: 6,
+      percentage: 40.0,
+      avgROI: 4.1,
+      retentionRate: 88.0
+    },
+    average: {
+      count: 4,
+      percentage: 26.7,
+      avgROI: 3.2,
+      retentionRate: 75.0
+    },
+    poor: {
+      count: 2,
+      percentage: 13.3,
+      avgROI: 2.1,
+      retentionRate: 45.0
+    }
+  },
+  radarData: {
+    current: {
+      spend: 85,
+      roi: 78,
+      conversion: 82,
+      retention: 88,
+      engagement: 75,
+      satisfaction: 80
+    },
+    benchmark: {
+      spend: 90,
+      roi: 85,
+      conversion: 85,
+      retention: 90,
+      engagement: 80,
+      satisfaction: 85
+    }
+  },
+  improvementSuggestions: [
+    {
+      id: 'IMP_001',
+      title: '优化广告创意素材',
+      priority: 'high',
+      impact: '高',
+      effort: '中',
+      description: '提升广告创意质量以提高转化率'
+    },
+    {
+      id: 'IMP_002',
+      title: '调整目标受众',
+      priority: 'medium',
+      impact: '中',
+      effort: '低',
+      description: '重新定义目标受众以提高ROI'
+    }
+  ],
+  customerQualityDetails: [
+    {
+      customerId: 'CUST_001',
+      customerName: 'TechCorp Solutions',
+      qualityScore: 92,
+      qualityLevel: 'excellent',
+      spend: 120000,
+      roi: 5.2,
+      retentionRate: 98,
+      improvementAreas: ['预算优化'],
+      lastEvaluation: '2024-07-20'
+    },
+    {
+      customerId: 'CUST_002',
+      customerName: 'Global E-commerce Inc',
+      qualityScore: 76,
+      qualityLevel: 'good',
+      spend: 85000,
+      roi: 4.1,
+      retentionRate: 85,
+      improvementAreas: ['创意优化', '受众定位'],
+      lastEvaluation: '2024-07-19'
+    }
+  ],
+  customerSegments: {
+    highValue: {
+      segmentName: '月消费10万美金以上',
+      customerCount: 2,
+      salesAmount: 600000,
+      totalConsumption: 120000,
+      roi: 5.0,
+      segmentPercentage: 13.3,
+      platformBreakdown: {
+        google: 80000,
+        meta: 25000,
+        criteo: 10000,
+        bing: 5000
+      }
+    },
+    mediumHighValue: {
+      segmentName: '月消费5-10万美金',
+      customerCount: 3,
+      salesAmount: 480000,
+      totalConsumption: 90000,
+      roi: 4.2,
+      segmentPercentage: 20.0,
+      platformBreakdown: {
+        google: 60000,
+        meta: 20000,
+        criteo: 7000,
+        bing: 3000
+      }
+    },
+    mediumValue: {
+      segmentName: '月消费3-5万美金',
+      customerCount: 4,
+      salesAmount: 360000,
+      totalConsumption: 60000,
+      roi: 3.8,
+      segmentPercentage: 26.7,
+      platformBreakdown: {
+        google: 40000,
+        meta: 15000,
+        criteo: 3000,
+        bing: 2000
+      }
+    },
+    lowMediumValue: {
+      segmentName: '月消费1.5-3万美金',
+      customerCount: 4,
+      salesAmount: 240000,
+      totalConsumption: 40000,
+      roi: 3.2,
+      segmentPercentage: 26.7,
+      platformBreakdown: {
+        google: 28000,
+        meta: 8000,
+        criteo: 2500,
+        bing: 1500
+      }
+    },
+    lowValue: {
+      segmentName: '月消费1.5万以下美金',
+      customerCount: 2,
+      salesAmount: 120000,
+      totalConsumption: 15000,
+      roi: 2.8,
+      segmentPercentage: 13.3,
+      platformBreakdown: {
+        google: 10000,
+        meta: 3000,
+        criteo: 1500,
+        bing: 500
+      }
+    }
+  }
+}
+
+// 账户余额数据
+export const googleAccountBalance: AccountBalanceData = {
+  optimizerId: 'OPT_GOOGLE_001',
+  summary: {
+    totalAccounts: 15,
+    warningAccounts: 3,
+    totalBalance: 85000,
+    averageRemainingDays: 12.5
+  },
+  customerAccounts: [
+    {
+      customerId: 'CUST_001',
+      customerName: 'TechCorp Solutions',
+      adAccount: 'ACC-123456789',
+      accountBalance: 2500,
+      past7DaysAvgSpend: 820,
+      estimatedDays: 3.0,
+      warningLevel: 'critical',
+      lastUpdated: '2024-07-23T08:30:00Z'
+    },
+    {
+      customerId: 'CUST_002',
+      customerName: 'Global E-commerce Inc',
+      adAccount: 'ACC-987654321',
+      accountBalance: 4200,
+      past7DaysAvgSpend: 650,
+      estimatedDays: 6.5,
+      warningLevel: 'warning',
+      lastUpdated: '2024-07-23T09:15:00Z'
+    },
+    {
+      customerId: 'CUST_003',
+      customerName: 'Fashion Forward Ltd',
+      adAccount: 'ACC-456789123',
+      accountBalance: 8500,
+      past7DaysAvgSpend: 1200,
+      estimatedDays: 7.1,
+      warningLevel: 'warning',
+      lastUpdated: '2024-07-23T07:45:00Z'
+    },
+    {
+      customerId: 'CUST_004',
+      customerName: 'Home & Garden Pro',
+      adAccount: 'ACC-789123456',
+      accountBalance: 15000,
+      past7DaysAvgSpend: 950,
+      estimatedDays: 15.8,
+      warningLevel: 'normal',
+      lastUpdated: '2024-07-23T10:20:00Z'
+    },
+    {
+      customerId: 'CUST_005',
+      customerName: 'Sports World Co',
+      adAccount: 'ACC-321654987',
+      accountBalance: 12800,
+      past7DaysAvgSpend: 780,
+      estimatedDays: 16.4,
+      warningLevel: 'normal',
+      lastUpdated: '2024-07-23T06:30:00Z'
+    }
+  ]
+}
+
+// Google广告数据总览
+export const googleAdsOverview: GoogleAdsOverviewData = {
+  optimizerId: 'OPT_GOOGLE_001',
+  summary: {
+    totalSpend: 485000,
+    totalImpressions: 12500000,
+    totalClicks: 375000,
+    totalConversions: 18750,
+    avgCPC: 1.29,
+    avgCTR: 0.03,
+    avgConversionRate: 0.05,
+    totalROAS: 3.8
+  },
+  customerAdsData: [
+    {
+      customerId: 'CUST_001',
+      customerName: 'TechCorp Solutions',
+      campaignCount: 8,
+      spend: 85000,
+      impressions: 2100000,
+      clicks: 63000,
+      conversions: 3150,
+      cpc: 1.35,
+      ctr: 0.03,
+      conversionRate: 0.05,
+      roas: 4.2,
+      lastOptimized: '2024-07-22T14:30:00Z',
+      performanceStatus: 'excellent'
+    },
+    {
+      customerId: 'CUST_002',
+      customerName: 'Global E-commerce Inc',
+      campaignCount: 12,
+      spend: 120000,
+      impressions: 3200000,
+      clicks: 96000,
+      conversions: 4320,
+      cpc: 1.25,
+      ctr: 0.03,
+      conversionRate: 0.045,
+      roas: 3.9,
+      lastOptimized: '2024-07-21T16:45:00Z',
+      performanceStatus: 'good'
+    },
+    {
+      customerId: 'CUST_003',
+      customerName: 'Fashion Forward Ltd',
+      adAccount: 'ACC-456789123',
+      campaignCount: 6,
+      spend: 65000,
+      impressions: 1850000,
+      clicks: 55500,
+      conversions: 2220,
+      cpc: 1.17,
+      ctr: 0.03,
+      conversionRate: 0.04,
+      roas: 3.4,
+      lastOptimized: '2024-07-20T11:20:00Z',
+      performanceStatus: 'good'
+    },
+    {
+      customerId: 'CUST_004',
+      customerName: 'Home & Garden Pro',
+      campaignCount: 4,
+      spend: 45000,
+      impressions: 1200000,
+      clicks: 36000,
+      conversions: 1440,
+      cpc: 1.25,
+      ctr: 0.03,
+      conversionRate: 0.04,
+      roas: 2.8,
+      lastOptimized: '2024-07-19T09:15:00Z',
+      performanceStatus: 'needs_attention'
+    },
+    {
+      customerId: 'CUST_005',
+      customerName: 'Sports World Co',
+      campaignCount: 5,
+      spend: 38000,
+      impressions: 980000,
+      clicks: 29400,
+      conversions: 1176,
+      cpc: 1.29,
+      ctr: 0.03,
+      conversionRate: 0.04,
+      roas: 2.5,
+      lastOptimized: '2024-07-18T15:30:00Z',
+      performanceStatus: 'needs_attention'
+    }
+  ],
+  anomalyAlerts: [
+    {
+      alertId: 'ALERT_001',
+      customerId: 'CUST_004',
+      customerName: 'Home & Garden Pro',
+      alertType: 'cpc_spike',
+      severity: 'high',
+      currentValue: 1.85,
+      expectedValue: 1.25,
+      deviation: 48.0,
+      detectedAt: '2024-07-23T08:15:00Z',
+      description: 'CPC异常上升，比预期值高出48%'
+    },
+    {
+      alertId: 'ALERT_002',
+      customerId: 'CUST_005',
+      customerName: 'Sports World Co',
+      alertType: 'conversion_drop',
+      severity: 'medium',
+      currentValue: 0.035,
+      expectedValue: 0.045,
+      deviation: -22.2,
+      detectedAt: '2024-07-23T07:30:00Z',
+      description: '转化率下降，比预期值低22.2%'
+    }
+  ]
+}
+
 // API 模拟函数
 export const businessAPI = {
   // 获取角色列表
   getRoles: () => Promise.resolve(businessRoles),
-  
+
   // 获取销售总监指标
   getSalesDirectorMetrics: () => Promise.resolve(salesDirectorMetrics),
-  
+
   // 获取目标完成对比
   getTargetComparison: () => Promise.resolve(targetComparisonData),
-  
+
   // 获取平台分布数据
   getPlatformDistribution: () => Promise.resolve(platformDistributionData),
-  
+
   // 获取客户毛利数据
   getCustomerProfitData: () => Promise.resolve(customerProfitData),
-  
+
   // 获取毛利汇总
   getProfitSummary: () => Promise.resolve(profitSummaryData),
-  
+
   // 获取流失客户数据
   getChurnData: () => Promise.resolve(churnData),
-  
+
   // 获取流失客户详情
   getChurnCustomerDetails: () => Promise.resolve(churnCustomerDetails),
-  
+
   // 获取销售人员表现
   getSalesPersonPerformance: () => Promise.resolve(salesPersonPerformance),
-  
+
   // 获取客户毛利明细
   getCustomerProfitDetails: () => Promise.resolve(customerProfitDetails),
-  
+
   // 获取续费客户数据
   getRenewalCustomerData: () => Promise.resolve(renewalCustomerData),
-  
+
   // 获取财务分析数据
   getFinancialAnalysisData: () => Promise.resolve(financialAnalysisData),
-  
+
   // 获取预算执行数据
   getBudgetExecutionData: () => Promise.resolve(budgetExecutionData),
-  
+
   // 获取应收账款数据
   getAccountsReceivableData: () => Promise.resolve(accountsReceivableData),
-  
+
   // 获取财务风险预警
   getFinancialRiskAlerts: () => Promise.resolve(financialRiskAlerts),
 
   // ============ 销售经理看板 API 函数 ============
-  
+
   // 获取销售经理看板核心指标
   getSalesManagerMetrics: () => Promise.resolve(salesManagerMetrics),
-  
+
   // 获取团队指标数据
   getTeamMetrics: () => Promise.resolve(teamMetrics),
-  
+
   // 获取团队成员绩效数据
   getTeamMemberPerformance: () => Promise.resolve(teamMemberPerformance),
-  
+
   // 获取团队销售统计
   getTeamSalesStatistics: () => Promise.resolve(teamSalesStatistics),
-  
+
   // 获取团队平台分布数据
   getTeamPlatformDistribution: () => Promise.resolve(teamPlatformDistribution),
-  
+
   // 获取团队客户毛利详情
   getTeamCustomerProfitDetails: () => Promise.resolve(teamCustomerProfitDetails),
-  
+
   // 获取团队续费客户数据
   getTeamRenewalCustomers: () => Promise.resolve(teamRenewalCustomers),
 
   // ============ 销售人员看板 API 函数 ============
-  
+
   // 获取个人绩效数据
   getPersonalPerformance: () => Promise.resolve(personalPerformance),
-  
+
   // 获取个人客户分类数据
   getPersonalCustomerCategories: () => Promise.resolve(personalCustomerCategories),
-  
+
   // 获取个人平台绩效数据
   getPersonalPlatformPerformance: () => Promise.resolve(personalPlatformPerformance),
-  
+
   // 获取个人客户详情数据
   getPersonalCustomerDetails: () => Promise.resolve(personalCustomerDetails),
-  
+
   // 获取个人续费任务数据
   getPersonalRenewalTasks: () => Promise.resolve(personalRenewalTasks),
 
   // ============ 项目总监看板 API 函数 ============
-  
+
   // 获取运营目标数据
   getOperationTargets: () => Promise.resolve(operationTargets),
-  
+
   // 获取部门目标数据
   getDepartmentTargets: () => Promise.resolve(departmentTargets),
-  
+
   // 获取客户分析数据（总计）
   getCustomerAnalysisTotal: () => Promise.resolve(customerAnalysisTotal),
-  
+
   // 获取部门客户分析数据
   getDepartmentCustomerAnalysis: () => Promise.resolve(departmentCustomerAnalysis),
-  
+
   // 获取平台项目数据（总计）
   getPlatformProjectsTotal: () => Promise.resolve(platformProjectsTotal),
-  
+
   // 获取部门平台项目数据
   getDepartmentPlatformProjects: () => Promise.resolve(departmentPlatformProjects),
-  
+
   // 获取平台毛利贡献数据（总计）
   getPlatformProfitContributionTotal: () => Promise.resolve(platformProfitContributionTotal),
-  
+
   // 获取部门平台毛利贡献数据
   getDepartmentPlatformProfitContribution: () => Promise.resolve(departmentPlatformProfitContribution),
-  
+
   // 获取客户质量评估数据（总计）
   getCustomerQualityTotal: () => Promise.resolve(customerQualityTotal),
-  
+
   // 获取部门客户质量评估数据
   getDepartmentCustomerQuality: () => Promise.resolve(departmentCustomerQuality),
-  
+
   // 获取客户贡献数据
   getCustomerContribution: () => Promise.resolve(customerContribution),
-  
+
   // 获取续费客户数据
   getRenewalCustomers: () => Promise.resolve(renewalCustomers),
 
   // ============ 项目经理看板 API 函数 ============
-  
+
   // 获取部门指标概览
   getDepartmentMetrics: () => Promise.resolve(departmentMetrics),
-  
+
   // 获取部门目标数据（项目经理视角）
   getDepartmentTarget: () => Promise.resolve(departmentTarget),
-  
+
   // 获取部门客户分析数据（项目经理视角）
   getDepartmentCustomerAnalysisForManager: () => Promise.resolve(departmentCustomerAnalysisForManager),
-  
+
   // 获取部门平台分析数据
   getDepartmentPlatformAnalysis: () => Promise.resolve(departmentPlatformAnalysis),
-  
+
   // 获取部门毛利贡献数据
   getDepartmentProfitContribution: () => Promise.resolve(departmentProfitContribution),
-  
+
   // 获取所有部门数据用于对比
-  getAllDepartmentsData: () => Promise.resolve(allDepartmentsData)
+  getAllDepartmentsData: () => Promise.resolve(allDepartmentsData),
+
+  // ============ Google优化师看板 API 函数 ============
+
+  // 获取Google优化师个人指标
+  getGoogleOptimizerMetrics: () => Promise.resolve(googleOptimizerMetrics),
+
+  // 获取Google优化师目标数据
+  getGoogleOptimizerTargets: () => Promise.resolve(googleOptimizerTargets),
+
+  // 获取Google优化师客户分析数据
+  getGoogleOptimizerCustomerAnalysis: () => Promise.resolve(googleOptimizerCustomerAnalysis),
+
+  // 获取Google优化师客户质量评估数据
+  getGoogleOptimizerCustomerQuality: () => Promise.resolve(googleOptimizerCustomerQuality),
+
+  // 获取Google账户余额数据
+  getGoogleAccountBalance: () => Promise.resolve(googleAccountBalance),
+
+  // 获取Google广告数据总览
+  getGoogleAdsOverview: () => Promise.resolve(googleAdsOverview)
 }
 
 export default businessAPI
