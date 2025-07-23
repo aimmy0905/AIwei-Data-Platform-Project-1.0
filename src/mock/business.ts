@@ -2671,7 +2671,15 @@ export const businessAPI = {
   getCriteoOptimizerMetrics: () => Promise.resolve({...googleOptimizerMetrics, platform: 'criteo'}),
 
   // 获取Criteo账户余额数据
-  getCriteoAccountBalance: () => Promise.resolve(googleAccountBalance)
+  getCriteoAccountBalance: () => Promise.resolve(googleAccountBalance),
+
+  // ============ Bing优化师看板 API 函数 ============
+
+  // 获取Bing优化师个人指标
+  getBingOptimizerMetrics: () => Promise.resolve({...googleOptimizerMetrics, platform: 'bing'}),
+
+  // 获取Bing账户余额数据
+  getBingAccountBalance: () => Promise.resolve(googleAccountBalance)
 }
 
 export default businessAPI
