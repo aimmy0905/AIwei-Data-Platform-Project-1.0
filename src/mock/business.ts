@@ -22,7 +22,19 @@ import type {
   PersonalCustomerCategory,
   PersonalPlatformPerformance,
   PersonalCustomerDetail,
-  PersonalRenewalTask
+  PersonalRenewalTask,
+  OperationTargetData,
+  DepartmentTargetData,
+  CustomerAnalysisData,
+  DepartmentCustomerAnalysis,
+  PlatformProjectData,
+  DepartmentPlatformData,
+  PlatformProfitContributionData,
+  DepartmentPlatformProfitData,
+  CustomerQualityData,
+  DepartmentCustomerQualityData,
+  CustomerContributionData,
+  RenewalCustomerData as RenewalCustomer
 } from '@/types'
 
 // 业务角色数据
@@ -1098,6 +1110,896 @@ export const personalRenewalTasks: PersonalRenewalTask[] = [
   }
 ]
 
+// ============ 项目总监看板模拟数据 ============
+
+// 运营目标数据
+export const operationTargets: OperationTargetData[] = [
+  {
+    quarter: '2025-Q1',
+    targets: {
+      totalProfitTarget: 50000000, // 5000万
+      serviceFeeTarget: 30000000,  // 3000万
+      rebateTarget: 20000000       // 2000万
+    },
+    achievements: {
+      totalProfitActual: 45000000,
+      totalProfitGap: -5000000,
+      totalProfitRate: 90.0,
+      serviceFeeActual: 28000000,
+      serviceFeeGap: -2000000,
+      serviceFeeRate: 93.3,
+      rebateActual: 17000000,
+      rebateGap: -3000000,
+      rebateRate: 85.0
+    }
+  },
+  {
+    quarter: '2025-Q2',
+    targets: {
+      totalProfitTarget: 55000000,
+      serviceFeeTarget: 32000000,
+      rebateTarget: 23000000
+    },
+    achievements: {
+      totalProfitActual: 52000000,
+      totalProfitGap: -3000000,
+      totalProfitRate: 94.5,
+      serviceFeeActual: 31000000,
+      serviceFeeGap: -1000000,
+      serviceFeeRate: 96.9,
+      rebateActual: 21000000,
+      rebateGap: -2000000,
+      rebateRate: 91.3
+    }
+  }
+]
+
+// 部门目标数据
+export const departmentTargets: DepartmentTargetData[] = [
+  {
+    departmentId: 'DEPT_001',
+    departmentName: '华东销售部',
+    targets: {
+      totalProfitTarget: 15000000,
+      serviceFeeTarget: 9000000,
+      rebateTarget: 6000000,
+      targetPercentage: 30.0
+    },
+    achievements: {
+      totalProfitActual: 14200000,
+      totalProfitGap: -800000,
+      totalProfitRate: 94.7,
+      serviceFeeActual: 8600000,
+      serviceFeeGap: -400000,
+      serviceFeeRate: 95.6,
+      rebateActual: 5600000,
+      rebateGap: -400000,
+      rebateRate: 93.3,
+      completionPercentage: 31.6
+    }
+  },
+  {
+    departmentId: 'DEPT_002',
+    departmentName: '华南销售部',
+    targets: {
+      totalProfitTarget: 12000000,
+      serviceFeeTarget: 7200000,
+      rebateTarget: 4800000,
+      targetPercentage: 24.0
+    },
+    achievements: {
+      totalProfitActual: 11800000,
+      totalProfitGap: -200000,
+      totalProfitRate: 98.3,
+      serviceFeeActual: 7100000,
+      serviceFeeGap: -100000,
+      serviceFeeRate: 98.6,
+      rebateActual: 4700000,
+      rebateGap: -100000,
+      rebateRate: 97.9,
+      completionPercentage: 26.2
+    }
+  },
+  {
+    departmentId: 'DEPT_003',
+    departmentName: '华北销售部',
+    targets: {
+      totalProfitTarget: 18000000,
+      serviceFeeTarget: 10800000,
+      rebateTarget: 7200000,
+      targetPercentage: 36.0
+    },
+    achievements: {
+      totalProfitActual: 16500000,
+      totalProfitGap: -1500000,
+      totalProfitRate: 91.7,
+      serviceFeeActual: 10200000,
+      serviceFeeGap: -600000,
+      serviceFeeRate: 94.4,
+      rebateActual: 6300000,
+      rebateGap: -900000,
+      rebateRate: 87.5,
+      completionPercentage: 36.7
+    }
+  }
+]
+
+// 客户分析数据（总计）
+export const customerAnalysisTotal: CustomerAnalysisData = {
+  quarter: '2025-Q1',
+  allCustomers: {
+    activeCustomerCount: 320,
+    totalProfit: 45000000,
+    serviceFee: 28000000,
+    rebate: 17000000
+  },
+  oldCustomers: {
+    activeCustomerCount: 240,
+    totalProfit: 32000000,
+    serviceFee: 20000000,
+    rebate: 12000000
+  },
+  newCustomers: {
+    activeCustomerCount: 80,
+    totalProfit: 13000000,
+    serviceFee: 8000000,
+    rebate: 5000000
+  },
+  churnedCustomers: {
+    customerCount: 25,
+    estimatedProfitLoss: 3200000,
+    estimatedServiceFeeLoss: 2000000,
+    estimatedRebateLoss: 1200000
+  }
+}
+
+// 部门客户分析数据
+export const departmentCustomerAnalysis: DepartmentCustomerAnalysis[] = [
+  {
+    departmentId: 'DEPT_001',
+    departmentName: '华东销售部',
+    customerData: {
+      quarter: '2025-Q1',
+      allCustomers: {
+        activeCustomerCount: 95,
+        totalProfit: 14200000,
+        serviceFee: 8600000,
+        rebate: 5600000
+      },
+      oldCustomers: {
+        activeCustomerCount: 72,
+        totalProfit: 10100000,
+        serviceFee: 6200000,
+        rebate: 3900000
+      },
+      newCustomers: {
+        activeCustomerCount: 23,
+        totalProfit: 4100000,
+        serviceFee: 2400000,
+        rebate: 1700000
+      },
+      churnedCustomers: {
+        customerCount: 8,
+        estimatedProfitLoss: 1100000,
+        estimatedServiceFeeLoss: 650000,
+        estimatedRebateLoss: 450000
+      }
+    },
+    departmentRanking: {
+      profitRanking: 2,
+      customerCountRanking: 1,
+      growthRanking: 2
+    }
+  },
+  {
+    departmentId: 'DEPT_002',
+    departmentName: '华南销售部',
+    customerData: {
+      quarter: '2025-Q1',
+      allCustomers: {
+        activeCustomerCount: 78,
+        totalProfit: 11800000,
+        serviceFee: 7100000,
+        rebate: 4700000
+      },
+      oldCustomers: {
+        activeCustomerCount: 58,
+        totalProfit: 8400000,
+        serviceFee: 5100000,
+        rebate: 3300000
+      },
+      newCustomers: {
+        activeCustomerCount: 20,
+        totalProfit: 3400000,
+        serviceFee: 2000000,
+        rebate: 1400000
+      },
+      churnedCustomers: {
+        customerCount: 5,
+        estimatedProfitLoss: 680000,
+        estimatedServiceFeeLoss: 410000,
+        estimatedRebateLoss: 270000
+      }
+    },
+    departmentRanking: {
+      profitRanking: 1,
+      customerCountRanking: 3,
+      growthRanking: 1
+    }
+  }
+]
+
+// 平台项目数据（总计）
+export const platformProjectsTotal: PlatformProjectData = {
+  quarter: '2025-Q1',
+  overview: {
+    totalProjects: 1250,
+    totalRebate: 17000000,
+    totalServiceFee: 28000000,
+    totalProfit: 45000000
+  },
+  platformData: {
+    allPlatformProjects: {
+      google: 620,
+      meta: 380,
+      criteo: 150,
+      bing: 100,
+      total: 1250
+    },
+    newCustomerProjects: {
+      google: 180,
+      meta: 120,
+      criteo: 45,
+      bing: 25,
+      total: 370
+    },
+    churnedCustomerProjects: {
+      google: 35,
+      meta: 20,
+      criteo: 8,
+      bing: 5,
+      total: 68
+    }
+  }
+}
+
+// 部门平台项目数据
+export const departmentPlatformProjects: DepartmentPlatformData[] = [
+  {
+    departmentId: 'DEPT_001',
+    departmentName: '华东销售部',
+    platformProjectData: {
+      quarter: '2025-Q1',
+      overview: {
+        totalProjects: 380,
+        totalRebate: 5600000,
+        totalServiceFee: 8600000,
+        totalProfit: 14200000
+      },
+      platformData: {
+        allPlatformProjects: {
+          google: 195,
+          meta: 115,
+          criteo: 45,
+          bing: 25,
+          total: 380
+        },
+        newCustomerProjects: {
+          google: 55,
+          meta: 35,
+          criteo: 15,
+          bing: 8,
+          total: 113
+        },
+        churnedCustomerProjects: {
+          google: 12,
+          meta: 8,
+          criteo: 3,
+          bing: 2,
+          total: 25
+        }
+      }
+    },
+    departmentPerformance: {
+      projectGrowthRate: 15.2,
+      profitGrowthRate: 12.8,
+      churnRate: 6.6,
+      newCustomerRate: 29.7
+    }
+  }
+]
+
+// 平台毛利贡献数据（总计）
+export const platformProfitContributionTotal: PlatformProfitContributionData = {
+  quarter: '2025-Q1',
+  allCustomers: {
+    projectCount: 1250,
+    totalProfit: 45000000,
+    serviceFee: 28000000,
+    rebate: 17000000
+  },
+  platformDetails: {
+    google: {
+      projectCount: 620,
+      totalProfit: 22500000,
+      serviceFee: 14000000,
+      rebate: 8500000,
+      profitMargin: 28.5,
+      growthRate: 12.3
+    },
+    meta: {
+      projectCount: 380,
+      totalProfit: 13500000,
+      serviceFee: 8400000,
+      rebate: 5100000,
+      profitMargin: 24.8,
+      growthRate: 8.7
+    },
+    criteo: {
+      projectCount: 150,
+      totalProfit: 6000000,
+      serviceFee: 3600000,
+      rebate: 2400000,
+      profitMargin: 22.1,
+      growthRate: 15.2
+    },
+    bing: {
+      projectCount: 100,
+      totalProfit: 3000000,
+      serviceFee: 2000000,
+      rebate: 1000000,
+      profitMargin: 18.5,
+      growthRate: 6.8
+    }
+  },
+  platformDistribution: {
+    customerCountDistribution: {
+      google: 49.6,
+      meta: 30.4,
+      criteo: 12.0,
+      bing: 8.0
+    },
+    profitDistribution: {
+      google: 50.0,
+      meta: 30.0,
+      criteo: 13.3,
+      bing: 6.7
+    },
+    serviceFeeDistribution: {
+      google: 50.0,
+      meta: 30.0,
+      criteo: 12.9,
+      bing: 7.1
+    },
+    rebateDistribution: {
+      google: 50.0,
+      meta: 30.0,
+      criteo: 14.1,
+      bing: 5.9
+    }
+  }
+}
+
+// 部门平台毛利贡献数据
+export const departmentPlatformProfitContribution: DepartmentPlatformProfitData[] = [
+  {
+    departmentId: 'DEPT_001',
+    departmentName: '华东销售部',
+    profitContributionData: {
+      quarter: '2025-Q1',
+      allCustomers: {
+        projectCount: 380,
+        totalProfit: 14200000,
+        serviceFee: 8600000,
+        rebate: 5600000
+      },
+      platformDetails: {
+        google: {
+          projectCount: 195,
+          totalProfit: 7100000,
+          serviceFee: 4300000,
+          rebate: 2800000,
+          profitMargin: 28.2,
+          growthRate: 13.5
+        },
+        meta: {
+          projectCount: 115,
+          totalProfit: 4260000,
+          serviceFee: 2580000,
+          rebate: 1680000,
+          profitMargin: 24.5,
+          growthRate: 9.2
+        },
+        criteo: {
+          projectCount: 45,
+          totalProfit: 1890000,
+          serviceFee: 1134000,
+          rebate: 756000,
+          profitMargin: 22.8,
+          growthRate: 16.8
+        },
+        bing: {
+          projectCount: 25,
+          totalProfit: 950000,
+          serviceFee: 570000,
+          rebate: 380000,
+          profitMargin: 19.2,
+          growthRate: 7.5
+        }
+      },
+      platformDistribution: {
+        customerCountDistribution: {
+          google: 51.3,
+          meta: 30.3,
+          criteo: 11.8,
+          bing: 6.6
+        },
+        profitDistribution: {
+          google: 50.0,
+          meta: 30.0,
+          criteo: 13.3,
+          bing: 6.7
+        },
+        serviceFeeDistribution: {
+          google: 50.0,
+          meta: 30.0,
+          criteo: 13.2,
+          bing: 6.6
+        },
+        rebateDistribution: {
+          google: 50.0,
+          meta: 30.0,
+          criteo: 13.5,
+          bing: 6.8
+        }
+      }
+    },
+    departmentRanking: {
+      totalProfitRanking: 2,
+      googleProfitRanking: 2,
+      metaProfitRanking: 1,
+      criteoProfitRanking: 3,
+      bingProfitRanking: 2
+    }
+  }
+]
+
+// 客户质量评估数据（总计）
+export const customerQualityTotal: CustomerQualityData = {
+  quarter: '2025-Q1',
+  customerSegments: {
+    highValue: {
+      segmentName: '高价值客户',
+      consumptionRange: '月消费≥10万美金',
+      customerCount: 25,
+      salesAmount: 18000000,
+      totalConsumption: 180000000,
+      roi: 4.2,
+      segmentPercentage: 7.8,
+      averageCustomerValue: 720000,
+      retentionRate: 95.2
+    },
+    mediumHighValue: {
+      segmentName: '中高价值客户',
+      consumptionRange: '月消费5-10万美金',
+      customerCount: 45,
+      salesAmount: 15000000,
+      totalConsumption: 120000000,
+      roi: 3.8,
+      segmentPercentage: 14.1,
+      averageCustomerValue: 333333,
+      retentionRate: 88.9
+    },
+    mediumValue: {
+      segmentName: '中等价值客户',
+      consumptionRange: '月消费3-5万美金',
+      customerCount: 85,
+      salesAmount: 8500000,
+      totalConsumption: 85000000,
+      roi: 3.2,
+      segmentPercentage: 26.6,
+      averageCustomerValue: 100000,
+      retentionRate: 82.4
+    },
+    lowMediumValue: {
+      segmentName: '中低价值客户',
+      consumptionRange: '月消费1.5-3万美金',
+      customerCount: 95,
+      salesAmount: 2850000,
+      totalConsumption: 47500000,
+      roi: 2.8,
+      segmentPercentage: 29.7,
+      averageCustomerValue: 30000,
+      retentionRate: 75.8
+    },
+    lowValue: {
+      segmentName: '低价值客户',
+      consumptionRange: '月消费＜1.5万美金',
+      customerCount: 70,
+      salesAmount: 650000,
+      totalConsumption: 21000000,
+      roi: 2.1,
+      segmentPercentage: 21.9,
+      averageCustomerValue: 9286,
+      retentionRate: 68.6
+    }
+  }
+}
+
+// 部门客户质量评估数据
+export const departmentCustomerQuality: DepartmentCustomerQualityData[] = [
+  {
+    departmentId: 'DEPT_001',
+    departmentName: '华东销售部',
+    customerQualityData: {
+      quarter: '2025-Q1',
+      customerSegments: {
+        highValue: {
+          segmentName: '高价值客户',
+          consumptionRange: '月消费≥10万美金',
+          customerCount: 8,
+          salesAmount: 5760000,
+          totalConsumption: 57600000,
+          roi: 4.3,
+          segmentPercentage: 8.4,
+          averageCustomerValue: 720000,
+          retentionRate: 100.0
+        },
+        mediumHighValue: {
+          segmentName: '中高价值客户',
+          consumptionRange: '月消费5-10万美金',
+          customerCount: 15,
+          salesAmount: 5000000,
+          totalConsumption: 40000000,
+          roi: 3.9,
+          segmentPercentage: 15.8,
+          averageCustomerValue: 333333,
+          retentionRate: 93.3
+        },
+        mediumValue: {
+          segmentName: '中等价值客户',
+          consumptionRange: '月消费3-5万美金',
+          customerCount: 25,
+          salesAmount: 2500000,
+          totalConsumption: 25000000,
+          roi: 3.3,
+          segmentPercentage: 26.3,
+          averageCustomerValue: 100000,
+          retentionRate: 84.0
+        },
+        lowMediumValue: {
+          segmentName: '中低价值客户',
+          consumptionRange: '月消费1.5-3万美金',
+          customerCount: 30,
+          salesAmount: 900000,
+          totalConsumption: 15000000,
+          roi: 2.9,
+          segmentPercentage: 31.6,
+          averageCustomerValue: 30000,
+          retentionRate: 80.0
+        },
+        lowValue: {
+          segmentName: '低价值客户',
+          consumptionRange: '月消费＜1.5万美金',
+          customerCount: 17,
+          salesAmount: 153000,
+          totalConsumption: 5100000,
+          roi: 2.2,
+          segmentPercentage: 17.9,
+          averageCustomerValue: 9000,
+          retentionRate: 70.6
+        }
+      }
+    },
+    departmentMetrics: {
+      averageCustomerValue: 149474,
+      highValueCustomerRatio: 24.2,
+      customerUpgradeRate: 12.5,
+      departmentROI: 3.4
+    }
+  }
+]
+
+// 客户贡献数据
+export const customerContribution: CustomerContributionData[] = [
+  {
+    customerId: 'CUST_001',
+    customerName: 'TechCorp Solutions',
+    salesAmount: 2400000,
+    totalProfit: 1440000,
+    totalServiceFee: 960000,
+    totalConsumption: 24000000,
+    totalRebate: 480000,
+    platformServiceFee: {
+      google: 480000,
+      meta: 288000,
+      criteo: 144000,
+      bing: 48000
+    },
+    platformConsumption: {
+      google: 12000000,
+      meta: 7200000,
+      criteo: 3600000,
+      bing: 1200000
+    },
+    platformRebate: {
+      google: 240000,
+      meta: 144000,
+      criteo: 72000,
+      bing: 24000
+    },
+    profitRanking: 1,
+    consumptionRanking: 1,
+    customerValue: 95,
+    cooperationDuration: 36
+  },
+  {
+    customerId: 'CUST_002',
+    customerName: 'Global Fashion Brand',
+    salesAmount: 1800000,
+    totalProfit: 1080000,
+    totalServiceFee: 720000,
+    totalConsumption: 18000000,
+    totalRebate: 360000,
+    platformServiceFee: {
+      google: 360000,
+      meta: 216000,
+      criteo: 108000,
+      bing: 36000
+    },
+    platformConsumption: {
+      google: 9000000,
+      meta: 5400000,
+      criteo: 2700000,
+      bing: 900000
+    },
+    platformRebate: {
+      google: 180000,
+      meta: 108000,
+      criteo: 54000,
+      bing: 18000
+    },
+    profitRanking: 2,
+    consumptionRanking: 2,
+    customerValue: 88,
+    cooperationDuration: 24
+  }
+]
+
+// 续费客户数据
+export const renewalCustomers: RenewalCustomer[] = [
+  {
+    customerId: 'CUST_001',
+    customerName: 'TechCorp Solutions',
+    salesPerson: '张三',
+    optimizationDept: '华东优化部',
+    cooperationProject: 'Google Ads + Meta广告',
+    cooperationTime: '2022-03-15',
+    cooperationYear: 2022,
+    lastCooperationPeriod: '2024年全年',
+    serviceExpiryTime: '2025-03-15',
+    lastRenewalProject: 'Google Ads优化',
+    lastRenewalAmount: 1200000,
+    daysToExpiry: 52,
+    renewalProbability: 85,
+    estimatedRenewalAmount: 1500000,
+    renewalPriority: 'high',
+    renewalStatus: 'contacted',
+    historicalValue: 3600000,
+    averageQuarterlyValue: 300000,
+    profitContribution: 1440000
+  },
+  {
+    customerId: 'CUST_002',
+    customerName: 'Global Fashion Brand',
+    salesPerson: '李四',
+    optimizationDept: '华南优化部',
+    cooperationProject: 'Multi-platform Campaign',
+    cooperationTime: '2023-06-01',
+    cooperationYear: 2023,
+    lastCooperationPeriod: '2024下半年',
+    serviceExpiryTime: '2025-06-01',
+    lastRenewalProject: 'Meta广告优化',
+    lastRenewalAmount: 800000,
+    daysToExpiry: 129,
+    renewalProbability: 72,
+    estimatedRenewalAmount: 1000000,
+    renewalPriority: 'medium',
+    renewalStatus: 'negotiating',
+    historicalValue: 2400000,
+    averageQuarterlyValue: 200000,
+    profitContribution: 1080000
+  }
+]
+
+// ============ 项目经理看板模拟数据 ============
+
+// 部门指标概览数据
+export const departmentMetrics: DepartmentMetrics = {
+  departmentId: 'DEPT_PM_001',
+  departmentName: '华东营销部',
+  totalProfit: 8500000, // 850万
+  customerCount: 45,
+  projectCount: 28,
+  departmentRanking: 2,
+  totalDepartments: 8,
+  profitGrowthRate: 18.5,
+  customerGrowthRate: 12.3,
+  targetCompletionRate: 92.8
+}
+
+// 部门目标数据（项目经理视角）
+export const departmentTarget: DepartmentTargetData = {
+  departmentId: 'DEPT_PM_001',
+  departmentName: '华东营销部',
+  targets: {
+    totalProfitTarget: 10000000,
+    serviceFeeTarget: 3500000,
+    rebateTarget: 800000,
+    targetPercentage: 18.5
+  },
+  achievements: {
+    totalProfitActual: 8500000,
+    totalProfitRate: 85.0,
+    totalProfitGap: -1500000,
+    serviceFeeActual: 3200000,
+    serviceFeeRate: 91.4,
+    serviceFeeGap: -300000,
+    rebateActual: 750000,
+    rebateRate: 93.8,
+    rebateGap: -50000,
+    completionPercentage: 17.2
+  }
+}
+
+// 部门客户分析数据（项目经理视角）
+export const departmentCustomerAnalysisForManager: DepartmentCustomerAnalysis = {
+  departmentId: 'DEPT_PM_001',
+  departmentName: '华东营销部',
+  customerData: customerAnalysisTotal, // 复用客户分析数据
+  departmentRanking: {
+    profitRanking: 2,
+    customerCountRanking: 3,
+    growthRanking: 1
+  }
+}
+
+// 部门平台分析数据
+export const departmentPlatformAnalysis: DepartmentPlatformAnalysis = {
+  departmentId: 'DEPT_PM_001',
+  departmentName: '华东营销部',
+  newOrderData: {
+    totalOrders: 245,
+    totalServiceFee: 3200000,
+    averageOrderValue: 13061,
+    platformDistribution: [
+      {
+        platform: 'Google',
+        orderCount: 98,
+        serviceFee: 1280000,
+        averageOrderValue: 13061,
+        growthRate: 15.8,
+        profitMargin: 28.5
+      },
+      {
+        platform: 'Facebook',
+        orderCount: 76,
+        serviceFee: 988000,
+        averageOrderValue: 13000,
+        growthRate: 22.3,
+        profitMargin: 31.2
+      },
+      {
+        platform: 'Amazon',
+        orderCount: 45,
+        serviceFee: 585000,
+        averageOrderValue: 13000,
+        growthRate: 8.9,
+        profitMargin: 25.8
+      },
+      {
+        platform: 'TikTok',
+        orderCount: 26,
+        serviceFee: 347000,
+        averageOrderValue: 13346,
+        growthRate: 45.2,
+        profitMargin: 35.1
+      }
+    ],
+    timeDistribution: [
+      { period: 'Q1', orders: 58, serviceFee: 754000 },
+      { period: 'Q2', orders: 62, serviceFee: 806000 },
+      { period: 'Q3', orders: 65, serviceFee: 845000 },
+      { period: 'Q4', orders: 60, serviceFee: 795000 }
+    ]
+  }
+}
+
+// 部门毛利贡献数据
+export const departmentProfitContribution: DepartmentProfitContribution = {
+  departmentId: 'DEPT_PM_001',
+  departmentName: '华东营销部',
+  totalProfit: 8500000,
+  contributionPercentage: 17.2,
+  departmentRanking: 2,
+  totalDepartments: 8,
+  profitGrowthRate: 18.5,
+  customerQualityScore: 85,
+  averageCustomerValue: 188889,
+  highValueCustomerRatio: 22.2,
+  efficiencyScore: 88,
+  perCapitaOutput: 708333,
+  customerConversionRate: 12.8,
+  profitMargin: 28.5,
+  
+  platformProfit: {
+    google: 3400000,
+    facebook: 2550000,
+    amazon: 1700000,
+    others: 850000
+  },
+  
+  serviceProfit: {
+    advertising: 4250000,
+    optimization: 2125000,
+    analytics: 1275000,
+    consulting: 850000
+  },
+  
+  customerProfit: {
+    gradeA: 5100000,
+    gradeB: 2550000,
+    gradeC: 850000
+  },
+  
+  topCustomers: [
+    {
+      customerId: 'CUST_001',
+      customerName: 'TechCorp Solutions',
+      profitContribution: 850000,
+      contributionPercentage: 10.0,
+      isCore: true
+    },
+    {
+      customerId: 'CUST_002',
+      customerName: 'Global E-commerce Inc',
+      profitContribution: 680000,
+      contributionPercentage: 8.0,
+      isCore: true
+    },
+    {
+      customerId: 'CUST_003',
+      customerName: 'Fashion Forward Ltd',
+      profitContribution: 595000,
+      contributionPercentage: 7.0,
+      isCore: true
+    },
+    {
+      customerId: 'CUST_004',
+      customerName: 'Home & Garden Pro',
+      profitContribution: 510000,
+      contributionPercentage: 6.0,
+      isCore: true
+    },
+    {
+      customerId: 'CUST_005',
+      customerName: 'Sports World Co',
+      profitContribution: 425000,
+      contributionPercentage: 5.0,
+      isCore: false
+    }
+  ]
+}
+
+// 所有部门数据用于对比
+export const allDepartmentsData = {
+  departments: [departmentMetrics],
+  departmentTargets: [departmentTarget],
+  departmentCustomerAnalysis: [departmentCustomerAnalysisForManager],
+  departmentPlatformAnalysis: [departmentPlatformAnalysis],
+  departmentProfitContribution: [departmentProfitContribution]
+}
+
 // API 模拟函数
 export const businessAPI = {
   // 获取角色列表
@@ -1183,7 +2085,65 @@ export const businessAPI = {
   getPersonalCustomerDetails: () => Promise.resolve(personalCustomerDetails),
   
   // 获取个人续费任务数据
-  getPersonalRenewalTasks: () => Promise.resolve(personalRenewalTasks)
+  getPersonalRenewalTasks: () => Promise.resolve(personalRenewalTasks),
+
+  // ============ 项目总监看板 API 函数 ============
+  
+  // 获取运营目标数据
+  getOperationTargets: () => Promise.resolve(operationTargets),
+  
+  // 获取部门目标数据
+  getDepartmentTargets: () => Promise.resolve(departmentTargets),
+  
+  // 获取客户分析数据（总计）
+  getCustomerAnalysisTotal: () => Promise.resolve(customerAnalysisTotal),
+  
+  // 获取部门客户分析数据
+  getDepartmentCustomerAnalysis: () => Promise.resolve(departmentCustomerAnalysis),
+  
+  // 获取平台项目数据（总计）
+  getPlatformProjectsTotal: () => Promise.resolve(platformProjectsTotal),
+  
+  // 获取部门平台项目数据
+  getDepartmentPlatformProjects: () => Promise.resolve(departmentPlatformProjects),
+  
+  // 获取平台毛利贡献数据（总计）
+  getPlatformProfitContributionTotal: () => Promise.resolve(platformProfitContributionTotal),
+  
+  // 获取部门平台毛利贡献数据
+  getDepartmentPlatformProfitContribution: () => Promise.resolve(departmentPlatformProfitContribution),
+  
+  // 获取客户质量评估数据（总计）
+  getCustomerQualityTotal: () => Promise.resolve(customerQualityTotal),
+  
+  // 获取部门客户质量评估数据
+  getDepartmentCustomerQuality: () => Promise.resolve(departmentCustomerQuality),
+  
+  // 获取客户贡献数据
+  getCustomerContribution: () => Promise.resolve(customerContribution),
+  
+  // 获取续费客户数据
+  getRenewalCustomers: () => Promise.resolve(renewalCustomers),
+
+  // ============ 项目经理看板 API 函数 ============
+  
+  // 获取部门指标概览
+  getDepartmentMetrics: () => Promise.resolve(departmentMetrics),
+  
+  // 获取部门目标数据（项目经理视角）
+  getDepartmentTarget: () => Promise.resolve(departmentTarget),
+  
+  // 获取部门客户分析数据（项目经理视角）
+  getDepartmentCustomerAnalysisForManager: () => Promise.resolve(departmentCustomerAnalysisForManager),
+  
+  // 获取部门平台分析数据
+  getDepartmentPlatformAnalysis: () => Promise.resolve(departmentPlatformAnalysis),
+  
+  // 获取部门毛利贡献数据
+  getDepartmentProfitContribution: () => Promise.resolve(departmentProfitContribution),
+  
+  // 获取所有部门数据用于对比
+  getAllDepartmentsData: () => Promise.resolve(allDepartmentsData)
 }
 
 export default businessAPI
