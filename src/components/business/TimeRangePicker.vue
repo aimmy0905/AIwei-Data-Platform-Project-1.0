@@ -111,7 +111,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-vue-next'
 import type { TimeRange } from '@/types'
 
@@ -143,9 +143,9 @@ const customEndDate = ref('')
 
 // 配置
 const tabs = [
-  { type: 'quick', label: '快捷选择' },
-  { type: 'custom', label: '自定义' },
-  { type: 'period', label: '周期' }
+  { type: 'quick' as const, label: '快捷选择' },
+  { type: 'custom' as const, label: '自定义' },
+  { type: 'period' as const, label: '周期' }
 ]
 
 const quickOptions = [
@@ -162,9 +162,9 @@ const quickOptions = [
 ]
 
 const periodTypes = [
-  { value: 'yearly', label: '年度' },
-  { value: 'quarterly', label: '季度' },
-  { value: 'monthly', label: '月度' }
+  { value: 'yearly' as const, label: '年度' },
+  { value: 'quarterly' as const, label: '季度' },
+  { value: 'monthly' as const, label: '月度' }
 ]
 
 // 计算属性
@@ -306,45 +306,45 @@ const formatDate = (date: Date): string => {
 const getQuickDateRange = (option: string): { start: Date; end: Date } => {
   const now = new Date()
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  
+
   switch (option) {
     case 'today':
       return { start: today, end: today }
-    
+
     case 'yesterday':
       const yesterday = new Date(today)
       yesterday.setDate(yesterday.getDate() - 1)
       return { start: yesterday, end: yesterday }
-    
+
     case 'current_week':
       const weekStart = new Date(today)
       weekStart.setDate(today.getDate() - today.getDay())
       const weekEnd = new Date(weekStart)
       weekEnd.setDate(weekStart.getDate() + 6)
       return { start: weekStart, end: weekEnd }
-    
+
     case 'last_week':
       const lastWeekEnd = new Date(today)
       lastWeekEnd.setDate(today.getDate() - today.getDay() - 1)
       const lastWeekStart = new Date(lastWeekEnd)
       lastWeekStart.setDate(lastWeekEnd.getDate() - 6)
       return { start: lastWeekStart, end: lastWeekEnd }
-    
+
     case 'current_month':
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
       const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
       return { start: monthStart, end: monthEnd }
-    
+
     case 'last_month':
       const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
       const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0)
       return { start: lastMonthStart, end: lastMonthEnd }
-    
+
     case 'current_quarter':
       const quarterStart = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1)
       const quarterEnd = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3 + 3, 0)
       return { start: quarterStart, end: quarterEnd }
-    
+
     case 'last_quarter':
       const lastQuarterStartMonth = Math.floor(now.getMonth() / 3) * 3 - 3
       const lastQuarterYear = lastQuarterStartMonth < 0 ? now.getFullYear() - 1 : now.getFullYear()
@@ -352,17 +352,17 @@ const getQuickDateRange = (option: string): { start: Date; end: Date } => {
       const lastQuarterStart = new Date(lastQuarterYear, adjustedMonth, 1)
       const lastQuarterEnd = new Date(lastQuarterYear, adjustedMonth + 3, 0)
       return { start: lastQuarterStart, end: lastQuarterEnd }
-    
+
     case 'current_year':
       const yearStart = new Date(now.getFullYear(), 0, 1)
       const yearEnd = new Date(now.getFullYear(), 11, 31)
       return { start: yearStart, end: yearEnd }
-    
+
     case 'last_year':
       const lastYearStart = new Date(now.getFullYear() - 1, 0, 1)
       const lastYearEnd = new Date(now.getFullYear() - 1, 11, 31)
       return { start: lastYearStart, end: lastYearEnd }
-    
+
     default:
       return { start: today, end: today }
   }
@@ -385,7 +385,7 @@ const getPeriodDateRange = (): { start: Date; end: Date } => {
   }
 }
 
-const updateTimeRange = () => {
+const updateTimeRange = (skipEmit = false) => {
   let timeRange: TimeRange
 
   if (selectedTab.value === 'quick') {
@@ -418,12 +418,16 @@ const updateTimeRange = () => {
   }
 
   emit('update:modelValue', timeRange)
-  emit('change', timeRange)
+
+  // 在初始化时跳过 change 事件，避免死循环
+  if (!skipEmit) {
+    emit('change', timeRange)
+  }
 }
 
 // 初始化
 onMounted(() => {
-  updateTimeRange()
+  updateTimeRange(true) // 初始化时跳过 change 事件避免死循环
 })
 
 // 键盘快捷键

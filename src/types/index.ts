@@ -2236,6 +2236,163 @@ export interface BusinessDashboardFilter {
   customerId?: number
 }
 
+// ============ 销售经理看板特定类型 ============
+
+// 团队指标概览
+export interface TeamMetrics {
+  teamId: string
+  teamName: string
+  memberCount: number
+  totalServiceFee: number
+  totalNewOrders: number
+  totalCustomers: number
+  averageCompletionRate: number
+  teamRanking: number
+  topPerformer: {
+    employeeId: string
+    employeeName: string
+    completionRate: number
+  }
+}
+
+// 团队成员绩效数据
+export interface TeamMemberPerformance {
+  employeeId: string
+  employeeName: string
+  serviceFeeTarget: number
+  serviceFeeActual: number
+  newOrdersTarget: number
+  newOrdersActual: number
+  serviceFeeCompletionRate: number
+  newOrdersCompletionRate: number
+  overallCompletionRate: number
+  performanceLevel: 'excellent' | 'good' | 'needImprovement'
+  monthlyTrend: {
+    currentMonth: number
+    lastMonth: number
+    trendDirection: 'up' | 'down' | 'stable'
+  }
+  customerCount: number
+  avgCustomerValue: number
+}
+
+// 团队销售统计
+export interface TeamSalesStatistics {
+  teamCompletionRate: number
+  teamRanking: number
+  totalTeams: number
+  memberDistribution: {
+    excellent: number      // >120% 完成率
+    good: number          // 80-120% 完成率
+    needImprovement: number // <80% 完成率
+  }
+  monthlyTrend: {
+    currentMonth: number
+    lastMonth: number
+    trendDirection: 'up' | 'down' | 'stable'
+  }
+}
+
+// 模块时间筛选器
+export interface ModuleTimeFilter {
+  moduleId: string
+  timeRange: TimeRange
+  isSynced: boolean
+}
+
+// ============ 销售人员看板特定类型 ============
+
+// 个人绩效概览
+export interface PersonalPerformance {
+  employeeId: string
+  employeeName: string
+  serviceFeeTarget: number
+  serviceFeeActual: number
+  newOrdersTarget: number
+  newOrdersActual: number
+  serviceFeeCompletionRate: number
+  newOrdersCompletionRate: number
+  overallCompletionRate: number
+  teamRanking: number
+  totalTeamMembers: number
+  assignedCustomerCount: number
+  monthlyTrend: {
+    currentMonth: number
+    lastMonth: number
+    trendDirection: 'up' | 'down' | 'stable'
+  }
+}
+
+// 个人客户分类
+export interface PersonalCustomerCategory {
+  categoryType: 'key' | 'growth' | 'maintenance' | 'risk'
+  customerCount: number
+  totalServiceFee: number
+  totalProfit: number
+  averageProfitMargin: number
+}
+
+// 个人平台绩效
+export interface PersonalPlatformPerformance {
+  platform: string
+  serviceFee: number
+  orderCount: number
+  customerCount: number
+  averageOrderValue: number
+  profitMargin: number
+  performanceLevel: 'excellent' | 'good' | 'average' | 'needImprovement'
+  color: string
+}
+
+// 个人客户详情
+export interface PersonalCustomerDetail {
+  id: number
+  customerName: string
+  industry: string
+  cooperationStartDate: string
+  category: 'key' | 'growth' | 'maintenance' | 'risk'
+  totalProfit: number
+  totalServiceFee: number
+  profitMargin: number
+  lastContactDate: string
+  nextFollowUpDate: string
+  communicationFrequency: 'high' | 'medium' | 'low'
+  satisfactionScore: number
+  churnRisk: 'high' | 'medium' | 'low'
+  platforms: string[]
+  notes: string
+}
+
+// 个人续费任务
+export interface PersonalRenewalTask {
+  id: number
+  customerName: string
+  contractEndDate: string
+  renewalStatus: 'pending' | 'contacted' | 'negotiating' | 'confirmed' | 'declined'
+  taskType: 'call' | 'email' | 'meeting' | 'proposal'
+  priority: 'high' | 'medium' | 'low'
+  lastYearRevenue: number
+  estimatedRenewalValue: number
+  renewalProbability: number
+  lastContactDate: string
+  nextFollowUpDate: string
+  daysUntilExpiry: number
+  notes: string
+  reminderSet: boolean
+}
+
+// 个人日常任务
+export interface PersonalDailyTask {
+  id: number
+  taskType: 'customer_follow_up' | 'renewal_contact' | 'proposal_preparation' | 'meeting_schedule'
+  customerName: string
+  description: string
+  priority: 'high' | 'medium' | 'low'
+  dueDate: string
+  completed: boolean
+  estimatedDuration: number // minutes
+}
+
 // ============ 结束业务看板模块类型定义 ============
 
 // 红人数据管理相关类型定义
@@ -2388,4 +2545,661 @@ export interface PostDataForm {
   interactionRate: number | null
   customerId: string
   projectId: string
+}
+
+// ============ 项目总监看板特定类型 ============
+
+// 运营目标数据
+export interface OperationTargetData {
+  quarter: string // 季度标识 YYYY-Q1
+  targets: {
+    totalProfitTarget: number // 合计毛利目标
+    serviceFeeTarget: number // 服务费目标
+    rebateTarget: number // 返点目标
+  }
+  achievements: {
+    totalProfitActual: number // 合计毛利完成
+    totalProfitGap: number // 毛利差额
+    totalProfitRate: number // 毛利完成百分比
+    serviceFeeActual: number // 服务费完成
+    serviceFeeGap: number // 服务费差额
+    serviceFeeRate: number // 服务费完成百分比
+    rebateActual: number // 返点完成
+    rebateGap: number // 返点差额
+    rebateRate: number // 返点完成百分比
+  }
+}
+
+// 部门目标数据
+export interface DepartmentTargetData {
+  departmentId: string // 部门ID
+  departmentName: string // 部门名称
+  targets: {
+    totalProfitTarget: number // 合计毛利目标
+    serviceFeeTarget: number // 服务费目标
+    rebateTarget: number // 返点目标
+    targetPercentage: number // 目标占比
+  }
+  achievements: {
+    totalProfitActual: number // 合计毛利完成
+    totalProfitGap: number // 毛利差额
+    totalProfitRate: number // 毛利完成百分比
+    serviceFeeActual: number // 服务费完成
+    serviceFeeGap: number // 服务费差额
+    serviceFeeRate: number // 服务费完成百分比
+    rebateActual: number // 返点完成
+    rebateGap: number // 返点差额
+    rebateRate: number // 返点完成百分比
+    completionPercentage: number // 完成占比
+  }
+}
+
+// 客户分析数据
+export interface CustomerAnalysisData {
+  quarter: string // 季度标识
+  allCustomers: {
+    activeCustomerCount: number // 活跃客户数（以客户名称为定量）
+    totalProfit: number // 总毛利
+    serviceFee: number // 服务费
+    rebate: number // 返点
+  }
+  oldCustomers: { // 2025前客户（老客户）
+    activeCustomerCount: number // 活跃客户数
+    totalProfit: number // 总毛利
+    serviceFee: number // 服务费
+    rebate: number // 返点
+  }
+  newCustomers: { // 2025年新签客户（新客户）
+    activeCustomerCount: number // 活跃客户数
+    totalProfit: number // 总毛利
+    serviceFee: number // 服务费
+    rebate: number // 返点
+  }
+  churnedCustomers: { // 2025年流失客户
+    customerCount: number // 客户数
+    estimatedProfitLoss: number // 预估流失毛利
+    estimatedServiceFeeLoss: number // 预估流失服务费
+    estimatedRebateLoss: number // 预估流失返点
+  }
+}
+
+// 部门客户分析
+export interface DepartmentCustomerAnalysis {
+  departmentId: string // 部门ID
+  departmentName: string // 部门名称
+  customerData: CustomerAnalysisData // 客户分析数据（复用上面的结构）
+  departmentRanking: { // 部门排名
+    profitRanking: number // 毛利排名
+    customerCountRanking: number // 客户数排名
+    growthRanking: number // 增长率排名
+  }
+}
+
+// 平台项目数据详情
+export interface PlatformProjectDetail {
+  google: number // Google平台数据
+  meta: number // Meta平台数据
+  criteo: number // Criteo平台数据
+  bing: number // Bing平台数据
+  total: number // 总计
+}
+
+// 平台项目数据
+export interface PlatformProjectData {
+  quarter: string // 季度标识
+  overview: {
+    totalProjects: number // 项目数
+    totalRebate: number // 项目对应返点
+    totalServiceFee: number // 项目对应服务费用
+    totalProfit: number // 总毛利
+  }
+  platformData: {
+    allPlatformProjects: PlatformProjectDetail // 所有平台项目数
+    newCustomerProjects: PlatformProjectDetail // 2025年新签客户数（新客户）
+    churnedCustomerProjects: PlatformProjectDetail // 2025年流失客户数
+  }
+}
+
+// 部门平台项目数据
+export interface DepartmentPlatformData {
+  departmentId: string // 部门ID
+  departmentName: string // 部门名称
+  platformProjectData: PlatformProjectData // 平台项目数据（复用上面的结构）
+  departmentPerformance: { // 部门表现
+    projectGrowthRate: number // 项目增长率
+    profitGrowthRate: number // 毛利增长率
+    churnRate: number // 流失率
+    newCustomerRate: number // 新客户获取率
+  }
+}
+
+// 平台分布占比
+export interface PlatformDistribution {
+  google: number // Google占比
+  meta: number // Meta占比
+  criteo: number // Criteo占比
+  bing: number // Bing占比
+}
+
+// 平台毛利详情
+export interface PlatformProfitDetail {
+  projectCount: number // 项目数
+  totalProfit: number // 总毛利
+  serviceFee: number // 服务费
+  rebate: number // 返点
+  profitMargin: number // 毛利率
+  growthRate: number // 增长率
+}
+
+// 平台毛利贡献数据
+export interface PlatformProfitContributionData {
+  quarter: string // 季度标识
+  allCustomers: {
+    projectCount: number // 项目数
+    totalProfit: number // 总毛利
+    serviceFee: number // 服务费
+    rebate: number // 返点
+  }
+  platformDetails: {
+    google: PlatformProfitDetail
+    meta: PlatformProfitDetail
+    criteo: PlatformProfitDetail
+    bing: PlatformProfitDetail
+  }
+  platformDistribution: { // 各平台占比
+    customerCountDistribution: PlatformDistribution
+    profitDistribution: PlatformDistribution
+    serviceFeeDistribution: PlatformDistribution
+    rebateDistribution: PlatformDistribution
+  }
+}
+
+// 部门平台毛利数据
+export interface DepartmentPlatformProfitData {
+  departmentId: string // 部门ID
+  departmentName: string // 部门名称
+  profitContributionData: PlatformProfitContributionData // 平台毛利贡献数据
+  departmentRanking: { // 部门排名
+    totalProfitRanking: number // 总毛利排名
+    googleProfitRanking: number // Google毛利排名
+    metaProfitRanking: number // Meta毛利排名
+    criteoProfitRanking: number // Criteo毛利排名
+    bingProfitRanking: number // Bing毛利排名
+  }
+}
+
+// 客户分段数据
+export interface CustomerSegmentData {
+  segmentName: string // 客户分段名称
+  consumptionRange: string // 消费范围
+  customerCount: number // 客户数
+  salesAmount: number // 销售额
+  totalConsumption: number // 总消费（所有平台）
+  roi: number // ROI
+  segmentPercentage: number // 各类型客户占比
+  averageCustomerValue: number // 平均客户价值
+  retentionRate: number // 客户留存率
+}
+
+// 客户质量数据
+export interface CustomerQualityData {
+  quarter: string // 季度标识
+  customerSegments: {
+    highValue: CustomerSegmentData // 月消费10万美金以上客户
+    mediumHighValue: CustomerSegmentData // 月消费5-10万美金客户
+    mediumValue: CustomerSegmentData // 月消费3-5万美金客户
+    lowMediumValue: CustomerSegmentData // 月消费1.5-3万美金客户
+    lowValue: CustomerSegmentData // 月消费1.5万以下美金客户
+  }
+}
+
+// 部门客户质量数据
+export interface DepartmentCustomerQualityData {
+  departmentId: string // 部门ID
+  departmentName: string // 部门名称
+  customerQualityData: CustomerQualityData // 客户质量数据
+  departmentMetrics: { // 部门指标
+    averageCustomerValue: number // 平均客户价值
+    highValueCustomerRatio: number // 高价值客户占比
+    customerUpgradeRate: number // 客户升级率
+    departmentROI: number // 部门整体ROI
+  }
+}
+
+// 客户贡献数据
+export interface CustomerContributionData {
+  customerId: string // 客户ID
+  customerName: string // 客户名称
+  salesAmount: number // 销售额
+  totalProfit: number // 总毛利
+  totalServiceFee: number // 总服务费
+  totalConsumption: number // 总消费
+  totalRebate: number // 总返点
+  // 分平台服务费
+  platformServiceFee: {
+    google: number // Google服务费
+    meta: number // Meta服务费
+    criteo: number // Criteo服务费
+    bing: number // Bing服务费
+  }
+  // 分平台消费
+  platformConsumption: {
+    google: number // Google消费
+    meta: number // Meta消费
+    criteo: number // Criteo消费
+    bing: number // Bing消费
+  }
+  // 分平台返点
+  platformRebate: {
+    google: number // Google返点
+    meta: number // Meta返点
+    criteo: number // Criteo返点
+    bing: number // Bing返点
+  }
+  // 客户排名和指标
+  profitRanking: number // 毛利排名
+  consumptionRanking: number // 消费排名
+  customerValue: number // 客户价值评分
+  cooperationDuration: number // 合作时长（月）
+}
+
+// 续费客户数据
+export interface RenewalCustomerData {
+  customerId: string // 客户ID
+  customerName: string // 客户名称
+  salesPerson: string // 销售
+  optimizationDept: string // 优化部门
+  cooperationProject: string // 合作项目
+  cooperationTime: string // 合作时间
+  cooperationYear: number // 合作年份
+  lastCooperationPeriod: string // 上一次合作周期
+  serviceExpiryTime: string // 服务到期时间
+  lastRenewalProject: string // 上一次续费项目
+  lastRenewalAmount: number // 上一次续费金额
+  // 续费分析
+  daysToExpiry: number // 距离到期天数
+  renewalProbability: number // 续费概率
+  estimatedRenewalAmount: number // 预估续费金额
+  renewalPriority: 'high' | 'medium' | 'low' // 续费优先级
+  renewalStatus: 'pending' | 'contacted' | 'negotiating' | 'confirmed' // 续费状态
+  // 客户价值
+  historicalValue: number // 历史总价值
+  averageQuarterlyValue: number // 平均季度价值
+  profitContribution: number // 毛利贡献
+}
+
+// ============ 项目经理看板特定类型 ============
+
+// 部门指标概览
+export interface DepartmentMetrics {
+  departmentId: string // 部门ID
+  departmentName: string // 部门名称
+  totalProfit: number // 部门总毛利
+  customerCount: number // 部门客户数
+  projectCount: number // 部门项目数
+  departmentRanking: number // 部门排名
+  totalDepartments: number // 总部门数
+  profitGrowthRate: number // 毛利增长率
+  customerGrowthRate: number // 客户增长率
+  targetCompletionRate: number // 目标完成率
+}
+
+// 部门平台分析数据
+export interface DepartmentPlatformAnalysis {
+  departmentId: string // 部门ID
+  departmentName: string // 部门名称
+  newOrderData: NewOrderServiceFeeData // 部门新订单数据，包含平台分布等
+}
+
+// 部门毛利贡献数据
+export interface DepartmentProfitContribution {
+  departmentId: string // 部门ID
+  departmentName: string // 部门名称
+  totalProfit: number // 部门总毛利
+  contributionPercentage: number // 占公司总毛利的百分比
+  departmentRanking: number // 部门排名
+  totalDepartments: number // 总部门数
+  profitGrowthRate: number // 毛利增长率
+  customerQualityScore: number // 客户质量评分(0-100)
+  averageCustomerValue: number // 平均客户价值
+  highValueCustomerRatio: number // 高价值客户占比
+  efficiencyScore: number // 效率评分(0-100)
+  perCapitaOutput: number // 人均产出
+  customerConversionRate: number // 客户转化率
+  profitMargin: number // 毛利率
+
+  // 平台毛利分布
+  platformProfit: {
+    google: number
+    facebook: number
+    amazon: number
+    others: number
+  }
+
+  // 服务毛利分布
+  serviceProfit: {
+    advertising: number // 广告投放
+    optimization: number // 优化服务
+    analytics: number // 数据分析
+    consulting: number // 咨询服务
+  }
+
+  // 客户等级毛利分布
+  customerProfit: {
+    gradeA: number
+    gradeB: number
+    gradeC: number
+  }
+
+  // 核心客户贡献
+  topCustomers: Array<{
+    customerId: string
+    customerName: string
+    profitContribution: number // 毛利贡献
+    contributionPercentage: number // 贡献占比
+    isCore: boolean // 是否核心客户
+  }>
+}
+
+// ============ Google优化师看板特定类型 ============
+
+// Google优化师指标概览
+export interface OptimizerMetrics {
+  optimizerId: string // 优化师ID
+  optimizerName: string // 优化师姓名
+  platform: 'google' | 'meta' | 'criteo' | 'bing' // 主要平台
+  customerCount: number // 负责客户数
+  totalProfit: number // 个人毛利完成
+  platformROI: number // 主平台ROI
+  lowBalanceAccounts: number // 余额预警账户数
+  monthlyGrowth: {
+    profitGrowth: number
+    roiGrowth: number
+    customerGrowth: number
+  }
+  targetCompletion: number // 目标完成率
+}
+
+// Google优化师目标完成数据
+export interface OptimizerTargetData {
+  quarter: string // 季度标识
+  optimizerId: string // 优化师ID
+  quarterCompletion: number // 季度完成率
+  currentProfit: number // 当前毛利
+  targetProfit: number // 目标毛利
+  currentCustomers: number // 当前客户数
+  targetCustomers: number // 目标客户数
+  currentROI: number // 当前ROI
+  targetROI: number // 目标ROI
+  monthlyTrends: Array<{
+    month: string
+    profitCompletion: number
+    roiCompletion: number
+  }>
+  monthlyBreakdown: Array<{
+    period: string
+    target: number
+    actual: number
+    completionRate: number
+    variance: number
+  }>
+  weeklyBreakdown: Array<{
+    period: string
+    target: number
+    actual: number
+    completionRate: number
+    variance: number
+  }>
+  targets: {
+    totalProfitTarget: number // 合计毛利目标
+    serviceFeeTarget: number // 服务费目标
+    rebateTarget: number // 返点目标
+  }
+  achievements: {
+    totalProfitActual: number // 合计毛利完成
+    totalProfitGap: number // 毛利差额
+    totalProfitProgress: number // 毛利完成进度
+    serviceFeeActual: number // 服务费完成
+    serviceFeeGap: number // 服务费差额
+    serviceFeeProgress: number // 服务费完成进度
+    rebateActual: number // 返点完成
+    rebateGap: number // 返点差额
+    rebateProgress: number // 返点完成进度
+  }
+  teamRanking: number // 在团队中的排名
+}
+
+// Google优化师客户分析数据
+export interface OptimizerCustomerAnalysisData {
+  quarter: string // 季度标识
+  optimizerId: string // 优化师ID
+  newCustomerConversionRate: number // 新客转化率
+  newCustomers: {
+    count: number
+    conversionRate: number
+    avgSpend: number
+    avgROI: number
+  }
+  existingCustomers: {
+    count: number
+    retentionRate: number
+    avgSpend: number
+    avgROI: number
+  }
+  churnCustomers: {
+    count: number
+    churnRate: number
+    avgLifetime: number
+    avgValue: number
+  }
+  acquisitionFunnel: {
+    overallConversionRate: number
+    stages: Array<{
+      stageName: string
+      count: number
+      conversionRate: number
+      dropoffRate: number
+    }>
+  }
+  lifecycleStages: Array<{
+    stageName: string
+    count: number
+    percentage: number
+    avgValue: number
+    icon: string
+  }>
+  valueSegments: Array<{
+    segmentName: string
+    customerCount: number
+    percentage: number
+    totalValue: number
+  }>
+  customerDetails: Array<{
+    customerId: string
+    customerName: string
+    type: 'new' | 'existing' | 'churn'
+    spend: number
+    roi: number
+    lastActivity: string
+    status: string
+  }>
+  allProjects: {
+    activeCustomerCount: number // 活跃客户数
+    totalProfit: number // 总毛利
+    serviceFee: number // 服务费
+    rebate: number // 返点
+  }
+  oldCustomers: {
+    activeCustomerCount: number
+    totalProfit: number
+    serviceFee: number
+    rebate: number
+  }
+  churnedCustomers: {
+    customerCount: number
+    estimatedProfitLoss: number
+    estimatedServiceFeeLoss: number
+    estimatedRebateLoss: number
+  }
+}
+
+// Google优化师客户质量评估数据
+export interface OptimizerCustomerQualityData {
+  quarter: string // 季度标识
+  optimizerId: string // 优化师ID
+  averageQualityScore: number // 平均质量评分
+  qualitySegments: {
+    excellent: {
+      count: number
+      percentage: number
+      avgROI: number
+      retentionRate: number
+    }
+    good: {
+      count: number
+      percentage: number
+      avgROI: number
+      retentionRate: number
+    }
+    average: {
+      count: number
+      percentage: number
+      avgROI: number
+      retentionRate: number
+    }
+    poor: {
+      count: number
+      percentage: number
+      avgROI: number
+      retentionRate: number
+    }
+  }
+  radarData: {
+    current: {
+      spend: number
+      roi: number
+      conversion: number
+      retention: number
+      engagement: number
+      satisfaction: number
+    }
+    benchmark: {
+      spend: number
+      roi: number
+      conversion: number
+      retention: number
+      engagement: number
+      satisfaction: number
+    }
+  }
+  improvementSuggestions: Array<{
+    id: string
+    title: string
+    priority: 'high' | 'medium' | 'low'
+    impact: string
+    effort: string
+    description: string
+  }>
+  customerQualityDetails: Array<{
+    customerId: string
+    customerName: string
+    qualityScore: number
+    qualityLevel: 'excellent' | 'good' | 'average' | 'poor'
+    spend: number
+    roi: number
+    retentionRate: number
+    improvementAreas: string[]
+    lastEvaluation: string
+  }>
+  customerSegments: {
+    highValue: OptimizerCustomerSegment // 月消费10万美金以上
+    mediumHighValue: OptimizerCustomerSegment // 月消费5-10万美金
+    mediumValue: OptimizerCustomerSegment // 月消费3-5万美金
+    lowMediumValue: OptimizerCustomerSegment // 月消费1.5-3万美金
+    lowValue: OptimizerCustomerSegment // 月消费1.5万以下
+  }
+}
+
+export interface OptimizerCustomerSegment {
+  segmentName: string // 客户分段名称
+  customerCount: number // 客户数
+  salesAmount: number // 销售额
+  totalConsumption: number // 总消费（所有平台）
+  roi: number // ROI
+  segmentPercentage: number // 各类型客户占比
+  platformBreakdown: {
+    google: number
+    meta: number
+    criteo: number
+    bing: number
+  }
+}
+
+// 账户余额管理数据
+export interface AccountBalanceData {
+  optimizerId: string // 优化师ID
+  summary: {
+    totalAccounts: number // 总账户数
+    warningAccounts: number // 预警账户数
+    totalBalance: number // 总余额
+    averageRemainingDays: number // 平均剩余天数
+  }
+  customerAccounts: CustomerAccountBalance[]
+}
+
+export interface CustomerAccountBalance {
+  customerId: string // 客户ID
+  customerName: string // 客户名称
+  adAccount: string // 广告账户
+  accountBalance: number // 账户余额
+  past7DaysAvgSpend: number // 过去7天平均花费
+  estimatedDays: number // 预计使用天数
+  warningLevel: 'critical' | 'warning' | 'normal' // 预警级别
+  lastUpdated: string // 最后更新时间
+}
+
+// Google广告数据总览
+export interface GoogleAdsOverviewData {
+  optimizerId: string // 优化师ID
+  summary: {
+    totalSpend: number // 总花费
+    totalImpressions: number // 总展示
+    totalClicks: number // 总点击
+    totalConversions: number // 总转化
+    avgCPC: number // 平均CPC
+    avgCTR: number // 平均CTR
+    avgConversionRate: number // 平均转化率
+    totalROAS: number // 总ROAS
+  }
+  customerAdsData: CustomerGoogleAdsData[]
+  anomalyAlerts: AnomalyAlert[] // 异常数据提醒
+}
+
+export interface CustomerGoogleAdsData {
+  customerId: string // 客户ID
+  customerName: string // 客户名称
+  campaignCount: number // 广告系列数
+  spend: number // 花费
+  impressions: number // 展示
+  clicks: number // 点击
+  conversions: number // 转化
+  cpc: number // CPC
+  ctr: number // CTR
+  conversionRate: number // 转化率
+  roas: number // ROAS
+  lastOptimized: string // 最后优化时间
+  performanceStatus: 'excellent' | 'good' | 'needs_attention' | 'poor' // 表现状态
+}
+
+export interface AnomalyAlert {
+  alertId: string // 提醒ID
+  customerId: string // 客户ID
+  customerName: string // 客户名称
+  alertType: 'cpc_spike' | 'spend_drop' | 'conversion_drop' | 'roas_drop' // 提醒类型
+  severity: 'high' | 'medium' | 'low' // 严重程度
+  currentValue: number // 当前值
+  expectedValue: number // 预期值
+  deviation: number // 偏差百分比
+  detectedAt: string // 检测时间
+  description: string // 描述
 }
