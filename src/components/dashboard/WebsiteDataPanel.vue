@@ -230,20 +230,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日AOI趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in aoiTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (aoiTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-info)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('aoi')"
+                      :key="index"
+                      class="bar-item bar-item--info"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in aoiTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (aoiTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-info)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -270,20 +284,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日转化成本趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in orderCostTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (orderCostTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-error)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('orderCost')"
+                      :key="index"
+                      class="bar-item bar-item--error"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in orderCostTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (orderCostTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-error)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -310,20 +338,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日订单价值趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in avgOrderValueTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (avgOrderValueTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-success)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('avgOrderValue')"
+                      :key="index"
+                      class="bar-item bar-item--success"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in avgOrderValueTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (avgOrderValueTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-success)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -350,20 +392,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日转化率趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in conversionTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (conversionTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-primary)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('conversion')"
+                      :key="index"
+                      class="bar-item bar-item--primary"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in conversionTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (conversionTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-primary)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -388,20 +444,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日访问次数趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in storeVisitsTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (storeVisitsTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-info)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('storeVisits')"
+                      :key="index"
+                      class="bar-item bar-item--info"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in storeVisitsTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (storeVisitsTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-info)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -428,20 +498,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日访问成本趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in visitCostTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (visitCostTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-warning)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('visitCost')"
+                      :key="index"
+                      class="bar-item bar-item--warning"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in visitCostTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (visitCostTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-warning)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -473,20 +557,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日订单量趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in ordersTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (ordersTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-success)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('orders')"
+                      :key="index"
+                      class="bar-item bar-item--success"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in ordersTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (ordersTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-success)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -511,20 +609,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日订单订购数量趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in orderItemsTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (orderItemsTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-info)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('orderItems')"
+                      :key="index"
+                      class="bar-item bar-item--info"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in orderItemsTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (orderItemsTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-info)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -549,20 +661,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日客户订单数趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in ordersPerCustomerTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (ordersPerCustomerTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-primary)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('ordersPerCustomer')"
+                      :key="index"
+                      class="bar-item bar-item--primary"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in ordersPerCustomerTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (ordersPerCustomerTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-primary)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -588,20 +714,34 @@
                 />
               </div>
               <div class="metric-detail">占比: {{ ((data.returningCustomerOrders / data.orders) * 100).toFixed(1) }}%</div>
-              <!-- 近7日回头客订单数趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in returningOrdersTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (returningOrdersTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-warning)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('returningOrders')"
+                      :key="index"
+                      class="bar-item bar-item--warning"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in returningOrdersTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (returningOrdersTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-warning)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -627,20 +767,34 @@
                 />
               </div>
               <div class="metric-detail">占比: {{ ((data.newCustomerOrders / data.orders) * 100).toFixed(1) }}%</div>
-              <!-- 近7日新客户订单数趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in newCustomerOrdersTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (newCustomerOrdersTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-success)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('newCustomerOrders')"
+                      :key="index"
+                      class="bar-item bar-item--success"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in newCustomerOrdersTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (newCustomerOrdersTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-success)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -699,20 +853,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日访客数趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in visitorsTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (visitorsTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-primary)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('visitors')"
+                      :key="index"
+                      class="bar-item bar-item--primary"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in visitorsTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (visitorsTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-primary)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -737,20 +905,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日访问趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in visitsTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (visitsTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-info)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('visits')"
+                      :key="index"
+                      class="bar-item bar-item--info"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in visitsTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (visitsTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-info)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -776,20 +958,34 @@
                 />
               </div>
               <div class="metric-detail">占比: {{ ((data.newUsers / data.visitors) * 100).toFixed(1) }}%</div>
-              <!-- 近7日新用户趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in newUsersTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (newUsersTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-success)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('newUsers')"
+                      :key="index"
+                      class="bar-item bar-item--success"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in newUsersTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (newUsersTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-success)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -815,20 +1011,34 @@
                 />
               </div>
               <div class="metric-detail">占比: {{ ((data.returningUsers / data.visitors) * 100).toFixed(1) }}%</div>
-              <!-- 近7日回访用户趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in returningUsersTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (returningUsersTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-warning)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('returningUsers')"
+                      :key="index"
+                      class="bar-item bar-item--warning"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in returningUsersTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (returningUsersTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-warning)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -854,20 +1064,34 @@
                 />
               </div>
               <div class="metric-detail">占比: {{ ((data.addToCartVisits / data.visits) * 100).toFixed(1) }}%</div>
-              <!-- 近7日加购访问趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in addToCartTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (addToCartTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-success)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('addToCart')"
+                      :key="index"
+                      class="bar-item bar-item--success"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in addToCartTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (addToCartTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-success)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -893,20 +1117,34 @@
                 />
               </div>
               <div class="metric-detail">占比: {{ ((data.reachCheckoutVisits / data.visits) * 100).toFixed(1) }}%</div>
-              <!-- 近7日到达结账页面趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in checkoutTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (checkoutTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-primary)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('checkout')"
+                      :key="index"
+                      class="bar-item bar-item--primary"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in checkoutTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (checkoutTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-primary)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -932,20 +1170,34 @@
                 />
               </div>
               <div class="metric-detail">占比: {{ ((data.completedCheckoutVisits / data.visits) * 100).toFixed(1) }}%</div>
-              <!-- 近7日完成结账访问趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in completedCheckoutTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (completedCheckoutTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-success)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('completedCheckout')"
+                      :key="index"
+                      class="bar-item bar-item--success"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in completedCheckoutTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (completedCheckoutTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-success)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -970,20 +1222,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日访问持续时间趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in visitDurationTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (visitDurationTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-info)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('visitDuration')"
+                      :key="index"
+                      class="bar-item bar-item--info"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in visitDurationTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (visitDurationTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-info)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1009,20 +1275,34 @@
                 />
               </div>
               <div class="metric-detail">跳出率: {{ data.bounceRate.toFixed(1) }}%</div>
-              <!-- 近7日跳出量趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in bounceTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (bounceTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-error)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('bounce')"
+                      :key="index"
+                      class="bar-item bar-item--error"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in bounceTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (bounceTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-error)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1056,20 +1336,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日加购率趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in addToCartRateTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (addToCartRateTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-success)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('addToCartRate')"
+                      :key="index"
+                      class="bar-item bar-item--success"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in addToCartRateTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (addToCartRateTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-success)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1096,20 +1390,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日完成结账率趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in checkoutCompletionRateTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (checkoutCompletionRateTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-info)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('checkoutCompletionRate')"
+                      :key="index"
+                      class="bar-item bar-item--info"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in checkoutCompletionRateTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (checkoutCompletionRateTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-info)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1136,20 +1444,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日结账转化率趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in checkoutConversionRateTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (checkoutConversionRateTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-warning)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('checkoutConversionRate')"
+                      :key="index"
+                      class="bar-item bar-item--warning"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in checkoutConversionRateTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (checkoutConversionRateTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-warning)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1176,20 +1498,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日总转化率趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in conversionRateTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (conversionRateTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-primary)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('conversionRate')"
+                      :key="index"
+                      class="bar-item bar-item--primary"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in conversionRateTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (conversionRateTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-primary)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1219,20 +1555,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日退货数趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in returnsTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (returnsTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-danger)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('returns')"
+                      :key="index"
+                      class="bar-item bar-item--error"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in returnsTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (returnsTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-danger)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1259,20 +1609,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日退货金额趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in returnAmountTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (returnAmountTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-warning)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('returnAmount')"
+                      :key="index"
+                      class="bar-item bar-item--warning"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in returnAmountTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (returnAmountTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-warning)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1299,20 +1663,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日退货数量比例趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in returnRateTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (returnRateTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-danger)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('returnRate')"
+                      :key="index"
+                      class="bar-item bar-item--error"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in returnRateTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (returnRateTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-danger)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1339,20 +1717,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日退货销售额占比趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in returnSalesRatioTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (returnSalesRatioTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-warning)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('returnSalesRatio')"
+                      :key="index"
+                      class="bar-item bar-item--warning"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in returnSalesRatioTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (returnSalesRatioTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-warning)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
