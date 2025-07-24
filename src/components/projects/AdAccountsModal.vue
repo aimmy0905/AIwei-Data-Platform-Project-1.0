@@ -75,7 +75,7 @@
                 <div class="metric-item">
                   <div class="metric-label">账号余额</div>
                   <div class="metric-value balance">
-                    ¥{{ formatNumber(account.balance) }}
+                    ${{ formatNumber(account.balance) }}
                   </div>
                   <div class="metric-status" :class="getBalanceStatusClass(account.balance)">
                     {{ getBalanceStatus(account.balance) }}
@@ -85,7 +85,7 @@
                 <div class="metric-item">
                   <div class="metric-label">已花费金额</div>
                   <div class="metric-value spent">
-                    ¥{{ formatNumber(account.spent_amount) }}
+                    ${{ formatNumber(account.spent_amount) }}
                   </div>
                 </div>
 

@@ -729,18 +729,12 @@ interface DashboardFilters {
   customerId: number | null
   projectId: string
   viewMode: 'all' | 'my'
-  dateRange: string
-  startDate: string
-  endDate: string
 }
 
 const filters = ref<DashboardFilters>({
   customerId: null,
   projectId: '',
-  viewMode: 'all',
-  dateRange: 'today',
-  startDate: '',
-  endDate: ''
+  viewMode: 'all'
 })
 
 
@@ -762,10 +756,7 @@ const handleFilterReset = () => {
   filters.value = {
     customerId: null,
     projectId: '',
-    viewMode: 'all',
-    dateRange: 'today',
-    startDate: '',
-    endDate: ''
+    viewMode: 'all'
   }
   loadDashboardData()
 }

@@ -102,7 +102,7 @@
                     <td>{{ goal.customer_name }}</td>
                     <td>
                       <div class="target-cell">
-                        <div class="target-amount">¥{{ formatNumber(goal.sales_target) }}</div>
+                        <div class="target-amount">${{ formatNumber(goal.sales_target) }}</div>
                         <div class="progress-container">
                           <div class="progress-bar">
                             <div
@@ -112,12 +112,12 @@
                           </div>
                           <span class="progress-percentage">{{ goal.completion_rate?.sales || 0 }}%</span>
                         </div>
-                        <div class="current-amount">当前: ¥{{ formatNumber(goal.actual_sales || 0) }}</div>
+                        <div class="current-amount">当前: ${{ formatNumber(goal.actual_sales || 0) }}</div>
                       </div>
                     </td>
                     <td>
                       <div class="target-cell">
-                        <div class="target-amount">¥{{ formatNumber(goal.profit_target || 0) }}</div>
+                        <div class="target-amount">${{ formatNumber(goal.profit_target || 0) }}</div>
                         <div class="progress-container">
                           <div class="progress-bar">
                             <div
@@ -127,12 +127,12 @@
                           </div>
                           <span class="progress-percentage">{{ goal.completion_rate?.profit || 0 }}%</span>
                         </div>
-                        <div class="current-amount">当前: ¥{{ formatNumber(goal.actual_profit || 0) }}</div>
+                        <div class="current-amount">当前: ${{ formatNumber(goal.actual_profit || 0) }}</div>
                       </div>
                     </td>
                     <td>
                       <div class="target-cell">
-                        <div class="target-amount">¥{{ formatNumber(goal.cost_target) }}</div>
+                        <div class="target-amount">${{ formatNumber(goal.cost_target) }}</div>
                         <div class="progress-container">
                           <div class="progress-bar">
                             <div
@@ -142,7 +142,7 @@
                           </div>
                           <span class="progress-percentage">{{ goal.completion_rate?.cost || 0 }}%</span>
                         </div>
-                        <div class="current-amount">当前: ¥{{ formatNumber(goal.actual_cost || 0) }}</div>
+                        <div class="current-amount">当前: ${{ formatNumber(goal.actual_cost || 0) }}</div>
                       </div>
                     </td>
                     <td>
@@ -271,11 +271,11 @@
               <div class="targets-grid">
                 <div class="target-item" v-if="selectedGoal.sales_target">
                   <span class="target-label">销量目标</span>
-                  <span class="target-value">¥{{ formatNumber(selectedGoal.sales_target) }}</span>
+                  <span class="target-value">${{ formatNumber(selectedGoal.sales_target) }}</span>
                 </div>
                 <div class="target-item" v-if="selectedGoal.cost_target">
                   <span class="target-label">成本目标</span>
-                  <span class="target-value">¥{{ formatNumber(selectedGoal.cost_target) }}</span>
+                  <span class="target-value">${{ formatNumber(selectedGoal.cost_target) }}</span>
                 </div>
                 <div class="target-item" v-if="selectedGoal.roi_target">
                   <span class="target-label">ROI目标</span>
@@ -283,7 +283,7 @@
                 </div>
                 <div class="target-item" v-if="selectedGoal.profit_target">
                   <span class="target-label">利润目标</span>
-                  <span class="target-value">¥{{ formatNumber(selectedGoal.profit_target) }}</span>
+                  <span class="target-value">${{ formatNumber(selectedGoal.profit_target) }}</span>
                 </div>
                 <div class="target-item" v-if="selectedGoal.user_count_target">
                   <span class="target-label">用户数目标</span>
@@ -304,8 +304,8 @@
                   </div>
                   <div class="completion-details">
                     <span class="detail-text">
-                      目标: ¥{{ formatNumber(selectedGoal.sales_target) }} |
-                      实际: ¥{{ formatNumber(selectedGoal.actual_sales || 0) }}
+                                      目标: ${{ formatNumber(selectedGoal.sales_target) }} |
+                实际: ${{ formatNumber(selectedGoal.actual_sales || 0) }}
                     </span>
                   </div>
                   <div class="progress-bar">

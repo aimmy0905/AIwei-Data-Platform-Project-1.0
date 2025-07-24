@@ -136,7 +136,7 @@
               <td class="customer-name">{{ record.customerName }}</td>
               <td class="project-name">{{ record.projectName }}</td>
               <td class="payment-date">{{ formatDate(record.paymentDate) }}</td>
-              <td class="payment-amount">¥{{ formatCurrency(record.paymentAmount) }}</td>
+              <td class="payment-amount">${{ formatCurrency(record.paymentAmount) }}</td>
               <td class="service-period">{{ record.servicePeriod }}</td>
               <td>
                 <span class="payment-type-badge" :class="getPaymentTypeBadgeClass(record.paymentType)">

@@ -1,8 +1,45 @@
 <template>
   <div class="channel-data-panel">
     <div class="panel-header">
-      <h2 class="panel-title">渠道数据</h2>
-      <p class="panel-description">查看各流量渠道的表现数据和详细分析</p>
+      <div class="header-content">
+        <h2 class="panel-title">渠道数据</h2>
+        <p class="panel-description">查看各流量渠道的表现数据和详细分析</p>
+      </div>
+      <div class="header-actions">
+        <!-- 时间筛选器 -->
+        <div class="time-filter">
+          <select v-model="selectedTimeRange" @change="handleTimeRangeChange" class="time-select">
+            <option value="today">今日</option>
+            <option value="yesterday">昨天</option>
+            <option value="last7days">近7天</option>
+            <option value="last14days">近14天</option>
+            <option value="last1month">近1个月</option>
+            <option value="last3months">近3个月</option>
+            <option value="last1year">近1年</option>
+            <option value="custom">自定义时间</option>
+          </select>
+          <!-- 自定义时间选择器 -->
+          <div v-if="selectedTimeRange === 'custom'" class="custom-date-range">
+            <input
+              type="date"
+              v-model="customStartDate"
+              @change="handleCustomDateChange"
+              class="date-input"
+            />
+            <span class="date-separator">至</span>
+            <input
+              type="date"
+              v-model="customEndDate"
+              @change="handleCustomDateChange"
+              class="date-input"
+            />
+          </div>
+        </div>
+        <button class="custom-dimension-btn" @click="showCustomDimensionModal = true">
+          <Settings :size="16" />
+          自定义维度
+        </button>
+      </div>
     </div>
 
 
@@ -19,13 +56,6 @@
           <component :is="tab.icon" :size="16" />
           {{ tab.name }}
         </button>
-
-        <div class="tab-actions">
-          <button class="action-button" @click="showCustomDimensionModal = true">
-            <Settings :size="16" />
-            自定义维度
-          </button>
-        </div>
       </div>
 
       <div class="tab-content">
@@ -162,6 +192,11 @@ const customData = ref<any[]>([])
 const showCustomDimensionModal = ref(false)
 const activeTab = ref('summary')
 const loading = ref(false)
+
+// 时间筛选相关数据
+const selectedTimeRange = ref('last7days')
+const customStartDate = ref('')
+const customEndDate = ref('')
 
 // 标签页配置
 const tabs = [
@@ -300,6 +335,28 @@ const getSalesPercentage = (revenue: number): number => {
   return Math.round((revenue / channelSummary.value.totalRevenue) * 10000) / 100
 }
 
+// 时间筛选处理方法
+const handleTimeRangeChange = () => {
+  console.log('时间范围变更:', selectedTimeRange.value)
+  // 这里可以实现重新加载数据的逻辑
+  loadDataByTimeRange()
+}
+
+const handleCustomDateChange = () => {
+  if (customStartDate.value && customEndDate.value) {
+    console.log('自定义时间范围:', customStartDate.value, '至', customEndDate.value)
+    // 这里可以实现重新加载数据的逻辑
+    loadDataByTimeRange()
+  }
+}
+
+const loadDataByTimeRange = () => {
+  // 根据选择的时间范围重新加载数据
+  console.log('根据时间范围重新加载渠道数据...')
+  // 实际项目中这里会调用API获取对应时间范围的数据
+  loadChannelData()
+}
+
 // 生命周期
 onMounted(() => {
   loadChannelData()
@@ -317,60 +374,97 @@ onMounted(() => {
 .panel-header {
   padding: 24px;
   border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.panel-title {
+.header-content {
+  flex: 1;
+}
+
+.header-content .panel-title {
   font-size: 24px;
   font-weight: 600;
   color: #1f2937;
   margin: 0 0 8px 0;
 }
 
-.panel-description {
+.header-content .panel-description {
   color: #6b7280;
   margin: 0;
 }
 
-.summary-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  padding: 24px;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.summary-card {
+.time-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
   background: white;
-  border-radius: 8px;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.card-icon {
-  width: 48px;
-  height: 48px;
-  background: #3b82f6;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
-
-.card-title {
   font-size: 14px;
-  color: #6b7280;
-  margin-bottom: 4px;
+  cursor: pointer;
+  min-width: 120px;
 }
 
-.card-value {
-  font-size: 20px;
-  font-weight: 600;
-  color: #1f2937;
+.time-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.custom-date-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 12px;
+}
+
+.date-input {
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.date-separator {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.custom-dimension-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.custom-dimension-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
 }
 
 .channel-tabs {
@@ -409,27 +503,6 @@ onMounted(() => {
 
 .tab-button:hover {
   color: #3b82f6;
-}
-
-.tab-actions {
-  margin-left: auto;
-}
-
-.action-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border: 1px solid #d1d5db;
-  background: white;
-  color: #374151;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.action-button:hover {
-  background: #f3f4f6;
 }
 
 .tab-content {
@@ -785,11 +858,6 @@ onMounted(() => {
     gap: 4px;
   }
 
-  .tab-actions {
-    margin-left: 0;
-    margin-top: 8px;
-  }
-
   .metrics-grid {
     grid-template-columns: 1fr;
   }
@@ -797,6 +865,38 @@ onMounted(() => {
   .modal-content {
     width: 95%;
     max-height: 90vh;
+  }
+
+  .panel-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .time-filter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .custom-date-range {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+
+  .time-select {
+    min-width: auto;
+  }
+
+  .custom-dimension-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 

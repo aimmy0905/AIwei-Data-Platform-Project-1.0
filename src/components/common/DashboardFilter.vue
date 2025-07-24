@@ -1,42 +1,48 @@
 <template>
   <div class="dashboard-filter">
     <div class="filter-section">
-      <!-- 客户筛选 -->
+      <!-- 客户选择 -->
       <div class="filter-group">
-        <label class="filter-label">客户项目</label>
-        <div class="customer-filter">
-                    <select
-            v-model.number="filters.customerId"
-            class="filter-select"
-            @change="handleCustomerChange"
+        <label class="filter-label">客户选择</label>
+        <select
+          v-model.number="filters.customerId"
+          class="filter-select"
+          @change="handleCustomerChange"
+        >
+          <option :value="null">全部客户</option>
+          <option
+            v-for="customer in customerOptions"
+            :key="customer.id"
+            :value="customer.id"
           >
-            <option :value="null">全部客户</option>
-            <option
-              v-for="customer in customerOptions"
-              :key="customer.id"
-              :value="customer.id"
-            >
-              {{ customer.name }}
-            </option>
-          </select>
+            {{ customer.name }}
+          </option>
+        </select>
+      </div>
 
-          <select
-            v-if="filters.customerId"
-            v-model="filters.projectId"
-            class="filter-select"
-            @change="handleFilterChange"
+      <!-- 项目选择 -->
+      <div class="filter-group">
+        <label class="filter-label">项目选择</label>
+        <select
+          v-model="filters.projectId"
+          class="filter-select"
+          @change="handleFilterChange"
+          :disabled="!filters.customerId"
+        >
+          <option value="">全部项目</option>
+          <option
+            v-for="project in currentProjects"
+            :key="project.id"
+            :value="project.id"
           >
-            <option value="">全部项目</option>
-            <option
-              v-for="project in currentProjects"
-              :key="project.id"
-              :value="project.id"
-            >
-              {{ project.name }}
-            </option>
-          </select>
-        </div>
+            {{ project.name }}
+          </option>
+        </select>
+      </div>
 
+      <!-- 查看模式 -->
+      <div class="filter-group">
+        <label class="filter-label">查看模式</label>
         <div class="quick-actions">
           <button
             class="quick-btn"
@@ -54,42 +60,6 @@
           </button>
         </div>
       </div>
-
-      <!-- 时间筛选 -->
-      <div class="filter-group">
-        <label class="filter-label">时间范围</label>
-        <div class="date-filter">
-          <div class="quick-dates">
-            <button
-              v-for="period in quickPeriods"
-              :key="period.value"
-              class="period-btn"
-              :class="{ 'period-btn--active': filters.dateRange === period.value }"
-              @click="setDateRange(period.value)"
-            >
-              {{ period.label }}
-            </button>
-          </div>
-
-          <div v-if="filters.dateRange === 'custom'" class="custom-date-range">
-            <input
-              v-model="filters.startDate"
-              type="date"
-              class="filter-input"
-              @change="handleFilterChange"
-            />
-            <span class="date-separator">至</span>
-            <input
-              v-model="filters.endDate"
-              type="date"
-              class="filter-input"
-              @change="handleFilterChange"
-            />
-          </div>
-        </div>
-      </div>
-
-
 
       <!-- 操作按钮 -->
       <div class="filter-actions">
@@ -116,9 +86,6 @@ interface DashboardFilters {
   customerId: number | null
   projectId: string
   viewMode: 'all' | 'my'
-  dateRange: string
-  startDate: string
-  endDate: string
 }
 
 interface Props {
@@ -138,25 +105,11 @@ const emit = defineEmits<{
   filterReset: []
 }>()
 
-// 快速时间选项
-const quickPeriods = [
-  { value: 'today', label: '今日' },
-  { value: 'yesterday', label: '昨日' },
-  { value: 'last7days', label: '近7日' },
-  { value: 'last14days', label: '近14天' },
-  { value: 'last90days', label: '近90天' },
-  { value: 'last1year', label: '近1年' },
-  { value: 'custom', label: '自定义' }
-]
-
 // 响应式数据
 const filters = reactive<DashboardFilters>({
   customerId: null,
   projectId: '',
   viewMode: 'all',
-  dateRange: 'today',
-  startDate: '',
-  endDate: '',
   ...props.initialFilters
 })
 
@@ -165,18 +118,6 @@ const currentProjects = computed(() => {
   if (!filters.customerId) return []
   const customer = props.customerOptions.find(c => c.id === filters.customerId)
   return customer?.projects || []
-})
-
-const hasValidFilters = computed(() => {
-  // 至少需要有日期范围
-  if (!filters.dateRange) return false
-
-  // 如果是自定义日期，需要有开始和结束日期
-  if (filters.dateRange === 'custom') {
-    return filters.startDate && filters.endDate
-  }
-
-  return true
 })
 
 // 监听器
@@ -200,31 +141,14 @@ const setViewMode = (mode: 'all' | 'my') => {
   handleFilterChange()
 }
 
-const setDateRange = (range: string) => {
-  filters.dateRange = range
-
-  // 如果不是自定义范围，清除自定义日期
-  if (range !== 'custom') {
-    filters.startDate = ''
-    filters.endDate = ''
-  }
-
-  handleFilterChange()
-}
-
 const applyFilters = () => {
-  if (hasValidFilters.value) {
-    emit('filterApply', { ...filters })
-  }
+  emit('filterApply', { ...filters })
 }
 
 const resetFilters = () => {
   filters.customerId = null
   filters.projectId = ''
   filters.viewMode = 'all'
-  filters.dateRange = 'today'
-  filters.startDate = ''
-  filters.endDate = ''
 
   emit('filterReset')
 }
@@ -267,14 +191,8 @@ defineExpose({
   margin-bottom: 8px;
 }
 
-.customer-filter {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-
 .filter-select {
-  flex: 1;
+  width: 100%;
   padding: 8px 12px;
   border: 1px solid var(--color-border);
   border-radius: 6px;
@@ -287,6 +205,12 @@ defineExpose({
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.filter-select:disabled {
+  background: var(--color-background-mute);
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
 }
 
 .quick-actions {
@@ -315,67 +239,6 @@ defineExpose({
   border-color: var(--color-primary);
 }
 
-.date-filter {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.quick-dates {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.period-btn {
-  padding: 6px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  background: var(--color-background-soft);
-  color: var(--color-text-secondary);
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.period-btn:hover {
-  background: var(--color-background-mute);
-}
-
-.period-btn--active {
-  background: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
-}
-
-.custom-date-range {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.filter-input {
-  padding: 8px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  font-size: 14px;
-  background: var(--color-background-soft);
-  color: var(--color-text);
-}
-
-.filter-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-}
-
-.date-separator {
-  color: var(--color-text-secondary);
-  font-size: 14px;
-}
-
-
-
 .filter-actions {
   display: flex;
   flex-direction: column;
@@ -383,7 +246,6 @@ defineExpose({
   min-width: 120px;
 }
 
-.filter-apply,
 .filter-reset {
   display: flex;
   align-items: center;
@@ -395,24 +257,6 @@ defineExpose({
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
-}
-
-.filter-apply {
-  background: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
-}
-
-.filter-apply:hover:not(:disabled) {
-  opacity: 0.9;
-}
-
-.filter-apply:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.filter-reset {
   background: var(--color-background-soft);
   color: var(--color-text-secondary);
 }
@@ -431,17 +275,8 @@ defineExpose({
     min-width: 100%;
   }
 
-  .customer-filter {
-    flex-direction: column;
-  }
-
-  .quick-dates {
+  .quick-actions {
     justify-content: center;
-  }
-
-  .custom-date-range {
-    flex-direction: column;
-    align-items: stretch;
   }
 }
 </style>

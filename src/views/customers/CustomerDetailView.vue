@@ -1442,7 +1442,7 @@
                           <td>时尚潮流服饰有限公司</td>
                           <td>春季新品推广</td>
                           <td>2024/12/15</td>
-                          <td class="amount-cell">¥32,000.00</td>
+                          <td class="amount-cell">$32,000.00</td>
                           <td>1年</td>
                           <td><span class="payment-type-badge续费">续费</span></td>
                           <td>2025年度服务费续费</td>
@@ -1463,7 +1463,7 @@
                           <td>有机食品专营</td>
                           <td>有机蔬菜推广</td>
                           <td>2024/10/25</td>
-                          <td class="amount-cell">¥24,000.00</td>
+                          <td class="amount-cell">$24,000.00</td>
                           <td>6个月</td>
                           <td><span class="payment-type-badge首次付款">首次付款</span></td>
                           <td>有机蔬菜推广服务</td>
@@ -1484,7 +1484,7 @@
                           <td>智能家电科技</td>
                           <td>智能音箱营销</td>
                           <td>2024/10/5</td>
-                          <td class="amount-cell">¥16,000.00</td>
+                          <td class="amount-cell">$16,000.00</td>
                           <td>3个月</td>
                           <td><span class="payment-type-badge续费">续费</span></td>
                           <td>智能音箱营销续费</td>

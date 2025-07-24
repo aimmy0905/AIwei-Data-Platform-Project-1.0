@@ -51,7 +51,7 @@
                         {{ formatDate(renewal.renewal_date) }}
                       </div>
                     </td>
-                    <td class="renewal-amount">¥{{ formatNumber(renewal.renewal_amount) }}</td>
+                    <td class="renewal-amount">${{ formatNumber(renewal.renewal_amount) }}</td>
                     <td class="renewal-period">{{ renewal.renewal_period }}</td>
                     <td>
                       <span class="type-badge" :class="getRenewalTypeClass(renewal.renewal_type)">
@@ -105,15 +105,15 @@
             </div>
             <div class="stats-item">
               <div class="stats-label">总续费金额</div>
-              <div class="stats-value">¥{{ formatNumber(totalRenewalAmount) }}</div>
+              <div class="stats-value">${{ formatNumber(totalRenewalAmount) }}</div>
             </div>
             <div class="stats-item">
               <div class="stats-label">已确认金额</div>
-              <div class="stats-value">¥{{ formatNumber(confirmedAmount) }}</div>
+              <div class="stats-value">${{ formatNumber(confirmedAmount) }}</div>
             </div>
             <div class="stats-item">
               <div class="stats-label">待确认金额</div>
-              <div class="stats-value">¥{{ formatNumber(pendingAmount) }}</div>
+              <div class="stats-value">${{ formatNumber(pendingAmount) }}</div>
             </div>
           </div>
         </div>

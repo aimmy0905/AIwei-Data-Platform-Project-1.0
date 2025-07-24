@@ -297,7 +297,7 @@
               </div>
               <div class="stat-item">
                 <DollarSign :size="16" />
-                <span>¥{{ kol.price.toLocaleString() }}/帖</span>
+                <span>${{ kol.price.toLocaleString() }}/帖</span>
               </div>
             </div>
 

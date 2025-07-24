@@ -95,9 +95,9 @@
                     销量目标
                   </div>
                   <div class="metric-value">
-                    <span class="target">¥{{ formatNumber(goal.sales_target) }}</span>
+                    <span class="target">${{ formatNumber(goal.sales_target) }}</span>
                     <span class="actual" v-if="goal.actual_sales">
-                      / ¥{{ formatNumber(goal.actual_sales) }}
+                      / ${{ formatNumber(goal.actual_sales) }}
                     </span>
                   </div>
                   <div class="completion-rate" v-if="goal.completion_rate?.sales">
@@ -120,9 +120,9 @@
                     成本目标
                   </div>
                   <div class="metric-value">
-                    <span class="target">¥{{ formatNumber(goal.cost_target) }}</span>
+                    <span class="target">${{ formatNumber(goal.cost_target) }}</span>
                     <span class="actual" v-if="goal.actual_cost">
-                      / ¥{{ formatNumber(goal.actual_cost) }}
+                      / ${{ formatNumber(goal.actual_cost) }}
                     </span>
                   </div>
                   <div class="completion-rate" v-if="goal.completion_rate?.cost">
@@ -170,9 +170,9 @@
                     利润目标
                   </div>
                   <div class="metric-value">
-                    <span class="target">¥{{ formatNumber(goal.profit_target) }}</span>
+                    <span class="target">${{ formatNumber(goal.profit_target) }}</span>
                     <span class="actual" v-if="goal.actual_profit">
-                      / ¥{{ formatNumber(goal.actual_profit) }}
+                      / ${{ formatNumber(goal.actual_profit) }}
                     </span>
                   </div>
                   <div class="completion-rate" v-if="goal.completion_rate?.profit">
@@ -301,9 +301,9 @@
                     销量目标
                   </div>
                   <div class="metric-value">
-                    <span class="target">¥{{ formatNumber(goal.sales_target) }}</span>
+                    <span class="target">${{ formatNumber(goal.sales_target) }}</span>
                     <span class="actual" v-if="goal.actual_sales">
-                      / ¥{{ formatNumber(goal.actual_sales) }}
+                      / ${{ formatNumber(goal.actual_sales) }}
                     </span>
                   </div>
                   <div class="completion-rate" v-if="goal.completion_rate?.sales">
@@ -326,9 +326,9 @@
                     成本目标
                   </div>
                   <div class="metric-value">
-                    <span class="target">¥{{ formatNumber(goal.cost_target) }}</span>
+                    <span class="target">${{ formatNumber(goal.cost_target) }}</span>
                     <span class="actual" v-if="goal.actual_cost">
-                      / ¥{{ formatNumber(goal.actual_cost) }}
+                      / ${{ formatNumber(goal.actual_cost) }}
                     </span>
                   </div>
                   <div class="completion-rate" v-if="goal.completion_rate?.cost">
@@ -376,9 +376,9 @@
                     利润目标
                   </div>
                   <div class="metric-value">
-                    <span class="target">¥{{ formatNumber(goal.profit_target) }}</span>
+                    <span class="target">${{ formatNumber(goal.profit_target) }}</span>
                     <span class="actual" v-if="goal.actual_profit">
-                      / ¥{{ formatNumber(goal.actual_profit) }}
+                      / ${{ formatNumber(goal.actual_profit) }}
                     </span>
                   </div>
                   <div class="completion-rate" v-if="goal.completion_rate?.profit">

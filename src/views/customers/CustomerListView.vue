@@ -218,7 +218,7 @@
                   <span class="sales-text">{{ customer.signingSales }}</span>
                 </td>
                 <td>
-                  <span class="service-fee-text">¥{{ formatNumber(customer.totalServiceFee) }}</span>
+                  <span class="service-fee-text">${{ formatNumber(customer.totalServiceFee) }}</span>
                 </td>
                 <td>
                   <span class="project-count-text">{{ customer.serviceProjectCount }}</span>
@@ -293,7 +293,7 @@
                 </div>
                 <div class="metric">
                   <span class="metric-label">服务费</span>
-                  <span class="metric-value service-fee-text">¥{{ formatNumber(customer.totalServiceFee) }}</span>
+                  <span class="metric-value service-fee-text">${{ formatNumber(customer.totalServiceFee) }}</span>
                 </div>
                 <div class="metric">
                   <span class="metric-label">项目数</span>

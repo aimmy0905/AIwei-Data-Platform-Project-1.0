@@ -42,7 +42,7 @@
             <DollarSign :size="24" />
           </div>
           <div class="summary-content">
-            <h3>¥{{ formatNumber(activitySummary.totalRevenue) }}</h3>
+            <h3>${{ formatNumber(activitySummary.totalRevenue) }}</h3>
             <p>总收入</p>
           </div>
         </div>
@@ -317,7 +317,7 @@
               </div>
               <div class="info-item">
                 <DollarSign :size="16" />
-                <span>预算: ¥{{ formatNumber(activity.budget) }}</span>
+                <span>预算: ${{ formatNumber(activity.budget) }}</span>
               </div>
               <div class="info-item">
                 <Target :size="16" />
@@ -448,7 +448,7 @@
                   <div>{{ formatDate(activity.endTime) }}</div>
                 </div>
               </td>
-              <td>¥{{ formatNumber(activity.budget) }}</td>
+              <td>${{ formatNumber(activity.budget) }}</td>
               <td>{{ activity.ownerName }}</td>
               <td>
                 <div class="action-buttons">

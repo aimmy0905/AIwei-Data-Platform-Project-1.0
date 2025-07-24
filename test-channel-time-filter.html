@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>渠道数据时间筛选测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .test-header {
+            padding: 20px;
+            background: #3b82f6;
+            color: white;
+            text-align: center;
+        }
+        
+        .test-content {
+            padding: 20px;
+        }
+        
+        .panel-header {
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-content {
+            flex: 1;
+        }
+        
+        .header-content h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0 0 8px 0;
+        }
+        
+        .header-content p {
+            color: #6b7280;
+            margin: 0;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .time-filter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .time-select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            min-width: 120px;
+        }
+        
+        .time-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        .custom-date-range {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 12px;
+        }
+        
+        .date-input {
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .date-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+                 .date-separator {
+             color: #6b7280;
+             font-size: 14px;
+         }
+         
+         .custom-dimension-btn {
+             display: flex;
+             align-items: center;
+             gap: 8px;
+             padding: 8px 12px;
+             background: #3b82f6;
+             color: white;
+             border: none;
+             border-radius: 6px;
+             font-size: 14px;
+             cursor: pointer;
+             transition: all 0.2s;
+         }
+         
+         .custom-dimension-btn:hover {
+             background: #2563eb;
+             transform: translateY(-1px);
+         }
+        
+        .test-info {
+            margin-top: 20px;
+            padding: 16px;
+            background: #f3f4f6;
+            border-radius: 6px;
+        }
+        
+        .test-result {
+            margin-top: 10px;
+            padding: 12px;
+            background: #ecfdf5;
+            border: 1px solid #10b981;
+            border-radius: 6px;
+            color: #065f46;
+        }
+        
+        @media (max-width: 768px) {
+            .panel-header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+            
+            .header-actions {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+                width: 100%;
+            }
+            
+            .time-filter {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .custom-date-range {
+                margin-left: 0;
+                margin-top: 8px;
+            }
+            
+                         .time-select {
+                 min-width: auto;
+             }
+             
+             .custom-dimension-btn {
+                 width: 100%;
+                 justify-content: center;
+             }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>渠道数据时间筛选功能测试</h1>
+            <p>测试与网站数据面板相同的时间筛选功能</p>
+        </div>
+        
+        <div class="test-content">
+            <!-- 模拟渠道数据面板的头部 -->
+            <div class="panel-header">
+                <div class="header-content">
+                    <h2>渠道数据</h2>
+                    <p>查看各流量渠道的表现数据和详细分析</p>
+                </div>
+                <div class="header-actions">
+                    <!-- 时间筛选器 -->
+                    <div class="time-filter">
+                        <select id="timeRange" class="time-select">
+                            <option value="today">今日</option>
+                            <option value="yesterday">昨天</option>
+                            <option value="last7days" selected>近7天</option>
+                            <option value="last14days">近14天</option>
+                            <option value="last1month">近1个月</option>
+                            <option value="last3months">近3个月</option>
+                            <option value="last1year">近1年</option>
+                            <option value="custom">自定义时间</option>
+                        </select>
+                        <!-- 自定义时间选择器 -->
+                                                 <div id="customDateRange" class="custom-date-range" style="display: none;">
+                             <input type="date" id="startDate" class="date-input" />
+                             <span class="date-separator">至</span>
+                             <input type="date" id="endDate" class="date-input" />
+                         </div>
+                     </div>
+                     <button class="custom-dimension-btn">
+                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                             <circle cx="12" cy="12" r="3"></circle>
+                             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                         </svg>
+                         自定义维度
+                     </button>
+                 </div>
+             </div>
+            
+            <div class="test-info">
+                <h3>测试说明</h3>
+                <p>1. 选择不同的时间范围选项，观察是否正常显示</p>
+                <p>2. 选择"自定义时间"选项，查看日期选择器是否出现</p>
+                <p>3. 点击"自定义维度"按钮，测试按钮功能是否正常</p>
+                <p>4. 在移动端模式下测试响应式布局</p>
+                <p>5. 验证样式与网站数据面板保持一致</p>
+            </div>
+            
+            <div id="testResult" class="test-result" style="display: none;">
+                <h4>测试结果</h4>
+                <p id="resultText">功能正常工作！</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟Vue的响应式行为
+        const timeRangeSelect = document.getElementById('timeRange');
+        const customDateRange = document.getElementById('customDateRange');
+        const testResult = document.getElementById('testResult');
+        const resultText = document.getElementById('resultText');
+        
+        // 时间范围变更处理
+        timeRangeSelect.addEventListener('change', function() {
+            const selectedValue = this.value;
+            console.log('时间范围变更:', selectedValue);
+            
+            // 显示/隐藏自定义时间选择器
+            if (selectedValue === 'custom') {
+                customDateRange.style.display = 'flex';
+            } else {
+                customDateRange.style.display = 'none';
+            }
+            
+            // 显示测试结果
+            testResult.style.display = 'block';
+            resultText.textContent = `已选择时间范围: ${this.options[this.selectedIndex].text}`;
+            
+            // 模拟数据加载
+            setTimeout(() => {
+                resultText.textContent += ' - 数据加载完成！';
+            }, 500);
+        });
+        
+        // 自定义日期变更处理
+        document.getElementById('startDate').addEventListener('change', handleCustomDateChange);
+        document.getElementById('endDate').addEventListener('change', handleCustomDateChange);
+        
+        function handleCustomDateChange() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (startDate && endDate) {
+                console.log('自定义时间范围:', startDate, '至', endDate);
+                testResult.style.display = 'block';
+                resultText.textContent = `自定义时间范围: ${startDate} 至 ${endDate}`;
+                
+                // 模拟数据加载
+                setTimeout(() => {
+                    resultText.textContent += ' - 数据加载完成！';
+                }, 500);
+            }
+        }
+        
+        // 自定义维度按钮点击事件
+        document.querySelector('.custom-dimension-btn').addEventListener('click', function() {
+            console.log('自定义维度按钮被点击');
+            testResult.style.display = 'block';
+            resultText.textContent = '自定义维度按钮功能正常 - 已点击！';
+            
+            // 模拟打开模态框
+            setTimeout(() => {
+                resultText.textContent += ' (实际项目中会打开维度设置模态框)';
+            }, 500);
+        });
+
+        // 初始化测试结果显示
+        testResult.style.display = 'block';
+        resultText.textContent = '时间筛选功能已就绪，请选择不同的时间范围进行测试';
+    </script>
+</body>
+</html> 
