@@ -6,6 +6,35 @@
         <p>网站访问和用户行为数据分析</p>
       </div>
       <div class="header-actions">
+        <!-- 时间筛选器 -->
+        <div class="time-filter">
+          <select v-model="selectedTimeRange" @change="handleTimeRangeChange" class="time-select">
+            <option value="today">今日</option>
+            <option value="yesterday">昨天</option>
+            <option value="last7days">近7天</option>
+            <option value="last14days">近14天</option>
+            <option value="last1month">近1个月</option>
+            <option value="last3months">近3个月</option>
+            <option value="last1year">近1年</option>
+            <option value="custom">自定义时间</option>
+          </select>
+          <!-- 自定义时间选择器 -->
+          <div v-if="selectedTimeRange === 'custom'" class="custom-date-range">
+            <input
+              type="date"
+              v-model="customStartDate"
+              @change="handleCustomDateChange"
+              class="date-input"
+            />
+            <span class="date-separator">至</span>
+            <input
+              type="date"
+              v-model="customEndDate"
+              @change="handleCustomDateChange"
+              class="date-input"
+            />
+          </div>
+        </div>
         <button class="custom-dimension-btn" @click="showCustomDimension = true">
           <Settings :size="16" />
           自定义维度
@@ -53,10 +82,24 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日销售额趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('sales')"
+                      :key="index"
+                      class="bar-item"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                  </div>
                 </div>
               </div>
             </div>
@@ -83,20 +126,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日花费趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in costTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (costTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-warning)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('cost')"
+                      :key="index"
+                      class="bar-item bar-item--warning"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in costTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (costTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-warning)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -121,20 +178,34 @@
                   show-period-label
                 />
               </div>
-              <!-- 近7日ROI趋势图 -->
+              <!-- 趋势图 -->
               <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in roiTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (roiTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-primary)'
-                    }"
-                  ></div>
+                <div class="mini-trend-label">{{ getTrendLabel() }}</div>
+                <div class="mini-trend-container">
+                  <!-- 柱状图（近1个月、近3个月、近1年） -->
+                  <div v-if="shouldShowBarChart()" class="bar-chart">
+                    <div
+                      v-for="(value, index) in getBarChartData('roi')"
+                      :key="index"
+                      class="bar-item bar-item--primary"
+                      :style="{ height: value.percentage + '%' }"
+                    >
+                      <div class="bar-value">{{ value.label }}</div>
+                    </div>
+                  </div>
+                  <!-- 折线图（其他时间范围） -->
+                  <div v-else class="mini-trend-line">
+                    <div
+                      v-for="(point, index) in roiTrendData"
+                      :key="index"
+                      class="mini-trend-point"
+                      :style="{
+                        left: (index / (roiTrendData.length - 1)) * 100 + '%',
+                        bottom: point + '%',
+                        background: 'var(--color-primary)'
+                      }"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1291,242 +1362,7 @@
 
       </div>
 
-      <!-- 库存指标 -->
-      <div v-if="activeTab === 'inventory'" class="tab-panel">
-        <div class="metrics-grid">
-          <div class="metric-card">
-            <div class="metric-icon">
-              <Package :size="24" />
-            </div>
-            <div class="metric-content">
-              <div class="metric-label">每日售出库存单位数</div>
-              <div class="metric-value">{{ formatNumber(data.dailySoldUnits) }}</div>
-              <div class="dual-comparison">
-                <ComparisonIndicator
-                  :comparison="momComparisonData.dailySoldUnits"
-                  period="mom"
-                  show-period-label
-                />
-                <ComparisonIndicator
-                  :comparison="qoqComparisonData.dailySoldUnits"
-                  period="qoq"
-                  show-period-label
-                />
-              </div>
-              <!-- 近7日售出库存单位数趋势图 -->
-              <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in dailySoldUnitsTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (dailySoldUnitsTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-success)'
-                    }"
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          <div class="metric-card">
-            <div class="metric-icon">
-              <Calendar :size="24" />
-            </div>
-            <div class="metric-content">
-              <div class="metric-label">剩余库存天数</div>
-              <div class="metric-value">{{ data.remainingStockDays }}天</div>
-              <div class="dual-comparison">
-                <ComparisonIndicator
-                  :comparison="momComparisonData.remainingStockDays"
-                  period="mom"
-                  show-period-label
-                />
-                <ComparisonIndicator
-                  :comparison="qoqComparisonData.remainingStockDays"
-                  period="qoq"
-                  show-period-label
-                />
-              </div>
-              <!-- 近7日剩余库存天数趋势图 -->
-              <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in remainingStockDaysTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (remainingStockDaysTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-info)'
-                    }"
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="metric-card">
-            <div class="metric-icon">
-              <CheckCircle :size="24" />
-            </div>
-            <div class="metric-content">
-              <div class="metric-label">有货天数</div>
-              <div class="metric-value">{{ data.inStockDays }}天</div>
-              <div class="dual-comparison">
-                <ComparisonIndicator
-                  :comparison="momComparisonData.inStockDays"
-                  period="mom"
-                  show-period-label
-                />
-                <ComparisonIndicator
-                  :comparison="qoqComparisonData.inStockDays"
-                  period="qoq"
-                  show-period-label
-                />
-              </div>
-              <!-- 近7日有货天数趋势图 -->
-              <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in inStockDaysTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (inStockDaysTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-success)'
-                    }"
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="metric-card">
-            <div class="metric-icon">
-              <XCircle :size="24" />
-            </div>
-            <div class="metric-content">
-              <div class="metric-label">缺货天数</div>
-              <div class="metric-value">{{ data.outOfStockDays }}天</div>
-              <div class="dual-comparison">
-                <ComparisonIndicator
-                  :comparison="momComparisonData.outOfStockDays"
-                  period="mom"
-                  show-period-label
-                />
-                <ComparisonIndicator
-                  :comparison="qoqComparisonData.outOfStockDays"
-                  period="qoq"
-                  show-period-label
-                />
-              </div>
-              <!-- 近7日缺货天数趋势图 -->
-              <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in outOfStockDaysTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (outOfStockDaysTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-danger)'
-                    }"
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="metric-card">
-            <div class="metric-icon">
-              <Clock :size="24" />
-            </div>
-            <div class="metric-content">
-              <div class="metric-label">在库天数</div>
-              <div class="metric-value">{{ data.averageStockDays }}天</div>
-              <div class="dual-comparison">
-                <ComparisonIndicator
-                  :comparison="momComparisonData.averageStockDays"
-                  period="mom"
-                  show-period-label
-                />
-                <ComparisonIndicator
-                  :comparison="qoqComparisonData.averageStockDays"
-                  period="qoq"
-                  show-period-label
-                />
-              </div>
-              <!-- 近7日在库天数趋势图 -->
-              <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in stockDaysTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (stockDaysTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-primary)'
-                    }"
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="metric-card">
-            <div class="metric-icon">
-              <TrendingUp :size="24" />
-            </div>
-            <div class="metric-content">
-              <div class="metric-label">售罄率</div>
-              <div class="metric-value">{{ data.sellThroughRate.toFixed(1) }}%</div>
-              <div class="dual-comparison">
-                <ComparisonIndicator
-                  :comparison="momComparisonData.sellThroughRate"
-                  period="mom"
-                  format="percentage"
-                  show-period-label
-                />
-                <ComparisonIndicator
-                  :comparison="qoqComparisonData.sellThroughRate"
-                  period="qoq"
-                  format="percentage"
-                  show-period-label
-                />
-              </div>
-              <!-- 近7日售罄率趋势图 -->
-              <div class="mini-trend-chart">
-                <div class="mini-trend-label">近7日趋势</div>
-                <div class="mini-trend-line">
-                  <div
-                    v-for="(point, index) in sellThroughRateTrendData"
-                    :key="index"
-                    class="mini-trend-point"
-                    :style="{
-                      left: (index / (sellThroughRateTrendData.length - 1)) * 100 + '%',
-                      bottom: point + '%',
-                      background: 'var(--color-success)'
-                    }"
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-
-      </div>
     </div>
 
     <!-- 自定义维度模态框 -->
@@ -1586,6 +1422,9 @@ const props = withDefaults(defineProps<Props>(), {
 const activeTab = ref('results')
 const showCustomDimension = ref(false)
 const selectedPeriod = ref<ComparisonPeriod>('mom')
+const selectedTimeRange = ref('last7days')
+const customStartDate = ref('')
+const customEndDate = ref('')
 
 // 趋势数据 - 模拟数据，实际应该从API获取
 const salesTrendData = ref([20, 35, 45, 55, 65, 70, 80])
@@ -1629,12 +1468,7 @@ const returnRateTrendData = ref([15, 18, 20, 22, 25, 28, 30])
 const returnSalesRatioTrendData = ref([12, 15, 18, 20, 22, 25, 28])
 
 // 库存指标趋势数据
-const dailySoldUnitsTrendData = ref([45, 50, 55, 60, 65, 70, 75])
-const remainingStockDaysTrendData = ref([40, 45, 50, 55, 60, 65, 70])
-const inStockDaysTrendData = ref([35, 40, 45, 50, 55, 60, 65])
-const outOfStockDaysTrendData = ref([30, 25, 20, 15, 10, 8, 5])
-const stockDaysTrendData = ref([50, 55, 60, 65, 70, 75, 80])
-const sellThroughRateTrendData = ref([60, 65, 70, 75, 80, 85, 90])
+
 
 // 计算比较数据
 const comparisonData = computed(() => {
@@ -1657,8 +1491,7 @@ const tabs = [
   { key: 'orders', label: '订单指标', icon: ShoppingBag },
   { key: 'users', label: '用户指标', icon: Users },
   { key: 'funnel', label: '用户漏斗', icon: Activity },
-  { key: 'returns', label: '退货指标', icon: ArrowLeft },
-  { key: 'inventory', label: '库存指标', icon: Package }
+  { key: 'returns', label: '退货指标', icon: ArrowLeft }
 ]
 
 // 方法
@@ -1690,6 +1523,78 @@ const handleExportCustomData = (data: any[]) => {
   // 这里可以实现导出功能，比如生成Excel文件
   // 暂时用console.log模拟
   showCustomDimension.value = false
+}
+
+// 时间筛选处理方法
+const handleTimeRangeChange = () => {
+  console.log('时间范围变更:', selectedTimeRange.value)
+  // 这里可以实现重新加载数据的逻辑
+  loadDataByTimeRange()
+}
+
+const handleCustomDateChange = () => {
+  if (customStartDate.value && customEndDate.value) {
+    console.log('自定义时间范围:', customStartDate.value, '至', customEndDate.value)
+    // 这里可以实现重新加载数据的逻辑
+    loadDataByTimeRange()
+  }
+}
+
+const loadDataByTimeRange = () => {
+  // 根据选择的时间范围重新加载数据
+  console.log('根据时间范围重新加载数据...')
+  // 实际项目中这里会调用API获取对应时间范围的数据
+}
+
+// 趋势图相关方法
+const getTrendLabel = () => {
+  const labels: Record<string, string> = {
+    'today': '今日趋势',
+    'yesterday': '昨日趋势',
+    'last7days': '近7日趋势',
+    'last14days': '近14日趋势',
+    'last1month': '近1个月趋势',
+    'last3months': '近3个月趋势',
+    'last1year': '近1年趋势',
+    'custom': '自定义时间趋势'
+  }
+  return labels[selectedTimeRange.value] || '趋势'
+}
+
+const shouldShowBarChart = () => {
+  return ['last1month', 'last3months', 'last1year'].includes(selectedTimeRange.value)
+}
+
+const getBarChartData = (metric: string) => {
+  // 根据时间范围和指标类型生成柱状图数据
+  const timeRange = selectedTimeRange.value
+
+  if (timeRange === 'last1month') {
+    // 近1个月：每周数据
+    return [
+      { label: '第1周', value: 80, percentage: 80 },
+      { label: '第2周', value: 65, percentage: 65 },
+      { label: '第3周', value: 90, percentage: 90 },
+      { label: '第4周', value: 75, percentage: 75 }
+    ]
+  } else if (timeRange === 'last3months') {
+    // 近3个月：每周数据（12周）
+    return Array.from({ length: 12 }, (_, i) => ({
+      label: `第${i + 1}周`,
+      value: 50 + Math.random() * 40,
+      percentage: 50 + Math.random() * 40
+    }))
+  } else if (timeRange === 'last1year') {
+    // 近1年：每月数据
+    const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+    return months.map(month => ({
+      label: month,
+      value: 40 + Math.random() * 50,
+      percentage: 40 + Math.random() * 50
+    }))
+  }
+
+  return []
 }
 </script>
 
@@ -1728,6 +1633,52 @@ const handleExportCustomData = (data: any[]) => {
   align-items: center;
   gap: var(--spacing-sm);
   flex-wrap: wrap;
+}
+
+.time-filter {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.time-select {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background: white;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.time-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.custom-date-range {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-left: var(--spacing-sm);
+}
+
+.date-input {
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.date-separator {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 .custom-dimension-btn {
@@ -2359,6 +2310,26 @@ const handleExportCustomData = (data: any[]) => {
     grid-template-columns: 1fr;
   }
 
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+  }
+
+  .time-filter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .custom-date-range {
+    margin-left: 0;
+    margin-top: var(--spacing-xs);
+  }
+
+  .time-select {
+    min-width: auto;
+  }
+
   .funnel-chart {
     max-width: 100%;
   }
@@ -2405,12 +2376,98 @@ const handleExportCustomData = (data: any[]) => {
   margin-bottom: var(--spacing-xs);
 }
 
+.mini-trend-container {
+  height: 40px;
+}
+
 .mini-trend-line {
   position: relative;
   height: 40px;
   background: #f8f9fa;
   border-radius: var(--border-radius-xs);
   overflow: hidden;
+}
+
+/* 柱状图样式 */
+.bar-chart {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  height: 40px;
+  padding: 0 2px;
+  gap: 1px;
+}
+
+.bar-item {
+  flex: 1;
+  background: linear-gradient(to top, var(--color-primary), var(--color-primary-light));
+  border-radius: var(--border-radius-xs) var(--border-radius-xs) 0 0;
+  min-height: 8px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.bar-item:hover {
+  background: linear-gradient(to top, var(--color-primary-dark), var(--color-primary));
+  transform: scaleY(1.1);
+}
+
+.bar-value {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s;
+  margin-bottom: 2px;
+}
+
+.bar-item:hover .bar-value {
+  opacity: 1;
+}
+
+/* 不同颜色的柱状图变体 */
+.bar-item--warning {
+  background: linear-gradient(to top, var(--color-warning), #fbbf24) !important;
+}
+
+.bar-item--warning:hover {
+  background: linear-gradient(to top, #d97706, var(--color-warning)) !important;
+}
+
+.bar-item--primary {
+  background: linear-gradient(to top, var(--color-primary), var(--color-primary-light)) !important;
+}
+
+.bar-item--primary:hover {
+  background: linear-gradient(to top, var(--color-primary-dark), var(--color-primary)) !important;
+}
+
+.bar-item--success {
+  background: linear-gradient(to top, var(--color-success), #4ade80) !important;
+}
+
+.bar-item--success:hover {
+  background: linear-gradient(to top, #16a34a, var(--color-success)) !important;
+}
+
+.bar-item--info {
+  background: linear-gradient(to top, var(--color-info), #38bdf8) !important;
+}
+
+.bar-item--info:hover {
+  background: linear-gradient(to top, #0284c7, var(--color-info)) !important;
+}
+
+.bar-item--error {
+  background: linear-gradient(to top, var(--color-error), #f87171) !important;
+}
+
+.bar-item--error:hover {
+  background: linear-gradient(to top, #dc2626, var(--color-error)) !important;
 }
 
 /* 简单的线性折线图样式 */

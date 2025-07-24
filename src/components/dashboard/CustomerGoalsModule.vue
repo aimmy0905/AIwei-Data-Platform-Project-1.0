@@ -59,6 +59,18 @@
             <span class="completion-rate">{{ websiteGoals.sales.completion }}%</span>
           </div>
 
+          <!-- 时间进度指示器 -->
+          <div class="time-progress-section">
+            <div class="time-progress-indicator" :class="getTimeProgressClass(websiteGoals.sales.completion, websiteGoals.sales.timeProgress)">
+              <component :is="getTimeProgressIcon(websiteGoals.sales.completion, websiteGoals.sales.timeProgress)" :size="14" />
+              <span class="time-progress-text">{{ getTimeProgressText(websiteGoals.sales.completion, websiteGoals.sales.timeProgress) }}</span>
+            </div>
+            <div class="time-progress-detail">
+              <span class="time-label">时间进度</span>
+              <span class="time-value">{{ websiteGoals.sales.timeProgress }}%</span>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -86,6 +98,18 @@
               <div class="progress-fill profit" :style="{ width: websiteGoals.profit.completion + '%' }"></div>
             </div>
             <span class="completion-rate">{{ websiteGoals.profit.completion }}%</span>
+          </div>
+
+          <!-- 时间进度指示器 -->
+          <div class="time-progress-section">
+            <div class="time-progress-indicator" :class="getTimeProgressClass(websiteGoals.profit.completion, websiteGoals.profit.timeProgress)">
+              <component :is="getTimeProgressIcon(websiteGoals.profit.completion, websiteGoals.profit.timeProgress)" :size="14" />
+              <span class="time-progress-text">{{ getTimeProgressText(websiteGoals.profit.completion, websiteGoals.profit.timeProgress) }}</span>
+            </div>
+            <div class="time-progress-detail">
+              <span class="time-label">时间进度</span>
+              <span class="time-value">{{ websiteGoals.profit.timeProgress }}%</span>
+            </div>
           </div>
 
         </div>
@@ -117,6 +141,18 @@
             <span class="completion-rate">{{ websiteGoals.cost.completion }}%</span>
           </div>
 
+          <!-- 时间进度指示器 -->
+          <div class="time-progress-section">
+            <div class="time-progress-indicator" :class="getTimeProgressClass(websiteGoals.cost.completion, websiteGoals.cost.timeProgress)">
+              <component :is="getTimeProgressIcon(websiteGoals.cost.completion, websiteGoals.cost.timeProgress)" :size="14" />
+              <span class="time-progress-text">{{ getTimeProgressText(websiteGoals.cost.completion, websiteGoals.cost.timeProgress) }}</span>
+            </div>
+            <div class="time-progress-detail">
+              <span class="time-label">时间进度</span>
+              <span class="time-value">{{ websiteGoals.cost.timeProgress }}%</span>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -144,6 +180,18 @@
               <div class="progress-fill roi" :style="{ width: websiteGoals.roi.completion + '%' }"></div>
             </div>
             <span class="completion-rate">{{ websiteGoals.roi.completion }}%</span>
+          </div>
+
+          <!-- 时间进度指示器 -->
+          <div class="time-progress-section">
+            <div class="time-progress-indicator" :class="getTimeProgressClass(websiteGoals.roi.completion, websiteGoals.roi.timeProgress)">
+              <component :is="getTimeProgressIcon(websiteGoals.roi.completion, websiteGoals.roi.timeProgress)" :size="14" />
+              <span class="time-progress-text">{{ getTimeProgressText(websiteGoals.roi.completion, websiteGoals.roi.timeProgress) }}</span>
+            </div>
+            <div class="time-progress-detail">
+              <span class="time-label">时间进度</span>
+              <span class="time-value">{{ websiteGoals.roi.timeProgress }}%</span>
+            </div>
           </div>
 
         </div>
@@ -175,6 +223,18 @@
             <span class="completion-rate">{{ websiteGoals.users.completion }}%</span>
           </div>
 
+          <!-- 时间进度指示器 -->
+          <div class="time-progress-section">
+            <div class="time-progress-indicator" :class="getTimeProgressClass(websiteGoals.users.completion, websiteGoals.users.timeProgress)">
+              <component :is="getTimeProgressIcon(websiteGoals.users.completion, websiteGoals.users.timeProgress)" :size="14" />
+              <span class="time-progress-text">{{ getTimeProgressText(websiteGoals.users.completion, websiteGoals.users.timeProgress) }}</span>
+            </div>
+            <div class="time-progress-detail">
+              <span class="time-label">时间进度</span>
+              <span class="time-value">{{ websiteGoals.users.timeProgress }}%</span>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -183,7 +243,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { TrendingUp, DollarSign, Target, BarChart3, Users } from 'lucide-vue-next'
+import { TrendingUp, DollarSign, Target, BarChart3, Users, Clock, TrendingDown } from 'lucide-vue-next'
 
 
 // 目标类型选项
@@ -230,35 +290,45 @@ const websiteGoals = ref({
     current: '¥750,000',
     completion: 75,
     yearOverYear: 15.2,
-    monthOverMonth: 8.5
+    monthOverMonth: 8.5,
+    timeProgress: 65, // 时间进度百分比
+    timeStatus: 'ahead' // ahead: 提前, behind: 滞后, ontrack: 正常
   },
   profit: {
     target: '¥500,000',
     current: '¥380,000',
     completion: 76,
     yearOverYear: 12.3,
-    monthOverMonth: -2.1
+    monthOverMonth: -2.1,
+    timeProgress: 70,
+    timeStatus: 'ahead'
   },
   cost: {
     target: '¥300,000',
     current: '¥280,000',
     completion: 93,
     yearOverYear: -8.5,
-    monthOverMonth: 2.3
+    monthOverMonth: 2.3,
+    timeProgress: 65,
+    timeStatus: 'ahead'
   },
   roi: {
     target: '3.5x',
     current: '2.8x',
     completion: 80,
     yearOverYear: 18.5,
-    monthOverMonth: -3.2
+    monthOverMonth: -3.2,
+    timeProgress: 75,
+    timeStatus: 'ahead'
   },
   users: {
     target: '5,000人',
     current: '3,800人',
     completion: 76,
     yearOverYear: 22.8,
-    monthOverMonth: 6.3
+    monthOverMonth: 6.3,
+    timeProgress: 80,
+    timeStatus: 'behind'
   }
 })
 
@@ -266,25 +336,25 @@ const websiteGoals = ref({
 const getGoalsDataByPeriod = (goalType: string, period: string) => {
   const baseData = {
     monthly: {
-      sales: { target: '¥1,000,000', current: '¥750,000', completion: 75, yearOverYear: 15.2, monthOverMonth: 8.5 },
-      profit: { target: '¥500,000', current: '¥380,000', completion: 76, yearOverYear: 12.3, monthOverMonth: -2.1 },
-      cost: { target: '¥300,000', current: '¥280,000', completion: 93, yearOverYear: -8.5, monthOverMonth: 2.3 },
-      roi: { target: '3.5x', current: '2.8x', completion: 80, yearOverYear: 18.5, monthOverMonth: -3.2 },
-      users: { target: '5,000人', current: '3,800人', completion: 76, yearOverYear: 22.8, monthOverMonth: 6.3 }
+      sales: { target: '¥1,000,000', current: '¥750,000', completion: 75, yearOverYear: 15.2, monthOverMonth: 8.5, timeProgress: 65, timeStatus: 'ahead' },
+      profit: { target: '¥500,000', current: '¥380,000', completion: 76, yearOverYear: 12.3, monthOverMonth: -2.1, timeProgress: 70, timeStatus: 'ahead' },
+      cost: { target: '¥300,000', current: '¥280,000', completion: 93, yearOverYear: -8.5, monthOverMonth: 2.3, timeProgress: 65, timeStatus: 'ahead' },
+      roi: { target: '3.5x', current: '2.8x', completion: 80, yearOverYear: 18.5, monthOverMonth: -3.2, timeProgress: 75, timeStatus: 'ahead' },
+      users: { target: '5,000人', current: '3,800人', completion: 76, yearOverYear: 22.8, monthOverMonth: 6.3, timeProgress: 80, timeStatus: 'behind' }
     },
     quarterly: {
-      sales: { target: '¥3,000,000', current: '¥2,250,000', completion: 75, yearOverYear: 18.7, monthOverMonth: 12.1 },
-      profit: { target: '¥1,500,000', current: '¥1,140,000', completion: 76, yearOverYear: 15.8, monthOverMonth: 5.2 },
-      cost: { target: '¥900,000', current: '¥840,000', completion: 93, yearOverYear: -6.2, monthOverMonth: 1.8 },
-      roi: { target: '3.8x', current: '3.1x', completion: 82, yearOverYear: 21.3, monthOverMonth: 2.7 },
-      users: { target: '15,000人', current: '11,400人', completion: 76, yearOverYear: 25.4, monthOverMonth: 8.9 }
+      sales: { target: '¥3,000,000', current: '¥2,250,000', completion: 75, yearOverYear: 18.7, monthOverMonth: 12.1, timeProgress: 60, timeStatus: 'ahead' },
+      profit: { target: '¥1,500,000', current: '¥1,140,000', completion: 76, yearOverYear: 15.8, monthOverMonth: 5.2, timeProgress: 55, timeStatus: 'ahead' },
+      cost: { target: '¥900,000', current: '¥840,000', completion: 93, yearOverYear: -6.2, monthOverMonth: 1.8, timeProgress: 60, timeStatus: 'ahead' },
+      roi: { target: '3.8x', current: '3.1x', completion: 82, yearOverYear: 21.3, monthOverMonth: 2.7, timeProgress: 65, timeStatus: 'ahead' },
+      users: { target: '15,000人', current: '11,400人', completion: 76, yearOverYear: 25.4, monthOverMonth: 8.9, timeProgress: 85, timeStatus: 'behind' }
     },
     yearly: {
-      sales: { target: '¥12,000,000', current: '¥9,000,000', completion: 75, yearOverYear: 22.1, monthOverMonth: 15.6 },
-      profit: { target: '¥6,000,000', current: '¥4,560,000', completion: 76, yearOverYear: 19.4, monthOverMonth: 8.3 },
-      cost: { target: '¥3,600,000', current: '¥3,360,000', completion: 93, yearOverYear: -4.7, monthOverMonth: 3.1 },
-      roi: { target: '4.2x', current: '3.4x', completion: 81, yearOverYear: 24.8, monthOverMonth: 5.9 },
-      users: { target: '60,000人', current: '45,600人', completion: 76, yearOverYear: 28.7, monthOverMonth: 11.2 }
+      sales: { target: '¥12,000,000', current: '¥9,000,000', completion: 75, yearOverYear: 22.1, monthOverMonth: 15.6, timeProgress: 25, timeStatus: 'ahead' },
+      profit: { target: '¥6,000,000', current: '¥4,560,000', completion: 76, yearOverYear: 19.4, monthOverMonth: 8.3, timeProgress: 30, timeStatus: 'ahead' },
+      cost: { target: '¥3,600,000', current: '¥3,360,000', completion: 93, yearOverYear: -4.7, monthOverMonth: 3.1, timeProgress: 25, timeStatus: 'ahead' },
+      roi: { target: '4.2x', current: '3.4x', completion: 81, yearOverYear: 24.8, monthOverMonth: 5.9, timeProgress: 35, timeStatus: 'ahead' },
+      users: { target: '60,000人', current: '45,600人', completion: 76, yearOverYear: 28.7, monthOverMonth: 11.2, timeProgress: 40, timeStatus: 'behind' }
     }
   }
 
@@ -324,6 +394,41 @@ const handlePeriodChange = () => {
   loadGoalsData()
 }
 
+// 计算时间进度状态
+const getTimeProgressStatus = (completion: number, timeProgress: number) => {
+  const difference = completion - timeProgress
+  if (difference > 0) return 'ahead'      // 任何提前
+  if (difference < 0) return 'behind'     // 任何滞后
+  return 'ontrack'                        // 完全相等
+}
+
+// 获取时间进度文本
+const getTimeProgressText = (completion: number, timeProgress: number) => {
+  const difference = completion - timeProgress
+  if (difference > 0) {
+    return `提前 ${Math.abs(difference).toFixed(1)}%`
+  } else if (difference < 0) {
+    return `滞后 ${Math.abs(difference).toFixed(1)}%`
+  } else {
+    return '进度正常'
+  }
+}
+
+// 获取时间进度图标
+const getTimeProgressIcon = (completion: number, timeProgress: number) => {
+  const difference = completion - timeProgress
+  if (difference > 0) return TrendingUp
+  if (difference < 0) return TrendingDown
+  return Clock
+}
+
+// 获取时间进度样式类
+const getTimeProgressClass = (completion: number, timeProgress: number) => {
+  const difference = completion - timeProgress
+  if (difference > 0) return 'time-ahead'      // 任何提前都显示绿色
+  if (difference < 0) return 'time-behind'     // 任何滞后都显示红色
+  return 'time-ontrack'                        // 完全相等显示绿色
+}
 
 
 // 组件挂载时加载数据
@@ -611,6 +716,68 @@ onMounted(() => {
   color: #d32f2f;
 }
 
+/* 时间进度样式 */
+.time-progress-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.time-progress-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.time-progress-indicator.time-ahead {
+  background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+  color: #2e7d32;
+}
+
+.time-progress-indicator.time-behind {
+  background: linear-gradient(135deg, #ffebee, #ffcdd2);
+  color: #d32f2f;
+}
+
+.time-progress-indicator.time-ontrack {
+  background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+  color: #2e7d32;
+}
+
+.time-progress-text {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.time-progress-detail {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.time-label {
+  font-size: 10px;
+  color: #999;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.time-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+}
+
 @media (max-width: 768px) {
   .goals-grid {
     grid-template-columns: 1fr;
@@ -628,6 +795,20 @@ onMounted(() => {
 
   .time-selector {
     justify-content: center;
+  }
+
+  .time-progress-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .time-progress-indicator {
+    justify-content: center;
+  }
+
+  .time-progress-detail {
+    align-items: center;
   }
 }
 </style>
