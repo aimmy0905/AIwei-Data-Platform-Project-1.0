@@ -548,8 +548,8 @@ const progressData = computed(() => {
       {
         name: '销量目标',
         completion: goal.completion_rate?.sales || 0,
-        target: `¥${goal.sales_target.toLocaleString()}`,
-        actual: `¥${(goal.actual_sales || 0).toLocaleString()}`
+        target: `$${goal.sales_target.toLocaleString()}`,
+        actual: `$${(goal.actual_sales || 0).toLocaleString()}`
       },
       {
         name: 'ROI目标',
@@ -560,8 +560,8 @@ const progressData = computed(() => {
       {
         name: '成本目标',
         completion: goal.completion_rate?.cost || 0,
-        target: `¥${goal.cost_target.toLocaleString()}`,
-        actual: `¥${(goal.actual_cost || 0).toLocaleString()}`
+        target: `$${goal.cost_target.toLocaleString()}`,
+        actual: `$${(goal.actual_cost || 0).toLocaleString()}`
       }
     ]
   }))

@@ -242,7 +242,7 @@ const resultDimensions: Dimension[] = [
   { key: 'totalSales', label: '总销售额', category: 'result', format: 'currency', unit: '美元' },
   { key: 'totalCost', label: '总花费', category: 'result', format: 'currency', unit: '美元' },
   { key: 'roi', label: 'ROI', category: 'result', format: 'number', unit: '倍' },
-  { key: 'averageOrderItems', label: '订单平均产品数量(AOI)', category: 'result', format: 'number', unit: '个' },
+  { key: 'averageOrderItems', label: '订单平均产品数量', category: 'result', format: 'number', unit: '个' },
   { key: 'orderConversionCost', label: '订单转化成本', category: 'result', format: 'currency', unit: '美元' },
   { key: 'averageOrderValue', label: '平均订单价值', category: 'result', format: 'currency', unit: '美元' },
   { key: 'conversionRate', label: '转化率', category: 'result', format: 'percentage', unit: '%' },

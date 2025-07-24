@@ -30,7 +30,7 @@
           <DollarSign :size="24" />
         </div>
         <div class="card-content">
-          <div class="card-value">¥{{ formatNumber(project?.service_fee || 0) }}</div>
+          <div class="card-value">${{ formatNumber(project?.service_fee || 0) }}</div>
           <div class="card-label">项目服务费</div>
         </div>
       </div>
@@ -40,7 +40,7 @@
           <Wallet :size="24" />
         </div>
         <div class="card-content">
-          <div class="card-value">¥{{ formatNumber(project?.balance_info || 0) }}</div>
+          <div class="card-value">${{ formatNumber(project?.balance_info || 0) }}</div>
           <div class="card-label">账户余额</div>
         </div>
       </div>
@@ -158,7 +158,7 @@
             <div class="account-details">
               <div class="detail-item">
                 <span class="label">余额：</span>
-                <span class="value">¥{{ formatNumber(account.balance) }}</span>
+                <span class="value">${{ formatNumber(account.balance) }}</span>
               </div>
               <div class="detail-item">
                 <span class="label">预计可用：</span>
@@ -209,7 +209,7 @@
               <Calendar :size="14" />
               {{ formatDate(renewal.renewal_date) }}
             </div>
-            <div class="renewal-amount">¥{{ formatNumber(renewal.renewal_amount) }}</div>
+            <div class="renewal-amount">${{ formatNumber(renewal.renewal_amount) }}</div>
             <div class="renewal-type">{{ renewal.renewal_type }}</div>
             <div class="renewal-status" :class="getConfirmationClass(renewal.payment_confirmed)">
               {{ renewal.payment_confirmed }}

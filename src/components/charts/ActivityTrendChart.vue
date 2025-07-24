@@ -161,7 +161,7 @@ const drawChart = () => {
 
 const formatValue = (value: number): string => {
   if (selectedMetric.value === 'sales') {
-    return `¥${(value / 1000).toFixed(0)}k`
+    return `$${(value / 1000).toFixed(0)}k`
   } else if (selectedMetric.value === 'roi') {
     return value.toFixed(1)
   } else {

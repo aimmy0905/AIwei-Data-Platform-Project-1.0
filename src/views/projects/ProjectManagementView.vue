@@ -226,10 +226,10 @@
                 </td>
                 <td class="contract-number">{{ project.contract_number }}</td>
                 <td class="new-order-count">{{ project.new_order_count }}</td>
-                <td class="first-service-fee">¥{{ formatNumber(project.first_service_fee) }}</td>
+                <td class="first-service-fee">${{ formatNumber(project.first_service_fee) }}</td>
                 <td class="first-payment-date">{{ formatDate(project.first_payment_date) }}</td>
                 <td class="customer-name">{{ project.customer_name }}</td>
-                <td class="service-fee">¥{{ formatNumber(project.service_fee) }}</td>
+                <td class="service-fee">${{ formatNumber(project.service_fee) }}</td>
 
                 <td class="operation-team">{{ project.operation_team }}</td>
                 <td class="sales-person">{{ project.sales_person }}</td>
@@ -362,7 +362,7 @@
                 </div>
                 <div class="info-item">
                   <span class="label">服务费:</span>
-                  <span class="value">¥{{ formatNumber(project.service_fee) }}</span>
+                  <span class="value">${{ formatNumber(project.service_fee) }}</span>
                 </div>
                 <div class="info-item">
                   <span class="label">销售:</span>

@@ -286,8 +286,8 @@ const loading = ref(false)
 // 网站整体目标数据
 const websiteGoals = ref({
   sales: {
-    target: '¥1,000,000',
-    current: '¥750,000',
+    target: '$1,000,000',
+    current: '$750,000',
     completion: 75,
     yearOverYear: 15.2,
     monthOverMonth: 8.5,
@@ -295,8 +295,8 @@ const websiteGoals = ref({
     timeStatus: 'ahead' // ahead: 提前, behind: 滞后, ontrack: 正常
   },
   profit: {
-    target: '¥500,000',
-    current: '¥380,000',
+    target: '$500,000',
+    current: '$380,000',
     completion: 76,
     yearOverYear: 12.3,
     monthOverMonth: -2.1,
@@ -304,8 +304,8 @@ const websiteGoals = ref({
     timeStatus: 'ahead'
   },
   cost: {
-    target: '¥300,000',
-    current: '¥280,000',
+    target: '$300,000',
+    current: '$280,000',
     completion: 93,
     yearOverYear: -8.5,
     monthOverMonth: 2.3,
@@ -336,23 +336,23 @@ const websiteGoals = ref({
 const getGoalsDataByPeriod = (goalType: string, period: string) => {
   const baseData = {
     monthly: {
-      sales: { target: '¥1,000,000', current: '¥750,000', completion: 75, yearOverYear: 15.2, monthOverMonth: 8.5, timeProgress: 65, timeStatus: 'ahead' },
-      profit: { target: '¥500,000', current: '¥380,000', completion: 76, yearOverYear: 12.3, monthOverMonth: -2.1, timeProgress: 70, timeStatus: 'ahead' },
-      cost: { target: '¥300,000', current: '¥280,000', completion: 93, yearOverYear: -8.5, monthOverMonth: 2.3, timeProgress: 65, timeStatus: 'ahead' },
+      sales: { target: '$1,000,000', current: '$750,000', completion: 75, yearOverYear: 15.2, monthOverMonth: 8.5, timeProgress: 65, timeStatus: 'ahead' },
+      profit: { target: '$500,000', current: '$380,000', completion: 76, yearOverYear: 12.3, monthOverMonth: -2.1, timeProgress: 70, timeStatus: 'ahead' },
+      cost: { target: '$300,000', current: '$280,000', completion: 93, yearOverYear: -8.5, monthOverMonth: 2.3, timeProgress: 65, timeStatus: 'ahead' },
       roi: { target: '3.5x', current: '2.8x', completion: 80, yearOverYear: 18.5, monthOverMonth: -3.2, timeProgress: 75, timeStatus: 'ahead' },
       users: { target: '5,000人', current: '3,800人', completion: 76, yearOverYear: 22.8, monthOverMonth: 6.3, timeProgress: 80, timeStatus: 'behind' }
     },
     quarterly: {
-      sales: { target: '¥3,000,000', current: '¥2,250,000', completion: 75, yearOverYear: 18.7, monthOverMonth: 12.1, timeProgress: 60, timeStatus: 'ahead' },
-      profit: { target: '¥1,500,000', current: '¥1,140,000', completion: 76, yearOverYear: 15.8, monthOverMonth: 5.2, timeProgress: 55, timeStatus: 'ahead' },
-      cost: { target: '¥900,000', current: '¥840,000', completion: 93, yearOverYear: -6.2, monthOverMonth: 1.8, timeProgress: 60, timeStatus: 'ahead' },
+      sales: { target: '$3,000,000', current: '$2,250,000', completion: 75, yearOverYear: 18.7, monthOverMonth: 12.1, timeProgress: 60, timeStatus: 'ahead' },
+      profit: { target: '$1,500,000', current: '$1,140,000', completion: 76, yearOverYear: 15.8, monthOverMonth: 5.2, timeProgress: 55, timeStatus: 'ahead' },
+      cost: { target: '$900,000', current: '$840,000', completion: 93, yearOverYear: -6.2, monthOverMonth: 1.8, timeProgress: 60, timeStatus: 'ahead' },
       roi: { target: '3.8x', current: '3.1x', completion: 82, yearOverYear: 21.3, monthOverMonth: 2.7, timeProgress: 65, timeStatus: 'ahead' },
       users: { target: '15,000人', current: '11,400人', completion: 76, yearOverYear: 25.4, monthOverMonth: 8.9, timeProgress: 85, timeStatus: 'behind' }
     },
     yearly: {
-      sales: { target: '¥12,000,000', current: '¥9,000,000', completion: 75, yearOverYear: 22.1, monthOverMonth: 15.6, timeProgress: 25, timeStatus: 'ahead' },
-      profit: { target: '¥6,000,000', current: '¥4,560,000', completion: 76, yearOverYear: 19.4, monthOverMonth: 8.3, timeProgress: 30, timeStatus: 'ahead' },
-      cost: { target: '¥3,600,000', current: '¥3,360,000', completion: 93, yearOverYear: -4.7, monthOverMonth: 3.1, timeProgress: 25, timeStatus: 'ahead' },
+      sales: { target: '$12,000,000', current: '$9,000,000', completion: 75, yearOverYear: 22.1, monthOverMonth: 15.6, timeProgress: 25, timeStatus: 'ahead' },
+      profit: { target: '$6,000,000', current: '$4,560,000', completion: 76, yearOverYear: 19.4, monthOverMonth: 8.3, timeProgress: 30, timeStatus: 'ahead' },
+      cost: { target: '$3,600,000', current: '$3,360,000', completion: 93, yearOverYear: -4.7, monthOverMonth: 3.1, timeProgress: 25, timeStatus: 'ahead' },
       roi: { target: '4.2x', current: '3.4x', completion: 81, yearOverYear: 24.8, monthOverMonth: 5.9, timeProgress: 35, timeStatus: 'ahead' },
       users: { target: '60,000人', current: '45,600人', completion: 76, yearOverYear: 28.7, monthOverMonth: 11.2, timeProgress: 40, timeStatus: 'behind' }
     }

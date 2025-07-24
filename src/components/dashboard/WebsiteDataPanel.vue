@@ -216,7 +216,7 @@
               <Package :size="24" />
             </div>
             <div class="metric-content">
-              <div class="metric-label">订单平均产品数(AOI)</div>
+              <div class="metric-label">订单平均产品数</div>
               <div class="metric-value">{{ data.averageOrderItems.toFixed(1) }}</div>
               <div class="dual-comparison">
                 <ComparisonIndicator

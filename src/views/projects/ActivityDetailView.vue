@@ -98,11 +98,11 @@
             <div class="info-content">
               <div class="info-item">
                 <label>活动预算：</label>
-                <span>¥{{ formatNumber(activityDetail.budget) }}</span>
+                <span>${{ formatNumber(activityDetail.budget) }}</span>
               </div>
               <div class="info-item">
                 <label>目标销售额：</label>
-                <span>¥{{ formatNumber(activityDetail.targetSales) }}</span>
+                <span>${{ formatNumber(activityDetail.targetSales) }}</span>
               </div>
               <div class="info-item">
                 <label>目标ROI：</label>
@@ -160,7 +160,7 @@
               <DollarSign :size="24" />
             </div>
             <div class="overview-content">
-              <h3>¥{{ formatNumber(activityDetail.overview.totalSales) }}</h3>
+              <h3>${{ formatNumber(activityDetail.overview.totalSales) }}</h3>
               <p>总销售额</p>
               <div class="change-indicator" :class="getChangeClass(activityDetail.overview.salesChange)">
                 <TrendingUp v-if="(activityDetail.overview.salesChange || 0) > 0" :size="14" />
@@ -230,7 +230,7 @@
               <CreditCard :size="24" />
             </div>
             <div class="overview-content">
-              <h3>¥{{ formatNumber(activityDetail.overview.avgOrderValue) }}</h3>
+              <h3>${{ formatNumber(activityDetail.overview.avgOrderValue) }}</h3>
               <p>平均客单价</p>
             </div>
           </div>
@@ -299,17 +299,17 @@
               <tbody>
                 <tr v-for="data in activityDetail.dailyData" :key="data.id">
                   <td>{{ formatDate(data.date) }}</td>
-                  <td>¥{{ formatNumber(data.totalSales) }}</td>
-                  <td>¥{{ formatNumber(data.adSpend) }}</td>
+                  <td>${{ formatNumber(data.totalSales) }}</td>
+                  <td>${{ formatNumber(data.adSpend) }}</td>
                   <td>{{ data.roi.toFixed(2) }}</td>
                   <td>{{ formatNumber(data.orderCount) }}</td>
-                  <td>¥{{ formatNumber(data.avgOrderValue) }}</td>
-                  <td>¥{{ formatNumber(data.totalSales * 0.8) }}</td>
+                  <td>${{ formatNumber(data.avgOrderValue) }}</td>
+                  <td>${{ formatNumber(data.totalSales * 0.8) }}</td>
                   <td>{{ (data.totalSales * 0.8 / data.adSpend).toFixed(2) }}</td>
-                  <td>¥{{ formatNumber(data.googleSpend) }}</td>
-                  <td>¥{{ formatNumber(data.googleRevenue) }}</td>
-                  <td>¥{{ formatNumber(data.facebookSpend) }}</td>
-                  <td>¥{{ formatNumber(data.facebookRevenue) }}</td>
+                  <td>${{ formatNumber(data.googleSpend) }}</td>
+                  <td>${{ formatNumber(data.googleRevenue) }}</td>
+                  <td>${{ formatNumber(data.facebookSpend) }}</td>
+                  <td>${{ formatNumber(data.facebookRevenue) }}</td>
                 </tr>
               </tbody>
             </table>
@@ -375,7 +375,7 @@
                     </span>
                   </td>
                   <td>
-                    ¥{{ formatNumber(product.salesAmount) }}
+                    ${{ formatNumber(product.salesAmount) }}
                     <span v-if="product.momData" class="change-small" :class="getChangeClass(product.momData.salesAmountChange)">
                       {{ product.momData.salesAmountChange > 0 ? '+' : '' }}{{ product.momData.salesAmountChange.toFixed(1) }}%
                     </span>
@@ -386,13 +386,13 @@
                       {{ product.momData.conversionRateChange > 0 ? '+' : '' }}{{ product.momData.conversionRateChange.toFixed(1) }}%
                     </span>
                   </td>
-                  <td>¥{{ formatNumber(product.avgOrderValue) }}</td>
+                  <td>${{ formatNumber(product.avgOrderValue) }}</td>
                   <td>{{ formatNumber(product.addToCartCount) }}</td>
                   <td>{{ product.addToCartRate.toFixed(2) }}%</td>
                   <td>{{ formatNumber(product.checkoutCount) }}</td>
                   <td>{{ product.checkoutRate.toFixed(2) }}%</td>
                   <td>{{ formatNumber(product.returnCount) }}</td>
-                  <td>¥{{ formatNumber(product.returnAmount) }}</td>
+                  <td>${{ formatNumber(product.returnAmount) }}</td>
                 </tr>
               </tbody>
             </table>
