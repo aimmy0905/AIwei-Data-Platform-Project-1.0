@@ -118,7 +118,6 @@
                 <th>联系人</th>
                 <th>联系岗位</th>
                 <th>联系电话</th>
-                <th>服务团队</th>
                 <th @click="setSortBy('cooperationStartTime')" class="sortable">
                   合作开始时间
                   <ArrowUpDown :size="14" v-if="sortBy === 'cooperationStartTime'" />
@@ -168,13 +167,7 @@
                 </td>
                 <td>
                   <div class="customer-info">
-                    <div class="customer-avatar">
-                      {{ customer.name.charAt(0).toUpperCase() }}
-                    </div>
-                    <div class="customer-details">
-                      <div class="customer-name">{{ customer.name }}</div>
-                      <div class="customer-website">{{ customer.website }}</div>
-                    </div>
+                    <div class="customer-name">{{ customer.name }}</div>
                   </div>
                 </td>
                 <td>
@@ -194,9 +187,6 @@
                 </td>
                 <td>
                   <span class="phone-text">{{ customer.primaryContact.phone }}</span>
-                </td>
-                <td>
-                  <span class="team-text">{{ customer.serviceTeam }}</span>
                 </td>
                 <td>
                   <span class="date-text">{{ formatDate(customer.cooperationStartTime) }}</span>
@@ -272,10 +262,6 @@
                 <div class="info-item">
                   <span class="info-label">合作方式</span>
                   <span class="cooperation-tag">{{ customer.cooperationType }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">服务团队</span>
-                  <span class="team-tag">{{ customer.serviceTeam }}</span>
                 </div>
                 <div class="info-item">
                   <span class="info-label">联系人</span>
@@ -435,7 +421,6 @@ const filters = reactive({
   minAmount: null as number | null,
   maxAmount: null as number | null,
   cooperationType: '',
-  serviceTeam: '',
   grade: '',
   signingSales: ''
 })
@@ -467,18 +452,7 @@ const customFilterOptions = [
       { value: '培训服务', label: '培训服务' }
     ]
   },
-  {
-    key: 'serviceTeam',
-    label: '服务团队',
-    type: 'select' as const,
-    options: [
-      { value: '时尚组', label: '时尚组' },
-      { value: '科技组', label: '科技组' },
-      { value: '美妆组', label: '美妆组' },
-      { value: '运动组', label: '运动组' },
-      { value: '家居组', label: '家居组' }
-    ]
-  },
+
   {
     key: 'grade',
     label: '客户分级',
@@ -506,7 +480,6 @@ const searchSuggestions = computed(() => {
     suggestions.add(customer.primaryContact.phone)
     suggestions.add(customer.signingSales)
     suggestions.add(customer.cooperationType)
-    suggestions.add(customer.serviceTeam)
   })
   return Array.from(suggestions)
 })
@@ -522,8 +495,7 @@ const filteredCustomers = computed(() => {
       customer.primaryContact.name.toLowerCase().includes(query) ||
       customer.primaryContact.phone.toLowerCase().includes(query) ||
       customer.signingSales.toLowerCase().includes(query) ||
-      customer.cooperationType.toLowerCase().includes(query) ||
-      customer.serviceTeam.toLowerCase().includes(query)
+      customer.cooperationType.toLowerCase().includes(query)
     )
   }
 
@@ -549,10 +521,7 @@ const filteredCustomers = computed(() => {
     result = result.filter(customer => customer.cooperationType === filters.cooperationType)
   }
 
-  // 服务团队过滤
-  if (filters.serviceTeam) {
-    result = result.filter(customer => customer.serviceTeam === filters.serviceTeam)
-  }
+
 
   // 客户分级过滤
   if (filters.grade) {
@@ -712,10 +681,7 @@ const exportColumns: ExportColumn[] = [
     label: '联系电话',
     formatter: (value: any) => value?.phone || ''
   },
-  {
-    key: 'serviceTeam',
-    label: '服务团队'
-  },
+
   {
     key: 'cooperationStartTime',
     label: '合作开始时间',
@@ -1358,42 +1324,13 @@ onMounted(() => {
 .customer-info {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
   white-space: normal;
   min-width: 200px;
-}
-
-.customer-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-sm);
-}
-
-.customer-details {
-  flex: 1;
-  min-width: 0;
 }
 
 .customer-name {
   font-weight: var(--font-weight-medium);
   color: var(--color-text-primary);
-  margin-bottom: var(--spacing-xs);
-  white-space: normal;
-  word-break: break-word;
-}
-
-.customer-website {
-  font-size: var(--font-size-sm);
-  color: var(--color-primary);
-  margin-bottom: var(--spacing-xs);
-  text-decoration: none;
   white-space: normal;
   word-break: break-word;
 }
@@ -1443,7 +1380,6 @@ onMounted(() => {
 
 .region-text,
 .contact-text,
-.team-text,
 .date-text,
 .sales-text,
 .service-fee-text,
@@ -1612,8 +1548,7 @@ onMounted(() => {
   color: var(--color-text-secondary);
 }
 
-.cooperation-tag,
-.team-tag {
+.cooperation-tag {
   padding: var(--spacing-xs) var(--spacing-sm);
   background: var(--color-background);
   border-radius: var(--border-radius-sm);
