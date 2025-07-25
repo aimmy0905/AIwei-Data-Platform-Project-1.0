@@ -9,21 +9,57 @@
         </h3>
       </div>
 
-      <div class="account-selector">
-        <div class="account-dropdown">
-          <select v-model="selectedAccount" @change="handleAccountChange">
-            <option value="">选择广告账户</option>
-            <option
-              v-for="account in accounts"
-              :key="account.id"
-              :value="account.id"
-            >
-              {{ account.name }} ({{ account.status }})
-            </option>
-          </select>
-        </div>
+      <!-- 筛选选项区域 -->
+      <div class="filters-section">
+        <div class="selector-row">
+          <div class="account-dropdown">
+            <select v-model="selectedAccount" @change="handleAccountChange">
+              <option value="all">全部店铺</option>
+              <option
+                v-for="account in accounts"
+                :key="account.id"
+                :value="account.id"
+              >
+                {{ account.name }} ({{ account.status }})
+              </option>
+            </select>
+          </div>
 
-        <div class="account-info" v-if="selectedAccountInfo">
+          <!-- 时间选择器 -->
+          <div class="time-selector">
+            <div class="time-buttons">
+              <button
+                v-for="option in timeOptions"
+                :key="option.value"
+                :class="['time-btn', { 'time-btn--active': selectedTimeRange === option.value }]"
+                @click="selectTimeRange(option.value)"
+              >
+                {{ option.label }}
+              </button>
+            </div>
+            <!-- 自定义时间选择器 -->
+            <div v-if="selectedTimeRange === 'custom'" class="custom-date-range">
+              <input
+                type="date"
+                v-model="customStartDate"
+                @change="handleCustomDateChange"
+                class="date-input"
+              />
+              <span class="date-separator">至</span>
+              <input
+                type="date"
+                v-model="customEndDate"
+                @change="handleCustomDateChange"
+                class="date-input"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 账户信息区域 -->
+      <div class="account-info-section" v-if="selectedAccountInfo">
+        <div class="info-card">
           <div class="account-status">
             <span :class="['status-badge', `status-badge--${selectedAccountInfo.status}`]">
               {{ selectedAccountInfo.statusText }}
@@ -1001,7 +1037,20 @@ interface VideoMaterialData {
 }
 
 // 响应式数据
-const selectedAccount = ref('')
+const selectedAccount = ref('all')
+const selectedTimeRange = ref('today')
+const customStartDate = ref('')
+const customEndDate = ref('')
+
+const timeOptions = ref([
+  { value: 'today', label: '今日' },
+  { value: 'yesterday', label: '昨日' },
+  { value: 'last14days', label: '近14天' },
+  { value: 'last1month', label: '近1个月' },
+  { value: 'last3months', label: '近3个月' },
+  { value: 'last1year', label: '近1年' },
+  { value: 'custom', label: '自定义时间' }
+])
 const alerts = ref<Alert[]>([
   {
     id: '1',
@@ -1721,6 +1770,31 @@ const handleAccountChange = () => {
   // 这里可以添加账户切换的逻辑
 }
 
+// 时间筛选处理方法
+const selectTimeRange = (value: string) => {
+  selectedTimeRange.value = value
+  console.log('时间范围变更:', selectedTimeRange.value)
+  loadGoogleDashboardData()
+}
+
+const handleTimeRangeChange = () => {
+  console.log('时间范围变更:', selectedTimeRange.value)
+  loadGoogleDashboardData()
+}
+
+const handleCustomDateChange = () => {
+  if (customStartDate.value && customEndDate.value) {
+    console.log('自定义时间范围:', customStartDate.value, '至', customEndDate.value)
+    loadGoogleDashboardData()
+  }
+}
+
+const loadGoogleDashboardData = () => {
+  // 根据选择的时间范围重新加载数据
+  console.log('根据时间范围重新加载Google广告数据...')
+  // 实际项目中这里会调用API获取对应时间范围的数据
+}
+
 const exportDailyData = () => {
   console.log('导出日投放数据')
   // 这里可以添加导出逻辑
@@ -2216,10 +2290,14 @@ onMounted(() => {
     grid-template-columns: 1fr;
   }
 
-  .account-selector {
+  .filters-section {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+  }
+
+  .account-info-section {
+    margin-top: 16px;
   }
 
   .alert-cards {
@@ -2234,6 +2312,129 @@ onMounted(() => {
   .audience-section,
   .materials-section {
     padding: 16px;
+  }
+}
+
+/* 筛选区域样式 */
+.filters-section {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.selector-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 0;
+}
+
+/* 账户信息区域样式 */
+.account-info-section {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.info-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.time-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.time-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.time-btn {
+  padding: 6px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.time-btn:hover {
+  border-color: #3b82f6;
+  background-color: #f8fafc;
+}
+
+.time-btn--active {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.time-btn--active:hover {
+  background-color: #2563eb;
+}
+
+.custom-date-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 12px;
+}
+
+.date-input {
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.date-separator {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .selector-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .time-selector {
+    width: 100%;
+  }
+
+  .time-buttons {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .time-btn {
+    flex: 0 0 auto;
+    font-size: 13px;
+    padding: 5px 10px;
+  }
+
+  .custom-date-range {
+    margin-left: 0;
+    width: 100%;
   }
 }
 </style>
