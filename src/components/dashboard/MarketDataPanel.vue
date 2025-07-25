@@ -1,8 +1,41 @@
 <template>
     <div class="market-data-panel">
-    <div class="section-header">
-      <h2 class="section-title">地区市场数据</h2>
-      <p class="section-description">全球市场表现分析和地区销售数据对比</p>
+    <div class="panel-header">
+      <div class="header-content">
+        <h2 class="section-title">地区市场数据</h2>
+        <p class="section-description">全球市场表现分析和地区销售数据对比</p>
+      </div>
+      <div class="header-actions">
+        <!-- 时间筛选器 -->
+        <div class="time-filter">
+          <select v-model="selectedTimeRange" @change="handleTimeRangeChange" class="time-select">
+            <option value="today">今日</option>
+            <option value="yesterday">昨天</option>
+            <option value="last7days">近7天</option>
+            <option value="last14days">近14天</option>
+            <option value="last1month">近1个月</option>
+            <option value="last3months">近3个月</option>
+            <option value="last1year">近1年</option>
+            <option value="custom">自定义时间</option>
+          </select>
+          <!-- 自定义时间选择器 -->
+          <div v-if="selectedTimeRange === 'custom'" class="custom-date-range">
+            <input
+              type="date"
+              v-model="customStartDate"
+              @change="handleCustomDateChange"
+              class="date-input"
+            />
+            <span class="date-separator">至</span>
+            <input
+              type="date"
+              v-model="customEndDate"
+              @change="handleCustomDateChange"
+              class="date-input"
+            />
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="panel-content">
@@ -13,6 +46,7 @@
           <div class="table-content">
             <div class="table-header">
               <div class="country-col">国家</div>
+              <div class="region-col">地区</div>
               <div class="revenue-col">销售额</div>
               <div class="revenue-ratio-col">销售额占比</div>
               <div class="visits-col">访问量</div>
@@ -39,6 +73,7 @@
                     <span class="name">{{ region.name }}</span>
                   </div>
                 </div>
+                <div class="region-col">{{ region.region }}</div>
                 <div class="revenue-col">${{ formatNumber(region.revenue) }}</div>
                 <div class="revenue-ratio-col">{{ region.revenueRatio }}%</div>
                 <div class="visits-col">{{ formatNumber(region.visits) }}</div>
@@ -138,6 +173,7 @@ interface Region {
   id: string
   name: string
   code: string
+  region: string
   flag: string
   revenue: number
   revenueRatio: number
@@ -172,6 +208,9 @@ interface ChartData {
 
 // 响应式数据
 const activeView = ref('revenue')
+const selectedTimeRange = ref('last7days')
+const customStartDate = ref('')
+const customEndDate = ref('')
 const stats = ref<MarketStats>({
   totalRegions: 45,
   regionGrowth: 8,
@@ -194,6 +233,7 @@ const topRegions = ref<Region[]>([
     id: '1',
     name: '美国',
     code: 'US',
+    region: '加利福尼亚州',
     flag: 'https://flagcdn.com/w20/us.png',
     revenue: 1250000,
     revenueRatio: 45.2,
@@ -213,6 +253,7 @@ const topRegions = ref<Region[]>([
     id: '2',
     name: '英国',
     code: 'UK',
+    region: '伦敦',
     flag: 'https://flagcdn.com/w20/gb.png',
     revenue: 680000,
     revenueRatio: 23.6,
@@ -232,6 +273,7 @@ const topRegions = ref<Region[]>([
     id: '3',
     name: '加拿大',
     code: 'CA',
+    region: '安大略省',
     flag: 'https://flagcdn.com/w20/ca.png',
     revenue: 450000,
     revenueRatio: 18.1,
@@ -251,6 +293,7 @@ const topRegions = ref<Region[]>([
     id: '4',
     name: '澳大利亚',
     code: 'AU',
+    region: '新南威尔士州',
     flag: 'https://flagcdn.com/w20/au.png',
     revenue: 380000,
     revenueRatio: 13.2,
@@ -270,6 +313,7 @@ const topRegions = ref<Region[]>([
     id: '5',
     name: '德国',
     code: 'DE',
+    region: '巴伐利亚州',
     flag: 'https://flagcdn.com/w20/de.png',
     revenue: 320000,
     revenueRatio: 10.1,
@@ -289,6 +333,7 @@ const topRegions = ref<Region[]>([
     id: '6',
     name: '法国',
     code: 'FR',
+    region: '巴黎大区',
     flag: 'https://flagcdn.com/w20/fr.png',
     revenue: 280000,
     revenueRatio: 8.5,
@@ -308,6 +353,7 @@ const topRegions = ref<Region[]>([
     id: '7',
     name: '日本',
     code: 'JP',
+    region: '东京都',
     flag: 'https://flagcdn.com/w20/jp.png',
     revenue: 240000,
     revenueRatio: 7.3,
@@ -408,6 +454,25 @@ const formatNumber = (num: number): string => {
   return num.toString()
 }
 
+// 时间筛选处理方法
+const handleTimeRangeChange = () => {
+  console.log('时间范围变更:', selectedTimeRange.value)
+  loadMarketData()
+}
+
+const handleCustomDateChange = () => {
+  if (customStartDate.value && customEndDate.value) {
+    console.log('自定义时间范围:', customStartDate.value, '至', customEndDate.value)
+    loadMarketData()
+  }
+}
+
+const loadMarketData = () => {
+  // 根据选择的时间范围重新加载数据
+  console.log('根据时间范围重新加载市场数据...')
+  // 实际项目中这里会调用API获取对应时间范围的数据
+}
+
 const getRankClass = (rank: number): string => {
   if (rank === 1) return 'rank-first'
   if (rank === 2) return 'rank-second'
@@ -434,6 +499,7 @@ const getInsightIcon = (type: string) => {
 
 onMounted(() => {
   console.log('地区市场数据面板已加载')
+  loadMarketData()
 })
 </script>
 
@@ -459,16 +525,19 @@ onMounted(() => {
   font-size: 24px;
   font-weight: 600;
   color: #1f2937;
-  margin: 0 0 8px 0;
+  margin: 0 0 6px 0;
+  line-height: 1.3;
 }
 
 .section-description {
   color: #6b7280;
   margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 .panel-content {
-  padding: 24px;
+  padding: 0 24px 24px 24px;
 }
 
 .stats-grid {
@@ -574,7 +643,7 @@ onMounted(() => {
 
 .table-header {
   display: grid;
-  grid-template-columns: 120px 100px 80px 100px 80px 100px 80px 100px 80px 100px 80px 120px 80px 80px;
+  grid-template-columns: 120px 80px 100px 80px 100px 80px 100px 80px 100px 80px 100px 80px 120px 80px 80px;
   gap: 8px;
   padding: 16px 12px;
   background: #f8fafc;
@@ -586,7 +655,7 @@ onMounted(() => {
 
 .table-row {
   display: grid;
-  grid-template-columns: 120px 100px 80px 100px 80px 100px 80px 100px 80px 100px 80px 120px 80px 80px;
+  grid-template-columns: 120px 80px 100px 80px 100px 80px 100px 80px 100px 80px 100px 80px 120px 80px 80px;
   gap: 8px;
   padding: 16px 12px;
   border-bottom: 1px solid #f1f5f9;
@@ -643,6 +712,13 @@ onMounted(() => {
 
 .country-col {
   min-width: 0;
+}
+
+.region-col {
+  text-align: center;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  font-size: 12px;
 }
 
 .revenue-col,
@@ -925,6 +1001,98 @@ onMounted(() => {
 
   .insights-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* 时间筛选器样式 */
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  padding: 24px 24px 20px 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.header-content {
+  flex: 1;
+  padding-right: 24px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.time-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.time-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.custom-date-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 12px;
+}
+
+.date-input {
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.date-separator {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+@media (max-width: 1024px) {
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .time-filter {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .custom-date-range {
+    margin-left: 0;
   }
 }
 </style>

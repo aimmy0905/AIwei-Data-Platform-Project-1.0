@@ -1,8 +1,41 @@
 <template>
   <div class="ad-platform-overview-panel">
-    <div class="section-header">
-      <h2 class="section-title">广告数据总览</h2>
-      <p class="section-description">全平台广告数据汇总和表现分析</p>
+    <div class="panel-header">
+      <div class="header-content">
+        <h2 class="section-title">广告数据总览</h2>
+        <p class="section-description">全平台广告数据汇总和表现分析</p>
+      </div>
+      <div class="header-actions">
+        <!-- 时间筛选器 -->
+        <div class="time-filter">
+          <select v-model="selectedTimeRange" @change="handleTimeRangeChange" class="time-select">
+            <option value="today">今日</option>
+            <option value="yesterday">昨天</option>
+            <option value="last7days">近7天</option>
+            <option value="last14days">近14天</option>
+            <option value="last1month">近1个月</option>
+            <option value="last3months">近3个月</option>
+            <option value="last1year">近1年</option>
+            <option value="custom">自定义时间</option>
+          </select>
+          <!-- 自定义时间选择器 -->
+          <div v-if="selectedTimeRange === 'custom'" class="custom-date-range">
+            <input
+              type="date"
+              v-model="customStartDate"
+              @change="handleCustomDateChange"
+              class="date-input"
+            />
+            <span class="date-separator">至</span>
+            <input
+              type="date"
+              v-model="customEndDate"
+              @change="handleCustomDateChange"
+              class="date-input"
+            />
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="panel-content">
@@ -195,6 +228,10 @@ interface ChartData {
 const router = useRouter()
 
 // 响应式数据
+const selectedTimeRange = ref('last7days')
+const customStartDate = ref('')
+const customEndDate = ref('')
+
 const platformTabs = ref([
   { key: 'google', name: 'Google' },
   { key: 'meta', name: 'Meta' },
@@ -382,8 +419,28 @@ const navigateToPlatform = (platform: string): void => {
   }
 }
 
+// 时间筛选处理方法
+const handleTimeRangeChange = () => {
+  console.log('时间范围变更:', selectedTimeRange.value)
+  loadAdPlatformData()
+}
+
+const handleCustomDateChange = () => {
+  if (customStartDate.value && customEndDate.value) {
+    console.log('自定义时间范围:', customStartDate.value, '至', customEndDate.value)
+    loadAdPlatformData()
+  }
+}
+
+const loadAdPlatformData = () => {
+  // 根据选择的时间范围重新加载数据
+  console.log('根据时间范围重新加载广告平台数据...')
+  // 实际项目中这里会调用API获取对应时间范围的数据
+}
+
 onMounted(() => {
   console.log('广告数据总览面板已加载')
+  loadAdPlatformData()
 })
 </script>
 
@@ -418,7 +475,7 @@ onMounted(() => {
 }
 
 .panel-content {
-  padding: 24px;
+  padding: 0 24px 24px 24px;
 }
 
 .platform-data-section {
@@ -773,6 +830,98 @@ onMounted(() => {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+  }
+}
+
+/* 时间筛选器样式 */
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  padding: 24px 24px 20px 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.header-content {
+  flex: 1;
+  padding-right: 24px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.time-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.time-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.custom-date-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 12px;
+}
+
+.date-input {
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.date-separator {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+@media (max-width: 1024px) {
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .time-filter {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .custom-date-range {
+    margin-left: 0;
   }
 }
 </style>

@@ -119,28 +119,6 @@ export const mockMenuItems: MenuItem[] = [
           }
         ],
         roles: ['superAdmin', 'manager', 'staff']
-      },
-      {
-        id: 'data-tools',
-        name: '数据工具',
-        icon: 'Tool',
-        children: [
-          {
-            id: 'data-export',
-            name: '数据导出',
-            icon: 'Download',
-            path: '/dashboard/data-export',
-            roles: ['superAdmin', 'manager', 'staff']
-          },
-          {
-            id: 'custom-metrics',
-            name: '自定义指标',
-            icon: 'Settings',
-            path: '/dashboard/custom-metrics',
-            roles: ['superAdmin', 'manager', 'staff']
-          }
-        ],
-        roles: ['superAdmin', 'manager', 'staff']
       }
     ],
     roles: ['superAdmin', 'manager', 'staff', 'finance', 'sales']

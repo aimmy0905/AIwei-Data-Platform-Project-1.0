@@ -530,6 +530,7 @@ export interface ProductSalesData {
   name: string
   category: string
   price: number
+  image?: string
 
   // 销量排名数据
   grossSales: number // 毛销售额
