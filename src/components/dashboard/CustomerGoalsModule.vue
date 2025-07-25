@@ -238,12 +238,53 @@
         </div>
       </div>
     </div>
+
+    <!-- 模块小结 -->
+    <div class="module-summary">
+      <div class="summary-header">
+        <h3>模块小结</h3>
+        <button class="edit-summary-btn" @click="toggleEditMode">
+          <component :is="isEditingMode ? 'Check' : 'Edit'" :size="16" />
+          {{ isEditingMode ? '保存' : '编辑' }}
+        </button>
+      </div>
+
+      <div class="summary-content">
+        <div v-if="!isEditingMode" class="summary-display">
+          <p>{{ summaryText }}</p>
+        </div>
+        <div v-else class="summary-edit">
+          <textarea
+            v-model="editingSummaryText"
+            class="summary-textarea"
+            placeholder="请输入目标完成情况小结..."
+            rows="4"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- 目标完成概览 -->
+      <div class="summary-stats">
+        <div class="stat-item">
+          <span class="stat-label">总体完成率</span>
+          <span class="stat-value">{{ overallProgress }}%</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">达标目标数</span>
+          <span class="stat-value">{{ achievedGoalsCount }}/{{ totalGoalsCount }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">进度状态</span>
+          <span :class="['stat-badge', progressStatusClass]">{{ progressStatusText }}</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { TrendingUp, DollarSign, Target, BarChart3, Users, Clock, TrendingDown } from 'lucide-vue-next'
+import { TrendingUp, DollarSign, Target, BarChart3, Users, Clock, TrendingDown, Edit, Check } from 'lucide-vue-next'
 
 
 // 目标类型选项
@@ -276,12 +317,51 @@ const availablePeriods = computed(() => {
   }
 })
 
+// 小结相关计算属性
+const overallProgress = computed(() => {
+  const goals = websiteGoals.value
+  const totalCompletion = goals.sales.completion + goals.profit.completion + goals.users.completion
+  return Math.round(totalCompletion / 3)
+})
+
+const totalGoalsCount = computed(() => 3) // 销售额、利润、用户数
+
+const achievedGoalsCount = computed(() => {
+  const goals = websiteGoals.value
+  let count = 0
+  if (goals.sales.completion >= 100) count++
+  if (goals.profit.completion >= 100) count++
+  if (goals.users.completion >= 100) count++
+  return count
+})
+
+const progressStatusClass = computed(() => {
+  const progress = overallProgress.value
+  if (progress >= 90) return 'status-excellent'
+  if (progress >= 75) return 'status-good'
+  if (progress >= 50) return 'status-warning'
+  return 'status-danger'
+})
+
+const progressStatusText = computed(() => {
+  const progress = overallProgress.value
+  if (progress >= 90) return '优秀'
+  if (progress >= 75) return '良好'
+  if (progress >= 50) return '一般'
+  return '需改进'
+})
+
 const activeGoalType = ref('monthly')
 const selectedPeriod = ref('2025-01')
 
 
 // 响应式数据
 const loading = ref(false)
+
+// 模块小结相关状态
+const isEditingMode = ref(false)
+const summaryText = ref('本月目标整体进展良好，销售额和利润目标均超额完成，用户增长稳定。建议继续保持当前策略，同时关注转化率优化。')
+const editingSummaryText = ref('')
 
 // 网站整体目标数据
 const websiteGoals = ref({
@@ -392,6 +472,19 @@ const handleGoalTypeChange = (type: string) => {
 // 处理时间段变化
 const handlePeriodChange = () => {
   loadGoalsData()
+}
+
+// 小结编辑相关方法
+const toggleEditMode = () => {
+  if (isEditingMode.value) {
+    // 保存编辑内容
+    summaryText.value = editingSummaryText.value
+    isEditingMode.value = false
+  } else {
+    // 进入编辑模式
+    editingSummaryText.value = summaryText.value
+    isEditingMode.value = true
+  }
 }
 
 // 计算时间进度状态
@@ -809,6 +902,139 @@ onMounted(() => {
 
   .time-progress-detail {
     align-items: center;
+  }
+}
+
+/* 模块小结样式 */
+.module-summary {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 24px;
+}
+
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.summary-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.edit-summary-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.edit-summary-btn:hover {
+  background: #2563eb;
+}
+
+.summary-content {
+  margin-bottom: 16px;
+}
+
+.summary-display p {
+  margin: 0;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.summary-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.summary-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.summary-stats {
+  display: flex;
+  gap: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.stat-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.stat-badge.status-excellent {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.stat-badge.status-good {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.stat-badge.status-warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.stat-badge.status-danger {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+@media (max-width: 768px) {
+  .summary-stats {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .summary-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
 }
 </style>

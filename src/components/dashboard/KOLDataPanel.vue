@@ -159,12 +159,20 @@
       </div>
 
     </div>
+
+    <!-- 模块小结 -->
+    <ModuleSummary
+      :default-text="kolSummaryText"
+      placeholder="请输入红人数据情况小结..."
+      :stats="kolSummaryStats"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Users, FileText, Eye, Heart, MessageCircle, ThumbsUp } from 'lucide-vue-next'
+import ModuleSummary from '@/components/common/ModuleSummary.vue'
 
 // 定义数据类型
 interface InfluencerStats {
@@ -259,7 +267,39 @@ const loadKOLData = () => {
   // 这里可以调用API获取对应时间范围的数据
 }
 
+// 模块小结相关计算属性
+const kolSummaryText = computed(() => {
+  return '红人数据表现良好，总观看量达到2.5M，增长率为15%。建议加强与高互动率红人的合作，扩大品牌影响力。'
+})
 
+const kolSummaryStats = computed(() => {
+  const totalInfluencers = stats.value.totalInfluencers
+  const totalViews = stats.value.totalViews
+  const viewGrowth = stats.value.viewGrowth
+
+  let statusClass = 'status-good'
+  let statusText = '良好'
+
+  if (viewGrowth >= 20) {
+    statusClass = 'status-excellent'
+    statusText = '优秀'
+  } else if (viewGrowth >= 10) {
+    statusClass = 'status-good'
+    statusText = '良好'
+  } else if (viewGrowth >= 5) {
+    statusClass = 'status-warning'
+    statusText = '一般'
+  } else {
+    statusClass = 'status-danger'
+    statusText = '需改进'
+  }
+
+  return [
+    { label: '红人总数', value: totalInfluencers },
+    { label: '总观看量', value: `${(totalViews / 1000000).toFixed(1)}M` },
+    { label: '数据状态', value: statusText, type: 'badge' as const, class: statusClass }
+  ]
+})
 
 onMounted(() => {
   // 组件挂载时加载数据

@@ -39,6 +39,10 @@
           <Settings :size="16" />
           自定义指标筛选
         </button>
+        <button class="view-all-btn" @click="viewAllProducts">
+          <Package :size="16" />
+          查看全部商品
+        </button>
       </div>
     </div>
 
@@ -581,14 +585,22 @@
         </div>
       </div>
     </div>
+
+        <!-- 模块小结 -->
+    <ModuleSummary
+      :default-text="productSummaryText"
+      placeholder="请输入产品销售情况小结..."
+      :stats="productSummaryStats"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { Settings, X } from 'lucide-vue-next'
+import { Settings, X, Package, Edit, Check } from 'lucide-vue-next'
 import { mockGetProductSalesData, mockGetProductSalesSummary } from '@/mock/dashboard'
 import type { ProductSalesData, ProductSalesSummary } from '@/types'
+import ModuleSummary from '@/components/common/ModuleSummary.vue'
 
 // 响应式数据
 const productSalesData = ref<ProductSalesData[]>([])
@@ -783,6 +795,40 @@ const customMetricsData = computed(() => {
   })
 })
 
+// 模块小结相关计算属性
+const productSummaryText = computed(() => {
+  return '产品销售表现良好，库存状态正常。建议重点关注转化率较低的产品，优化产品描述和定价策略，提升整体销售效果。'
+})
+
+const productSummaryStats = computed(() => {
+  const totalProducts = productSalesData.value.length
+  const totalSales = summary.value.totalRevenue
+  const avgConversionRate = summary.value.averageConversionRate
+
+  let statusClass = 'status-good'
+  let statusText = '良好'
+
+  if (avgConversionRate >= 8) {
+    statusClass = 'status-excellent'
+    statusText = '优秀'
+  } else if (avgConversionRate >= 5) {
+    statusClass = 'status-good'
+    statusText = '良好'
+  } else if (avgConversionRate >= 3) {
+    statusClass = 'status-warning'
+    statusText = '一般'
+  } else {
+    statusClass = 'status-danger'
+    statusText = '需改进'
+  }
+
+  return [
+    { label: '产品总数', value: totalProducts },
+    { label: '总销售额', value: `$${formatNumber(totalSales)}` },
+    { label: '销售状态', value: statusText, type: 'badge' as const, class: statusClass }
+  ]
+})
+
 // 工具方法
 const formatNumber = (num: number): string => {
   return num.toLocaleString()
@@ -899,6 +945,13 @@ const openCustomMetricsModal = () => {
 
 const closeCustomMetricsModal = () => {
   showCustomMetricsModal.value = false
+}
+
+// 查看全部商品
+const viewAllProducts = () => {
+  console.log('查看全部商品')
+  // 这里可以导航到商品列表页面或打开商品管理模态框
+  // 例如: router.push('/products') 或打开模态框
 }
 
 const toggleMetric = (metricKey: string) => {
@@ -1118,6 +1171,25 @@ onMounted(() => {
 
 .custom-filter-btn:hover {
   background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.view-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-all-btn:hover {
+  background: #059669;
   transform: translateY(-1px);
 }
 

@@ -155,11 +155,23 @@
         </div>
       </div>
     </div>
+
+    <!-- 模块小结 -->
+    <ModuleSummary
+      :default-text="'页面表现数据良好，核心页面转化率稳定。建议优化加载速度较慢的页面，提升用户体验。'"
+      placeholder="请输入页面表现情况小结..."
+      :stats="[
+        { label: '监控页面', value: 15 },
+        { label: '平均转化率', value: '6.2%' },
+        { label: '性能状态', value: '良好', type: 'badge', class: 'status-good' }
+      ]"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import ModuleSummary from '@/components/common/ModuleSummary.vue'
 
 // 定义数据类型
 interface PageStats {
