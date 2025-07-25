@@ -82,6 +82,17 @@
         </form>
       </div>
     </div>
+
+    <!-- 模块小结 -->
+    <ModuleSummary
+      :default-text="'竞品监控数据完整，主要竞争对手活动频繁。建议关注竞品定价策略和营销活动，及时调整我方策略。'"
+      placeholder="请输入竞品情况小结..."
+      :stats="[
+        { label: '监控竞品', value: 8 },
+        { label: '活跃竞品', value: 5 },
+        { label: '竞争状态', value: '激烈', type: 'badge', class: 'status-warning' }
+      ]"
+    />
   </div>
 </template>
 
@@ -89,6 +100,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import type { CompetitorData } from '@/types'
 import { mockGetCompetitorData, mockAddCompetitor } from '@/mock/dashboard'
+import ModuleSummary from '@/components/common/ModuleSummary.vue'
 
 const competitorData = ref<CompetitorData[]>([])
 const showAddDialog = ref(false)

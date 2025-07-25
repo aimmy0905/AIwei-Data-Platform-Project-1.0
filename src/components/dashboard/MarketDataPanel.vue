@@ -148,6 +148,13 @@
 
 
     </div>
+
+    <!-- 模块小结 -->
+    <ModuleSummary
+      :default-text="marketSummaryText"
+      placeholder="请输入地区市场数据情况小结..."
+      :stats="marketSummaryStats"
+    />
   </div>
 </template>
 
@@ -156,6 +163,7 @@ import { ref, computed, onMounted } from 'vue'
 import { Globe, TrendingUp, Users, ShoppingCart, AlertTriangle, Target, Zap, Info } from 'lucide-vue-next'
 import PieChart from '@/components/charts/PieChart.vue'
 import LineChart from '@/components/charts/LineChart.vue'
+import ModuleSummary from '@/components/common/ModuleSummary.vue'
 
 // 定义数据类型
 interface MarketStats {
@@ -496,6 +504,40 @@ const getInsightIcon = (type: string) => {
   }
   return iconMap[type as keyof typeof iconMap] || Info
 }
+
+// 模块小结相关计算属性
+const marketSummaryText = computed(() => {
+  return '地区市场数据表现良好，美国市场领先，加利福尼亚州表现突出。建议加强欧洲市场投入，关注新兴市场机会。'
+})
+
+const marketSummaryStats = computed(() => {
+  const totalRegions = topRegions.value.length
+  const totalRevenue = topRegions.value.reduce((sum, region) => sum + region.revenue, 0)
+  const avgConversionRate = topRegions.value.reduce((sum, region) => sum + region.conversionRate, 0) / totalRegions
+
+  let statusClass = 'status-good'
+  let statusText = '良好'
+
+  if (avgConversionRate >= 8) {
+    statusClass = 'status-excellent'
+    statusText = '优秀'
+  } else if (avgConversionRate >= 5) {
+    statusClass = 'status-good'
+    statusText = '良好'
+  } else if (avgConversionRate >= 3) {
+    statusClass = 'status-warning'
+    statusText = '一般'
+  } else {
+    statusClass = 'status-danger'
+    statusText = '需改进'
+  }
+
+  return [
+    { label: '覆盖地区', value: totalRegions },
+    { label: '总销售额', value: `$${(totalRevenue / 1000000).toFixed(1)}M` },
+    { label: '市场状态', value: statusText, type: 'badge' as const, class: statusClass }
+  ]
+})
 
 onMounted(() => {
   console.log('地区市场数据面板已加载')

@@ -1,5 +1,5 @@
 <template>
-  <div class="website-data-panel">
+        <div class="website-data-panel">
     <div class="panel-header">
       <div class="header-content">
         <h3>网站数据</h3>
@@ -1757,6 +1757,13 @@
 
     </div>
 
+    <!-- 模块小结 -->
+    <ModuleSummary
+      :default-text="websiteSummaryText"
+      placeholder="请输入网站数据情况小结..."
+      :stats="websiteSummaryStats"
+    />
+
     <!-- 自定义维度模态框 -->
     <CustomDimensionModal
       :visible="showCustomDimension"
@@ -1787,6 +1794,7 @@ import {
   Check,
   Clock,
   LogOut,
+  Edit,
   RotateCcw,
   Calendar,
   CheckCircle,
@@ -1798,6 +1806,7 @@ import {
 } from 'lucide-vue-next'
 import CustomDimensionModal from './CustomDimensionModal.vue'
 import ComparisonIndicator from './ComparisonIndicator.vue'
+import ModuleSummary from '@/components/common/ModuleSummary.vue'
 import { getWebsiteDataComparison } from '@/mock/dashboard'
 import type { WebsiteData, ComparisonPeriod } from '@/types'
 
@@ -1817,6 +1826,11 @@ const selectedPeriod = ref<ComparisonPeriod>('mom')
 const selectedTimeRange = ref('last7days')
 const customStartDate = ref('')
 const customEndDate = ref('')
+
+// 模块小结相关状态
+const isEditingMode = ref(false)
+const summaryText = ref('网站数据表现良好，总销售额达到$1.3M，环比增长2.8%。ROI表现稳定在4.4x，用户活跃度持续提升。建议继续优化转化率，关注新用户获取成本。')
+const editingSummaryText = ref('')
 
 // 趋势数据 - 模拟数据，实际应该从API获取
 const salesTrendData = ref([20, 35, 45, 55, 65, 70, 80])
@@ -1877,6 +1891,38 @@ const qoqComparisonData = computed(() => {
   return getWebsiteDataComparison('qoq')
 })
 
+// 小结相关计算属性
+const websiteStats = computed(() => {
+  const data = comparisonData.value
+  return {
+    totalSales: 1300000, // $1.3M
+    roi: 4.4
+  }
+})
+
+const dataStatusClass = computed(() => {
+  // 简化状态判断，基于固定数据
+  const salesGrowth = 2.8 // 从模板中的数据
+  const roiGrowth = 8.1 // 从模板中的数据
+
+  const avgGrowth = (salesGrowth + roiGrowth) / 2
+  if (avgGrowth >= 5) return 'status-excellent'
+  if (avgGrowth >= 2) return 'status-good'
+  if (avgGrowth >= 0) return 'status-warning'
+  return 'status-danger'
+})
+
+const dataStatusText = computed(() => {
+  const statusClass = dataStatusClass.value
+  switch (statusClass) {
+    case 'status-excellent': return '优秀'
+    case 'status-good': return '良好'
+    case 'status-warning': return '一般'
+    case 'status-danger': return '需改进'
+    default: return '良好'
+  }
+})
+
 // 标签页配置
 const tabs = [
   { key: 'results', label: '结果指标', icon: BarChart3 },
@@ -1894,6 +1940,36 @@ const formatNumber = (num: number): string => {
     return (num / 1000).toFixed(0) + 'K'
   }
   return num.toString()
+}
+
+const formatCurrency = (num: number): string => {
+  return '$' + formatNumber(num)
+}
+
+// ModuleSummary组件所需的计算属性
+const websiteSummaryText = computed(() => {
+  return summaryText.value
+})
+
+const websiteSummaryStats = computed(() => {
+  return [
+    { label: '总销售额', value: formatCurrency(websiteStats.value.totalSales) },
+    { label: 'ROI表现', value: `${websiteStats.value.roi}x` },
+    { label: '数据状态', value: dataStatusText.value, type: 'badge' as const, class: dataStatusClass.value }
+  ]
+})
+
+// 小结编辑相关方法
+const toggleEditMode = () => {
+  if (isEditingMode.value) {
+    // 保存编辑内容
+    summaryText.value = editingSummaryText.value
+    isEditingMode.value = false
+  } else {
+    // 进入编辑模式
+    editingSummaryText.value = summaryText.value
+    isEditingMode.value = true
+  }
 }
 
 // 渲染迷你趋势图的方法
@@ -2930,4 +3006,6 @@ const getBarChartData = (metric: string) => {
     height: 100px;
   }
 }
+
+
 </style>

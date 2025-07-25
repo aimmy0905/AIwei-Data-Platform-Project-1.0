@@ -370,6 +370,13 @@
         </div>
       </div>
     </div>
+
+    <!-- 模块小结 -->
+    <ModuleSummary
+      :default-text="campaignSummaryText"
+      placeholder="请输入活动数据情况小结..."
+      :stats="campaignSummaryStats"
+    />
   </div>
 </template>
 
@@ -378,8 +385,9 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   Calendar, Play, DollarSign, TrendingUp, Target, Award,
-  List, ArrowLeft, BarChart3
+  List, ArrowLeft, BarChart3, Edit, Check
 } from 'lucide-vue-next'
+import ModuleSummary from '@/components/common/ModuleSummary.vue'
 import type { CampaignData, CampaignSummary, CampaignDailyData } from '@/types'
 import {
   mockGetCampaignData,
@@ -409,6 +417,11 @@ const activeTab = ref('list')
 const statusFilter = ref('')
 const typeFilter = ref('')
 const loading = ref(false)
+
+// 模块小结相关状态
+const isEditingMode = ref(false)
+const summaryText = ref('活动数据表现良好，当前有多个活动正在进行中。建议重点关注转化率较低的活动，优化投放策略和目标受众定位。')
+const editingSummaryText = ref('')
 
 // 标签页配置
 const tabs = [
@@ -531,6 +544,56 @@ const navigateToCampaignDetails = (campaignId: number) => {
 const showAllCampaigns = () => {
   // 这里可以跳转到全部活动页面或打开模态框
   console.log('显示全部活动')
+}
+
+// 小结相关计算属性和函数
+const campaignStats = computed(() => {
+  return {
+    totalCampaigns: campaignSummary.value.totalCampaigns,
+    totalSales: campaignSummary.value.totalRevenue
+  }
+})
+
+const campaignStatusClass = computed(() => {
+  const roi = campaignSummary.value.averageROI
+  if (roi >= 4) return 'status-excellent'
+  if (roi >= 2.5) return 'status-good'
+  if (roi >= 1.5) return 'status-warning'
+  return 'status-danger'
+})
+
+const campaignStatusText = computed(() => {
+  const statusClass = campaignStatusClass.value
+  switch (statusClass) {
+    case 'status-excellent': return '优秀'
+    case 'status-good': return '良好'
+    case 'status-warning': return '一般'
+    case 'status-danger': return '需改进'
+    default: return '良好'
+  }
+})
+
+// ModuleSummary组件所需的计算属性
+const campaignSummaryText = computed(() => {
+  return summaryText.value
+})
+
+const campaignSummaryStats = computed(() => {
+  return [
+    { label: '活动总数', value: campaignStats.value.totalCampaigns },
+    { label: '总销售额', value: `$${formatNumber(campaignStats.value.totalSales)}` },
+    { label: '活动状态', value: campaignStatusText.value, type: 'badge' as const, class: campaignStatusClass.value }
+  ]
+})
+
+const toggleEditMode = () => {
+  if (isEditingMode.value) {
+    summaryText.value = editingSummaryText.value
+    isEditingMode.value = false
+  } else {
+    editingSummaryText.value = summaryText.value
+    isEditingMode.value = true
+  }
 }
 
 // 生命周期
@@ -1101,4 +1164,6 @@ onMounted(() => {
     gap: 8px;
   }
 }
+
+
 </style>

@@ -188,6 +188,17 @@
         </div>
       </div>
     </div>
+
+    <!-- 模块小结 -->
+    <ModuleSummary
+      :default-text="'广告平台数据表现稳定，Meta平台效果最佳，Google平台增长潜力大。建议优化Bing平台投放策略。'"
+      placeholder="请输入广告平台情况小结..."
+      :stats="[
+        { label: '活跃平台', value: 4 },
+        { label: '总广告支出', value: '$125K' },
+        { label: '投放状态', value: '优秀', type: 'badge', class: 'status-excellent' }
+      ]"
+    />
   </div>
 </template>
 
@@ -195,6 +206,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import PieChart from '@/components/charts/PieChart.vue'
+import ModuleSummary from '@/components/common/ModuleSummary.vue'
 
 // 定义数据类型
 interface PlatformData {
