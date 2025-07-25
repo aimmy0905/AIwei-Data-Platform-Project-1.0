@@ -1,8 +1,41 @@
 <template>
   <div class="kol-data-panel">
-    <div class="section-header">
-      <h2 class="section-title">红人数据</h2>
-      <p class="section-description">红人及帖子数据分析</p>
+    <div class="panel-header">
+      <div class="header-content">
+        <h2 class="section-title">红人数据</h2>
+        <p class="section-description">红人及帖子数据分析</p>
+      </div>
+      <div class="header-actions">
+        <!-- 时间筛选器 -->
+        <div class="time-filter">
+          <select v-model="selectedTimeRange" @change="handleTimeRangeChange" class="time-select">
+            <option value="today">今日</option>
+            <option value="yesterday">昨天</option>
+            <option value="last7days">近7天</option>
+            <option value="last14days">近14天</option>
+            <option value="last1month">近1个月</option>
+            <option value="last3months">近3个月</option>
+            <option value="last1year">近1年</option>
+            <option value="custom">自定义时间</option>
+          </select>
+          <!-- 自定义时间选择器 -->
+          <div v-if="selectedTimeRange === 'custom'" class="custom-date-range">
+            <input
+              type="date"
+              v-model="customStartDate"
+              @change="handleCustomDateChange"
+              class="date-input"
+            />
+            <span class="date-separator">至</span>
+            <input
+              type="date"
+              v-model="customEndDate"
+              @change="handleCustomDateChange"
+              class="date-input"
+            />
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="panel-content">
@@ -189,6 +222,11 @@ const postStats = ref<PostStats>({
   postEngagementGrowth: 7
 })
 
+// 时间筛选
+const selectedTimeRange = ref('last7days')
+const customStartDate = ref('')
+const customEndDate = ref('')
+
 
 
 // 工具函数
@@ -199,6 +237,26 @@ const formatNumber = (num: number): string => {
     return (num / 1000).toFixed(0) + 'K'
   }
   return num.toString()
+}
+
+// 时间筛选处理函数
+const handleTimeRangeChange = () => {
+  // 当时间范围改变时，重新加载数据
+  loadKOLData()
+}
+
+const handleCustomDateChange = () => {
+  if (customStartDate.value && customEndDate.value) {
+    // 当自定义日期改变时，重新加载数据
+    loadKOLData()
+  }
+}
+
+// 数据加载函数
+const loadKOLData = () => {
+  // 根据选择的时间范围加载KOL数据
+  console.log('加载KOL数据，时间范围:', selectedTimeRange.value)
+  // 这里可以调用API获取对应时间范围的数据
 }
 
 
@@ -224,8 +282,16 @@ onMounted(() => {
   transform: translateY(-2px);
 }
 
-.section-header {
+.panel-header {
   margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.header-content {
+  flex: 1;
 }
 
 .section-title {
@@ -238,6 +304,89 @@ onMounted(() => {
 .section-description {
   color: var(--color-text-secondary);
   margin: 0;
+}
+
+/* Header Actions - 与 WebsiteDataPanel 保持一致的样式 */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.time-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.time-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.custom-date-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+}
+
+.date-input {
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.date-separator {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .panel-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .time-filter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .custom-date-range {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+
+  .time-select {
+    min-width: auto;
+  }
 }
 
 .stats-grid {

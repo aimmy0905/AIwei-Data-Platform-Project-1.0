@@ -57,6 +57,8 @@
                     <th>活动名称</th>
                     <th>活动类型</th>
                     <th>活动阶段</th>
+                    <th>活动开始时间</th>
+                    <th>活动截止时间</th>
                     <th>目标市场</th>
                     <th>参与渠道</th>
                     <th>总销售额</th>
@@ -82,6 +84,8 @@
                         {{ getStageText(campaign.stage) }}
                       </span>
                     </td>
+                    <td>{{ formatActivityDate(campaign.startDate) }}</td>
+                    <td>{{ formatActivityDate(campaign.endDate) }}</td>
                     <td>{{ campaign.targetMarket }}</td>
                     <td>
                       <div class="channels">
@@ -434,6 +438,15 @@ const formatNumber = (value: number): string => {
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString)
   return date.toLocaleDateString('zh-CN', {
+    month: '2-digit',
+    day: '2-digit'
+  })
+}
+
+const formatActivityDate = (dateString: string): string => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('zh-CN', {
+    year: 'numeric',
     month: '2-digit',
     day: '2-digit'
   })

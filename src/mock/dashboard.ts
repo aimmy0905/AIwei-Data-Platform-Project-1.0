@@ -1395,6 +1395,7 @@ export const mockProductSalesData: ProductSalesData[] = [
     name: '时尚T恤',
     category: '服装',
     price: 29.99,
+    image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=300&fit=crop',
 
     // 销量排名数据
     grossSales: 39000,
@@ -1435,6 +1436,7 @@ export const mockProductSalesData: ProductSalesData[] = [
     name: '运动鞋',
     category: '鞋类',
     price: 89.99,
+    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop',
 
     // 销量排名数据
     grossSales: 80000,
@@ -1475,6 +1477,7 @@ export const mockProductSalesData: ProductSalesData[] = [
     name: '智能手表',
     category: '电子产品',
     price: 199.99,
+    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop',
 
     // 销量排名数据
     grossSales: 88000,
@@ -1515,6 +1518,7 @@ export const mockProductSalesData: ProductSalesData[] = [
     name: '护肤套装',
     category: '美容',
     price: 149.99,
+    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400&h=300&fit=crop',
 
     // 销量排名数据
     grossSales: 105000,
@@ -1555,6 +1559,7 @@ export const mockProductSalesData: ProductSalesData[] = [
     name: '咖啡机',
     category: '家电',
     price: 299.99,
+    image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop',
 
     // 销量排名数据
     grossSales: 98000,
@@ -1595,6 +1600,7 @@ export const mockProductSalesData: ProductSalesData[] = [
     name: '时尚背包',
     category: '箱包',
     price: 79.99,
+    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=300&fit=crop',
 
     // 销量排名数据
     grossSales: 52000,
