@@ -80,6 +80,8 @@ const toggleEditMode = () => {
   border-radius: 8px;
   padding: 20px;
   margin-top: 24px;
+  /* 确保与其他面板内容的间距一致 */
+  margin-bottom: 0;
 }
 
 .summary-header {
