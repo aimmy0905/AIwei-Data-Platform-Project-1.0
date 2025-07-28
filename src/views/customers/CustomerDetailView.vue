@@ -62,14 +62,45 @@
           <MessageSquare :size="16" />
           添加Q&A
         </button>
-        <button
-          v-if="!isEditMode"
-          class="action-btn action-btn--primary"
-          @click="showMoreActions"
-        >
-          <MoreHorizontal :size="16" />
-          更多操作
-        </button>
+        <!-- 更多操作下拉菜单 -->
+        <div v-if="!isEditMode" class="dropdown-container">
+          <button
+            class="action-btn action-btn--primary dropdown-trigger"
+            @click="toggleMoreActions"
+            ref="moreActionsButton"
+          >
+            <MoreHorizontal :size="16" />
+            更多操作
+          </button>
+
+          <!-- 下拉菜单 -->
+          <div
+            v-if="showMoreActionsMenu"
+            class="dropdown-menu dropdown-menu--detail"
+            @click.stop
+          >
+            <button class="dropdown-item" @click="viewCustomerProjects">
+              <Briefcase :size="14" />
+              客户项目
+            </button>
+            <button class="dropdown-item" @click="viewServiceFeeRecords">
+              <DollarSign :size="14" />
+              服务费记录
+            </button>
+            <button class="dropdown-item" @click="viewReviewRecords">
+              <Star :size="14" />
+              客户评价
+            </button>
+            <button class="dropdown-item" @click="viewCustomerAccount">
+              <User :size="14" />
+              客户账号
+            </button>
+            <button class="dropdown-item" @click="addCustomerQA">
+              <MessageSquare :size="14" />
+              客户QA
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1756,14 +1787,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, reactive } from 'vue'
+import { ref, onMounted, onUnmounted, computed, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   ArrowLeft, Edit, MessageSquare, MoreHorizontal, Loader,
   Handshake, User, Globe, Users, AlertTriangle, MessageCircle,
   RefreshCw, Plus, Check, X, Phone, Mail, ExternalLink,
   Target, Clock, Languages, Shield, TrendingUp, History, DollarSign, Save, File, Briefcase,
-  BarChart3, CreditCard, FileText, Calendar
+  BarChart3, CreditCard, FileText, Calendar, Star
 } from 'lucide-vue-next'
 import { mockGetCustomerDetail } from '@/mock/customer'
 import type { CustomerDetail, ContactPerson, CompetitorWebsite } from '@/types'
@@ -1779,6 +1810,8 @@ const isEditMode = ref(false)
 const saving = ref(false)
 const activeTab = ref('info')
 const showCreateProject = ref(false)
+const showMoreActionsMenu = ref(false)
+const moreActionsButton = ref<HTMLElement | null>(null)
 
 // 项目筛选
 const projectFilter = reactive({
@@ -2261,9 +2294,40 @@ const isValidUrl = (url: string): boolean => {
   }
 }
 
-const showMoreActions = () => {
-  console.log('显示更多操作')
-  // 这里可以显示更多操作菜单
+// 更多操作菜单相关方法
+const toggleMoreActions = () => {
+  showMoreActionsMenu.value = !showMoreActionsMenu.value
+}
+
+// 客户操作方法 - 与客户列表保持一致
+const viewCustomerProjects = () => {
+  console.log('查看客户项目:', customerDetail.value?.cooperationDetails?.customerName)
+  showMoreActionsMenu.value = false
+  // 这里可以跳转到客户项目列表页面
+}
+
+const viewServiceFeeRecords = () => {
+  console.log('查看服务费记录:', customerDetail.value?.cooperationDetails?.customerName)
+  showMoreActionsMenu.value = false
+  // 这里可以跳转到服务费记录列表页面
+}
+
+const viewReviewRecords = () => {
+  console.log('查看客户评价:', customerDetail.value?.cooperationDetails?.customerName)
+  showMoreActionsMenu.value = false
+  // 这里可以跳转到客户评价列表页面
+}
+
+const viewCustomerAccount = () => {
+  console.log('查看客户账号:', customerDetail.value?.cooperationDetails?.customerName)
+  showMoreActionsMenu.value = false
+  // 这里可以跳转到客户账号管理页面
+}
+
+const addCustomerQA = () => {
+  console.log('添加客户Q&A:', customerDetail.value?.cooperationDetails?.customerName)
+  showMoreActionsMenu.value = false
+  addQA() // 调用现有的添加Q&A方法
 }
 
 const loadCustomerDetail = async () => {
@@ -2509,11 +2573,26 @@ const validateForm = (): boolean => {
   return isValid
 }
 
+// 点击外部关闭下拉菜单
+const handleClickOutside = (event: MouseEvent) => {
+  if (showMoreActionsMenu.value && moreActionsButton.value && !moreActionsButton.value.contains(event.target as Node)) {
+    showMoreActionsMenu.value = false
+  }
+}
+
 // 生命周期
 onMounted(() => {
   // 检查是否是编辑模式
   isEditMode.value = route.query.edit === 'true'
   loadCustomerDetail()
+
+  // 添加点击外部事件监听
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  // 移除事件监听
+  document.removeEventListener('click', handleClickOutside)
 })
 </script>
 
@@ -4091,5 +4170,61 @@ onMounted(() => {
     align-items: center;
     text-align: center;
   }
+}
+
+/* 下拉菜单样式 */
+.dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  min-width: 160px;
+  padding: var(--spacing-xs) 0;
+  margin-top: var(--spacing-xs);
+}
+
+.dropdown-menu--detail {
+  min-width: 180px;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  background: none;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-primary);
+}
+
+.dropdown-item:active {
+  background: var(--color-bg-tertiary);
+}
+
+.dropdown-trigger {
+  position: relative;
+}
+
+.dropdown-trigger:focus {
+  outline: none;
 }
 </style>
