@@ -1,11 +1,11 @@
 <template>
-  <div class="customer-list-view">
-    <div class="page-header">
-      <div class="page-header__main">
-        <h1 class="page-title">客户管理</h1>
-        <p class="page-description">管理和分析您的客户数据，优化客户关系</p>
+  <div class="customer-data-panel">
+    <div class="panel-header">
+      <div class="header-content">
+        <h3>客户管理</h3>
+        <p>管理和分析您的客户数据，优化客户关系</p>
       </div>
-      <div class="page-header__actions">
+      <div class="header-actions">
         <button
           class="action-btn action-btn--secondary"
           @click="showExportModal = true"
@@ -91,147 +91,187 @@
 
         <!-- 表格视图 -->
         <div v-if="viewMode === 'table'" class="customer-table">
-          <table>
-            <thead>
-              <tr>
-                <th>
-                  <input
-                    type="checkbox"
-                    v-model="selectAll"
-                    @change="handleSelectAll"
-                    class="checkbox-input"
-                  />
-                </th>
-                <th @click="setSortBy('name')" class="sortable">
-                  客户名称
-                  <ArrowUpDown :size="14" v-if="sortBy === 'name'" />
-                </th>
-                <th @click="setSortBy('cooperationType')" class="sortable">
-                  合作方式
-                  <ArrowUpDown :size="14" v-if="sortBy === 'cooperationType'" />
-                </th>
-                <th @click="setSortBy('industry')" class="sortable">
-                  客户行业
-                  <ArrowUpDown :size="14" v-if="sortBy === 'industry'" />
-                </th>
-                <th>地区</th>
-                <th>联系人</th>
-                <th>联系岗位</th>
-                <th>联系电话</th>
-                <th @click="setSortBy('cooperationStartTime')" class="sortable">
-                  合作开始时间
-                  <ArrowUpDown :size="14" v-if="sortBy === 'cooperationStartTime'" />
-                </th>
-                <th @click="setSortBy('serviceStartTime')" class="sortable">
-                  服务开始时间
-                  <ArrowUpDown :size="14" v-if="sortBy === 'serviceStartTime'" />
-                </th>
-                <th @click="setSortBy('grade')" class="sortable">
-                  分级
-                  <ArrowUpDown :size="14" v-if="sortBy === 'grade'" />
-                </th>
-                <th @click="setSortBy('status')" class="sortable">
-                  状态
-                  <ArrowUpDown :size="14" v-if="sortBy === 'status'" />
-                </th>
-                <th @click="setSortBy('signingSales')" class="sortable">
-                  签单销售人员
-                  <ArrowUpDown :size="14" v-if="sortBy === 'signingSales'" />
-                </th>
-                <th @click="setSortBy('totalServiceFee')" class="sortable">
-                  累计服务费
-                  <ArrowUpDown :size="14" v-if="sortBy === 'totalServiceFee'" />
-                </th>
-                <th @click="setSortBy('serviceProjectCount')" class="sortable">
-                  服务项目数量
-                  <ArrowUpDown :size="14" v-if="sortBy === 'serviceProjectCount'" />
-                </th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="customer in paginatedCustomers"
-                :key="customer.id"
-                class="customer-row"
-                :class="{ 'customer-row--selected': selectedCustomers.includes(customer.id) }"
-                @click="handleRowClick(customer)"
-              >
-                <td @click.stop>
-                  <input
-                    type="checkbox"
-                    v-model="selectedCustomers"
-                    :value="customer.id"
-                    class="checkbox-input"
-                  />
-                </td>
-                <td>
-                  <div class="customer-info">
-                    <div class="customer-name">{{ customer.name }}</div>
-                  </div>
-                </td>
-                <td>
-                  <span class="cooperation-badge">{{ customer.cooperationType }}</span>
-                </td>
-                <td>
-                  <span class="industry-badge">{{ customer.industry }}</span>
-                </td>
-                <td>
-                  <span class="region-text">{{ getCustomerRegions(customer) }}</span>
-                </td>
-                <td>
-                  <span class="contact-text">{{ customer.primaryContact.name }}</span>
-                </td>
-                <td>
-                  <span class="position-text">{{ customer.primaryContact.position }}</span>
-                </td>
-                <td>
-                  <span class="phone-text">{{ customer.primaryContact.phone }}</span>
-                </td>
-                <td>
-                  <span class="date-text">{{ formatDate(customer.cooperationStartTime) }}</span>
-                </td>
-                <td>
-                  <span class="date-text">{{ formatDate(customer.serviceStartTime) }}</span>
-                </td>
-                <td>
-                  <span class="grade-badge" :class="`grade-badge--${customer.grade}`">
-                    {{ customer.grade }}
-                  </span>
-                </td>
-                <td>
-                  <span class="status-badge" :class="`status-badge--${customer.status}`">
-                    {{ getStatusText(customer.status) }}
-                  </span>
-                </td>
-                <td>
-                  <span class="sales-text">{{ customer.signingSales }}</span>
-                </td>
-                <td>
-                  <span class="service-fee-text">${{ formatNumber(customer.totalServiceFee) }}</span>
-                </td>
-                <td>
-                  <span class="project-count-text">{{ customer.serviceProjectCount }}</span>
-                </td>
-                <td @click.stop>
-                  <div class="action-menu">
-                    <button class="action-btn action-btn--small" @click="viewCustomer(customer)" title="查看详情">
-                      <Eye :size="14" />
-                    </button>
-                    <button class="action-btn action-btn--small" @click="editCustomer(customer)" title="客户编辑">
-                      <Edit :size="14" />
-                    </button>
-                    <button class="action-btn action-btn--small" @click="addCustomerQA(customer)" title="添加Q&A">
-                      <MessageSquare :size="14" />
-                    </button>
-                    <button class="action-btn action-btn--small" @click="showCustomerMenu(customer)" title="更多操作">
-                      <MoreHorizontal :size="14" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-scroll-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>
+                    <input
+                      type="checkbox"
+                      v-model="selectAll"
+                      @change="handleSelectAll"
+                      class="checkbox-input"
+                    />
+                  </th>
+                  <th @click="setSortBy('name')" class="sortable">
+                    客户名称
+                    <ArrowUpDown :size="14" v-if="sortBy === 'name'" />
+                  </th>
+                  <th @click="setSortBy('cooperationType')" class="sortable">
+                    合作方式
+                    <ArrowUpDown :size="14" v-if="sortBy === 'cooperationType'" />
+                  </th>
+                  <th @click="setSortBy('industry')" class="sortable">
+                    客户行业
+                    <ArrowUpDown :size="14" v-if="sortBy === 'industry'" />
+                  </th>
+                  <th>地区</th>
+                  <th>联系人</th>
+                  <th>联系岗位</th>
+                  <th>联系电话</th>
+                  <th @click="setSortBy('cooperationStartTime')" class="sortable">
+                    合作开始时间
+                    <ArrowUpDown :size="14" v-if="sortBy === 'cooperationStartTime'" />
+                  </th>
+                  <th @click="setSortBy('serviceStartTime')" class="sortable">
+                    服务开始时间
+                    <ArrowUpDown :size="14" v-if="sortBy === 'serviceStartTime'" />
+                  </th>
+                  <th @click="setSortBy('grade')" class="sortable">
+                    分级
+                    <ArrowUpDown :size="14" v-if="sortBy === 'grade'" />
+                  </th>
+                  <th @click="setSortBy('status')" class="sortable">
+                    状态
+                    <ArrowUpDown :size="14" v-if="sortBy === 'status'" />
+                  </th>
+                  <th @click="setSortBy('signingSales')" class="sortable">
+                    签单销售人员
+                    <ArrowUpDown :size="14" v-if="sortBy === 'signingSales'" />
+                  </th>
+                  <th @click="setSortBy('totalServiceFee')" class="sortable">
+                    累计服务费
+                    <ArrowUpDown :size="14" v-if="sortBy === 'totalServiceFee'" />
+                  </th>
+                  <th @click="setSortBy('serviceProjectCount')" class="sortable">
+                    服务项目数量
+                    <ArrowUpDown :size="14" v-if="sortBy === 'serviceProjectCount'" />
+                  </th>
+                  <th style="width: 220px;">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="customer in paginatedCustomers"
+                  :key="customer.id"
+                  :data-customer-id="customer.id"
+                  class="customer-row"
+                  :class="{ 'customer-row--selected': selectedCustomers.includes(customer.id) }"
+                  @click="handleRowClick(customer)"
+                >
+                  <td @click.stop>
+                    <input
+                      type="checkbox"
+                      v-model="selectedCustomers"
+                      :value="customer.id"
+                      class="checkbox-input"
+                    />
+                  </td>
+                  <td>
+                    <div class="customer-info">
+                      <div class="customer-name">{{ customer.name }}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="cooperation-badge">{{ customer.cooperationType }}</span>
+                  </td>
+                  <td>
+                    <span class="industry-badge">{{ customer.industry }}</span>
+                  </td>
+                  <td>
+                    <span class="region-text">{{ getCustomerRegions(customer) }}</span>
+                  </td>
+                  <td>
+                    <span class="contact-text">{{ customer.primaryContact.name }}</span>
+                  </td>
+                  <td>
+                    <span class="position-text">{{ customer.primaryContact.position }}</span>
+                  </td>
+                  <td>
+                    <span class="phone-text">{{ customer.primaryContact.phone }}</span>
+                  </td>
+                  <td>
+                    <span class="date-text">{{ formatDate(customer.cooperationStartTime) }}</span>
+                  </td>
+                  <td>
+                    <span class="date-text">{{ formatDate(customer.serviceStartTime) }}</span>
+                  </td>
+                  <td>
+                    <span class="grade-badge" :class="`grade-badge--${customer.grade}`">
+                      {{ customer.grade }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="status-badge" :class="`status-badge--${customer.status}`">
+                      {{ getStatusText(customer.status) }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="sales-text">{{ customer.signingSales }}</span>
+                  </td>
+                  <td>
+                    <span class="service-fee-text">${{ formatNumber(customer.totalServiceFee) }}</span>
+                  </td>
+                  <td>
+                    <span class="project-count-text">{{ customer.serviceProjectCount }}</span>
+                  </td>
+                  <td @click.stop style="min-width: 220px;">
+                    <div class="action-menu">
+                      <!-- 默认显示的三个按钮 -->
+                      <button class="action-btn action-btn--small action-btn--text" @click="viewCustomer(customer)" title="查看详情">
+                        <Eye :size="14" />
+                        查看详情
+                      </button>
+                      <button class="action-btn action-btn--small action-btn--text" @click="editCustomer(customer)" title="编辑">
+                        <Edit :size="14" />
+                        编辑
+                      </button>
+
+                      <!-- 更多操作下拉菜单 -->
+                      <div class="dropdown-container">
+                        <button
+                          class="action-btn action-btn--small action-btn--text dropdown-trigger"
+                          @click="toggleCustomerMenu(customer.id)"
+                          title="更多"
+                        >
+                          <MoreHorizontal :size="14" />
+                          更多
+                        </button>
+
+                        <!-- 下拉菜单 -->
+                        <div
+                          v-if="activeMenuId === customer.id"
+                          class="dropdown-menu"
+                          @click.stop
+                        >
+                          <button class="dropdown-item" @click="viewCustomerProjects(customer)">
+                            <Briefcase :size="14" />
+                            客户项目
+                          </button>
+                          <button class="dropdown-item" @click="viewServiceFeeRecords(customer)">
+                            <DollarSign :size="14" />
+                            服务费记录
+                          </button>
+                          <button class="dropdown-item" @click="viewReviewRecords(customer)">
+                            <Star :size="14" />
+                            客户评价
+                          </button>
+                          <button class="dropdown-item" @click="viewCustomerAccount(customer)">
+                            <User :size="14" />
+                            客户账号
+                          </button>
+                          <button class="dropdown-item" @click="addCustomerQA(customer)">
+                            <MessageSquare :size="14" />
+                            客户QA
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <!-- 网格视图 -->
@@ -247,12 +287,48 @@
                 {{ customer.name.charAt(0).toUpperCase() }}
               </div>
               <div class="customer-actions">
-                <button class="card-action" @click.stop="editCustomer(customer)">
-                  <Edit :size="16" />
+                <button class="card-action card-action--text" @click.stop="viewCustomer(customer)" title="查看详情">
+                  <Eye :size="14" />
+                  查看
                 </button>
-                <button class="card-action" @click.stop="showCustomerMenu(customer)">
-                  <MoreHorizontal :size="16" />
+                <button class="card-action card-action--text" @click.stop="editCustomer(customer)" title="编辑">
+                  <Edit :size="14" />
+                  编辑
                 </button>
+                <div class="dropdown-container">
+                  <button class="card-action card-action--text dropdown-trigger" @click.stop="toggleCustomerMenu(customer.id)" title="更多">
+                    <MoreHorizontal :size="14" />
+                    更多
+                  </button>
+
+                  <!-- 下拉菜单 -->
+                  <div
+                    v-if="activeMenuId === customer.id"
+                    class="dropdown-menu"
+                    @click.stop
+                  >
+                    <button class="dropdown-item" @click="viewCustomerProjects(customer)">
+                      <Briefcase :size="14" />
+                      客户项目
+                    </button>
+                    <button class="dropdown-item" @click="viewServiceFeeRecords(customer)">
+                      <DollarSign :size="14" />
+                      服务费记录
+                    </button>
+                    <button class="dropdown-item" @click="viewReviewRecords(customer)">
+                      <Star :size="14" />
+                      客户评价
+                    </button>
+                    <button class="dropdown-item" @click="viewCustomerAccount(customer)">
+                      <User :size="14" />
+                      客户账号
+                    </button>
+                    <button class="dropdown-item" @click="addCustomerQA(customer)">
+                      <MessageSquare :size="14" />
+                      客户QA
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="customer-card__content">
@@ -382,12 +458,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive } from 'vue'
+import { ref, computed, onMounted, reactive, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   Plus, Download, Users, TrendingUp, DollarSign, Target,
   List, Grid, ArrowUpDown, ChevronLeft, ChevronRight,
-  Edit, Eye, MoreHorizontal, Mail, Trash2, Loader, MessageSquare
+  Edit, Eye, MoreHorizontal, Mail, Trash2, Loader, MessageSquare, Briefcase, Star, User
 } from 'lucide-vue-next'
 import { mockGetCustomers, type ExtendedCustomer } from '@/mock/customer'
 import SearchInput from '@/components/common/SearchInput.vue'
@@ -411,6 +487,7 @@ const selectAll = ref(false)
 const currentPage = ref(1)
 const pageSize = ref(10)
 const showExportModal = ref(false)
+const activeMenuId = ref<number | null>(null) // 用于控制下拉菜单的显示
 
 const filters = reactive({
   dateRange: '',
@@ -863,6 +940,54 @@ const showCustomerMenu = (customer: ExtendedCustomer) => {
   console.log('显示客户菜单:', customer.name)
 }
 
+const toggleCustomerMenu = (customerId: number) => {
+  // 关闭之前打开的菜单
+  if (activeMenuId.value && activeMenuId.value !== customerId) {
+    const prevRow = document.querySelector(`tr[data-customer-id="${activeMenuId.value}"]`)
+    if (prevRow) {
+      (prevRow as HTMLElement).style.zIndex = ''
+    }
+  }
+
+  // 切换当前菜单
+  activeMenuId.value = activeMenuId.value === customerId ? null : customerId
+
+  // 设置当前行的z-index
+  const currentRow = document.querySelector(`tr[data-customer-id="${customerId}"]`)
+  if (currentRow) {
+    if (activeMenuId.value === customerId) {
+      (currentRow as HTMLElement).style.zIndex = '1001'
+    } else {
+      (currentRow as HTMLElement).style.zIndex = ''
+    }
+  }
+}
+
+const deleteCustomer = (customer: ExtendedCustomer) => {
+  console.log('删除客户:', customer.name)
+  // 这里可以添加删除确认弹窗
+}
+
+const viewCustomerProjects = (customer: ExtendedCustomer) => {
+  console.log('查看客户项目:', customer.name)
+  // 这里可以跳转到客户项目列表页面
+}
+
+const viewServiceFeeRecords = (customer: ExtendedCustomer) => {
+  console.log('查看服务费记录:', customer.name)
+  // 这里可以跳转到服务费记录列表页面
+}
+
+const viewReviewRecords = (customer: ExtendedCustomer) => {
+  console.log('查看客户评价:', customer.name)
+  // 这里可以跳转到客户评价列表页面
+}
+
+const viewCustomerAccount = (customer: ExtendedCustomer) => {
+  console.log('查看客户账号:', customer.name)
+  // 这里可以跳转到客户账号管理页面
+}
+
 const handleExportComplete = (exportData: {
   format: string
   data: Record<string, unknown>[]
@@ -897,43 +1022,59 @@ const loadCustomers = async () => {
 // 生命周期
 onMounted(() => {
   loadCustomers()
+
+  // 添加全局点击事件监听器来关闭下拉菜单
+  document.addEventListener('click', handleOutsideClick)
 })
+
+// 清理事件监听器
+onUnmounted(() => {
+  document.removeEventListener('click', handleOutsideClick)
+})
+
+// 处理点击外部关闭下拉菜单
+const handleOutsideClick = () => {
+  if (activeMenuId.value) {
+    const currentRow = document.querySelector(`tr[data-customer-id="${activeMenuId.value}"]`)
+    if (currentRow) {
+      (currentRow as HTMLElement).style.zIndex = ''
+    }
+    activeMenuId.value = null
+  }
+}
 </script>
 
 <style scoped>
-.customer-list-view {
-  position: relative;
-  padding: 0;
+.customer-data-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
 }
 
-.page-header {
+.panel-header {
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border-light);
+  background: white;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--spacing-xl);
-  flex-wrap: wrap;
-  gap: var(--spacing-md);
+  align-items: center;
 }
 
-.page-header__main {
-  flex: 1;
-  min-width: 300px;
-}
-
-.page-title {
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
-  margin: 0 0 var(--spacing-sm) 0;
-}
-
-.page-description {
+.header-content h3 {
+  margin: 0 0 var(--spacing-xs) 0;
   font-size: var(--font-size-lg);
-  color: var(--color-text-secondary);
-  margin: 0;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
 }
 
-.page-header__actions {
+.header-content p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.header-actions {
   display: flex;
   gap: var(--spacing-sm);
   align-items: center;
@@ -980,7 +1121,16 @@ onMounted(() => {
   border-radius: var(--border-radius-sm);
 }
 
+.action-btn--text {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+  min-width: auto;
+}
+
 .customer-content {
+  padding: var(--spacing-lg);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xl);
@@ -1061,7 +1211,7 @@ onMounted(() => {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-lg);
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -1206,15 +1356,75 @@ onMounted(() => {
 }
 
 .customer-table {
-  overflow-x: auto;
+  width: 100%;
+  border-radius: var(--border-radius-sm);
   background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
   position: relative;
+  overflow: visible;
+}
+
+.table-scroll-wrapper {
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch; /* 优化移动端滚动 */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  position: relative;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }
 
 .customer-table table {
   width: 100%;
-  min-width: 1400px; /* 确保表格足够宽以触发水平滚动 */
   border-collapse: collapse;
+  position: relative; /* 为下拉菜单提供定位上下文 */
+  min-width: 1600px; /* 确保表格有足够宽度显示操作按钮 */
+  overflow: visible;
+}
+
+.customer-table tbody {
+  position: relative;
+  overflow: visible;
+}
+
+.dropdown-container {
+  position: relative;
+  z-index: 1000; /* 确保下拉容器在最上层 */
+}
+
+/* 当下拉菜单激活时，提升整行的层级 */
+.customer-row:has(.dropdown-menu) {
+  z-index: 1001 !important;
+  position: relative;
+}
+
+/* 备用方案：为所有包含下拉菜单的行提供更高的层级 */
+.customer-row {
+  isolation: isolate;
+}
+
+.customer-row td:last-child {
+  overflow: visible;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  z-index: 10000;
+  min-width: 150px;
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+  white-space: nowrap;
+  margin-top: 2px;
 }
 
 .customer-table th,
@@ -1289,6 +1499,8 @@ onMounted(() => {
   transition: all var(--duration-fast);
   position: relative;
 }
+
+
 
 .customer-row:hover {
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
@@ -1448,6 +1660,58 @@ onMounted(() => {
 .action-menu {
   display: flex;
   gap: var(--spacing-xs);
+  position: relative;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 200px;
+}
+
+.dropdown-container {
+  position: relative;
+  z-index: 999;
+}
+
+.dropdown-trigger {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  min-width: 44px;
+  height: 36px;
+  font-size: var(--font-size-sm);
+}
+
+.dropdown-trigger:hover {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  transform: translateY(-1px);
+}
+
+
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #374151;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  width: 100%;
+}
+
+.dropdown-item:hover {
+  background: #f3f4f6;
+  color: #1f2937;
 }
 
 .checkbox-input {
@@ -1500,6 +1764,8 @@ onMounted(() => {
 .customer-actions {
   display: flex;
   gap: var(--spacing-xs);
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .card-action {
@@ -1515,6 +1781,13 @@ onMounted(() => {
 .card-action:hover {
   border-color: var(--color-primary);
   color: var(--color-primary);
+}
+
+.card-action--text {
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  white-space: nowrap;
 }
 
 .customer-card__name {
@@ -1802,13 +2075,13 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
-  .page-header {
+  .panel-header {
     flex-direction: column;
     align-items: stretch;
     gap: var(--spacing-lg);
   }
 
-  .page-header__actions {
+  .header-actions {
     flex-direction: column;
     gap: var(--spacing-sm);
   }
