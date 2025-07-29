@@ -288,21 +288,21 @@
                         </button>
                         <button
                           class="dropdown-item"
-                          @click="viewCustomerReviews(project.id)"
+                          @click="viewCustomerReviews(project.id); activeDropdown = null"
                         >
                           <Star :size="14" />
                           <span>客户评价</span>
                         </button>
                         <button
                           class="dropdown-item"
-                          @click="manageInfluencerData(project.id)"
+                          @click="manageInfluencerData(project.id); activeDropdown = null"
                         >
                           <Users :size="14" />
                           <span>红人数据</span>
                         </button>
                         <button
                           class="dropdown-item"
-                          @click="editProject(project.id)"
+                          @click="editProject(project.id); activeDropdown = null"
                         >
                           <Edit :size="14" />
                           <span>编辑</span>
@@ -827,23 +827,54 @@ const manageProjectActivities = (projectId: number) => {
 }
 
 const viewCustomerReviews = (projectId: number) => {
-  console.log('查看客户评价:', projectId)
-  // TODO: 打开客户评价弹窗
+  const project = projects.value.find(p => p.id === projectId)
+  if (project) {
+    // 跳转到客户评价页面，并传递项目筛选参数
+    router.push({
+      name: 'customer-reviews',
+      query: {
+        projectId: projectId.toString(),
+        projectName: project.project_name,
+        customerName: project.customer_name
+      }
+    })
+  }
 }
 
 const manageInfluencerData = (projectId: number) => {
-  console.log('管理红人数据:', projectId)
-  // TODO: 打开红人数据管理弹窗
+  const project = projects.value.find(p => p.id === projectId)
+  if (project) {
+    // 跳转到红人数据管理页面
+    router.push({
+      name: 'kol-posts',
+      query: {
+        projectId: projectId.toString(),
+        projectName: project.project_name
+      }
+    })
+  }
 }
 
 const editProject = (projectId: number) => {
-  console.log('编辑项目:', projectId)
-  // TODO: 打开项目编辑弹窗
+  const project = projects.value.find(p => p.id === projectId)
+  if (project) {
+    // 跳转到项目编辑页面或打开编辑弹窗
+    console.log('编辑项目:', project.project_name)
+    // 这里可以打开编辑弹窗或跳转到编辑页面
+    // 暂时显示一个提示
+    alert(`编辑项目: ${project.project_name}`)
+  }
 }
 
 const deleteProject = (projectId: number) => {
-  console.log('删除项目:', projectId)
-  // TODO: 实现删除项目功能
+  const project = projects.value.find(p => p.id === projectId)
+  if (project && confirm(`确定要删除项目 "${project.project_name}" 吗？此操作不可撤销。`)) {
+    // 从列表中移除项目
+    projects.value = projects.value.filter(p => p.id !== projectId)
+    // 关闭下拉菜单
+    activeDropdown.value = null
+    console.log('已删除项目:', project.project_name)
+  }
 }
 
 const handleExport = (exportData: any) => {

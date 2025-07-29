@@ -250,29 +250,7 @@
           </div>
         </div>
 
-        <!-- 模板选择（仅新建时显示） -->
-        <div v-if="!isEdit" class="form-section">
-          <h4 class="section-title">快速设置</h4>
 
-          <div class="form-group">
-            <label class="form-label">选择模板（可选）</label>
-            <div class="template-grid">
-              <div
-                v-for="template in templates"
-                :key="template.id"
-                class="template-card"
-                :class="{ active: selectedTemplate?.id === template.id }"
-                @click="applyTemplate(template)"
-              >
-                <div class="template-header">
-                  <h5>{{ template.name }}</h5>
-                  <span class="template-type">{{ getTemplateTypeText(template.type) }}</span>
-                </div>
-                <p class="template-description">{{ template.description }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
       </form>
 
       <div class="modal-footer">

@@ -157,45 +157,6 @@
 
     <!-- 红人数据管理内容 -->
     <div v-if="activeTab === 'influencer-data'" class="content-section">
-      <!-- 数据统计概览 -->
-      <div class="stats-overview">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <Users :size="24" />
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">{{ mockInfluencerStats.totalInfluencers }}</div>
-            <div class="stat-label">总红人数</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">
-            <TrendingUp :size="24" />
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">{{ mockInfluencerStats.monthlyNewInfluencers }}</div>
-            <div class="stat-label">本月新增</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">
-            <Eye :size="24" />
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">{{ formatNumber(mockInfluencerStats.totalViews) }}</div>
-            <div class="stat-label">总观看量</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">
-            <Heart :size="24" />
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">{{ mockInfluencerStats.averageInteractionRate }}%</div>
-            <div class="stat-label">平均互动率</div>
-          </div>
-        </div>
-      </div>
 
       <!-- 红人数据列表表格 -->
       <div class="data-table-container">
