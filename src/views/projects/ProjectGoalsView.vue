@@ -498,9 +498,17 @@
             <div class="form-grid">
               <div class="form-group">
                 <label class="form-label">项目名称 *</label>
-                <select v-model="newGoal.project_id" class="form-select" required>
+                <select
+                  v-model="newGoal.project_id"
+                  class="form-select"
+                  required
+                >
                   <option value="">请选择项目</option>
-                  <option v-for="project in projects" :key="project.id" :value="project.id">
+                  <option
+                    v-for="project in availableProjects"
+                    :key="project.id"
+                    :value="project.id.toString()"
+                  >
                     {{ project.project_name }}
                   </option>
                 </select>
@@ -508,7 +516,12 @@
 
               <div class="form-group">
                 <label class="form-label">目标类型 *</label>
-                <select v-model="newGoal.goal_type" class="form-select" required @change="updateGoalPeriodOptions">
+                <select
+                  v-model="newGoal.goal_type"
+                  @change="updateGoalPeriodOptions"
+                  class="form-select"
+                  required
+                >
                   <option value="">请选择目标类型</option>
                   <option value="月度">月度目标</option>
                   <option value="季度">季度目标</option>
@@ -518,10 +531,19 @@
 
               <div class="form-group">
                 <label class="form-label">目标周期 *</label>
-                <select v-model="newGoal.goal_period" class="form-select" required>
+                <select
+                  v-model="newGoal.goal_period"
+                  class="form-select"
+                  required
+                  :disabled="!newGoal.goal_type"
+                >
                   <option value="">请选择目标周期</option>
-                  <option v-for="period in goalPeriodOptions" :key="period" :value="period">
-                    {{ period }}
+                  <option
+                    v-for="option in goalPeriodOptions"
+                    :key="option.value"
+                    :value="option.value"
+                  >
+                    {{ option.label }}
                   </option>
                 </select>
               </div>
@@ -529,12 +551,12 @@
               <div class="form-group">
                 <label class="form-label">销售额目标 *</label>
                 <input
-                  type="number"
                   v-model.number="newGoal.sales_target"
+                  type="number"
                   class="form-input"
                   placeholder="请输入销售额目标"
                   min="0"
-                  step="1000"
+                  step="0.01"
                   required
                 />
               </div>
@@ -542,12 +564,12 @@
               <div class="form-group">
                 <label class="form-label">成本目标 *</label>
                 <input
-                  type="number"
                   v-model.number="newGoal.cost_target"
+                  type="number"
                   class="form-input"
                   placeholder="请输入成本目标"
                   min="0"
-                  step="1000"
+                  step="0.01"
                   required
                 />
               </div>
@@ -555,12 +577,12 @@
               <div class="form-group">
                 <label class="form-label">ROI目标 *</label>
                 <input
-                  type="number"
                   v-model.number="newGoal.roi_target"
+                  type="number"
                   class="form-input"
                   placeholder="请输入ROI目标"
                   min="0"
-                  step="0.1"
+                  step="0.01"
                   required
                 />
               </div>
@@ -568,24 +590,23 @@
               <div class="form-group">
                 <label class="form-label">利润目标</label>
                 <input
-                  type="number"
                   v-model.number="newGoal.profit_target"
+                  type="number"
                   class="form-input"
                   placeholder="请输入利润目标"
                   min="0"
-                  step="1000"
+                  step="0.01"
                 />
               </div>
 
               <div class="form-group">
                 <label class="form-label">用户数目标</label>
                 <input
-                  type="number"
                   v-model.number="newGoal.user_count_target"
+                  type="number"
                   class="form-input"
                   placeholder="请输入用户数目标"
                   min="0"
-                  step="100"
                 />
               </div>
 
@@ -612,6 +633,156 @@
         </div>
       </div>
     </div>
+
+    <!-- 编辑目标弹窗 -->
+    <div v-if="showEditGoal" class="modal-overlay" @click="closeEditGoal">
+      <div class="modal-container modal-container--medium" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">编辑目标</h3>
+          <button class="modal-close" @click="closeEditGoal">
+            <X :size="20" />
+          </button>
+        </div>
+        <div class="modal-content">
+          <form @submit.prevent="submitEditGoal" class="create-goal-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">项目名称 *</label>
+                <select
+                  v-model="newGoal.project_id"
+                  class="form-select"
+                  required
+                >
+                  <option value="">请选择项目</option>
+                  <option
+                    v-for="project in availableProjects"
+                    :key="project.id"
+                    :value="project.id.toString()"
+                  >
+                    {{ project.project_name }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">目标类型 *</label>
+                <select
+                  v-model="newGoal.goal_type"
+                  @change="updateGoalPeriodOptions"
+                  class="form-select"
+                  required
+                >
+                  <option value="">请选择目标类型</option>
+                  <option value="月度">月度目标</option>
+                  <option value="季度">季度目标</option>
+                  <option value="年度">年度目标</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">目标周期 *</label>
+                <select
+                  v-model="newGoal.goal_period"
+                  class="form-select"
+                  required
+                  :disabled="!newGoal.goal_type"
+                >
+                  <option value="">请选择目标周期</option>
+                  <option
+                    v-for="option in goalPeriodOptions"
+                    :key="option"
+                    :value="option"
+                  >
+                    {{ option }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">销售额目标 *</label>
+                <input
+                  v-model.number="newGoal.sales_target"
+                  type="number"
+                  class="form-input"
+                  placeholder="请输入销售额目标"
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">成本目标 *</label>
+                <input
+                  v-model.number="newGoal.cost_target"
+                  type="number"
+                  class="form-input"
+                  placeholder="请输入成本目标"
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">ROI目标 *</label>
+                <input
+                  v-model.number="newGoal.roi_target"
+                  type="number"
+                  class="form-input"
+                  placeholder="请输入ROI目标"
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">利润目标</label>
+                <input
+                  v-model.number="newGoal.profit_target"
+                  type="number"
+                  class="form-input"
+                  placeholder="请输入利润目标"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">用户数目标</label>
+                <input
+                  v-model.number="newGoal.user_count_target"
+                  type="number"
+                  class="form-input"
+                  placeholder="请输入用户数目标"
+                  min="0"
+                />
+              </div>
+
+              <div class="form-group form-group--full">
+                <label class="form-label">备注</label>
+                <textarea
+                  v-model="newGoal.remarks"
+                  class="form-textarea"
+                  placeholder="请输入备注信息"
+                  rows="3"
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn--secondary" @click="closeEditGoal">
+                取消
+              </button>
+              <button type="submit" class="btn btn--primary" :disabled="!isFormValid">
+                更新目标
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -632,6 +803,8 @@ const selectedGoal = ref<ProjectGoal | null>(null)
 const showProjectAllGoals = ref(false)
 const selectedProjectGoals = ref<ProjectGroup | null>(null)
 const showCreateGoal = ref(false)
+const showEditGoal = ref(false)
+const editingGoal = ref<ProjectGoal | null>(null)
 
 const goals = ref<ProjectGoal[]>([])
 const customers = ref<Array<{id: number, name: string}>>([])
@@ -861,6 +1034,13 @@ const closeCreateGoal = () => {
   resetNewGoalForm()
 }
 
+// 关闭编辑目标弹窗
+const closeEditGoal = () => {
+  showEditGoal.value = false
+  editingGoal.value = null
+  resetNewGoalForm()
+}
+
 // 更新目标周期选项
 const updateGoalPeriodOptions = () => {
   const currentYear = new Date().getFullYear()
@@ -951,6 +1131,41 @@ const submitCreateGoal = () => {
   console.log('新建目标:', goalToCreate)
 }
 
+// 提交编辑目标
+const submitEditGoal = () => {
+  if (!isFormValid.value || !editingGoal.value) {
+    alert('请填写所有必填字段')
+    return
+  }
+
+  // 找到要编辑的目标在数组中的索引
+  const goalIndex = goals.value.findIndex(g => g.id === editingGoal.value!.id)
+
+  if (goalIndex !== -1) {
+    // 更新目标数据
+    const updatedGoal: ProjectGoal = {
+      ...editingGoal.value,
+      project_id: parseInt(newGoal.project_id),
+      goal_type: newGoal.goal_type as '月度' | '季度' | '年度',
+      goal_period: newGoal.goal_period,
+      sales_target: newGoal.sales_target,
+      cost_target: newGoal.cost_target,
+      roi_target: newGoal.roi_target,
+      profit_target: newGoal.profit_target,
+      user_count_target: newGoal.user_count_target,
+      remarks: newGoal.remarks
+    }
+
+    // 替换数组中的目标
+    goals.value[goalIndex] = updatedGoal
+
+    alert('目标更新成功！')
+    closeEditGoal()
+
+    console.log('编辑目标成功:', updatedGoal)
+  }
+}
+
 // 查看项目全部目标
 const viewProjectAllGoals = (goal: ProjectGoal) => {
   // 获取该项目的所有目标
@@ -1026,8 +1241,25 @@ const viewGoalDetail = (goal: ProjectGoal) => {
 }
 
 const editGoal = (goal: ProjectGoal) => {
-  console.log('编辑目标:', goal.id)
-  // TODO: 实现编辑目标功能
+  editingGoal.value = goal
+
+  // 填充编辑表单
+  Object.assign(newGoal, {
+    project_id: goal.project_id.toString(),
+    goal_type: goal.goal_type,
+    goal_period: goal.goal_period,
+    sales_target: goal.sales_target,
+    cost_target: goal.cost_target,
+    roi_target: goal.roi_target,
+    profit_target: goal.profit_target || 0,
+    user_count_target: goal.user_count_target || 0,
+    remarks: goal.remarks || ''
+  })
+
+  // 更新目标周期选项
+  updateGoalPeriodOptions()
+
+  showEditGoal.value = true
 }
 
 const deleteGoal = (goal: ProjectGoal) => {
