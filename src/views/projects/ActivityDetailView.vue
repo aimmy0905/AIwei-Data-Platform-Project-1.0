@@ -357,8 +357,8 @@
                 <tr v-for="product in activityDetail.productData" :key="product.id">
                   <td>
                     <div class="product-title">
-                      {{ product.productTitle }}
-                      <small>ID: {{ product.productId }}</small>
+                      <div class="product-name">{{ product.productTitle }}</div>
+                      <div class="product-id">ID: {{ product.productId }}</div>
                     </div>
                   </td>
                   <td>{{ product.productCategory }}</td>
@@ -1121,7 +1121,26 @@ onMounted(() => {
 .product-title, .page-url {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  max-width: 280px;
+}
+
+.product-name {
+  font-weight: 500;
+  color: #1a1a1a;
+  line-height: 1.4;
+  font-size: 14px;
+}
+
+.product-id {
+  color: #666;
+  font-size: 11px;
+  font-weight: 400;
+  padding: 2px 6px;
+  background: #f5f5f5;
+  border-radius: 3px;
+  display: inline-block;
+  width: fit-content;
 }
 
 .product-title small, .page-url small {

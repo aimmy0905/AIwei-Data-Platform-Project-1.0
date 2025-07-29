@@ -117,6 +117,10 @@
                   <FileText class="icon" />
                   待办事项
                 </button>
+                <button class="btn btn-sm btn-outline" @click.stop="viewDataDashboard(report.id)">
+                  <LayoutDashboard class="icon" />
+                  查看数据面板
+                </button>
                 <button class="btn btn-sm btn-secondary" @click.stop="downloadReport('weekly', report.id)">
                   <Download class="icon" />
                   下载
@@ -228,21 +232,139 @@
 
     <!-- 月报数据看板 -->
     <div v-if="currentTab === 'monthly'" class="tab-content">
-      <div class="reports-header">
-        <h2>月报数据看板</h2>
-        <div class="filters">
-          <select v-model="selectedMonthlyReport" @change="loadMonthlyDashboard">
-            <option value="">选择月报</option>
-            <option v-for="report in monthlyReports" :key="report.id" :value="report.id">
-              {{ report.monthPeriod }} - {{ report.projectName }}
-            </option>
-          </select>
-          <button v-if="selectedMonthlyReport" class="btn btn-secondary" @click="openMeetingModal('monthly')">
-            <Users class="icon" />
-            安排会议
-          </button>
+      <!-- 月报列表视图 -->
+      <div v-if="!selectedMonthlyReport" class="reports-section">
+        <div class="reports-header">
+          <h2>月报数据看板</h2>
+          <div class="filters">
+            <input
+              v-model="monthlySearchTerm"
+              type="text"
+              placeholder="搜索项目名称、客户或月份..."
+              class="search-input"
+            />
+            <select v-model="monthlyStatusFilter" class="filter-select">
+              <option value="">全部状态</option>
+              <option value="completed">已完成</option>
+              <option value="in_progress">进行中</option>
+              <option value="draft">草稿</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="reports-grid">
+          <div v-for="report in filteredMonthlyReports" :key="report.id" class="report-card" @click="viewMonthlyReport(report.id)">
+            <div class="report-header">
+              <h3>{{ report.projectName }}</h3>
+              <span class="status-badge" :class="`status-${report.status}`">
+                {{ getStatusLabel(report.status) }}
+              </span>
+            </div>
+            <div class="report-meta">
+              <p><strong>客户：</strong>{{ report.customerName }}</p>
+              <p><strong>月份：</strong>{{ report.monthPeriod }}</p>
+              <p><strong>报告周期：</strong>{{ report.reportPeriod }}</p>
+              <p><strong>创建时间：</strong>{{ formatDate(report.createdAt) }}</p>
+              <p><strong>跟进团队：</strong>{{ report.followUpTeam.join(', ') }}</p>
+            </div>
+            <div class="report-metrics">
+              <div class="metric-item">
+                <span class="metric-label">月度访问量</span>
+                <span class="metric-value">{{ report.metrics.visits.toLocaleString() }}</span>
+                <span class="metric-change" :class="report.metrics.visitsChange >= 0 ? 'positive' : 'negative'">
+                  {{ report.metrics.visitsChange >= 0 ? '+' : '' }}{{ report.metrics.visitsChange }}%
+                </span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">转化率</span>
+                <span class="metric-value">{{ report.metrics.conversion }}%</span>
+                <span class="metric-change" :class="report.metrics.conversionChange >= 0 ? 'positive' : 'negative'">
+                  {{ report.metrics.conversionChange >= 0 ? '+' : '' }}{{ report.metrics.conversionChange }}%
+                </span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">广告花费</span>
+                <span class="metric-value">¥{{ report.metrics.adSpend.toLocaleString() }}</span>
+                <span class="metric-change" :class="report.metrics.adSpendChange >= 0 ? 'negative' : 'positive'">
+                  {{ report.metrics.adSpendChange >= 0 ? '+' : '' }}{{ report.metrics.adSpendChange }}%
+                </span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">ROI</span>
+                <span class="metric-value">{{ report.metrics.roi }}%</span>
+                <span class="metric-change" :class="report.metrics.roiChange >= 0 ? 'positive' : 'negative'">
+                  {{ report.metrics.roiChange >= 0 ? '+' : '' }}{{ report.metrics.roiChange }}%
+                </span>
+              </div>
+            </div>
+            <div class="report-actions">
+              <div class="action-stats">
+                <span class="stat-item">
+                  <Users class="icon" />
+                  {{ report.meetingsCount }} 个会议
+                </span>
+                <span class="stat-item">
+                  <FileText class="icon" />
+                  {{ report.completedTodosCount }}/{{ report.todosCount }} 待办
+                </span>
+              </div>
+              <div class="action-buttons">
+                <button class="btn btn-sm btn-outline" @click.stop="viewMeetingRecords(report.id)">
+                  <Users class="icon" />
+                  会议记录
+                </button>
+                <button class="btn btn-sm btn-outline" @click.stop="viewTodoItems(report.id)">
+                  <FileText class="icon" />
+                  待办事项
+                </button>
+                <button class="btn btn-sm btn-outline" @click.stop="viewDataDashboard(report.id)">
+                  <LayoutDashboard class="icon" />
+                  查看数据面板
+                </button>
+                <button class="btn btn-sm btn-secondary" @click.stop="downloadReport('monthly', report.id)">
+                  <Download class="icon" />
+                  下载
+                </button>
+                <button class="btn btn-sm btn-primary" @click.stop="openMeetingModal('monthly', report.id)">
+                  <Plus class="icon" />
+                  新建会议
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      <!-- 月报详情数据看板 -->
+      <div v-else class="dashboard-section">
+        <div class="dashboard-header">
+          <button class="btn btn-secondary" @click="backToMonthlyList">
+            <ArrowLeft class="icon" />
+            返回列表
+          </button>
+          <h2>{{ currentMonthlyReport?.monthPeriod }} - {{ currentMonthlyReport?.projectName }}</h2>
+          <div class="header-actions">
+            <button class="btn btn-secondary" @click="downloadReport('monthly', selectedMonthlyReport)">
+              <Download class="icon" />
+              下载数据
+            </button>
+            <button class="btn btn-primary" @click="openMeetingModal('monthly', selectedMonthlyReport)">
+              <Users class="icon" />
+              安排会议
+            </button>
+          </div>
+        </div>
+
+        <div class="dashboard-container">
+          <div class="dashboard-info">
+            <div class="info-card">
+              <h3>{{ currentMonthlyReport?.projectName }}</h3>
+              <p>客户：{{ currentMonthlyReport?.customerName }}</p>
+              <p>月份：{{ currentMonthlyReport?.monthPeriod }}</p>
+              <p>包含周报：{{ currentMonthlyReport?.weeklyReportsCount }} 个</p>
+              <p>状态：<span class="status-badge" :class="`status-${currentMonthlyReport?.status}`">{{ getStatusLabel(currentMonthlyReport?.status || '') }}</span></p>
+            </div>
+          </div>
 
       <!-- 月报数据看板内容 -->
       <div v-if="selectedMonthlyReport" class="dashboard-container">
@@ -320,6 +442,10 @@
 
         <!-- 操作按钮 -->
         <div class="dashboard-actions">
+          <button class="btn btn-outline" @click="viewDataDashboard(selectedMonthlyReport)">
+            <LayoutDashboard class="icon" />
+            查看数据面板
+          </button>
           <button class="btn btn-secondary" @click="downloadReport('monthly')">
             <Download class="icon" />
             下载月报数据
@@ -628,10 +754,15 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import {
   FileText, Plus, Calendar, BarChart3, Users, TrendingUp, Target,
-  DollarSign, Activity, PieChart, LineChart, Download, Eye, Edit, X, ArrowLeft
+  DollarSign, Activity, PieChart, LineChart, Download, Eye, Edit, X, ArrowLeft,
+  LayoutDashboard
 } from 'lucide-vue-next'
+
+// Router
+const router = useRouter()
 
 // 响应式数据
 const currentTab = ref('weekly')
@@ -709,8 +840,14 @@ const monthlyReports = ref([
     projectName: 'Apple iPhone推广项目',
     customerName: 'Apple Inc.',
     monthPeriod: '2025-01',
+    reportPeriod: '2025年1月1日~2025年1月31日',
     weeklyReportsCount: 4,
     status: 'completed',
+    createdAt: '2025-01-31T18:00:00Z',
+    followUpTeam: ['张三', '李四', '王五'],
+    meetingsCount: 6,
+    todosCount: 15,
+    completedTodosCount: 12,
     metrics: {
       visits: 48500,
       visitsChange: 22.1,
@@ -720,6 +857,102 @@ const monthlyReports = ref([
       adSpendChange: -5.2,
       roi: 295,
       roiChange: 18.7
+    }
+  },
+  {
+    id: 'monthly-2',
+    projectName: 'Samsung Galaxy营销项目',
+    customerName: 'Samsung Electronics',
+    monthPeriod: '2025-01',
+    reportPeriod: '2025年1月1日~2025年1月31日',
+    weeklyReportsCount: 4,
+    status: 'completed',
+    createdAt: '2025-01-31T17:30:00Z',
+    followUpTeam: ['赵六', '钱七', '孙八'],
+    meetingsCount: 4,
+    todosCount: 12,
+    completedTodosCount: 10,
+    metrics: {
+      visits: 38200,
+      visitsChange: 18.5,
+      conversion: 4.1,
+      conversionChange: 0.3,
+      adSpend: 24800,
+      adSpendChange: 3.2,
+      roi: 315,
+      roiChange: 12.4
+    }
+  },
+  {
+    id: 'monthly-3',
+    projectName: 'Nike运动鞋推广',
+    customerName: 'Nike Inc.',
+    monthPeriod: '2024-12',
+    reportPeriod: '2024年12月1日~2024年12月31日',
+    weeklyReportsCount: 5,
+    status: 'completed',
+    createdAt: '2024-12-31T16:00:00Z',
+    followUpTeam: ['周九', '吴十'],
+    meetingsCount: 5,
+    todosCount: 18,
+    completedTodosCount: 16,
+    metrics: {
+      visits: 52300,
+      visitsChange: 28.7,
+      conversion: 3.2,
+      conversionChange: -0.2,
+      adSpend: 35600,
+      adSpendChange: 8.1,
+      roi: 278,
+      roiChange: 15.9
+    }
+  },
+  {
+    id: 'monthly-4',
+    projectName: 'Tesla Model Y营销',
+    customerName: 'Tesla Motors',
+    monthPeriod: '2024-12',
+    reportPeriod: '2024年12月1日~2024年12月31日',
+    weeklyReportsCount: 5,
+    status: 'in_progress',
+    createdAt: '2024-12-31T15:45:00Z',
+    followUpTeam: ['郑十一', '王十二'],
+    meetingsCount: 3,
+    todosCount: 8,
+    completedTodosCount: 6,
+    metrics: {
+      visits: 29800,
+      visitsChange: 12.3,
+      conversion: 2.8,
+      conversionChange: 0.6,
+      adSpend: 28900,
+      adSpendChange: -1.5,
+      roi: 198,
+      roiChange: 8.7
+    }
+  },
+  {
+    id: 'monthly-5',
+    projectName: 'Microsoft Surface推广',
+    customerName: 'Microsoft Corporation',
+    monthPeriod: '2024-11',
+    reportPeriod: '2024年11月1日~2024年11月30日',
+    weeklyReportsCount: 4,
+    status: 'completed',
+    createdAt: '2024-11-30T19:00:00Z',
+    followUpTeam: ['李十三', '陈十四'],
+    meetingsCount: 7,
+    todosCount: 20,
+    completedTodosCount: 18,
+    metrics: {
+      visits: 41600,
+      visitsChange: 19.8,
+      conversion: 3.9,
+      conversionChange: 1.2,
+      adSpend: 31200,
+      adSpendChange: 5.4,
+      roi: 342,
+      roiChange: 22.1
     }
   }
 ])
@@ -865,6 +1098,14 @@ const backToWeeklyList = () => {
   selectedWeeklyReport.value = ''
 }
 
+const viewMonthlyReport = (reportId: string) => {
+  selectedMonthlyReport.value = reportId
+}
+
+const backToMonthlyList = () => {
+  selectedMonthlyReport.value = ''
+}
+
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString)
   return date.toLocaleString('zh-CN')
@@ -878,6 +1119,11 @@ const viewMeetingRecords = (reportId: string) => {
 const viewTodoItems = (reportId: string) => {
   currentReportId.value = reportId
   showTodoItemsModal.value = true
+}
+
+const viewDataDashboard = (reportId: string) => {
+  // Navigate to the main dashboard
+  router.push({ name: 'dashboard' })
 }
 
 const closeMeetingRecordsModal = () => {
