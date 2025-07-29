@@ -231,6 +231,61 @@ export const customerReviews: CustomerReview[] = [
     responsibleTeam: '金融科技团队',
     createTime: '2025-01-03 15:50:00',
     createdBy: '张销售'
+  },
+  // 添加客户ID 9的评价记录
+  {
+    id: '11',
+    customerId: '9',
+    customerName: '时尚潮流服饰有限公司',
+    projectId: '15',
+    projectName: '春季新品推广活动',
+    evaluationMonth: '2024-12',
+    evaluator: '李市场总监',
+    evaluationDate: '2025-01-06',
+    overallRating: 8,
+    problemHandlingRating: 8,
+    professionalRating: 9,
+    serviceAttitudeRating: 8,
+    improvementSuggestions: '团队对时尚行业的理解很到位，创意素材质量高，建议在数据分析报告中增加更多行业对比数据。',
+    responsibleTeam: '时尚营销团队',
+    createTime: '2025-01-06 14:20:00',
+    createdBy: '王销售'
+  },
+  {
+    id: '12',
+    customerId: '9',
+    customerName: '时尚潮流服饰有限公司',
+    projectId: '16',
+    projectName: '冬季清仓促销',
+    evaluationMonth: '2024-11',
+    evaluator: '张运营经理',
+    evaluationDate: '2024-12-01',
+    overallRating: 9,
+    problemHandlingRating: 9,
+    professionalRating: 10,
+    serviceAttitudeRating: 9,
+    improvementSuggestions: '非常满意的合作体验，团队响应迅速，专业能力强，希望在后续合作中继续保持这种高水准的服务。',
+    responsibleTeam: '时尚营销团队',
+    createTime: '2024-12-01 16:45:00',
+    createdBy: '王销售'
+  },
+  {
+    id: '13',
+    customerId: '9',
+    customerName: '时尚潮流服饰有限公司',
+    projectId: '17',
+    projectName: '品牌形象重塑',
+    evaluationMonth: '2024-10',
+    evaluator: '陈品牌总监',
+    evaluationDate: '2024-11-05',
+    overallRating: 7,
+    problemHandlingRating: 7,
+    professionalRating: 8,
+    serviceAttitudeRating: 7,
+    improvementSuggestions: '整体表现良好，但在品牌定位方面的建议还需要更加深入，希望团队能提供更多创新性的想法。',
+    responsibleTeam: '品牌营销团队',
+    createTime: '2024-11-05 11:30:00',
+    createdBy: '刘销售'
   }
 ];
 
