@@ -1,237 +1,235 @@
 <template>
-  <div class="dashboard-content">
-    <!-- 筛选项部分 -->
-    <div class="dashboard-filter-container">
-      <div class="page-header">
-        <div class="page-header__main">
-          <h1 class="page-title">项目目标管理</h1>
-          <p class="page-description">查看和管理所有项目的目标设定与完成情况</p>
-        </div>
-        <div class="page-header__actions">
-          <button class="action-btn action-btn--primary" @click="createGoal">
-            <Plus :size="16" />
-            新建目标
-          </button>
+  <div class="project-data-panel">
+    <div class="panel-header">
+      <div class="header-content">
+        <h3>项目目标管理</h3>
+        <p>查看和管理所有项目的目标设定与完成情况</p>
+      </div>
+      <div class="header-actions">
+        <button class="action-btn action-btn--primary" @click="createGoal">
+          <Plus :size="16" />
+          新建目标
+        </button>
+      </div>
+    </div>
+
+    <div class="project-content">
+      <!-- 搜索和筛选区域 -->
+      <div class="search-filter-section">
+        <div class="search-section">
+          <div class="filter-section">
+            <div class="filter-row">
+              <div class="filter-group">
+                <label class="filter-label">客户名称:</label>
+                <select v-model="filters.customerId" @change="handleCustomerChange" class="filter-select">
+                  <option value="">全部客户</option>
+                  <option v-for="customer in customers" :key="customer.id" :value="customer.id">
+                    {{ customer.name }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label class="filter-label">项目名称:</label>
+                <select v-model="filters.projectId" @change="handleFilterChange" class="filter-select">
+                  <option value="">全部项目</option>
+                  <option v-for="project in availableProjects" :key="project.id" :value="project.id">
+                    {{ project.project_name }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="filter-group">
+                <label class="filter-label">目标月份:</label>
+                <input
+                  type="month"
+                  v-model="filters.goalPeriod"
+                  @input="handleFilterChange"
+                  placeholder="——年——月"
+                  class="filter-input"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- 筛选区域 -->
-      <div class="filter-section">
-        <div class="filter-row">
-          <div class="filter-group">
-            <label class="filter-label">客户名称:</label>
-            <select v-model="filters.customerId" @change="handleCustomerChange" class="filter-select">
-              <option value="">全部客户</option>
-              <option v-for="customer in customers" :key="customer.id" :value="customer.id">
-                {{ customer.name }}
-              </option>
-            </select>
+      <!-- 目标表格 -->
+      <div class="project-table-section">
+        <div class="table-header">
+          <div class="table-header__left">
+            <h3>目标列表</h3>
+            <span class="record-count">共 {{ filteredGoals.length }} 条记录</span>
           </div>
-
-          <div class="filter-group">
-            <label class="filter-label">项目名称:</label>
-            <select v-model="filters.projectId" @change="handleFilterChange" class="filter-select">
-              <option value="">全部项目</option>
-              <option v-for="project in availableProjects" :key="project.id" :value="project.id">
-                {{ project.project_name }}
-              </option>
-            </select>
+          <div class="table-header__right">
+            <!-- 目标类型标签页 -->
+            <div class="goal-type-tabs">
+              <button
+                v-for="type in goalTypes"
+                :key="type.value"
+                class="goal-type-tab"
+                :class="{ 'goal-type-tab--active': filters.goalType === type.value }"
+                @click="selectGoalType(type.value)"
+              >
+                {{ type.label }}
+              </button>
+            </div>
           </div>
+        </div>
 
-          <div class="filter-group">
-            <label class="filter-label">目标月份:</label>
-            <input
-              type="month"
-              v-model="filters.goalPeriod"
-              @input="handleFilterChange"
-              placeholder="——年——月"
-              class="filter-input"
-            />
+        <!-- 表格视图 -->
+        <div class="project-table">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>项目名称</th>
+                  <th>所属客户</th>
+                  <th>销售额目标</th>
+                  <th>利润目标</th>
+                  <th>成本目标</th>
+                  <th>ROI目标</th>
+                  <th>用户数目标</th>
+                  <th>目标周期</th>
+                  <th>目标月份</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="goal in paginatedGoals" :key="goal.id" class="goal-row">
+                  <td>{{ goal.project_name }}</td>
+                  <td>{{ goal.customer_name }}</td>
+                  <td>
+                    <div class="target-cell">
+                      <div class="target-amount">${{ formatNumber(goal.sales_target) }}</div>
+                      <div class="progress-container">
+                        <div class="progress-bar">
+                          <div
+                            class="progress-fill progress-fill--sales"
+                            :style="{ width: Math.min(goal.completion_rate?.sales || 0, 100) + '%' }"
+                          ></div>
+                        </div>
+                        <span class="progress-percentage">{{ goal.completion_rate?.sales || 0 }}%</span>
+                      </div>
+                      <div class="current-amount">当前: ${{ formatNumber(goal.actual_sales || 0) }}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="target-cell">
+                      <div class="target-amount">${{ formatNumber(goal.profit_target || 0) }}</div>
+                      <div class="progress-container">
+                        <div class="progress-bar">
+                          <div
+                            class="progress-fill progress-fill--profit"
+                            :style="{ width: Math.min(goal.completion_rate?.profit || 0, 100) + '%' }"
+                          ></div>
+                        </div>
+                        <span class="progress-percentage">{{ goal.completion_rate?.profit || 0 }}%</span>
+                      </div>
+                      <div class="current-amount">当前: ${{ formatNumber(goal.actual_profit || 0) }}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="target-cell">
+                      <div class="target-amount">${{ formatNumber(goal.cost_target) }}</div>
+                      <div class="progress-container">
+                        <div class="progress-bar">
+                          <div
+                            class="progress-fill progress-fill--cost"
+                            :style="{ width: Math.min(goal.completion_rate?.cost || 0, 100) + '%' }"
+                          ></div>
+                        </div>
+                        <span class="progress-percentage">{{ goal.completion_rate?.cost || 0 }}%</span>
+                      </div>
+                      <div class="current-amount">当前: ${{ formatNumber(goal.actual_cost || 0) }}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="target-cell">
+                      <div class="target-amount">{{ goal.roi_target }}%</div>
+                      <div class="progress-container">
+                        <div class="progress-bar">
+                          <div
+                            class="progress-fill progress-fill--roi"
+                            :style="{ width: Math.min(goal.completion_rate?.roi || 0, 100) + '%' }"
+                          ></div>
+                        </div>
+                        <span class="progress-percentage">{{ goal.completion_rate?.roi || 0 }}%</span>
+                      </div>
+                      <div class="current-amount">当前: {{ (goal.actual_roi || 0) }}%</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="target-cell">
+                      <div class="target-amount">{{ formatNumber(goal.user_count_target || 0) }}</div>
+                      <div class="progress-container">
+                        <div class="progress-bar">
+                          <div
+                            class="progress-fill progress-fill--users"
+                            :style="{ width: Math.min(goal.completion_rate?.user_count || 0, 100) + '%' }"
+                          ></div>
+                        </div>
+                        <span class="progress-percentage">{{ goal.completion_rate?.user_count || 0 }}%</span>
+                      </div>
+                      <div class="current-amount">当前: {{ formatNumber(goal.actual_user_count || 0) }}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="goal-type-badge" :class="getGoalTypeClass(goal.goal_type)">
+                      {{ goal.goal_type }}目标
+                    </span>
+                  </td>
+                  <td>{{ goal.goal_period }}</td>
+                  <td>
+                    <div class="action-buttons">
+                      <button
+                        class="action-btn-small action-btn-small--primary"
+                        @click="editGoal(goal)"
+                        title="编辑"
+                      >
+                        编辑
+                      </button>
+                      <button
+                        class="action-btn-small action-btn-small--danger"
+                        @click="deleteGoal(goal)"
+                        title="删除"
+                      >
+                        删除
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 分页 -->
+        <div class="pagination-section">
+          <div class="pagination-info">
+            显示第 {{ (currentPage - 1) * pageSize + 1 }} - {{ Math.min(currentPage * pageSize, filteredGoals.length) }} 条，
+            共 {{ filteredGoals.length }} 条记录
+          </div>
+          <div class="pagination-controls">
+            <button
+              class="pagination-btn"
+              :disabled="currentPage === 1"
+              @click="currentPage = currentPage - 1"
+            >
+              上一页
+            </button>
+            <span class="pagination-current">{{ currentPage }} / {{ totalPages }}</span>
+            <button
+              class="pagination-btn"
+              :disabled="currentPage === totalPages"
+              @click="currentPage = currentPage + 1"
+            >
+              下一页
+            </button>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- 项目目标内容部分 -->
-    <section class="dashboard-section">
-      <div class="section-card">
-        <!-- 目标类型标签页 -->
-        <div class="goal-type-tabs">
-          <button
-            v-for="type in goalTypes"
-            :key="type.value"
-            class="goal-type-tab"
-            :class="{ 'goal-type-tab--active': filters.goalType === type.value }"
-            @click="selectGoalType(type.value)"
-          >
-            {{ type.label }}
-          </button>
-        </div>
-
-        <!-- 目标列表 -->
-        <div class="goals-section">
-          <div class="section-header">
-            <div class="section-info">
-              <h3>目标列表</h3>
-              <span class="record-count">共 {{ filteredGoals.length }} 条记录</span>
-            </div>
-
-          </div>
-
-          <!-- 表格视图 -->
-          <div class="goals-table">
-            <div class="table-wrapper">
-              <table>
-                <thead>
-                  <tr>
-                    <th>项目名称</th>
-                    <th>所属客户</th>
-                    <th>销售额目标</th>
-                    <th>利润目标</th>
-                    <th>成本目标</th>
-                    <th>ROI目标</th>
-                    <th>用户数目标</th>
-                    <th>目标周期</th>
-                    <th>目标月份</th>
-                    <th>操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="goal in paginatedGoals" :key="goal.id" class="goal-row">
-                    <td>{{ goal.project_name }}</td>
-                    <td>{{ goal.customer_name }}</td>
-                    <td>
-                      <div class="target-cell">
-                        <div class="target-amount">${{ formatNumber(goal.sales_target) }}</div>
-                        <div class="progress-container">
-                          <div class="progress-bar">
-                            <div
-                              class="progress-fill progress-fill--sales"
-                              :style="{ width: Math.min(goal.completion_rate?.sales || 0, 100) + '%' }"
-                            ></div>
-                          </div>
-                          <span class="progress-percentage">{{ goal.completion_rate?.sales || 0 }}%</span>
-                        </div>
-                        <div class="current-amount">当前: ${{ formatNumber(goal.actual_sales || 0) }}</div>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="target-cell">
-                        <div class="target-amount">${{ formatNumber(goal.profit_target || 0) }}</div>
-                        <div class="progress-container">
-                          <div class="progress-bar">
-                            <div
-                              class="progress-fill progress-fill--profit"
-                              :style="{ width: Math.min(goal.completion_rate?.profit || 0, 100) + '%' }"
-                            ></div>
-                          </div>
-                          <span class="progress-percentage">{{ goal.completion_rate?.profit || 0 }}%</span>
-                        </div>
-                        <div class="current-amount">当前: ${{ formatNumber(goal.actual_profit || 0) }}</div>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="target-cell">
-                        <div class="target-amount">${{ formatNumber(goal.cost_target) }}</div>
-                        <div class="progress-container">
-                          <div class="progress-bar">
-                            <div
-                              class="progress-fill progress-fill--cost"
-                              :style="{ width: Math.min(goal.completion_rate?.cost || 0, 100) + '%' }"
-                            ></div>
-                          </div>
-                          <span class="progress-percentage">{{ goal.completion_rate?.cost || 0 }}%</span>
-                        </div>
-                        <div class="current-amount">当前: ${{ formatNumber(goal.actual_cost || 0) }}</div>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="target-cell">
-                        <div class="target-amount">{{ goal.roi_target }}%</div>
-                        <div class="progress-container">
-                          <div class="progress-bar">
-                            <div
-                              class="progress-fill progress-fill--roi"
-                              :style="{ width: Math.min(goal.completion_rate?.roi || 0, 100) + '%' }"
-                            ></div>
-                          </div>
-                          <span class="progress-percentage">{{ goal.completion_rate?.roi || 0 }}%</span>
-                        </div>
-                        <div class="current-amount">当前: {{ (goal.actual_roi || 0) }}%</div>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="target-cell">
-                        <div class="target-amount">{{ formatNumber(goal.user_count_target || 0) }}</div>
-                        <div class="progress-container">
-                          <div class="progress-bar">
-                            <div
-                              class="progress-fill progress-fill--users"
-                              :style="{ width: Math.min(goal.completion_rate?.user_count || 0, 100) + '%' }"
-                            ></div>
-                          </div>
-                          <span class="progress-percentage">{{ goal.completion_rate?.user_count || 0 }}%</span>
-                        </div>
-                        <div class="current-amount">当前: {{ formatNumber(goal.actual_user_count || 0) }}</div>
-                      </div>
-                    </td>
-                    <td>
-                      <span class="goal-type-badge" :class="getGoalTypeClass(goal.goal_type)">
-                        {{ goal.goal_type }}目标
-                      </span>
-                    </td>
-                    <td>{{ goal.goal_period }}</td>
-                    <td>
-                      <div class="action-buttons">
-                        <button
-                          class="action-btn-small action-btn-small--primary"
-                          @click="editGoal(goal)"
-                          title="编辑"
-                        >
-                          编辑
-                        </button>
-                        <button
-                          class="action-btn-small action-btn-small--danger"
-                          @click="deleteGoal(goal)"
-                          title="删除"
-                        >
-                          删除
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- 分页 -->
-          <div class="pagination-section">
-            <div class="pagination-info">
-              显示第 {{ (currentPage - 1) * pageSize + 1 }} - {{ Math.min(currentPage * pageSize, filteredGoals.length) }} 条，
-              共 {{ filteredGoals.length }} 条记录
-            </div>
-            <div class="pagination-controls">
-              <button
-                class="pagination-btn"
-                :disabled="currentPage === 1"
-                @click="currentPage = currentPage - 1"
-              >
-                上一页
-              </button>
-              <span class="pagination-current">{{ currentPage }} / {{ totalPages }}</span>
-              <button
-                class="pagination-btn"
-                :disabled="currentPage === totalPages"
-                @click="currentPage = currentPage + 1"
-              >
-                下一页
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- 目标详情弹窗 -->
     <div v-if="showGoalDetail && selectedGoal" class="modal-overlay" @click="closeGoalDetail">
@@ -587,84 +585,40 @@ const closeGoalDetail = () => {
 </script>
 
 <style scoped>
-.dashboard-content {
-  padding-top: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding-left: 20px;
-  padding-right: 20px;
+.project-data-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
 }
 
-.dashboard-filter-container {
-  position: sticky;
-  top: 64px;
-  z-index: 1000;
-  background-color: rgba(255, 255, 255, 0.98);
+.panel-header {
+  padding: var(--spacing-lg);
   border-bottom: 1px solid var(--color-border-light);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  margin-bottom: var(--spacing-2xl);
-  backdrop-filter: blur(12px);
-  border-radius: 8px;
-  margin-left: -20px;
-  margin-right: -20px;
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
-
-.page-header {
+  background: white;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--spacing-lg);
-  flex-wrap: wrap;
-  gap: var(--spacing-md);
+  align-items: center;
 }
 
-.dashboard-section {
-  margin-bottom: var(--spacing-2xl);
-  scroll-margin-top: 80px;
-}
-
-.section-card {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
-}
-
-.page-header__main {
-  flex: 1;
-  min-width: 300px;
-}
-
-.page-title {
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
-  margin: 0 0 var(--spacing-sm) 0;
-}
-
-.page-description {
+.header-content h3 {
+  margin: 0 0 var(--spacing-xs) 0;
   font-size: var(--font-size-lg);
-  color: var(--color-text-secondary);
-  margin: 0;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
 }
 
-.page-header__actions {
+.header-content p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.header-actions {
   display: flex;
   gap: var(--spacing-sm);
   align-items: center;
   flex-wrap: wrap;
-}
-
-.project-content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xl);
 }
 
 .action-btn {
@@ -702,12 +656,23 @@ const closeGoalDetail = () => {
   color: var(--color-primary);
 }
 
-.dashboard-section {
-  margin-bottom: 32px;
-  background: var(--color-background-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  overflow: hidden;
+.project-content {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.search-filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.search-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
 }
 
 /* 筛选区域 */
@@ -716,10 +681,7 @@ const closeGoalDetail = () => {
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 20px;
-  margin-bottom: 24px;
 }
-
-
 
 .filter-row {
   display: flex;
@@ -756,159 +718,165 @@ const closeGoalDetail = () => {
   border-color: var(--color-primary);
 }
 
-.date-range,
-.amount-range {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.date-separator,
-.range-separator {
-  color: var(--color-text-secondary);
-  font-size: 14px;
-}
-
-.advanced-filters {
-  border-top: 1px solid var(--color-border);
-  padding-top: 20px;
-  margin-top: 20px;
-}
-
-.filter-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid var(--color-border);
-}
-
-/* 目标列表区域 */
-.goals-section {
-  background: var(--color-background-secondary);
+.project-table-section {
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
-  overflow: hidden;
+  border-radius: var(--border-radius-lg);
+  overflow: visible;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.section-header {
+.table-header {
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 2px solid var(--color-border-light);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid var(--color-border);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  position: relative;
 }
 
-.section-info {
+.table-header::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+}
+
+.table-header__left {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }
 
-.section-info h3 {
-  font-size: 18px;
-  font-weight: 600;
+.table-header__left h3 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.table-header__left h3::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: var(--color-primary);
+  border-radius: 2px;
 }
 
 .record-count {
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
-  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: var(--border-radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
 }
 
-.section-actions {
+.record-count::before {
+  content: '📊';
+  font-size: 12px;
+}
+
+.table-header__right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--spacing-md);
 }
 
-.view-options {
+/* 目标类型标签页样式 */
+.goal-type-tabs {
   display: flex;
-  gap: 4px;
+  gap: 8px;
+  background: var(--color-background);
+  padding: 6px;
+  border-radius: 12px;
+  width: fit-content;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.view-btn {
-  padding: 6px 8px;
+.goal-type-tab {
+  padding: 12px 20px;
   border: 1px solid var(--color-border);
   background: var(--color-background);
-  color: var(--color-text-secondary);
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.view-btn:hover {
-  background: var(--color-background-hover);
   color: var(--color-text-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.view-btn--active {
+.goal-type-tab:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.goal-type-tab--active {
   background: var(--color-primary);
   color: white;
   border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-.sort-options {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.sort-select {
-  padding: 6px 8px;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  background: var(--color-background);
-  color: var(--color-text-primary);
-  font-size: 14px;
-}
-
-.sort-direction {
-  padding: 6px 8px;
-  border: 1px solid var(--color-border);
-  background: var(--color-background);
-  color: var(--color-text-secondary);
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.sort-direction:hover {
-  background: var(--color-background-hover);
-  color: var(--color-text-primary);
+.goal-type-tab--active:hover {
+  background: var(--color-primary);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 }
 
 /* 表格视图 */
-.goals-table {
-  overflow-x: auto;
+.project-table {
+  position: relative;
 }
 
 .table-wrapper {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.project-table table {
+  width: 100%;
+  border-collapse: collapse;
   min-width: 1200px;
 }
 
-.goals-table table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.goals-table th,
-.goals-table td {
+.project-table th,
+.project-table td {
   padding: 12px;
   text-align: left;
   border-bottom: 1px solid var(--color-border);
 }
 
-.goals-table th {
-  background: var(--color-background-tertiary);
+.project-table th {
+  background: var(--color-background);
   font-weight: 600;
   color: var(--color-text-primary);
   font-size: 14px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
-.goals-table td {
+.project-table td {
   font-size: 14px;
   color: var(--color-text-primary);
 }
@@ -939,90 +907,6 @@ const closeGoalDetail = () => {
   color: var(--color-warning);
 }
 
-.completion-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.completion-rate {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.completion-rate.excellent {
-  color: var(--color-success);
-}
-
-.completion-rate.good {
-  color: var(--color-primary);
-}
-
-.completion-rate.warning {
-  color: var(--color-warning);
-}
-
-.completion-rate.danger {
-  color: var(--color-danger);
-}
-
-.mini-progress {
-  width: 60px;
-  height: 4px;
-  background: var(--color-background-tertiary);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.mini-progress-fill {
-  height: 100%;
-  border-radius: 2px;
-  transition: width 0.3s ease;
-}
-
-.mini-progress-fill.excellent {
-  background: var(--color-success);
-}
-
-.mini-progress-fill.good {
-  background: var(--color-primary);
-}
-
-.mini-progress-fill.warning {
-  background: var(--color-warning);
-}
-
-.mini-progress-fill.danger {
-  background: var(--color-danger);
-}
-
-.status-badge {
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.status-badge.excellent {
-  background: var(--color-success-light);
-  color: var(--color-success);
-}
-
-.status-badge.good {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-}
-
-.status-badge.warning {
-  background: var(--color-warning-light);
-  color: var(--color-warning);
-}
-
-.status-badge.danger {
-  background: var(--color-danger-light);
-  color: var(--color-danger);
-}
-
 .action-buttons {
   display: flex;
   gap: 4px;
@@ -1049,17 +933,6 @@ const closeGoalDetail = () => {
   color: white;
 }
 
-.action-btn-small--secondary {
-  background: var(--color-background-tertiary);
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
-}
-
-.action-btn-small--secondary:hover {
-  background: var(--color-background-hover);
-  color: var(--color-text-primary);
-}
-
 .action-btn-small--danger {
   background: var(--color-danger-light);
   color: var(--color-danger);
@@ -1070,163 +943,19 @@ const closeGoalDetail = () => {
   color: white;
 }
 
-/* 卡片视图 */
-.goals-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 20px;
-  padding: 20px;
-}
-
-.goal-card {
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 20px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.goal-card:hover {
-  border-color: var(--color-primary);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.goal-card__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
-}
-
-.goal-card__title h4 {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0 0 4px 0;
-}
-
-.goal-card__title p {
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  margin: 0;
-}
-
-.goal-card__period {
-  margin-bottom: 16px;
-}
-
-.period-text {
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  background: var(--color-background-secondary);
-  padding: 4px 8px;
-  border-radius: 4px;
-}
-
-.goal-card__metrics {
-  margin-bottom: 16px;
-}
-
-.metric-row {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.metric-item {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.metric-label {
-  font-size: 12px;
-  color: var(--color-text-secondary);
-}
-
-.metric-progress {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.progress-bar {
-  flex: 1;
-  height: 6px;
-  background: var(--color-background-tertiary);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 0.3s ease;
-}
-
-.progress-fill.excellent {
-  background: var(--color-success);
-}
-
-.progress-fill.good {
-  background: var(--color-primary);
-}
-
-.progress-fill.warning {
-  background: var(--color-warning);
-}
-
-.progress-fill.danger {
-  background: var(--color-danger);
-}
-
-.progress-text {
-  font-size: 12px;
-  font-weight: 600;
-  min-width: 40px;
-  text-align: right;
-}
-
-.progress-text.excellent {
-  color: var(--color-success);
-}
-
-.progress-text.good {
-  color: var(--color-primary);
-}
-
-.progress-text.warning {
-  color: var(--color-warning);
-}
-
-.progress-text.danger {
-  color: var(--color-danger);
-}
-
-.goal-card__footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.goal-card__actions {
-  display: flex;
-  gap: 4px;
-}
-
 /* 分页 */
 .pagination-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: 20px 24px;
+  background: var(--color-background);
   border-top: 1px solid var(--color-border);
 }
 
 .pagination-info {
-  color: var(--color-text-secondary);
   font-size: 14px;
+  color: var(--color-text-secondary);
 }
 
 .pagination-controls {
@@ -1236,7 +965,7 @@ const closeGoalDetail = () => {
 }
 
 .pagination-btn {
-  padding: 6px 12px;
+  padding: 8px 12px;
   border: 1px solid var(--color-border);
   background: var(--color-background);
   color: var(--color-text-primary);
@@ -1248,11 +977,79 @@ const closeGoalDetail = () => {
 
 .pagination-btn:hover:not(:disabled) {
   background: var(--color-background-hover);
+  border-color: var(--color-primary);
 }
 
 .pagination-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* 目标单元格样式 */
+.target-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 120px;
+}
+
+.target-amount {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: 14px;
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 6px;
+  background: #f0f0f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* 不同目标类型的进度条颜色 */
+.progress-fill--sales {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.progress-fill--profit {
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+}
+
+.progress-fill--cost {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.progress-fill--roi {
+  background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+}
+
+.progress-fill--users {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.progress-percentage {
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 35px;
+  text-align: right;
+}
+
+.current-amount {
+  font-size: 11px;
+  color: var(--color-text-secondary);
 }
 
 /* 目标详情弹窗 */
@@ -1317,12 +1114,6 @@ const closeGoalDetail = () => {
   flex: 1;
 }
 
-.goal-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
 .detail-section h4 {
   font-size: 16px;
   font-weight: 600;
@@ -1336,18 +1127,24 @@ const closeGoalDetail = () => {
   gap: 16px;
 }
 
-.detail-item {
+.detail-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
 }
 
-.detail-label {
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-label {
   font-size: 12px;
   color: var(--color-text-secondary);
 }
 
-.detail-value {
+.info-value {
   font-size: 14px;
   color: var(--color-text-primary);
   font-weight: 500;
@@ -1406,6 +1203,27 @@ const closeGoalDetail = () => {
   font-weight: 500;
 }
 
+.completion-rate {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.completion-rate.excellent {
+  color: var(--color-success);
+}
+
+.completion-rate.good {
+  color: var(--color-primary);
+}
+
+.completion-rate.warning {
+  color: var(--color-warning);
+}
+
+.completion-rate.danger {
+  color: var(--color-danger);
+}
+
 .completion-details {
   margin-bottom: 8px;
 }
@@ -1429,186 +1247,60 @@ const closeGoalDetail = () => {
   color: var(--color-text-secondary);
 }
 
-/* 目标单元格样式 */
-.target-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 120px;
-}
-
-.target-amount {
-  font-weight: 600;
-  color: var(--color-text-primary);
-  font-size: 14px;
-}
-
-.progress-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.progress-bar {
-  flex: 1;
-  height: 6px;
-  background: #f0f0f0;
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 0.3s ease;
-}
-
-.progress-fill.excellent {
-  background: linear-gradient(90deg, #22c55e, #16a34a);
-}
-
-.progress-fill.good {
-  background: linear-gradient(90deg, #3b82f6, #2563eb);
-}
-
-.progress-fill.warning {
-  background: linear-gradient(90deg, #f59e0b, #d97706);
-}
-
-.progress-fill.danger {
-  background: linear-gradient(90deg, #ef4444, #dc2626);
-}
-
-/* 不同目标类型的进度条颜色 */
-.progress-fill--sales {
-  background: linear-gradient(90deg, #10b981, #059669);
-}
-
-.progress-fill--profit {
-  background: linear-gradient(90deg, #3b82f6, #2563eb);
-}
-
-.progress-fill--cost {
-  background: linear-gradient(90deg, #f59e0b, #d97706);
-}
-
-.progress-fill--roi {
-  background: linear-gradient(90deg, #8b5cf6, #7c3aed);
-}
-
-.progress-fill--users {
-  background: linear-gradient(90deg, #ef4444, #dc2626);
-}
-
-.progress-percentage {
-  font-size: 12px;
-  font-weight: 600;
-  min-width: 35px;
-  text-align: right;
-}
-
-.progress-percentage.excellent {
-  color: #16a34a;
-}
-
-.progress-percentage.good {
-  color: #2563eb;
-}
-
-.progress-percentage.warning {
-  color: #d97706;
-}
-
-.progress-percentage.danger {
-  color: #dc2626;
-}
-
-.current-amount {
-  font-size: 11px;
-  color: var(--color-text-secondary);
-}
-
-/* 目标类型标签页样式 */
-.goal-type-tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-  background: var(--color-background);
-  padding: 6px;
-  border-radius: 12px;
-  width: fit-content;
-  border: 1px solid var(--color-border);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.goal-type-tab {
-  padding: 12px 20px;
-  border: 1px solid var(--color-border);
-  background: var(--color-background);
-  color: var(--color-text-primary);
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  position: relative;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.goal-type-tab:hover {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-  border-color: var(--color-primary);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.goal-type-tab--active {
-  background: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.goal-type-tab--active:hover {
-  background: var(--color-primary);
-  color: white;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
-}
-
 @media (max-width: 768px) {
-  .page-header {
+  .panel-header {
     flex-direction: column;
-    gap: 16px;
     align-items: stretch;
+    gap: var(--spacing-lg);
   }
 
-  .page-header__actions {
-    justify-content: flex-end;
+  .header-actions {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .action-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .search-filter-section {
+    gap: var(--spacing-md);
   }
 
   .filter-row {
-    grid-template-columns: 1fr;
-  }
-
-  .section-header {
     flex-direction: column;
-    gap: 16px;
     align-items: stretch;
+    gap: var(--spacing-sm);
   }
 
-  .section-actions {
-    justify-content: space-between;
+  .filter-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-xs);
   }
 
-  .goals-cards {
-    grid-template-columns: 1fr;
+  .table-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+  }
+
+  .goal-type-tabs {
+    align-self: center;
   }
 
   .pagination-section {
     flex-direction: column;
-    gap: 16px;
+    align-items: stretch;
+    text-align: center;
+    gap: var(--spacing-sm);
+  }
+
+  .pagination-controls {
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .detail-grid,
