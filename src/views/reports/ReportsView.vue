@@ -30,14 +30,7 @@
         <BarChart3 class="icon" />
         月报数据看板
       </button>
-      <button
-        class="tab-button"
-        :class="{ active: currentTab === 'meetings' }"
-        @click="currentTab = 'meetings'"
-      >
-        <Users class="icon" />
-        会议管理
-      </button>
+
     </div>
 
     <!-- 周报列表 -->
@@ -148,10 +141,7 @@
               <Download class="icon" />
               下载数据
             </button>
-            <button class="btn btn-primary" @click="openMeetingModal('weekly', selectedWeeklyReport)">
-              <Users class="icon" />
-              安排会议
-            </button>
+
           </div>
         </div>
 
@@ -255,46 +245,32 @@
         <div class="reports-grid">
           <div v-for="report in filteredMonthlyReports" :key="report.id" class="report-card" @click="viewMonthlyReport(report.id)">
             <div class="report-header">
-              <h3>{{ report.projectName }}</h3>
+              <div class="header-left">
+                <h3>{{ report.monthPeriod }}</h3>
+                <p class="report-period">{{ report.reportPeriod }}</p>
+              </div>
               <span class="status-badge" :class="`status-${report.status}`">
                 {{ getStatusLabel(report.status) }}
               </span>
             </div>
-            <div class="report-meta">
+            <div class="report-info">
+              <p><strong>项目：</strong>{{ report.projectName }}</p>
               <p><strong>客户：</strong>{{ report.customerName }}</p>
-              <p><strong>月份：</strong>{{ report.monthPeriod }}</p>
-              <p><strong>报告周期：</strong>{{ report.reportPeriod }}</p>
-              <p><strong>创建时间：</strong>{{ formatDate(report.createdAt) }}</p>
               <p><strong>跟进团队：</strong>{{ report.followUpTeam.join(', ') }}</p>
+              <p><strong>创建时间：</strong>{{ formatDate(report.createdAt) }}</p>
             </div>
             <div class="report-metrics">
               <div class="metric-item">
-                <span class="metric-label">月度访问量</span>
+                <span class="metric-label">访问量</span>
                 <span class="metric-value">{{ report.metrics.visits.toLocaleString() }}</span>
-                <span class="metric-change" :class="report.metrics.visitsChange >= 0 ? 'positive' : 'negative'">
-                  {{ report.metrics.visitsChange >= 0 ? '+' : '' }}{{ report.metrics.visitsChange }}%
-                </span>
               </div>
               <div class="metric-item">
                 <span class="metric-label">转化率</span>
                 <span class="metric-value">{{ report.metrics.conversion }}%</span>
-                <span class="metric-change" :class="report.metrics.conversionChange >= 0 ? 'positive' : 'negative'">
-                  {{ report.metrics.conversionChange >= 0 ? '+' : '' }}{{ report.metrics.conversionChange }}%
-                </span>
-              </div>
-              <div class="metric-item">
-                <span class="metric-label">广告花费</span>
-                <span class="metric-value">¥{{ report.metrics.adSpend.toLocaleString() }}</span>
-                <span class="metric-change" :class="report.metrics.adSpendChange >= 0 ? 'negative' : 'positive'">
-                  {{ report.metrics.adSpendChange >= 0 ? '+' : '' }}{{ report.metrics.adSpendChange }}%
-                </span>
               </div>
               <div class="metric-item">
                 <span class="metric-label">ROI</span>
                 <span class="metric-value">{{ report.metrics.roi }}%</span>
-                <span class="metric-change" :class="report.metrics.roiChange >= 0 ? 'positive' : 'negative'">
-                  {{ report.metrics.roiChange >= 0 ? '+' : '' }}{{ report.metrics.roiChange }}%
-                </span>
               </div>
             </div>
             <div class="report-actions">
@@ -348,10 +324,7 @@
               <Download class="icon" />
               下载数据
             </button>
-            <button class="btn btn-primary" @click="openMeetingModal('monthly', selectedMonthlyReport)">
-              <Users class="icon" />
-              安排会议
-            </button>
+
           </div>
         </div>
 
@@ -366,19 +339,7 @@
             </div>
           </div>
 
-      <!-- 月报数据看板内容 -->
-      <div v-if="selectedMonthlyReport" class="dashboard-container">
-        <div class="dashboard-info">
-          <div class="info-card">
-            <h3>{{ currentMonthlyReport?.projectName }}</h3>
-            <p>客户：{{ currentMonthlyReport?.customerName }}</p>
-            <p>月份：{{ currentMonthlyReport?.monthPeriod }}</p>
-            <p>包含周报：{{ currentMonthlyReport?.weeklyReportsCount }} 个</p>
-                          <p>状态：<span class="status-badge" :class="`status-${currentMonthlyReport?.status}`">{{ getStatusLabel(currentMonthlyReport?.status || '') }}</span></p>
-          </div>
-        </div>
-
-        <!-- 月度数据看板组件 -->
+          <!-- 月度数据看板组件 -->
         <div class="dashboard-content">
           <div class="metrics-grid">
             <div class="metric-card">
@@ -455,62 +416,11 @@
             安排客户会议
           </button>
         </div>
-      </div>
-
-      <!-- 未选择月报时的提示 -->
-      <div v-else class="empty-state">
-        <BarChart3 class="empty-icon" />
-        <h3>请选择一个月报</h3>
-        <p>选择上方的月报来查看数据看板</p>
-      </div>
-    </div>
-
-    <!-- 会议管理 -->
-    <div v-if="currentTab === 'meetings'" class="tab-content">
-      <div class="meetings-header">
-        <h2>会议管理</h2>
-        <button class="btn btn-primary" @click="createMeeting">
-          <Plus class="icon" />
-          创建会议
-        </button>
-      </div>
-
-      <!-- 会议列表 -->
-      <div class="meetings-list">
-        <div v-for="meeting in meetings" :key="meeting.id" class="meeting-card">
-          <div class="meeting-info">
-            <h3>{{ meeting.title }}</h3>
-            <p class="meeting-meta">
-              <Calendar class="icon" />
-              {{ meeting.date }} {{ meeting.time }}
-            </p>
-            <p class="meeting-meta">
-              <Users class="icon" />
-              参会人员：{{ meeting.attendees.join(', ') }}
-            </p>
-            <p class="meeting-meta">
-              <FileText class="icon" />
-              关联报告：{{ meeting.reportType === 'weekly' ? '周报' : '月报' }} - {{ meeting.reportPeriod }}
-            </p>
-          </div>
-          <div class="meeting-status">
-            <span class="status-badge" :class="`status-${meeting.status}`">
-              {{ getMeetingStatusLabel(meeting.status) }}
-            </span>
-          </div>
-          <div class="meeting-actions">
-            <button class="btn btn-sm btn-secondary" @click="viewMeeting(meeting)">
-              <Eye class="icon" />
-              查看
-            </button>
-            <button class="btn btn-sm btn-primary" @click="editMeeting(meeting)">
-              <Edit class="icon" />
-              编辑
-            </button>
-          </div>
         </div>
       </div>
     </div>
+
+
 
     <!-- 会议详情/编辑模态框 -->
     <div v-if="showMeetingModal" class="modal-overlay" @click="closeMeetingModal">
@@ -777,6 +687,21 @@ const showMeetingRecordsModal = ref(false)
 const showTodoItemsModal = ref(false)
 const currentReportId = ref('')
 
+// 当前会议数据
+const currentMeeting = ref({
+  id: '',
+  title: '',
+  date: '',
+  time: '',
+  attendees: [] as string[],
+  reportType: 'weekly' as 'weekly' | 'monthly',
+  reportPeriod: '',
+  status: 'scheduled' as string,
+  agenda: '',
+  notes: '',
+  todos: [] as Array<{task: string, assignee: string, deadline: string}>
+})
+
 // 搜索和筛选
 const weeklySearchTerm = ref('')
 const weeklyStatusFilter = ref('')
@@ -1036,21 +961,6 @@ const currentWeeklyReport = computed(() =>
 const currentMonthlyReport = computed(() =>
   monthlyReports.value.find(r => r.id === selectedMonthlyReport.value)
 )
-
-// 当前会议数据
-const currentMeeting = ref({
-  id: '',
-  title: '',
-  date: '',
-  time: '',
-  attendees: [] as string[],
-  reportType: 'weekly' as 'weekly' | 'monthly',
-  reportPeriod: '',
-  status: 'scheduled' as string,
-  agenda: '',
-  notes: '',
-  todos: [] as Array<{task: string, assignee: string, deadline: string}>
-})
 
 // 方法
 const loadWeeklyDashboard = () => {
