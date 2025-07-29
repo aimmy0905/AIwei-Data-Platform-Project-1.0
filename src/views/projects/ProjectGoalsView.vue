@@ -58,7 +58,7 @@
       <div class="project-table-section">
         <div class="table-header">
           <div class="table-header__left">
-            <h3>目标列表</h3>
+            <h3>目标列表 - {{ currentGoalTypeText }}</h3>
             <span class="record-count">共 {{ filteredGoals.length }} 条记录</span>
           </div>
           <div class="table-header__right">
@@ -71,7 +71,9 @@
                 :class="{ 'goal-type-tab--active': filters.goalType === type.value }"
                 @click="selectGoalType(type.value)"
               >
-                {{ type.label }}
+                <span class="tab-icon">📊</span>
+                <span class="tab-text">{{ type.label }}</span>
+                <span v-if="filters.goalType === type.value" class="tab-indicator"></span>
               </button>
             </div>
           </div>
@@ -182,6 +184,13 @@
                   <td>{{ goal.goal_period }}</td>
                   <td>
                     <div class="action-buttons">
+                      <button
+                        class="action-btn-small action-btn-small--info"
+                        @click="viewProjectAllGoals(goal)"
+                        title="查看该项目全部目标"
+                      >
+                        全部目标
+                      </button>
                       <button
                         class="action-btn-small action-btn-small--primary"
                         @click="editGoal(goal)"
@@ -302,8 +311,8 @@
                   </div>
                   <div class="completion-details">
                     <span class="detail-text">
-                                      目标: ${{ formatNumber(selectedGoal.sales_target) }} |
-                实际: ${{ formatNumber(selectedGoal.actual_sales || 0) }}
+                      目标: ${{ formatNumber(selectedGoal.sales_target) }} |
+                      实际: ${{ formatNumber(selectedGoal.actual_sales || 0) }}
                     </span>
                   </div>
                   <div class="progress-bar">
@@ -355,40 +364,278 @@
         </div>
       </div>
     </div>
+
+    <!-- 项目全部目标弹窗 -->
+    <div v-if="showProjectAllGoals && selectedProjectGoals" class="modal-overlay" @click="closeProjectAllGoals">
+      <div class="modal-container modal-container--large" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">{{ selectedProjectGoals.projectName }} - 全部目标</h3>
+          <div class="modal-header-actions">
+            <button class="action-btn action-btn--primary" @click="createProjectGoal">
+              <Plus :size="16" />
+              新建项目目标
+            </button>
+            <button class="modal-close" @click="closeProjectAllGoals">
+              <X :size="20" />
+            </button>
+          </div>
+        </div>
+        <div class="modal-content">
+          <div class="project-all-goals">
+            <div class="project-summary">
+              <div class="summary-item">
+                <span class="summary-label">客户名称</span>
+                <span class="summary-value">{{ selectedProjectGoals.customerName }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">目标总数</span>
+                <span class="summary-value">{{ selectedProjectGoals.goals.length }} 个</span>
+              </div>
+            </div>
+
+            <div class="goals-by-type">
+              <div
+                v-for="goalType in ['月度', '季度', '年度']"
+                :key="goalType"
+                class="goal-type-section"
+              >
+                <div class="goal-type-header">
+                  <h4 class="goal-type-title">{{ goalType }}目标</h4>
+                  <span class="goal-count">{{ getGoalsByType(selectedProjectGoals.goals, goalType).length }} 个</span>
+                </div>
+
+                <div class="goals-table">
+                  <table v-if="getGoalsByType(selectedProjectGoals.goals, goalType).length > 0">
+                    <thead>
+                      <tr>
+                        <th>目标周期</th>
+                        <th>销售额目标</th>
+                        <th>利润目标</th>
+                        <th>ROI目标</th>
+                        <th>完成状态</th>
+                        <th>创建时间</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="goal in getGoalsByType(selectedProjectGoals.goals, goalType)" :key="goal.id">
+                        <td>{{ goal.goal_period }}</td>
+                        <td>
+                          <div class="goal-metric">
+                            <div class="metric-target">${{ formatNumber(goal.sales_target) }}</div>
+                            <div class="metric-actual">${{ formatNumber(goal.actual_sales || 0) }}</div>
+                            <div class="metric-progress">
+                              <div class="progress-bar-small">
+                                <div
+                                  class="progress-fill-small progress-fill--sales"
+                                  :style="{ width: Math.min(goal.completion_rate?.sales || 0, 100) + '%' }"
+                                ></div>
+                              </div>
+                              <span class="progress-text-small">{{ goal.completion_rate?.sales || 0 }}%</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="goal-metric">
+                            <div class="metric-target">${{ formatNumber(goal.profit_target || 0) }}</div>
+                            <div class="metric-actual">${{ formatNumber(goal.actual_profit || 0) }}</div>
+                            <div class="metric-progress">
+                              <div class="progress-bar-small">
+                                <div
+                                  class="progress-fill-small progress-fill--profit"
+                                  :style="{ width: Math.min(goal.completion_rate?.profit || 0, 100) + '%' }"
+                                ></div>
+                              </div>
+                              <span class="progress-text-small">{{ goal.completion_rate?.profit || 0 }}%</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="goal-metric">
+                            <div class="metric-target">{{ goal.roi_target }}x</div>
+                            <div class="metric-actual">{{ goal.actual_roi || 0 }}x</div>
+                            <div class="metric-progress">
+                              <div class="progress-bar-small">
+                                <div
+                                  class="progress-fill-small progress-fill--roi"
+                                  :style="{ width: Math.min(goal.completion_rate?.roi || 0, 100) + '%' }"
+                                ></div>
+                              </div>
+                              <span class="progress-text-small">{{ goal.completion_rate?.roi || 0 }}%</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <span class="completion-status" :class="getCompletionClass(getAverageCompletion(goal))">
+                            {{ getCompletionStatusText(getAverageCompletion(goal)) }}
+                          </span>
+                        </td>
+                        <td>{{ formatDate(goal.created_at) }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div v-else class="no-goals-message">
+                    暂无{{ goalType }}目标数据
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 新建目标弹窗 -->
+    <div v-if="showCreateGoal" class="modal-overlay" @click="closeCreateGoal">
+      <div class="modal-container modal-container--medium" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">新建目标</h3>
+          <button class="modal-close" @click="closeCreateGoal">
+            <X :size="20" />
+          </button>
+        </div>
+        <div class="modal-content">
+          <form @submit.prevent="submitCreateGoal" class="create-goal-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">项目名称 *</label>
+                <select v-model="newGoal.project_id" class="form-select" required>
+                  <option value="">请选择项目</option>
+                  <option v-for="project in projects" :key="project.id" :value="project.id">
+                    {{ project.project_name }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">目标类型 *</label>
+                <select v-model="newGoal.goal_type" class="form-select" required @change="updateGoalPeriodOptions">
+                  <option value="">请选择目标类型</option>
+                  <option value="月度">月度目标</option>
+                  <option value="季度">季度目标</option>
+                  <option value="年度">年度目标</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">目标周期 *</label>
+                <select v-model="newGoal.goal_period" class="form-select" required>
+                  <option value="">请选择目标周期</option>
+                  <option v-for="period in goalPeriodOptions" :key="period" :value="period">
+                    {{ period }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">销售额目标 *</label>
+                <input
+                  type="number"
+                  v-model.number="newGoal.sales_target"
+                  class="form-input"
+                  placeholder="请输入销售额目标"
+                  min="0"
+                  step="1000"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">成本目标 *</label>
+                <input
+                  type="number"
+                  v-model.number="newGoal.cost_target"
+                  class="form-input"
+                  placeholder="请输入成本目标"
+                  min="0"
+                  step="1000"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">ROI目标 *</label>
+                <input
+                  type="number"
+                  v-model.number="newGoal.roi_target"
+                  class="form-input"
+                  placeholder="请输入ROI目标"
+                  min="0"
+                  step="0.1"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">利润目标</label>
+                <input
+                  type="number"
+                  v-model.number="newGoal.profit_target"
+                  class="form-input"
+                  placeholder="请输入利润目标"
+                  min="0"
+                  step="1000"
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">用户数目标</label>
+                <input
+                  type="number"
+                  v-model.number="newGoal.user_count_target"
+                  class="form-input"
+                  placeholder="请输入用户数目标"
+                  min="0"
+                  step="100"
+                />
+              </div>
+
+              <div class="form-group form-group--full">
+                <label class="form-label">备注</label>
+                <textarea
+                  v-model="newGoal.remarks"
+                  class="form-textarea"
+                  placeholder="请输入备注信息"
+                  rows="3"
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn--secondary" @click="closeCreateGoal">
+                取消
+              </button>
+              <button type="submit" class="btn btn--primary" :disabled="!isFormValid">
+                创建目标
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive } from 'vue'
-import { useRouter } from 'vue-router'
 import {
-  BarChart3,
-  Download,
   Plus,
-  Filter,
-  ChevronDown,
-  RotateCcw,
-  Search,
-  Eye,
-  Edit,
-  Trash2,
   X
 } from 'lucide-vue-next'
 
 import { mockProjectGoals, mockProjects, type ProjectGoal, type Project } from '@/mock/projects'
-
-const router = useRouter()
 
 // 响应式数据
 const currentPage = ref(1)
 const pageSize = ref(10)
 const showGoalDetail = ref(false)
 const selectedGoal = ref<ProjectGoal | null>(null)
+const showProjectAllGoals = ref(false)
+const selectedProjectGoals = ref<ProjectGroup | null>(null)
+const showCreateGoal = ref(false)
 
 const goals = ref<ProjectGoal[]>([])
 const customers = ref<Array<{id: number, name: string}>>([])
 const projects = ref<Project[]>([])
-const creators = ref<string[]>([])
 
 const goalTypes = ref([
   { value: '月度', label: '月度目标' },
@@ -403,12 +650,36 @@ const filters = reactive({
   projectId: ''
 })
 
+// 新建目标表单数据
+const newGoal = reactive({
+  project_id: '',
+  goal_type: '',
+  goal_period: '',
+  sales_target: 0,
+  cost_target: 0,
+  roi_target: 0,
+  profit_target: 0,
+  user_count_target: 0,
+  remarks: ''
+})
+
+const goalPeriodOptions = ref<string[]>([])
+
+// 项目分组接口
+interface ProjectGroup {
+  projectId: number
+  projectName: string
+  customerName: string
+  goals: ProjectGoal[]
+}
+
 // 初始化数据
 onMounted(() => {
   loadGoals()
   loadCustomers()
   loadProjects()
-  loadCreators()
+  // 设置默认显示当前时间周期的目标
+  setDefaultFilters()
 })
 
 // 计算属性
@@ -445,6 +716,19 @@ const filteredGoals = computed(() => {
     result = result.filter(goal => goal.project_id === parseInt(filters.projectId))
   }
 
+  // 当显示全部目标时，按项目名称和目标类型排序，便于查看
+  if (!filters.goalType) {
+    result.sort((a, b) => {
+      // 首先按项目名称排序
+      if (a.project_name !== b.project_name) {
+        return a.project_name.localeCompare(b.project_name)
+      }
+      // 然后按目标类型排序（月度 -> 季度 -> 年度）
+      const typeOrder = { '月度': 1, '季度': 2, '年度': 3 }
+      return (typeOrder[a.goal_type] || 4) - (typeOrder[b.goal_type] || 4)
+    })
+  }
+
   return result
 })
 
@@ -457,6 +741,24 @@ const paginatedGoals = computed(() => {
 const totalPages = computed(() => {
   return Math.ceil(filteredGoals.value.length / pageSize.value)
 })
+
+// 当前目标类型显示文本
+const currentGoalTypeText = computed(() => {
+  const goalType = goalTypes.value.find(type => type.value === filters.goalType)
+  return goalType ? goalType.label : '月度目标'
+})
+
+// 表单验证
+const isFormValid = computed(() => {
+  return newGoal.project_id &&
+         newGoal.goal_type &&
+         newGoal.goal_period &&
+         newGoal.sales_target > 0 &&
+         newGoal.cost_target > 0 &&
+         newGoal.roi_target > 0
+})
+
+
 
 // 方法
 const loadGoals = () => {
@@ -475,18 +777,12 @@ const loadProjects = () => {
   projects.value = mockProjects
 }
 
-const loadCreators = () => {
-  creators.value = [...new Set(mockProjectGoals.map(goal => goal.created_by))]
+// 根据目标类型筛选目标
+const getGoalsByType = (goals: ProjectGoal[], goalType: string) => {
+  return goals.filter(goal => goal.goal_type === goalType)
 }
 
-const getAverageCompletion = (goal: ProjectGoal) => {
-  const rates = [
-    goal.completion_rate?.sales || 0,
-    goal.completion_rate?.cost || 0,
-    goal.completion_rate?.roi || 0
-  ]
-  return rates.reduce((sum, rate) => sum + rate, 0) / rates.length
-}
+
 
 const getGoalTypeClass = (type: string) => {
   const typeMap: Record<string, string> = {
@@ -504,18 +800,7 @@ const getCompletionClass = (rate: number) => {
   return 'danger'
 }
 
-const getOverallStatusClass = (goal: ProjectGoal) => {
-  const avgCompletion = getAverageCompletion(goal)
-  return getCompletionClass(avgCompletion)
-}
 
-const getOverallStatusText = (goal: ProjectGoal) => {
-  const avgCompletion = getAverageCompletion(goal)
-  if (avgCompletion >= 110) return '超额完成'
-  if (avgCompletion >= 90) return '达成目标'
-  if (avgCompletion >= 70) return '接近目标'
-  return '未达目标'
-}
 
 const formatNumber = (num: number) => {
   return num.toLocaleString('zh-CN')
@@ -523,6 +808,17 @@ const formatNumber = (num: number) => {
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('zh-CN')
+}
+
+// 设置默认筛选条件，显示当前时间周期的目标
+const setDefaultFilters = () => {
+  // 默认显示月度目标
+  filters.goalType = '月度'
+}
+
+const selectGoalType = (type: string) => {
+  filters.goalType = type
+  currentPage.value = 1
 }
 
 const handleFilterChange = () => {
@@ -534,29 +830,169 @@ const handleCustomerChange = () => {
   handleFilterChange()
 }
 
-const selectGoalType = (type: string) => {
-  filters.goalType = type
-  currentPage.value = 1
-}
 
-const resetFilters = () => {
-  filters.goalType = ''
-  filters.goalPeriod = ''
-  filters.customerId = ''
-  filters.projectId = ''
-  currentPage.value = 1
-}
-
-const applyFilters = () => {
-  currentPage.value = 1
-  // 筛选逻辑已在computed中处理
-}
 
 
 
 const createGoal = () => {
-  console.log('创建新目标')
-  // TODO: 实现创建目标功能
+  showCreateGoal.value = true
+  resetNewGoalForm()
+}
+
+// 重置新建目标表单
+const resetNewGoalForm = () => {
+  Object.assign(newGoal, {
+    project_id: '',
+    goal_type: '',
+    goal_period: '',
+    sales_target: 0,
+    cost_target: 0,
+    roi_target: 0,
+    profit_target: 0,
+    user_count_target: 0,
+    remarks: ''
+  })
+  goalPeriodOptions.value = []
+}
+
+// 关闭新建目标弹窗
+const closeCreateGoal = () => {
+  showCreateGoal.value = false
+  resetNewGoalForm()
+}
+
+// 更新目标周期选项
+const updateGoalPeriodOptions = () => {
+  const currentYear = new Date().getFullYear()
+
+  goalPeriodOptions.value = []
+
+  if (newGoal.goal_type === '月度') {
+    // 生成月度选项：当前年份的12个月
+    for (let month = 1; month <= 12; month++) {
+      goalPeriodOptions.value.push(`${currentYear}年${month}月`)
+    }
+    // 添加下一年的前几个月
+    for (let month = 1; month <= 3; month++) {
+      goalPeriodOptions.value.push(`${currentYear + 1}年${month}月`)
+    }
+  } else if (newGoal.goal_type === '季度') {
+    // 生成季度选项
+    for (let quarter = 1; quarter <= 4; quarter++) {
+      goalPeriodOptions.value.push(`${currentYear}年Q${quarter}`)
+    }
+    for (let quarter = 1; quarter <= 2; quarter++) {
+      goalPeriodOptions.value.push(`${currentYear + 1}年Q${quarter}`)
+    }
+  } else if (newGoal.goal_type === '年度') {
+    // 生成年度选项
+    for (let year = currentYear; year <= currentYear + 2; year++) {
+      goalPeriodOptions.value.push(`${year}年`)
+    }
+  }
+}
+
+// 提交新建目标
+const submitCreateGoal = () => {
+  if (!isFormValid.value) {
+    alert('请填写所有必填字段')
+    return
+  }
+
+  // 获取选中的项目信息
+  const selectedProject = projects.value.find(p => p.id === parseInt(newGoal.project_id))
+  if (!selectedProject) {
+    alert('请选择有效的项目')
+    return
+  }
+
+  // 生成新的目标ID
+  const newId = Math.max(...goals.value.map(g => g.id)) + 1
+
+  // 创建新目标对象
+  const goalToCreate: ProjectGoal = {
+    id: newId,
+    project_id: parseInt(newGoal.project_id),
+    customer_name: selectedProject.customer_name,
+    project_name: selectedProject.project_name,
+    goal_type: newGoal.goal_type as '月度' | '季度' | '年度',
+    goal_period: newGoal.goal_period,
+    sales_target: newGoal.sales_target,
+    cost_target: newGoal.cost_target,
+    roi_target: newGoal.roi_target,
+    profit_target: newGoal.profit_target || 0,
+    user_count_target: newGoal.user_count_target || 0,
+    actual_sales: 0,
+    actual_cost: 0,
+    actual_roi: 0,
+    actual_profit: 0,
+    actual_user_count: 0,
+    completion_rate: {
+      sales: 0,
+      cost: 0,
+      roi: 0,
+      profit: 0,
+      user_count: 0
+    },
+    created_at: new Date().toISOString().split('T')[0],
+    created_by: '当前用户', // 这里应该从用户状态获取
+    remarks: newGoal.remarks || ''
+  }
+
+  // 添加到目标列表
+  goals.value.unshift(goalToCreate)
+
+  // 关闭弹窗
+  closeCreateGoal()
+
+  // 显示成功消息
+  alert('目标创建成功！')
+
+  console.log('新建目标:', goalToCreate)
+}
+
+// 查看项目全部目标
+const viewProjectAllGoals = (goal: ProjectGoal) => {
+  // 获取该项目的所有目标
+  const projectGoals = goals.value.filter(g => g.project_id === goal.project_id)
+
+  selectedProjectGoals.value = {
+    projectId: goal.project_id,
+    projectName: goal.project_name,
+    customerName: goal.customer_name,
+    goals: projectGoals.sort((a, b) => {
+      // 按目标类型和时间排序
+      const typeOrder = { '月度': 1, '季度': 2, '年度': 3 }
+      const typeComparison = (typeOrder[a.goal_type] || 4) - (typeOrder[b.goal_type] || 4)
+      if (typeComparison !== 0) return typeComparison
+      return b.created_at.localeCompare(a.created_at) // 最新的在前
+    })
+  }
+
+  showProjectAllGoals.value = true
+}
+
+const closeProjectAllGoals = () => {
+  showProjectAllGoals.value = false
+  selectedProjectGoals.value = null
+}
+
+// 计算平均完成率
+const getAverageCompletion = (goal: ProjectGoal) => {
+  const rates = [
+    goal.completion_rate?.sales || 0,
+    goal.completion_rate?.cost || 0,
+    goal.completion_rate?.roi || 0
+  ]
+  return rates.reduce((sum, rate) => sum + rate, 0) / rates.length
+}
+
+// 获取完成状态文本
+const getCompletionStatusText = (rate: number) => {
+  if (rate >= 110) return '超额完成'
+  if (rate >= 90) return '达成目标'
+  if (rate >= 70) return '接近目标'
+  return '未达目标'
 }
 
 const viewGoalDetail = (goal: ProjectGoal) => {
@@ -798,49 +1234,114 @@ const closeGoalDetail = () => {
 /* 目标类型标签页样式 */
 .goal-type-tabs {
   display: flex;
-  gap: 8px;
-  background: var(--color-background);
-  padding: 6px;
-  border-radius: 12px;
+  gap: 4px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 8px;
+  border-radius: 16px;
   width: fit-content;
-  border: 1px solid var(--color-border);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(10px);
 }
 
 .goal-type-tab {
-  padding: 12px 20px;
-  border: 1px solid var(--color-border);
-  background: var(--color-background);
-  color: var(--color-text-primary);
-  border-radius: 8px;
+  padding: 12px 18px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  border-radius: 12px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 80px;
+  justify-content: center;
+}
+
+.goal-type-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 12px;
+}
+
+.goal-type-tab:hover::before {
+  opacity: 1;
 }
 
 .goal-type-tab:hover {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-  border-color: var(--color-primary);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.9);
+  color: #1e293b;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 25px -8px rgba(59, 130, 246, 0.3);
 }
 
 .goal-type-tab--active {
-  background: var(--color-primary);
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   color: white;
-  border-color: var(--color-primary);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px -8px rgba(59, 130, 246, 0.5);
+}
+
+.goal-type-tab--active::before {
+  opacity: 0;
 }
 
 .goal-type-tab--active:hover {
-  background: var(--color-primary);
-  color: white;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 30px -8px rgba(59, 130, 246, 0.6);
+}
+
+
+
+.tab-icon {
+  font-size: 16px;
+  opacity: 0.8;
+  transition: transform 0.3s ease;
+}
+
+.goal-type-tab:hover .tab-icon {
+  transform: scale(1.1);
+}
+
+.tab-text {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+.tab-indicator {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 2px;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: 20px;
+    opacity: 1;
+  }
 }
 
 /* 表格视图 */
@@ -913,7 +1414,7 @@ const closeGoalDetail = () => {
 }
 
 .action-btn-small {
-  padding: 4px 6px;
+  padding: 4px 8px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -921,6 +1422,18 @@ const closeGoalDetail = () => {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.action-btn-small--info {
+  background: var(--color-info-light, #e0f2fe);
+  color: var(--color-info, #0288d1);
+}
+
+.action-btn-small--info:hover {
+  background: var(--color-info, #0288d1);
+  color: white;
 }
 
 .action-btn-small--primary {
@@ -941,6 +1454,164 @@ const closeGoalDetail = () => {
 .action-btn-small--danger:hover {
   background: var(--color-danger);
   color: white;
+}
+
+.goals-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.goal-item {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  transition: all 0.2s ease;
+}
+
+.goal-item:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.goal-period {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.goal-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.metric-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.metric-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.progress-text {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  min-width: 35px;
+  text-align: right;
+}
+
+.metric-values {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--font-size-xs);
+}
+
+.target-value {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.actual-value {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.goal-type-badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.goal-type-badge.monthly {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.goal-type-badge.quarterly {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.goal-type-badge.yearly {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.goal-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  justify-content: flex-end;
+}
+
+.action-btn-small {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.action-btn-small--primary {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.action-btn-small--primary:hover {
+  background: var(--color-primary);
+  color: white;
+}
+
+.action-btn-small--secondary {
+  background: var(--color-background);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.action-btn-small--secondary:hover {
+  background: var(--color-background-hover);
+  color: var(--color-text-primary);
+  border-color: var(--color-primary);
+}
+
+.action-btn-small--danger {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.action-btn-small--danger:hover {
+  background: var(--color-danger);
+  color: white;
+}
+
+.no-goals {
+  text-align: center;
+  padding: var(--spacing-lg);
+  color: var(--color-text-secondary);
+  font-style: italic;
+  background: var(--color-background);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--border-radius-md);
 }
 
 /* 分页 */
@@ -1247,6 +1918,295 @@ const closeGoalDetail = () => {
   color: var(--color-text-secondary);
 }
 
+/* 项目全部目标弹窗样式 */
+.modal-container--large {
+  max-width: 1200px;
+  width: 95%;
+  max-height: 95vh;
+}
+
+.project-all-goals {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.project-summary {
+  display: flex;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-md);
+  background: var(--color-background);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--color-border);
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.summary-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.summary-value {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.goals-by-type {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.goal-type-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+}
+
+.goal-type-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.goal-type-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.goal-count {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.goals-table {
+  overflow-x: auto;
+}
+
+.goals-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.goals-table th,
+.goals-table td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.goals-table th {
+  background: var(--color-background);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.goals-table td {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.goal-metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 120px;
+}
+
+.metric-target {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.metric-actual {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.metric-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.progress-bar-small {
+  flex: 1;
+  height: 4px;
+  background: var(--color-background);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill-small {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.progress-text-small {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  min-width: 30px;
+  text-align: right;
+}
+
+.completion-status {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.completion-status.excellent {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.completion-status.good {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.completion-status.warning {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.completion-status.danger {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.no-goals-message {
+  padding: var(--spacing-xl);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  background: var(--color-background);
+}
+
+/* 新建目标弹窗样式 */
+.modal-container--medium {
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+}
+
+.create-goal-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.form-group--full {
+  grid-column: 1 / -1;
+}
+
+.form-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.form-select,
+.form-input,
+.form-textarea {
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  transition: border-color 0.2s ease;
+}
+
+.form-select:focus,
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--color-primary-dark, #2563eb);
+}
+
+.btn--primary:disabled {
+  background: var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+}
+
+.btn--secondary {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.btn--secondary:hover {
+  background: var(--color-background-hover);
+  border-color: var(--color-primary);
+}
+
 @media (max-width: 768px) {
   .panel-header {
     flex-direction: column;
@@ -1280,15 +2240,32 @@ const closeGoalDetail = () => {
     gap: var(--spacing-xs);
   }
 
-  .table-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--spacing-sm);
+  .projects-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
     padding: var(--spacing-md);
   }
 
-  .goal-type-tabs {
-    align-self: center;
+  .project-card-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+  }
+
+  .goal-metrics {
+    gap: var(--spacing-md);
+  }
+
+  .metric-item {
+    background: var(--color-surface);
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-border-light);
+  }
+
+  .goal-actions {
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   .pagination-section {
@@ -1313,12 +2290,22 @@ const closeGoalDetail = () => {
     gap: 8px;
   }
 
-  .target-cell {
-    min-width: 100px;
+  .modal-container--medium {
+    width: 95%;
+    max-width: none;
   }
 
-  .target-amount {
-    font-size: 12px;
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn {
+    width: 100%;
   }
 }
 </style>

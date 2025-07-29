@@ -8,17 +8,9 @@
           <p class="page-description">记录和管理每月红人合作数据和发帖效果数据</p>
         </div>
         <div class="header-right">
-          <button v-if="activeTab === 'influencer-data'" class="btn btn-primary" @click="showAddDataModal">
-            <Plus :size="16" />
-            添加红人数据
-          </button>
           <button v-if="activeTab === 'post-data'" class="btn btn-primary" @click="showAddPostModal">
             <Plus :size="16" />
             添加发帖数据
-          </button>
-          <button class="btn btn-secondary">
-            <FileText :size="16" />
-            导出数据
           </button>
         </div>
       </div>
@@ -163,7 +155,7 @@
         <div class="table-header">
           <h3>红人数据列表</h3>
           <div class="table-actions">
-            <button class="btn btn-primary">
+            <button class="btn btn-primary" @click="showAddDataModal">
               <Plus :size="16" />
               添加红人数据
             </button>
@@ -203,22 +195,21 @@
                 <td>{{ data.projectName }}</td>
                 <td>{{ formatDate(data.createdAt) }}</td>
                 <td>{{ data.createdBy }}</td>
-                <td>
+                                <td>
                   <div class="action-buttons">
-                    <button class="btn btn-sm btn-outline" title="查看详情">
+                    <button
+                      class="action-btn-small action-btn-small--primary"
+                      title="查看详情"
+                      @click="viewInfluencerDetails(data)"
+                    >
                       <Eye :size="14" />
                     </button>
-                    <button class="btn btn-sm btn-outline" title="编辑" @click="showEditDataModal(data)">
-                      <Settings :size="14" />
-                    </button>
-                    <button class="btn btn-sm btn-outline" title="发帖数据">
-                      <FileText :size="14" />
-                    </button>
-                    <button class="btn btn-sm btn-outline" title="数据分析">
-                      <BarChart3 :size="14" />
-                    </button>
-                    <button class="btn btn-sm btn-outline btn-danger" title="删除" @click="handleDeleteData(data)">
-                      <X :size="14" />
+                    <button
+                      class="action-btn-small action-btn-small--secondary"
+                      title="编辑"
+                      @click="showEditDataModal(data)"
+                    >
+                      <Edit :size="14" />
                     </button>
                   </div>
                 </td>
@@ -338,17 +329,19 @@
                 <td>{{ data.createdBy }}</td>
                 <td>
                   <div class="action-buttons">
-                    <button class="btn btn-sm btn-outline" title="查看详情">
+                    <button
+                      class="action-btn-small action-btn-small--primary"
+                      title="查看详情"
+                      @click="viewPostDetails(data)"
+                    >
                       <Eye :size="14" />
                     </button>
-                    <button class="btn btn-sm btn-outline" title="编辑" @click="showEditPostModal(data)">
-                      <Settings :size="14" />
-                    </button>
-                    <button class="btn btn-sm btn-outline" title="数据分析">
-                      <BarChart3 :size="14" />
-                    </button>
-                    <button class="btn btn-sm btn-outline btn-danger" title="删除" @click="handleDeletePostData(data)">
-                      <X :size="14" />
+                    <button
+                      class="action-btn-small action-btn-small--secondary"
+                      title="编辑"
+                      @click="showEditPostModal(data)"
+                    >
+                      <Edit :size="14" />
                     </button>
                   </div>
                 </td>
@@ -396,7 +389,7 @@
 import { ref, computed } from 'vue'
 import {
   Plus, FileText, Users, Heart, TrendingUp, DollarSign, MessageCircle,
-  BarChart3, Settings, User, Calendar, Globe, Eye, Share, X
+  BarChart3, Settings, User, Calendar, Globe, Eye, Share, X, Edit
 } from 'lucide-vue-next'
 import {
   mockInfluencerData,
@@ -803,6 +796,36 @@ const handleDeletePostData = (data: any) => {
   }
 }
 
+// 查看红人详情
+const viewInfluencerDetails = (data: any) => {
+  console.log('查看红人详情:', data)
+  // TODO: 实现查看详情功能，可以打开详情弹窗或跳转详情页面
+  alert(`查看 ${data.customerName} - ${data.projectName} 的红人详情`)
+}
+
+// 查看发帖数据
+const viewPostData = (data: any) => {
+  console.log('查看发帖数据:', data)
+  // TODO: 跳转到发帖数据页面或筛选发帖数据
+  // 切换到发帖数据标签页并筛选相关数据
+  activeTab.value = 'post-data'
+  // 可以添加筛选逻辑
+}
+
+// 查看数据分析
+const viewDataAnalytics = (data: any) => {
+  console.log('查看数据分析:', data)
+  // TODO: 实现数据分析功能，可以打开分析图表弹窗
+  alert(`查看 ${data.customerName} - ${data.projectName} 的数据分析`)
+}
+
+// 查看发帖详情
+const viewPostDetails = (data: any) => {
+  console.log('查看发帖详情:', data)
+  // TODO: 实现查看发帖详情功能，可以打开详情弹窗
+  alert(`查看 ${data.customerName} - ${data.projectName} 的发帖详情`)
+}
+
 // 筛选后的发帖数据
 const filteredPostData = computed(() => {
   let filtered = mockPostData
@@ -875,43 +898,76 @@ const filteredPostData = computed(() => {
 }
 
 .tabs-section {
-  background: white;
-  border-radius: 8px;
-  padding: 4px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 16px;
+  padding: 8px;
   margin-bottom: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
 .tabs {
   display: flex;
-  gap: 4px;
+  gap: 6px;
 }
 
 .tab-button {
   flex: 1;
-  padding: 12px 20px;
+  padding: 14px 24px;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: 12px;
   font-size: 14px;
-  font-weight: 500;
-  color: #666;
+  font-weight: 600;
+  color: #64748b;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.tab-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 12px;
+}
+
+.tab-button:hover::before {
+  opacity: 1;
 }
 
 .tab-button.active {
-  background: #1976d2;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   color: white;
+  box-shadow: 0 8px 25px -8px rgba(59, 130, 246, 0.5);
+  transform: translateY(-1px);
+}
+
+.tab-button.active::before {
+  opacity: 0;
 }
 
 .tab-button:hover:not(.active) {
-  background: #f5f5f5;
-  color: #333;
+  background: rgba(255, 255, 255, 0.8);
+  color: #1e293b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.15);
+}
+
+.tab-button:active {
+  transform: translateY(0);
+  transition: transform 0.1s ease;
 }
 
 .filter-section {
@@ -1358,26 +1414,59 @@ const filteredPostData = computed(() => {
 
 .action-buttons {
   display: flex;
-  gap: 6px;
+  gap: 4px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
-.btn-sm {
+.action-btn-small {
   padding: 6px 8px;
-  font-size: 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.btn-sm .lucide {
-  width: 14px;
-  height: 14px;
+.action-btn-small--primary {
+  background: var(--color-primary);
+  color: white;
 }
 
-.btn-danger {
-  color: #dc3545;
-  border-color: #dc3545;
+.action-btn-small--primary:hover {
+  background: var(--color-primary-hover);
 }
 
-.btn-danger:hover {
-  background: #dc3545;
+.action-btn-small--secondary {
+  background: var(--color-background-tertiary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.action-btn-small--secondary:hover {
+  background: var(--color-background-hover);
+  color: var(--color-text-primary);
+}
+
+.action-btn-small--warning {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.action-btn-small--warning:hover {
+  background: var(--color-warning);
+  color: white;
+}
+
+.action-btn-small--danger {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.action-btn-small--danger:hover {
+  background: var(--color-danger);
   color: white;
 }
 </style>
