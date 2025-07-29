@@ -42,13 +42,37 @@
             <input
               v-model="weeklySearchTerm"
               type="text"
-              placeholder="搜索周报..."
+              placeholder="搜索项目名称、客户或周期..."
               class="search-input"
             />
-            <select v-model="weeklyStatusFilter" class="status-filter">
+            <select v-model="weeklyCustomerFilter" class="filter-select">
+              <option value="">全部客户</option>
+              <option value="Apple Inc.">Apple Inc.</option>
+              <option value="Samsung Electronics">Samsung Electronics</option>
+              <option value="Nike Inc.">Nike Inc.</option>
+              <option value="Tesla Motors">Tesla Motors</option>
+              <option value="Microsoft Corporation">Microsoft Corporation</option>
+            </select>
+            <select v-model="weeklyProjectFilter" class="filter-select">
+              <option value="">全部项目</option>
+              <option value="Apple iPhone推广项目">Apple iPhone推广项目</option>
+              <option value="Samsung Galaxy营销项目">Samsung Galaxy营销项目</option>
+              <option value="Nike运动鞋推广">Nike运动鞋推广</option>
+              <option value="Tesla Model Y营销">Tesla Model Y营销</option>
+              <option value="Microsoft Surface推广">Microsoft Surface推广</option>
+            </select>
+            <select v-model="weeklyTimeFilter" class="filter-select">
+              <option value="">全部时间</option>
+              <option value="2025-W03">2025年第3周</option>
+              <option value="2025-W02">2025年第2周</option>
+              <option value="2025-W01">2025年第1周</option>
+              <option value="2024-W52">2024年第52周</option>
+            </select>
+            <select v-model="weeklyStatusFilter" class="filter-select">
               <option value="">全部状态</option>
               <option value="completed">已完成</option>
               <option value="draft">草稿</option>
+              <option value="in_progress">进行中</option>
             </select>
           </div>
         </div>
@@ -233,6 +257,29 @@
               placeholder="搜索项目名称、客户或月份..."
               class="search-input"
             />
+            <select v-model="monthlyCustomerFilter" class="filter-select">
+              <option value="">全部客户</option>
+              <option value="Apple Inc.">Apple Inc.</option>
+              <option value="Samsung Electronics">Samsung Electronics</option>
+              <option value="Nike Inc.">Nike Inc.</option>
+              <option value="Tesla Motors">Tesla Motors</option>
+              <option value="Microsoft Corporation">Microsoft Corporation</option>
+            </select>
+            <select v-model="monthlyProjectFilter" class="filter-select">
+              <option value="">全部项目</option>
+              <option value="Apple iPhone推广项目">Apple iPhone推广项目</option>
+              <option value="Samsung Galaxy营销项目">Samsung Galaxy营销项目</option>
+              <option value="Nike运动鞋推广">Nike运动鞋推广</option>
+              <option value="Tesla Model Y营销">Tesla Model Y营销</option>
+              <option value="Microsoft Surface推广">Microsoft Surface推广</option>
+            </select>
+            <select v-model="monthlyTimeFilter" class="filter-select">
+              <option value="">全部时间</option>
+              <option value="2025-01">2025年1月</option>
+              <option value="2024-12">2024年12月</option>
+              <option value="2024-11">2024年11月</option>
+              <option value="2024-10">2024年10月</option>
+            </select>
             <select v-model="monthlyStatusFilter" class="filter-select">
               <option value="">全部状态</option>
               <option value="completed">已完成</option>
@@ -705,8 +752,14 @@ const currentMeeting = ref({
 // 搜索和筛选
 const weeklySearchTerm = ref('')
 const weeklyStatusFilter = ref('')
+const weeklyCustomerFilter = ref('')
+const weeklyProjectFilter = ref('')
+const weeklyTimeFilter = ref('')
 const monthlySearchTerm = ref('')
 const monthlyStatusFilter = ref('')
+const monthlyCustomerFilter = ref('')
+const monthlyProjectFilter = ref('')
+const monthlyTimeFilter = ref('')
 
 // 周报数据
 const weeklyReports = ref([
@@ -911,6 +964,48 @@ const meetings = ref([
     agenda: '1. 回顾项目进展\n2. 分析数据趋势\n3. 制定优化方案',
     notes: '项目进展顺利，ROI表现优异。需要进一步优化落地页转化率。',
     todos: []
+  },
+  {
+    id: 'meeting-3',
+    title: 'Apple iPhone项目月度总结会议',
+    date: '2025-02-01',
+    time: '15:00',
+    attendees: ['张三', '李四', '王五', 'John Smith'],
+    reportType: 'monthly',
+    reportPeriod: '2025-01',
+    reportId: 'monthly-1',
+    status: 'completed',
+    agenda: '1. 回顾1月整体数据表现\n2. 分析月度ROI趋势\n3. 制定2月投放策略',
+    notes: '1月整体表现优异，ROI达到295%，超出预期。建议2月继续加大Facebook和Google广告投放，重点优化移动端转化率。',
+    todos: []
+  },
+  {
+    id: 'meeting-4',
+    title: 'Samsung Galaxy月度复盘会议',
+    date: '2025-02-02',
+    time: '10:30',
+    attendees: ['赵六', '钱七', '孙八'],
+    reportType: 'monthly',
+    reportPeriod: '2025-01',
+    reportId: 'monthly-2',
+    status: 'completed',
+    agenda: '1. 月度数据分析\n2. 竞品对比分析\n3. 下月策略调整',
+    notes: '月度转化率表现良好，但需要关注成本控制。建议优化关键词投放策略，提升质量得分。',
+    todos: []
+  },
+  {
+    id: 'meeting-5',
+    title: 'Nike运动鞋项目年终总结',
+    date: '2025-01-05',
+    time: '14:00',
+    attendees: ['周九', '吴十'],
+    reportType: 'monthly',
+    reportPeriod: '2024-12',
+    reportId: 'monthly-3',
+    status: 'completed',
+    agenda: '1. 年终数据回顾\n2. 全年ROI分析\n3. 新年度规划',
+    notes: '全年表现优秀，12月ROI达到278%。新年度计划扩大投放规模，重点关注年轻消费群体。',
+    todos: []
   }
 ])
 
@@ -925,6 +1020,18 @@ const filteredWeeklyReports = computed(() => {
       report.customerName.toLowerCase().includes(query) ||
       report.weekPeriod.toLowerCase().includes(query)
     )
+  }
+
+  if (weeklyCustomerFilter.value) {
+    filtered = filtered.filter(report => report.customerName === weeklyCustomerFilter.value)
+  }
+
+  if (weeklyProjectFilter.value) {
+    filtered = filtered.filter(report => report.projectName === weeklyProjectFilter.value)
+  }
+
+  if (weeklyTimeFilter.value) {
+    filtered = filtered.filter(report => report.weekPeriod === weeklyTimeFilter.value)
   }
 
   if (weeklyStatusFilter.value) {
@@ -944,6 +1051,18 @@ const filteredMonthlyReports = computed(() => {
       report.customerName.toLowerCase().includes(query) ||
       report.monthPeriod.toLowerCase().includes(query)
     )
+  }
+
+  if (monthlyCustomerFilter.value) {
+    filtered = filtered.filter(report => report.customerName === monthlyCustomerFilter.value)
+  }
+
+  if (monthlyProjectFilter.value) {
+    filtered = filtered.filter(report => report.projectName === monthlyProjectFilter.value)
+  }
+
+  if (monthlyTimeFilter.value) {
+    filtered = filtered.filter(report => report.monthPeriod === monthlyTimeFilter.value)
   }
 
   if (monthlyStatusFilter.value) {
@@ -1104,6 +1223,77 @@ const getReportTodos = (reportId: string) => {
       deadline: '2025-01-27T15:00:00Z',
       priority: 'low',
       completed: false
+    },
+    // 月报相关待办事项
+    {
+      id: 'todo-6',
+      reportId: 'monthly-1',
+      title: '制定2月投放预算',
+      description: '基于1月ROI表现，制定2月各平台投放预算分配方案',
+      assignee: '张三',
+      deadline: '2025-02-05T18:00:00Z',
+      priority: 'high',
+      completed: true
+    },
+    {
+      id: 'todo-7',
+      reportId: 'monthly-1',
+      title: '优化移动端转化率',
+      description: '重点优化移动端用户体验，提升转化率至4.5%以上',
+      assignee: '李四',
+      deadline: '2025-02-10T17:00:00Z',
+      priority: 'high',
+      completed: false
+    },
+    {
+      id: 'todo-8',
+      reportId: 'monthly-1',
+      title: '分析用户行为数据',
+      description: '深入分析1月用户行为数据，找出转化路径优化点',
+      assignee: '王五',
+      deadline: '2025-02-08T16:00:00Z',
+      priority: 'medium',
+      completed: false
+    },
+    {
+      id: 'todo-9',
+      reportId: 'monthly-2',
+      title: '关键词质量得分优化',
+      description: '优化Google Ads关键词质量得分，降低平均点击成本',
+      assignee: '赵六',
+      deadline: '2025-02-12T19:00:00Z',
+      priority: 'high',
+      completed: true
+    },
+    {
+      id: 'todo-10',
+      reportId: 'monthly-2',
+      title: '竞品投放策略分析',
+      description: '分析主要竞品1月投放策略，制定差异化竞争方案',
+      assignee: '钱七',
+      deadline: '2025-02-15T15:00:00Z',
+      priority: 'medium',
+      completed: false
+    },
+    {
+      id: 'todo-11',
+      reportId: 'monthly-3',
+      title: '年度投放总结报告',
+      description: '整理全年投放数据，制作年度总结报告',
+      assignee: '周九',
+      deadline: '2025-01-10T18:00:00Z',
+      priority: 'medium',
+      completed: true
+    },
+    {
+      id: 'todo-12',
+      reportId: 'monthly-3',
+      title: '新年度预算规划',
+      description: '制定新年度各渠道投放预算和KPI目标',
+      assignee: '吴十',
+      deadline: '2025-01-15T17:00:00Z',
+      priority: 'high',
+      completed: true
     }
   ]
   return mockTodos.filter(todo => todo.reportId === reportId)
@@ -1280,20 +1470,73 @@ onMounted(() => {
 
 .reports-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
 }
 
 .reports-header h2 {
   margin: 0;
   color: var(--color-text-primary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+}
+
+@media (min-width: 768px) {
+  .reports-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .filters {
+    flex: 1;
+    max-width: 800px;
+    margin-left: var(--spacing-xl);
+    margin-bottom: 0;
+  }
 }
 
 .filters {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--spacing-md);
   align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.search-input {
+  flex: 1;
+  min-width: 250px;
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+.filter-select {
+  min-width: 140px;
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
 }
 
 .filters select {
