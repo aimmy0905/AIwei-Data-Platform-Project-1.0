@@ -1,474 +1,482 @@
 <template>
-  <div class="reports-view">
-    <!-- 页面标题 -->
-    <div class="page-header">
+  <div class="project-data-panel">
+    <div class="panel-header">
       <div class="header-content">
-        <h1>
-          <FileText class="icon" />
-          报告中心
-        </h1>
+        <h3>报告中心</h3>
         <p>周报月报数据看板，用于客户会议展示和数据分析</p>
       </div>
-
+      <div class="header-actions">
+        <!-- Header actions can be added here if needed -->
+      </div>
     </div>
 
-    <!-- 标签页导航 -->
-    <div class="report-tabs">
-      <button
-        class="tab-button"
-        :class="{ active: currentTab === 'weekly' }"
-        @click="currentTab = 'weekly'"
-      >
-        <Calendar class="icon" />
-        周报数据看板
-      </button>
-      <button
-        class="tab-button"
-        :class="{ active: currentTab === 'monthly' }"
-        @click="currentTab = 'monthly'"
-      >
-        <BarChart3 class="icon" />
-        月报数据看板
-      </button>
+    <div class="project-content">
+      <!-- 标签页导航 -->
+      <div class="search-filter-section">
+        <div class="report-tabs">
+          <button
+            class="tab-button"
+            :class="{ active: currentTab === 'weekly' }"
+            @click="currentTab = 'weekly'"
+          >
+            <Calendar class="icon" />
+            周报数据看板
+          </button>
+          <button
+            class="tab-button"
+            :class="{ active: currentTab === 'monthly' }"
+            @click="currentTab = 'monthly'"
+          >
+            <BarChart3 class="icon" />
+            月报数据看板
+          </button>
+        </div>
+      </div>
 
-    </div>
+      <!-- 周报列表 -->
+      <div v-if="currentTab === 'weekly'" class="tab-content">
+        <div v-if="!selectedWeeklyReport" class="project-table-section">
+          <div class="table-header">
+            <div class="table-header__left">
+              <h3>周报列表</h3>
+              <span class="record-count">共 {{ filteredWeeklyReports.length }} 条记录</span>
+            </div>
+            <div class="table-header__right">
+              <div class="filters">
+                <input
+                  v-model="weeklySearchTerm"
+                  type="text"
+                  placeholder="搜索项目名称、客户或周期..."
+                  class="search-input"
+                />
+                <select v-model="weeklyCustomerFilter" class="filter-select">
+                  <option value="">全部客户</option>
+                  <option value="Apple Inc.">Apple Inc.</option>
+                  <option value="Samsung Electronics">Samsung Electronics</option>
+                  <option value="Nike Inc.">Nike Inc.</option>
+                  <option value="Tesla Motors">Tesla Motors</option>
+                  <option value="Microsoft Corporation">Microsoft Corporation</option>
+                </select>
+                <select v-model="weeklyProjectFilter" class="filter-select">
+                  <option value="">全部项目</option>
+                  <option value="Apple iPhone推广项目">Apple iPhone推广项目</option>
+                  <option value="Samsung Galaxy营销项目">Samsung Galaxy营销项目</option>
+                  <option value="Nike运动鞋推广">Nike运动鞋推广</option>
+                  <option value="Tesla Model Y营销">Tesla Model Y营销</option>
+                  <option value="Microsoft Surface推广">Microsoft Surface推广</option>
+                </select>
+                <select v-model="weeklyTimeFilter" class="filter-select">
+                  <option value="">全部时间</option>
+                  <option value="2025-W03">2025年第3周</option>
+                  <option value="2025-W02">2025年第2周</option>
+                  <option value="2025-W01">2025年第1周</option>
+                  <option value="2024-W52">2024年第52周</option>
+                </select>
+                <select v-model="weeklyStatusFilter" class="filter-select">
+                  <option value="">全部状态</option>
+                  <option value="completed">已完成</option>
+                  <option value="draft">草稿</option>
+                  <option value="in_progress">进行中</option>
+                </select>
+              </div>
+            </div>
+          </div>
 
-    <!-- 周报列表 -->
-    <div v-if="currentTab === 'weekly'" class="tab-content">
-      <div v-if="!selectedWeeklyReport" class="reports-list">
-        <div class="reports-header">
-          <h2>周报列表</h2>
-          <div class="filters">
-            <input
-              v-model="weeklySearchTerm"
-              type="text"
-              placeholder="搜索项目名称、客户或周期..."
-              class="search-input"
-            />
-            <select v-model="weeklyCustomerFilter" class="filter-select">
-              <option value="">全部客户</option>
-              <option value="Apple Inc.">Apple Inc.</option>
-              <option value="Samsung Electronics">Samsung Electronics</option>
-              <option value="Nike Inc.">Nike Inc.</option>
-              <option value="Tesla Motors">Tesla Motors</option>
-              <option value="Microsoft Corporation">Microsoft Corporation</option>
-            </select>
-            <select v-model="weeklyProjectFilter" class="filter-select">
-              <option value="">全部项目</option>
-              <option value="Apple iPhone推广项目">Apple iPhone推广项目</option>
-              <option value="Samsung Galaxy营销项目">Samsung Galaxy营销项目</option>
-              <option value="Nike运动鞋推广">Nike运动鞋推广</option>
-              <option value="Tesla Model Y营销">Tesla Model Y营销</option>
-              <option value="Microsoft Surface推广">Microsoft Surface推广</option>
-            </select>
-            <select v-model="weeklyTimeFilter" class="filter-select">
-              <option value="">全部时间</option>
-              <option value="2025-W03">2025年第3周</option>
-              <option value="2025-W02">2025年第2周</option>
-              <option value="2025-W01">2025年第1周</option>
-              <option value="2024-W52">2024年第52周</option>
-            </select>
-            <select v-model="weeklyStatusFilter" class="filter-select">
-              <option value="">全部状态</option>
-              <option value="completed">已完成</option>
-              <option value="draft">草稿</option>
-              <option value="in_progress">进行中</option>
-            </select>
+          <!-- 周报列表 -->
+          <div class="reports-grid">
+            <div
+              v-for="report in filteredWeeklyReports"
+              :key="report.id"
+              class="report-card"
+              @click="viewWeeklyReport(report.id)"
+            >
+              <div class="report-header">
+                <div class="header-left">
+                  <h3>{{ report.weekPeriod }}</h3>
+                  <p class="report-period">{{ report.reportPeriod }}</p>
+                </div>
+                <span class="status-badge" :class="`status-${report.status}`">
+                  {{ getStatusLabel(report.status) }}
+                </span>
+              </div>
+              <div class="report-info">
+                <p><strong>项目：</strong>{{ report.projectName }}</p>
+                <p><strong>客户：</strong>{{ report.customerName }}</p>
+                <p><strong>跟进团队：</strong>{{ report.followUpTeam.join(', ') }}</p>
+                <p><strong>创建时间：</strong>{{ formatDate(report.createdAt) }}</p>
+              </div>
+              <div class="report-metrics">
+                <div class="metric-item">
+                  <span class="metric-label">访问量</span>
+                  <span class="metric-value">{{ report.metrics.visits.toLocaleString() }}</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-label">转化率</span>
+                  <span class="metric-value">{{ report.metrics.conversion }}%</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-label">ROI</span>
+                  <span class="metric-value">{{ report.metrics.roi }}%</span>
+                </div>
+              </div>
+              <div class="report-actions">
+                <div class="action-stats">
+                  <span class="stat-item">
+                    <Users class="icon" />
+                    {{ report.meetingsCount }} 个会议
+                  </span>
+                  <span class="stat-item">
+                    <FileText class="icon" />
+                    {{ report.completedTodosCount }}/{{ report.todosCount }} 待办
+                  </span>
+                </div>
+                <div class="action-buttons">
+                  <button class="btn btn-sm btn-outline" @click.stop="viewMeetingRecords(report.id)">
+                    <Users class="icon" />
+                    会议记录
+                  </button>
+                  <button class="btn btn-sm btn-outline" @click.stop="viewTodoItems(report.id)">
+                    <FileText class="icon" />
+                    待办事项
+                  </button>
+                  <button class="btn btn-sm btn-outline" @click.stop="viewDataDashboard(report.id)">
+                    <LayoutDashboard class="icon" />
+                    查看数据面板
+                  </button>
+                  <button class="btn btn-sm btn-secondary" @click.stop="downloadReport('weekly', report.id)">
+                    <Download class="icon" />
+                    下载
+                  </button>
+                  <button class="btn btn-sm btn-primary" @click.stop="openMeetingModal('weekly', report.id)">
+                    <Plus class="icon" />
+                    新建会议
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- 周报列表 -->
-        <div class="reports-grid">
-          <div
-            v-for="report in filteredWeeklyReports"
-            :key="report.id"
-            class="report-card"
-            @click="viewWeeklyReport(report.id)"
-          >
-            <div class="report-header">
-              <div class="header-left">
-                <h3>{{ report.weekPeriod }}</h3>
-                <p class="report-period">{{ report.reportPeriod }}</p>
-              </div>
-              <span class="status-badge" :class="`status-${report.status}`">
-                {{ getStatusLabel(report.status) }}
-              </span>
+        <!-- 周报详情数据看板 -->
+        <div v-else class="dashboard-view">
+          <div class="dashboard-header">
+            <button class="btn btn-secondary" @click="backToWeeklyList">
+              <ArrowLeft class="icon" />
+              返回列表
+            </button>
+            <h2>{{ currentWeeklyReport?.weekPeriod }} - {{ currentWeeklyReport?.projectName }}</h2>
+            <div class="header-actions">
+              <button class="btn btn-secondary" @click="downloadReport('weekly', selectedWeeklyReport)">
+                <Download class="icon" />
+                下载数据
+              </button>
             </div>
-            <div class="report-info">
-              <p><strong>项目：</strong>{{ report.projectName }}</p>
-              <p><strong>客户：</strong>{{ report.customerName }}</p>
-              <p><strong>跟进团队：</strong>{{ report.followUpTeam.join(', ') }}</p>
-              <p><strong>创建时间：</strong>{{ formatDate(report.createdAt) }}</p>
-            </div>
-            <div class="report-metrics">
-              <div class="metric-item">
-                <span class="metric-label">访问量</span>
-                <span class="metric-value">{{ report.metrics.visits.toLocaleString() }}</span>
-              </div>
-              <div class="metric-item">
-                <span class="metric-label">转化率</span>
-                <span class="metric-value">{{ report.metrics.conversion }}%</span>
-              </div>
-              <div class="metric-item">
-                <span class="metric-label">ROI</span>
-                <span class="metric-value">{{ report.metrics.roi }}%</span>
+          </div>
+
+          <div class="dashboard-container">
+            <div class="dashboard-info">
+              <div class="info-card">
+                <h3>{{ currentWeeklyReport?.projectName }}</h3>
+                <p>客户：{{ currentWeeklyReport?.customerName }}</p>
+                <p>周期：{{ currentWeeklyReport?.weekPeriod }}</p>
+                <p>状态：<span class="status-badge" :class="`status-${currentWeeklyReport?.status}`">{{ getStatusLabel(currentWeeklyReport?.status || '') }}</span></p>
               </div>
             </div>
-            <div class="report-actions">
-              <div class="action-stats">
-                <span class="stat-item">
-                  <Users class="icon" />
-                  {{ report.meetingsCount }} 个会议
-                </span>
-                <span class="stat-item">
-                  <FileText class="icon" />
-                  {{ report.completedTodosCount }}/{{ report.todosCount }} 待办
-                </span>
+
+            <!-- 数据看板组件 -->
+            <div class="dashboard-content">
+              <div class="metrics-grid">
+                <div class="metric-card">
+                  <div class="metric-header">
+                    <h4>本周访问量</h4>
+                    <TrendingUp class="icon" />
+                  </div>
+                  <div class="metric-value">{{ currentWeeklyReport?.metrics?.visits || 0 }}</div>
+                  <div class="metric-change positive">+{{ currentWeeklyReport?.metrics?.visitsChange || 0 }}%</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-header">
+                    <h4>转化率</h4>
+                    <Target class="icon" />
+                  </div>
+                  <div class="metric-value">{{ currentWeeklyReport?.metrics?.conversion || 0 }}%</div>
+                  <div class="metric-change" :class="(currentWeeklyReport?.metrics?.conversionChange || 0) >= 0 ? 'positive' : 'negative'">
+                    {{ (currentWeeklyReport?.metrics?.conversionChange || 0) >= 0 ? '+' : '' }}{{ currentWeeklyReport?.metrics?.conversionChange || 0 }}%
+                  </div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-header">
+                    <h4>广告花费</h4>
+                    <DollarSign class="icon" />
+                  </div>
+                  <div class="metric-value">${{ currentWeeklyReport?.metrics?.adSpend || 0 }}</div>
+                  <div class="metric-change" :class="(currentWeeklyReport?.metrics?.adSpendChange || 0) <= 0 ? 'positive' : 'negative'">
+                    {{ (currentWeeklyReport?.metrics?.adSpendChange || 0) >= 0 ? '+' : '' }}{{ currentWeeklyReport?.metrics?.adSpendChange || 0 }}%
+                  </div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-header">
+                    <h4>ROI</h4>
+                    <Activity class="icon" />
+                  </div>
+                  <div class="metric-value">{{ currentWeeklyReport?.metrics?.roi || 0 }}%</div>
+                  <div class="metric-change" :class="(currentWeeklyReport?.metrics?.roiChange || 0) >= 0 ? 'positive' : 'negative'">
+                    {{ (currentWeeklyReport?.metrics?.roiChange || 0) >= 0 ? '+' : '' }}{{ currentWeeklyReport?.metrics?.roiChange || 0 }}%
+                  </div>
+                </div>
               </div>
-              <div class="action-buttons">
-                <button class="btn btn-sm btn-outline" @click.stop="viewMeetingRecords(report.id)">
-                  <Users class="icon" />
-                  会议记录
-                </button>
-                <button class="btn btn-sm btn-outline" @click.stop="viewTodoItems(report.id)">
-                  <FileText class="icon" />
-                  待办事项
-                </button>
-                <button class="btn btn-sm btn-outline" @click.stop="viewDataDashboard(report.id)">
-                  <LayoutDashboard class="icon" />
-                  查看数据面板
-                </button>
-                <button class="btn btn-sm btn-secondary" @click.stop="downloadReport('weekly', report.id)">
-                  <Download class="icon" />
-                  下载
-                </button>
-                <button class="btn btn-sm btn-primary" @click.stop="openMeetingModal('weekly', report.id)">
-                  <Plus class="icon" />
-                  新建会议
-                </button>
+
+              <!-- 图表区域 -->
+              <div class="charts-section">
+                <div class="chart-container">
+                  <h4>本周流量趋势</h4>
+                  <div class="chart-placeholder">
+                    <BarChart3 class="chart-icon" />
+                    <p>流量趋势图表</p>
+                  </div>
+                </div>
+                <div class="chart-container">
+                  <h4>渠道分析</h4>
+                  <div class="chart-placeholder">
+                    <PieChart class="chart-icon" />
+                    <p>渠道分布图表</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 周报详情数据看板 -->
-      <div v-else class="dashboard-view">
-        <div class="dashboard-header">
-          <button class="btn btn-secondary" @click="backToWeeklyList">
-            <ArrowLeft class="icon" />
-            返回列表
-          </button>
-          <h2>{{ currentWeeklyReport?.weekPeriod }} - {{ currentWeeklyReport?.projectName }}</h2>
-          <div class="header-actions">
-            <button class="btn btn-secondary" @click="downloadReport('weekly', selectedWeeklyReport)">
-              <Download class="icon" />
-              下载数据
-            </button>
-
-          </div>
-        </div>
-
-        <div class="dashboard-container">
-          <div class="dashboard-info">
-            <div class="info-card">
-              <h3>{{ currentWeeklyReport?.projectName }}</h3>
-              <p>客户：{{ currentWeeklyReport?.customerName }}</p>
-              <p>周期：{{ currentWeeklyReport?.weekPeriod }}</p>
-              <p>状态：<span class="status-badge" :class="`status-${currentWeeklyReport?.status}`">{{ getStatusLabel(currentWeeklyReport?.status || '') }}</span></p>
+      <!-- 月报数据看板 -->
+      <div v-if="currentTab === 'monthly'" class="tab-content">
+        <!-- 月报列表视图 -->
+        <div v-if="!selectedMonthlyReport" class="project-table-section">
+          <div class="table-header">
+            <div class="table-header__left">
+              <h3>月报数据看板</h3>
+              <span class="record-count">共 {{ filteredMonthlyReports.length }} 条记录</span>
+            </div>
+            <div class="table-header__right">
+              <div class="filters">
+                <input
+                  v-model="monthlySearchTerm"
+                  type="text"
+                  placeholder="搜索项目名称、客户或月份..."
+                  class="search-input"
+                />
+                <select v-model="monthlyCustomerFilter" class="filter-select">
+                  <option value="">全部客户</option>
+                  <option value="Apple Inc.">Apple Inc.</option>
+                  <option value="Samsung Electronics">Samsung Electronics</option>
+                  <option value="Nike Inc.">Nike Inc.</option>
+                  <option value="Tesla Motors">Tesla Motors</option>
+                  <option value="Microsoft Corporation">Microsoft Corporation</option>
+                </select>
+                <select v-model="monthlyProjectFilter" class="filter-select">
+                  <option value="">全部项目</option>
+                  <option value="Apple iPhone推广项目">Apple iPhone推广项目</option>
+                  <option value="Samsung Galaxy营销项目">Samsung Galaxy营销项目</option>
+                  <option value="Nike运动鞋推广">Nike运动鞋推广</option>
+                  <option value="Tesla Model Y营销">Tesla Model Y营销</option>
+                  <option value="Microsoft Surface推广">Microsoft Surface推广</option>
+                </select>
+                <select v-model="monthlyTimeFilter" class="filter-select">
+                  <option value="">全部时间</option>
+                  <option value="2025-01">2025年1月</option>
+                  <option value="2024-12">2024年12月</option>
+                  <option value="2024-11">2024年11月</option>
+                  <option value="2024-10">2024年10月</option>
+                </select>
+                <select v-model="monthlyStatusFilter" class="filter-select">
+                  <option value="">全部状态</option>
+                  <option value="completed">已完成</option>
+                  <option value="in_progress">进行中</option>
+                  <option value="draft">草稿</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          <!-- 数据看板组件 -->
+          <div class="reports-grid">
+            <div v-for="report in filteredMonthlyReports" :key="report.id" class="report-card" @click="viewMonthlyReport(report.id)">
+              <div class="report-header">
+                <div class="header-left">
+                  <h3>{{ report.monthPeriod }}</h3>
+                  <p class="report-period">{{ report.reportPeriod }}</p>
+                </div>
+                <span class="status-badge" :class="`status-${report.status}`">
+                  {{ getStatusLabel(report.status) }}
+                </span>
+              </div>
+              <div class="report-info">
+                <p><strong>项目：</strong>{{ report.projectName }}</p>
+                <p><strong>客户：</strong>{{ report.customerName }}</p>
+                <p><strong>跟进团队：</strong>{{ report.followUpTeam.join(', ') }}</p>
+                <p><strong>创建时间：</strong>{{ formatDate(report.createdAt) }}</p>
+              </div>
+              <div class="report-metrics">
+                <div class="metric-item">
+                  <span class="metric-label">访问量</span>
+                  <span class="metric-value">{{ report.metrics.visits.toLocaleString() }}</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-label">转化率</span>
+                  <span class="metric-value">{{ report.metrics.conversion }}%</span>
+                </div>
+                <div class="metric-item">
+                  <span class="metric-label">ROI</span>
+                  <span class="metric-value">{{ report.metrics.roi }}%</span>
+                </div>
+              </div>
+              <div class="report-actions">
+                <div class="action-stats">
+                  <span class="stat-item">
+                    <Users class="icon" />
+                    {{ report.meetingsCount }} 个会议
+                  </span>
+                  <span class="stat-item">
+                    <FileText class="icon" />
+                    {{ report.completedTodosCount }}/{{ report.todosCount }} 待办
+                  </span>
+                </div>
+                <div class="action-buttons">
+                  <button class="btn btn-sm btn-outline" @click.stop="viewMeetingRecords(report.id)">
+                    <Users class="icon" />
+                    会议记录
+                  </button>
+                  <button class="btn btn-sm btn-outline" @click.stop="viewTodoItems(report.id)">
+                    <FileText class="icon" />
+                    待办事项
+                  </button>
+                  <button class="btn btn-sm btn-outline" @click.stop="viewDataDashboard(report.id)">
+                    <LayoutDashboard class="icon" />
+                    查看数据面板
+                  </button>
+                  <button class="btn btn-sm btn-secondary" @click.stop="downloadReport('monthly', report.id)">
+                    <Download class="icon" />
+                    下载
+                  </button>
+                  <button class="btn btn-sm btn-primary" @click.stop="openMeetingModal('monthly', report.id)">
+                    <Plus class="icon" />
+                    新建会议
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 月报详情数据看板 -->
+        <div v-else class="dashboard-section">
+          <div class="dashboard-header">
+            <button class="btn btn-secondary" @click="backToMonthlyList">
+              <ArrowLeft class="icon" />
+              返回列表
+            </button>
+            <h2>{{ currentMonthlyReport?.monthPeriod }} - {{ currentMonthlyReport?.projectName }}</h2>
+            <div class="header-actions">
+              <button class="btn btn-secondary" @click="downloadReport('monthly', selectedMonthlyReport)">
+                <Download class="icon" />
+                下载数据
+              </button>
+            </div>
+          </div>
+
+          <div class="dashboard-container">
+            <div class="dashboard-info">
+              <div class="info-card">
+                <h3>{{ currentMonthlyReport?.projectName }}</h3>
+                <p>客户：{{ currentMonthlyReport?.customerName }}</p>
+                <p>月份：{{ currentMonthlyReport?.monthPeriod }}</p>
+                <p>包含周报：{{ currentMonthlyReport?.weeklyReportsCount }} 个</p>
+                <p>状态：<span class="status-badge" :class="`status-${currentMonthlyReport?.status}`">{{ getStatusLabel(currentMonthlyReport?.status || '') }}</span></p>
+              </div>
+            </div>
+
+            <!-- 月度数据看板组件 -->
           <div class="dashboard-content">
             <div class="metrics-grid">
               <div class="metric-card">
                 <div class="metric-header">
-                  <h4>本周访问量</h4>
+                  <h4>月度访问量</h4>
                   <TrendingUp class="icon" />
                 </div>
-                <div class="metric-value">{{ currentWeeklyReport?.metrics?.visits || 0 }}</div>
-                <div class="metric-change positive">+{{ currentWeeklyReport?.metrics?.visitsChange || 0 }}%</div>
+                <div class="metric-value">{{ currentMonthlyReport?.metrics?.visits || 0 }}</div>
+                <div class="metric-change positive">+{{ currentMonthlyReport?.metrics?.visitsChange || 0 }}%</div>
               </div>
               <div class="metric-card">
                 <div class="metric-header">
-                  <h4>转化率</h4>
+                  <h4>平均转化率</h4>
                   <Target class="icon" />
                 </div>
-                <div class="metric-value">{{ currentWeeklyReport?.metrics?.conversion || 0 }}%</div>
-                <div class="metric-change" :class="(currentWeeklyReport?.metrics?.conversionChange || 0) >= 0 ? 'positive' : 'negative'">
-                  {{ (currentWeeklyReport?.metrics?.conversionChange || 0) >= 0 ? '+' : '' }}{{ currentWeeklyReport?.metrics?.conversionChange || 0 }}%
+                <div class="metric-value">{{ currentMonthlyReport?.metrics?.conversion || 0 }}%</div>
+                <div class="metric-change" :class="(currentMonthlyReport?.metrics?.conversionChange || 0) >= 0 ? 'positive' : 'negative'">
+                  {{ (currentMonthlyReport?.metrics?.conversionChange || 0) >= 0 ? '+' : '' }}{{ currentMonthlyReport?.metrics?.conversionChange || 0 }}%
                 </div>
               </div>
               <div class="metric-card">
                 <div class="metric-header">
-                  <h4>广告花费</h4>
+                  <h4>月度广告花费</h4>
                   <DollarSign class="icon" />
                 </div>
-                <div class="metric-value">${{ currentWeeklyReport?.metrics?.adSpend || 0 }}</div>
-                <div class="metric-change" :class="(currentWeeklyReport?.metrics?.adSpendChange || 0) <= 0 ? 'positive' : 'negative'">
-                  {{ (currentWeeklyReport?.metrics?.adSpendChange || 0) >= 0 ? '+' : '' }}{{ currentWeeklyReport?.metrics?.adSpendChange || 0 }}%
+                <div class="metric-value">${{ currentMonthlyReport?.metrics?.adSpend || 0 }}</div>
+                <div class="metric-change" :class="(currentMonthlyReport?.metrics?.adSpendChange || 0) <= 0 ? 'positive' : 'negative'">
+                  {{ (currentMonthlyReport?.metrics?.adSpendChange || 0) >= 0 ? '+' : '' }}{{ currentMonthlyReport?.metrics?.adSpendChange || 0 }}%
                 </div>
               </div>
               <div class="metric-card">
                 <div class="metric-header">
-                  <h4>ROI</h4>
+                  <h4>月度ROI</h4>
                   <Activity class="icon" />
                 </div>
-                <div class="metric-value">{{ currentWeeklyReport?.metrics?.roi || 0 }}%</div>
-                <div class="metric-change" :class="(currentWeeklyReport?.metrics?.roiChange || 0) >= 0 ? 'positive' : 'negative'">
-                  {{ (currentWeeklyReport?.metrics?.roiChange || 0) >= 0 ? '+' : '' }}{{ currentWeeklyReport?.metrics?.roiChange || 0 }}%
+                <div class="metric-value">{{ currentMonthlyReport?.metrics?.roi || 0 }}%</div>
+                <div class="metric-change" :class="(currentMonthlyReport?.metrics?.roiChange || 0) >= 0 ? 'positive' : 'negative'">
+                  {{ (currentMonthlyReport?.metrics?.roiChange || 0) >= 0 ? '+' : '' }}{{ currentMonthlyReport?.metrics?.roiChange || 0 }}%
                 </div>
               </div>
             </div>
 
-            <!-- 图表区域 -->
+            <!-- 月度图表 -->
             <div class="charts-section">
+              <div class="chart-container large">
+                <h4>月度趋势分析</h4>
+                <div class="chart-placeholder">
+                  <LineChart class="chart-icon" />
+                  <p>月度趋势图表</p>
+                </div>
+              </div>
               <div class="chart-container">
-                <h4>本周流量趋势</h4>
+                <h4>周度对比</h4>
                 <div class="chart-placeholder">
                   <BarChart3 class="chart-icon" />
-                  <p>流量趋势图表</p>
-                </div>
-              </div>
-              <div class="chart-container">
-                <h4>渠道分析</h4>
-                <div class="chart-placeholder">
-                  <PieChart class="chart-icon" />
-                  <p>渠道分布图表</p>
+                  <p>周度对比图表</p>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- 月报数据看板 -->
-    <div v-if="currentTab === 'monthly'" class="tab-content">
-      <!-- 月报列表视图 -->
-      <div v-if="!selectedMonthlyReport" class="reports-section">
-        <div class="reports-header">
-          <h2>月报数据看板</h2>
-          <div class="filters">
-            <input
-              v-model="monthlySearchTerm"
-              type="text"
-              placeholder="搜索项目名称、客户或月份..."
-              class="search-input"
-            />
-            <select v-model="monthlyCustomerFilter" class="filter-select">
-              <option value="">全部客户</option>
-              <option value="Apple Inc.">Apple Inc.</option>
-              <option value="Samsung Electronics">Samsung Electronics</option>
-              <option value="Nike Inc.">Nike Inc.</option>
-              <option value="Tesla Motors">Tesla Motors</option>
-              <option value="Microsoft Corporation">Microsoft Corporation</option>
-            </select>
-            <select v-model="monthlyProjectFilter" class="filter-select">
-              <option value="">全部项目</option>
-              <option value="Apple iPhone推广项目">Apple iPhone推广项目</option>
-              <option value="Samsung Galaxy营销项目">Samsung Galaxy营销项目</option>
-              <option value="Nike运动鞋推广">Nike运动鞋推广</option>
-              <option value="Tesla Model Y营销">Tesla Model Y营销</option>
-              <option value="Microsoft Surface推广">Microsoft Surface推广</option>
-            </select>
-            <select v-model="monthlyTimeFilter" class="filter-select">
-              <option value="">全部时间</option>
-              <option value="2025-01">2025年1月</option>
-              <option value="2024-12">2024年12月</option>
-              <option value="2024-11">2024年11月</option>
-              <option value="2024-10">2024年10月</option>
-            </select>
-            <select v-model="monthlyStatusFilter" class="filter-select">
-              <option value="">全部状态</option>
-              <option value="completed">已完成</option>
-              <option value="in_progress">进行中</option>
-              <option value="draft">草稿</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="reports-grid">
-          <div v-for="report in filteredMonthlyReports" :key="report.id" class="report-card" @click="viewMonthlyReport(report.id)">
-            <div class="report-header">
-              <div class="header-left">
-                <h3>{{ report.monthPeriod }}</h3>
-                <p class="report-period">{{ report.reportPeriod }}</p>
-              </div>
-              <span class="status-badge" :class="`status-${report.status}`">
-                {{ getStatusLabel(report.status) }}
-              </span>
-            </div>
-            <div class="report-info">
-              <p><strong>项目：</strong>{{ report.projectName }}</p>
-              <p><strong>客户：</strong>{{ report.customerName }}</p>
-              <p><strong>跟进团队：</strong>{{ report.followUpTeam.join(', ') }}</p>
-              <p><strong>创建时间：</strong>{{ formatDate(report.createdAt) }}</p>
-            </div>
-            <div class="report-metrics">
-              <div class="metric-item">
-                <span class="metric-label">访问量</span>
-                <span class="metric-value">{{ report.metrics.visits.toLocaleString() }}</span>
-              </div>
-              <div class="metric-item">
-                <span class="metric-label">转化率</span>
-                <span class="metric-value">{{ report.metrics.conversion }}%</span>
-              </div>
-              <div class="metric-item">
-                <span class="metric-label">ROI</span>
-                <span class="metric-value">{{ report.metrics.roi }}%</span>
-              </div>
-            </div>
-            <div class="report-actions">
-              <div class="action-stats">
-                <span class="stat-item">
-                  <Users class="icon" />
-                  {{ report.meetingsCount }} 个会议
-                </span>
-                <span class="stat-item">
-                  <FileText class="icon" />
-                  {{ report.completedTodosCount }}/{{ report.todosCount }} 待办
-                </span>
-              </div>
-              <div class="action-buttons">
-                <button class="btn btn-sm btn-outline" @click.stop="viewMeetingRecords(report.id)">
-                  <Users class="icon" />
-                  会议记录
-                </button>
-                <button class="btn btn-sm btn-outline" @click.stop="viewTodoItems(report.id)">
-                  <FileText class="icon" />
-                  待办事项
-                </button>
-                <button class="btn btn-sm btn-outline" @click.stop="viewDataDashboard(report.id)">
-                  <LayoutDashboard class="icon" />
-                  查看数据面板
-                </button>
-                <button class="btn btn-sm btn-secondary" @click.stop="downloadReport('monthly', report.id)">
-                  <Download class="icon" />
-                  下载
-                </button>
-                <button class="btn btn-sm btn-primary" @click.stop="openMeetingModal('monthly', report.id)">
-                  <Plus class="icon" />
-                  新建会议
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 月报详情数据看板 -->
-      <div v-else class="dashboard-section">
-        <div class="dashboard-header">
-          <button class="btn btn-secondary" @click="backToMonthlyList">
-            <ArrowLeft class="icon" />
-            返回列表
-          </button>
-          <h2>{{ currentMonthlyReport?.monthPeriod }} - {{ currentMonthlyReport?.projectName }}</h2>
-          <div class="header-actions">
-            <button class="btn btn-secondary" @click="downloadReport('monthly', selectedMonthlyReport)">
-              <Download class="icon" />
-              下载数据
+          <!-- 操作按钮 -->
+          <div class="dashboard-actions">
+            <button class="btn btn-outline" @click="viewDataDashboard(selectedMonthlyReport)">
+              <LayoutDashboard class="icon" />
+              查看数据面板
             </button>
-
+            <button class="btn btn-secondary" @click="downloadReport('monthly')">
+              <Download class="icon" />
+              下载月报数据
+            </button>
+            <button class="btn btn-primary" @click="openMeetingModal('monthly')">
+              <Users class="icon" />
+              安排客户会议
+            </button>
           </div>
-        </div>
-
-        <div class="dashboard-container">
-          <div class="dashboard-info">
-            <div class="info-card">
-              <h3>{{ currentMonthlyReport?.projectName }}</h3>
-              <p>客户：{{ currentMonthlyReport?.customerName }}</p>
-              <p>月份：{{ currentMonthlyReport?.monthPeriod }}</p>
-              <p>包含周报：{{ currentMonthlyReport?.weeklyReportsCount }} 个</p>
-              <p>状态：<span class="status-badge" :class="`status-${currentMonthlyReport?.status}`">{{ getStatusLabel(currentMonthlyReport?.status || '') }}</span></p>
-            </div>
           </div>
-
-          <!-- 月度数据看板组件 -->
-        <div class="dashboard-content">
-          <div class="metrics-grid">
-            <div class="metric-card">
-              <div class="metric-header">
-                <h4>月度访问量</h4>
-                <TrendingUp class="icon" />
-              </div>
-              <div class="metric-value">{{ currentMonthlyReport?.metrics?.visits || 0 }}</div>
-              <div class="metric-change positive">+{{ currentMonthlyReport?.metrics?.visitsChange || 0 }}%</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-header">
-                <h4>平均转化率</h4>
-                <Target class="icon" />
-              </div>
-              <div class="metric-value">{{ currentMonthlyReport?.metrics?.conversion || 0 }}%</div>
-              <div class="metric-change" :class="(currentMonthlyReport?.metrics?.conversionChange || 0) >= 0 ? 'positive' : 'negative'">
-                {{ (currentMonthlyReport?.metrics?.conversionChange || 0) >= 0 ? '+' : '' }}{{ currentMonthlyReport?.metrics?.conversionChange || 0 }}%
-              </div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-header">
-                <h4>月度广告花费</h4>
-                <DollarSign class="icon" />
-              </div>
-              <div class="metric-value">${{ currentMonthlyReport?.metrics?.adSpend || 0 }}</div>
-              <div class="metric-change" :class="(currentMonthlyReport?.metrics?.adSpendChange || 0) <= 0 ? 'positive' : 'negative'">
-                {{ (currentMonthlyReport?.metrics?.adSpendChange || 0) >= 0 ? '+' : '' }}{{ currentMonthlyReport?.metrics?.adSpendChange || 0 }}%
-              </div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-header">
-                <h4>月度ROI</h4>
-                <Activity class="icon" />
-              </div>
-              <div class="metric-value">{{ currentMonthlyReport?.metrics?.roi || 0 }}%</div>
-              <div class="metric-change" :class="(currentMonthlyReport?.metrics?.roiChange || 0) >= 0 ? 'positive' : 'negative'">
-                {{ (currentMonthlyReport?.metrics?.roiChange || 0) >= 0 ? '+' : '' }}{{ currentMonthlyReport?.metrics?.roiChange || 0 }}%
-              </div>
-            </div>
-          </div>
-
-          <!-- 月度图表 -->
-          <div class="charts-section">
-            <div class="chart-container large">
-              <h4>月度趋势分析</h4>
-              <div class="chart-placeholder">
-                <LineChart class="chart-icon" />
-                <p>月度趋势图表</p>
-              </div>
-            </div>
-            <div class="chart-container">
-              <h4>周度对比</h4>
-              <div class="chart-placeholder">
-                <BarChart3 class="chart-icon" />
-                <p>周度对比图表</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 操作按钮 -->
-        <div class="dashboard-actions">
-          <button class="btn btn-outline" @click="viewDataDashboard(selectedMonthlyReport)">
-            <LayoutDashboard class="icon" />
-            查看数据面板
-          </button>
-          <button class="btn btn-secondary" @click="downloadReport('monthly')">
-            <Download class="icon" />
-            下载月报数据
-          </button>
-          <button class="btn btn-primary" @click="openMeetingModal('monthly')">
-            <Users class="icon" />
-            安排客户会议
-          </button>
-        </div>
         </div>
       </div>
     </div>
 
-
-
+    <!-- All modals remain the same -->
     <!-- 会议详情/编辑模态框 -->
     <div v-if="showMeetingModal" class="modal-overlay" @click="closeMeetingModal">
       <div class="modal-content" @click.stop>
@@ -1402,37 +1410,46 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.reports-view {
-  padding: var(--spacing-xl);
-  max-width: 1400px;
-  margin: 0 auto;
+.project-data-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
 }
 
-.page-header {
+.panel-header {
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border-light);
+  background: white;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--spacing-xl);
-  padding-bottom: var(--spacing-lg);
-  border-bottom: 1px solid var(--color-border);
+  align-items: center;
 }
 
-.header-content h1 {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
+.header-content h3 {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
-  margin: 0 0 var(--spacing-sm) 0;
 }
 
 .header-content p {
-  color: var(--color-text-secondary);
   margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 .header-actions {
   display: flex;
   gap: var(--spacing-md);
+}
+
+.project-content {
+  padding: var(--spacing-lg);
+}
+
+.search-filter-section {
+  margin-bottom: var(--spacing-xl);
 }
 
 .report-tabs {
@@ -1468,33 +1485,41 @@ onMounted(() => {
   min-height: 600px;
 }
 
-.reports-header {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
+.project-table-section {
   margin-bottom: var(--spacing-xl);
 }
 
-.reports-header h2 {
-  margin: 0;
-  color: var(--color-text-primary);
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border-light);
 }
 
-@media (min-width: 768px) {
-  .reports-header {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
+.table-header__left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
 
-  .filters {
-    flex: 1;
-    max-width: 800px;
-    margin-left: var(--spacing-xl);
-    margin-bottom: 0;
-  }
+.table-header__left h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.record-count {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.table-header__right {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
 }
 
 .filters {
@@ -1502,13 +1527,11 @@ onMounted(() => {
   flex-wrap: wrap;
   gap: var(--spacing-md);
   align-items: center;
-  margin-bottom: var(--spacing-md);
 }
 
 .search-input {
-  flex: 1;
   min-width: 250px;
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-md);
   background: var(--color-surface);
@@ -1524,7 +1547,7 @@ onMounted(() => {
 
 .filter-select {
   min-width: 140px;
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-md);
   background: var(--color-surface);
@@ -1539,23 +1562,243 @@ onMounted(() => {
   box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
 }
 
-.filters select {
+/* Reports Grid */
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.report-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+
+.report-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary-light);
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.header-left h3 {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.report-period {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.status-badge {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.status-draft {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.status-completed {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.status-in_progress {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.report-info {
+  margin-bottom: var(--spacing-md);
+}
+
+.report-info p {
+  margin: var(--spacing-xs) 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.report-info strong {
+  color: var(--color-text-primary);
+}
+
+.report-metrics {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-background);
+  border-radius: var(--border-radius-md);
+}
+
+.metric-item {
+  text-align: center;
+}
+
+.metric-label {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.metric-value {
+  display: block;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.report-actions {
+  border-top: 1px solid var(--color-border-light);
+  padding-top: var(--spacing-md);
+}
+
+.action-stats {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.stat-item .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
   padding: var(--spacing-sm) var(--spacing-md);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-md);
   background: var(--color-surface);
   color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  text-decoration: none;
 }
 
-.dashboard-container {
+.btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn.btn-sm {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-xs);
+}
+
+.btn.btn-outline {
+  background: transparent;
+  border-color: var(--color-border);
+}
+
+.btn.btn-outline:hover {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn.btn-primary {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.btn.btn-primary:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+.btn.btn-secondary {
+  background: var(--color-text-secondary);
+  border-color: var(--color-text-secondary);
+  color: white;
+}
+
+.btn.btn-secondary:hover {
+  background: var(--color-text-primary);
+  border-color: var(--color-text-primary);
+}
+
+.btn .icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Dashboard styles */
+.dashboard-view {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-lg);
   overflow: hidden;
 }
 
+.dashboard-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg);
+  background: white;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.dashboard-header h2 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+}
+
+.dashboard-container {
+  background: var(--color-surface);
+}
+
 .dashboard-info {
-  padding: var(--spacing-xl);
+  padding: var(--spacing-lg);
   background: var(--color-background);
   border-bottom: 1px solid var(--color-border);
 }
@@ -1570,30 +1813,8 @@ onMounted(() => {
   color: var(--color-text-secondary);
 }
 
-.status-badge {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-}
-
-.status-draft {
-  background: var(--color-warning-light);
-  color: var(--color-warning);
-}
-
-.status-completed {
-  background: var(--color-success-light);
-  color: var(--color-success);
-}
-
-.status-scheduled {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-}
-
 .dashboard-content {
-  padding: var(--spacing-xl);
+  padding: var(--spacing-lg);
 }
 
 .metrics-grid {
@@ -1689,11 +1910,121 @@ onMounted(() => {
 }
 
 .dashboard-actions {
-  padding: var(--spacing-xl);
+  padding: var(--spacing-lg);
   background: var(--color-background);
   border-top: 1px solid var(--color-border);
   display: flex;
   gap: var(--spacing-md);
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--color-surface);
+  border-radius: var(--border-radius-lg);
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: var(--spacing-xs);
+}
+
+.close-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.modal-body {
+  padding: var(--spacing-lg);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--color-border);
+}
+
+.form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.todo-list {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+}
+
+.todo-item {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  align-items: center;
 }
 
 .empty-state {
@@ -1712,404 +2043,7 @@ onMounted(() => {
   opacity: 0.5;
 }
 
-.empty-state h3 {
-  margin: 0 0 var(--spacing-md) 0;
-  color: var(--color-text-primary);
-}
-
-.meetings-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-xl);
-}
-
-.meetings-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.meeting-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-lg);
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.meeting-info h3 {
-  margin: 0 0 var(--spacing-md) 0;
-  color: var(--color-text-primary);
-}
-
-.meeting-meta {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  margin: var(--spacing-xs) 0;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-}
-
-.meeting-actions {
-  display: flex;
-  gap: var(--spacing-sm);
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: var(--color-surface);
-  border-radius: var(--border-radius-lg);
-  width: 90%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-lg) var(--spacing-xl);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.modal-header h3 {
-  margin: 0;
-  color: var(--color-text-primary);
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  padding: var(--spacing-sm);
-}
-
-.modal-body {
-  padding: var(--spacing-xl);
-}
-
-.form-group {
-  margin-bottom: var(--spacing-lg);
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-lg);
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: var(--spacing-sm);
-  color: var(--color-text-primary);
-  font-weight: var(--font-weight-medium);
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: var(--spacing-md);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-md);
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-}
-
-.todo-list {
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-md);
-  padding: var(--spacing-md);
-}
-
-.todo-item {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr auto;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-md);
-  align-items: center;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--spacing-md);
-  padding: var(--spacing-lg) var(--spacing-xl);
-  border-top: 1px solid var(--color-border);
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-lg);
-  border: 1px solid transparent;
-  border-radius: var(--border-radius-md);
-  font-weight: var(--font-weight-medium);
-  text-decoration: none;
-  cursor: pointer;
-  transition: all var(--duration-fast);
-}
-
-.btn-primary {
-  background: var(--color-primary);
-  color: white;
-}
-
-.btn-primary:hover {
-  background: var(--color-primary-dark);
-}
-
-.btn-secondary {
-  background: var(--color-surface);
-  border-color: var(--color-border);
-  color: var(--color-text-primary);
-}
-
-.btn-secondary:hover {
-  background: var(--color-background);
-}
-
-.btn-outline {
-  background: transparent;
-  border-color: var(--color-border);
-  color: var(--color-text-secondary);
-}
-
-.btn-outline:hover {
-  background: var(--color-background);
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
-
-.btn-danger {
-  background: var(--color-danger);
-  color: white;
-}
-
-.btn-sm {
-  padding: var(--spacing-sm) var(--spacing-md);
-  font-size: var(--font-size-sm);
-}
-
-.icon {
-  width: 16px;
-  height: 16px;
-}
-
-/* 报告列表样式 */
-.reports-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: var(--spacing-xl);
-  margin-top: var(--spacing-lg);
-}
-
-.report-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-xl);
-  transition: all var(--duration-fast);
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.report-card:hover {
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
-  border-color: var(--color-primary);
-}
-
-.report-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--spacing-lg);
-  padding-bottom: var(--spacing-md);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.header-left {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.report-header h3 {
-  margin: 0;
-  color: var(--color-primary);
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-}
-
-.report-period {
-  margin: 0;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-normal);
-}
-
-.report-info {
-  margin-bottom: var(--spacing-lg);
-}
-
-.report-info p {
-  margin: var(--spacing-sm) 0;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-}
-
-.report-info strong {
-  color: var(--color-text-primary);
-  font-weight: var(--font-weight-medium);
-}
-
-.report-metrics {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-lg);
-  padding: var(--spacing-md);
-  background: var(--color-background);
-  border-radius: var(--border-radius-md);
-}
-
-.metric-item {
-  text-align: center;
-}
-
-.metric-label {
-  display: block;
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  margin-bottom: var(--spacing-xs);
-}
-
-.metric-value {
-  display: block;
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-primary);
-}
-
-.report-actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.action-stats {
-  display: flex;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-sm) 0;
-  border-top: 1px solid var(--color-border);
-  margin-top: var(--spacing-sm);
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-}
-
-.stat-item .icon {
-  width: 14px;
-  height: 14px;
-}
-
-.action-buttons {
-  display: flex;
-  gap: var(--spacing-sm);
-  justify-content: flex-end;
-  flex-wrap: wrap;
-}
-
-.search-input {
-  flex: 1;
-  padding: var(--spacing-md);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-md);
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-sm);
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px var(--color-primary-light);
-}
-
-.status-filter {
-  padding: var(--spacing-md);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-md);
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-sm);
-  min-width: 120px;
-}
-
-/* 数据看板视图样式 */
-.dashboard-view {
-  animation: slideIn 0.3s ease-out;
-}
-
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-xl);
-  padding: var(--spacing-lg);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-lg);
-}
-
-.dashboard-header h2 {
-  margin: 0;
-  color: var(--color-text-primary);
-  font-size: var(--font-size-2xl);
-}
-
-.header-actions {
-  display: flex;
-  gap: var(--spacing-md);
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* 会议记录模态框样式 */
+/* Meeting Records Modal */
 .meetings-records-list {
   max-height: 400px;
   overflow-y: auto;
@@ -2156,7 +2090,7 @@ onMounted(() => {
   line-height: 1.5;
 }
 
-/* 待办事项模态框样式 */
+/* Todo Items Modal */
 .todo-items-list {
   max-height: 400px;
   overflow-y: auto;
