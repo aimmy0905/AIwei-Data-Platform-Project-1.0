@@ -977,6 +977,31 @@ const closeProjectAllGoals = () => {
   selectedProjectGoals.value = null
 }
 
+// 为当前项目创建新目标
+const createProjectGoal = () => {
+  if (selectedProjectGoals.value) {
+    // 预填充项目信息
+    newGoal.project_id = selectedProjectGoals.value.projectId.toString()
+
+    // 关闭全部目标弹窗
+    closeProjectAllGoals()
+
+    // 打开新建目标弹窗
+    showCreateGoal.value = true
+
+    // 重置其他表单字段
+    newGoal.goal_type = ''
+    newGoal.goal_period = ''
+    newGoal.sales_target = 0
+    newGoal.cost_target = 0
+    newGoal.roi_target = 0
+    newGoal.profit_target = 0
+    newGoal.user_count_target = 0
+    newGoal.remarks = ''
+    goalPeriodOptions.value = []
+  }
+}
+
 // 计算平均完成率
 const getAverageCompletion = (goal: ProjectGoal) => {
   const rates = [
@@ -1734,7 +1759,7 @@ const closeGoalDetail = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: var(--z-modal, 1040);
 }
 
 .modal-container {
@@ -1755,6 +1780,12 @@ const closeGoalDetail = () => {
   padding: 20px 24px;
   border-bottom: 1px solid var(--color-border);
   background: var(--color-background-secondary);
+}
+
+.modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 
 .modal-title {
