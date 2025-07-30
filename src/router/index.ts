@@ -207,7 +207,7 @@ const router = createRouter({
           path: 'sales-director',
           name: 'sales-director-dashboard',
           component: () => import('@/views/business/SalesDirectorDashboard.vue'),
-          meta: { 
+          meta: {
             requiresAuth: true,
             roles: ['sales_director']
           }
@@ -216,7 +216,7 @@ const router = createRouter({
           path: 'sales-manager',
           name: 'sales-manager-dashboard',
           component: () => import('@/views/business/SalesManagerDashboard.vue'),
-          meta: { 
+          meta: {
             requiresAuth: true,
             roles: ['sales_manager']
           }
@@ -225,7 +225,7 @@ const router = createRouter({
           path: 'sales-person',
           name: 'sales-person-dashboard',
           component: () => import('@/views/business/SalesPersonDashboard.vue'),
-          meta: { 
+          meta: {
             requiresAuth: true,
             roles: ['sales_person']
           }
@@ -236,7 +236,7 @@ const router = createRouter({
           path: 'project-director',
           name: 'project-director-dashboard',
           component: () => import('@/views/business/ProjectDirectorDashboard.vue'),
-          meta: { 
+          meta: {
             requiresAuth: true,
             roles: ['project_director']
           }
@@ -245,7 +245,7 @@ const router = createRouter({
           path: 'project-manager',
           name: 'project-manager-dashboard',
           component: () => import('@/views/business/ProjectManagerDashboard.vue'),
-          meta: { 
+          meta: {
             requiresAuth: true,
             roles: ['project_manager']
           }
@@ -254,7 +254,7 @@ const router = createRouter({
           path: 'google-optimizer',
           name: 'google-optimizer-dashboard',
           component: () => import('@/views/business/GoogleOptimizerDashboard.vue'),
-          meta: { 
+          meta: {
             requiresAuth: true,
             roles: ['google_optimizer']
           }
@@ -263,7 +263,7 @@ const router = createRouter({
           path: 'meta-optimizer',
           name: 'meta-optimizer-dashboard',
           component: () => import('@/views/business/MetaOptimizerDashboard.vue'),
-          meta: { 
+          meta: {
             requiresAuth: true,
             roles: ['meta_optimizer']
           }
@@ -272,7 +272,7 @@ const router = createRouter({
           path: 'criteo-optimizer',
           name: 'criteo-optimizer-dashboard',
           component: () => import('@/views/business/CriteoOptimizerDashboard.vue'),
-          meta: { 
+          meta: {
             requiresAuth: true,
             roles: ['criteo_optimizer']
           }
@@ -281,7 +281,7 @@ const router = createRouter({
           path: 'bing-optimizer',
           name: 'bing-optimizer-dashboard',
           component: () => import('@/views/business/BingOptimizerDashboard.vue'),
-          meta: { 
+          meta: {
             requiresAuth: true,
             roles: ['bing_optimizer']
           }
@@ -292,10 +292,39 @@ const router = createRouter({
           path: 'finance-director',
           name: 'finance-director-dashboard',
           component: () => import('@/views/business/FinanceDirectorDashboard.vue'),
-          meta: { 
+          meta: {
             requiresAuth: true,
             roles: ['finance_director']
           }
+        }
+      ]
+    },
+
+    // 部门管理路由
+    {
+      path: '/departments',
+      component: () => import('@/components/layout/MainLayout.vue'),
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: 'organization',
+          name: 'organization',
+          component: () => import('@/views/departments/OrganizationView.vue')
+        },
+        {
+          path: 'employees',
+          name: 'employees',
+          component: () => import('@/views/departments/EmployeesView.vue')
+        },
+        {
+          path: 'performance',
+          name: 'performance',
+          component: () => import('@/views/departments/PerformanceView.vue')
+        },
+        {
+          path: 'goals',
+          name: 'department-goals',
+          component: () => import('@/views/departments/GoalsView.vue')
         }
       ]
     },
