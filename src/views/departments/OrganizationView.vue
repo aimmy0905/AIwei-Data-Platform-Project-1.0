@@ -263,7 +263,13 @@
 
             <!-- 部门员工 -->
             <div class="detail-section">
-              <h4 class="section-title">部门员工 ({{ departmentEmployees.length }}人)</h4>
+              <div class="section-header">
+                <h4 class="section-title">部门员工 ({{ departmentEmployees.length }}人)</h4>
+                <button class="action-btn action-btn--primary" @click="addEmployeeToDepartment">
+                  <Plus :size="16" />
+                  添加员工
+                </button>
+              </div>
               <div v-if="departmentEmployees.length === 0" class="no-employees">
                 暂无员工数据
               </div>
@@ -277,6 +283,7 @@
                       <th>联系方式</th>
                       <th>入职时间</th>
                       <th>状态</th>
+                      <th>操作</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -291,12 +298,149 @@
                           {{ getEmployeeStatusText(employee.status) }}
                         </span>
                       </td>
+                      <td>
+                        <div class="employee-actions">
+                          <button
+                            class="action-btn-small action-btn-small--primary"
+                            @click="editEmployeeInDepartment(employee)"
+                            title="编辑员工"
+                          >
+                            <Edit :size="14" />
+                          </button>
+                          <button
+                            class="action-btn-small action-btn-small--danger"
+                            @click="removeEmployeeFromDepartment(employee)"
+                            title="移除员工"
+                          >
+                            <Trash2 :size="14" />
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 员工管理弹窗 -->
+    <div v-if="showEmployeeModal" class="modal-overlay" @click="closeEmployeeModal">
+      <div class="modal-container modal-container--medium" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">{{ isEditingEmployee ? '编辑员工' : '添加员工' }}</h3>
+          <button class="modal-close" @click="closeEmployeeModal">
+            <X :size="20" />
+          </button>
+        </div>
+        <div class="modal-content">
+          <form @submit.prevent="submitEmployee" class="employee-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">姓名 *</label>
+                <input
+                  v-model="employeeForm.name"
+                  type="text"
+                  class="form-input"
+                  placeholder="请输入姓名"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">工号 *</label>
+                <input
+                  v-model="employeeForm.employee_id"
+                  type="text"
+                  class="form-input"
+                  placeholder="请输入工号"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">性别</label>
+                <div class="radio-group">
+                  <label class="radio-item">
+                    <input v-model="employeeForm.gender" type="radio" value="male" />
+                    <span class="radio-label">男</span>
+                  </label>
+                  <label class="radio-item">
+                    <input v-model="employeeForm.gender" type="radio" value="female" />
+                    <span class="radio-label">女</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">职务 *</label>
+                <select v-model="employeeForm.position" class="form-select" required>
+                  <option value="">请选择职务</option>
+                  <option value="销售经理">销售经理</option>
+                  <option value="销售主管">销售主管</option>
+                  <option value="销售专员">销售专员</option>
+                  <option value="销售助理">销售助理</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">手机号码 *</label>
+                <input
+                  v-model="employeeForm.phone"
+                  type="tel"
+                  class="form-input"
+                  placeholder="请输入手机号码"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">邮箱地址 *</label>
+                <input
+                  v-model="employeeForm.email"
+                  type="email"
+                  class="form-input"
+                  placeholder="请输入邮箱地址"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">入职日期 *</label>
+                <input
+                  v-model="employeeForm.hire_date"
+                  type="date"
+                  class="form-input"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">状态</label>
+                <div class="radio-group">
+                  <label class="radio-item">
+                    <input v-model="employeeForm.status" type="radio" value="active" />
+                    <span class="radio-label">在职</span>
+                  </label>
+                  <label class="radio-item">
+                    <input v-model="employeeForm.status" type="radio" value="probation" />
+                    <span class="radio-label">试用</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn--secondary" @click="closeEmployeeModal">
+                取消
+              </button>
+              <button type="submit" class="btn btn--primary" :disabled="!isEmployeeFormValid">
+                {{ isEditingEmployee ? '更新' : '添加' }}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -311,6 +455,7 @@ import {
   Download,
   Upload,
   Edit,
+  Trash2,
   X
 } from 'lucide-vue-next'
 import { mockDepartments, allEmployees, buildDepartmentTree } from '@/mock/departments'
@@ -323,7 +468,9 @@ const departments = ref<Department[]>([])
 const employees = ref<Employee[]>([])
 const showDepartmentModal = ref(false)
 const showDetailModal = ref(false)
+const showEmployeeModal = ref(false)
 const isEditing = ref(false)
+const isEditingEmployee = ref(false)
 const selectedDepartment = ref<Department | null>(null)
 
 // 部门表单
@@ -336,6 +483,19 @@ const departmentForm = reactive({
   description: '',
   sort_order: 1,
   status: 'active' as 'active' | 'inactive'
+})
+
+// 员工表单
+const employeeForm = reactive({
+  id: 0,
+  name: '',
+  employee_id: '',
+  gender: 'male' as 'male' | 'female',
+  position: '',
+  phone: '',
+  email: '',
+  hire_date: '',
+  status: 'active' as 'active' | 'probation' | 'inactive'
 })
 
 // 计算属性
@@ -390,6 +550,15 @@ const departmentEmployees = computed(() => {
 const isFormValid = computed(() => {
   return departmentForm.name.trim() !== '' &&
          departmentForm.code.trim() !== ''
+})
+
+const isEmployeeFormValid = computed(() => {
+  return employeeForm.name.trim() !== '' &&
+         employeeForm.employee_id.trim() !== '' &&
+         employeeForm.position.trim() !== '' &&
+         employeeForm.phone.trim() !== '' &&
+         employeeForm.email.trim() !== '' &&
+         employeeForm.hire_date.trim() !== ''
 })
 
 // 生命周期
@@ -565,6 +734,120 @@ const getEmployeeStatusText = (status: string): string => {
     resigned: '离职'
   }
   return statusMap[status] || status
+}
+
+// 员工管理方法
+const addEmployeeToDepartment = () => {
+  if (!selectedDepartment.value) return
+  resetEmployeeForm()
+  isEditingEmployee.value = false
+  showEmployeeModal.value = true
+}
+
+const editEmployeeInDepartment = (employee: Employee) => {
+  Object.assign(employeeForm, {
+    id: employee.id,
+    name: employee.name,
+    employee_id: employee.employee_id,
+    gender: employee.gender,
+    position: employee.position,
+    phone: employee.phone,
+    email: employee.email,
+    hire_date: employee.hire_date,
+    status: employee.status
+  })
+  isEditingEmployee.value = true
+  showEmployeeModal.value = true
+}
+
+const removeEmployeeFromDepartment = (employee: Employee) => {
+  if (confirm(`确定要从部门中移除员工"${employee.name}"吗？`)) {
+    employees.value = employees.value.filter(e => e.id !== employee.id)
+    // 更新部门员工数量
+    if (selectedDepartment.value) {
+      const deptIndex = departments.value.findIndex(d => d.id === selectedDepartment.value!.id)
+      if (deptIndex !== -1) {
+        departments.value[deptIndex].employee_count--
+      }
+    }
+    alert('员工移除成功！')
+  }
+}
+
+const submitEmployee = () => {
+  if (!isEmployeeFormValid.value || !selectedDepartment.value) return
+
+  if (isEditingEmployee.value) {
+    // 更新员工
+    const index = employees.value.findIndex(e => e.id === employeeForm.id)
+    if (index !== -1) {
+      employees.value[index] = {
+        ...employees.value[index],
+        name: employeeForm.name,
+        employee_id: employeeForm.employee_id,
+        gender: employeeForm.gender,
+        position: employeeForm.position,
+        phone: employeeForm.phone,
+        email: employeeForm.email,
+        hire_date: employeeForm.hire_date,
+        status: employeeForm.status,
+        updated_at: new Date().toISOString().split('T')[0]
+      }
+      alert('员工信息更新成功！')
+    }
+  } else {
+    // 添加员工
+    const newId = Math.max(...employees.value.map(e => e.id)) + 1
+    const newEmployee: Employee = {
+      id: newId,
+      name: employeeForm.name,
+      employee_id: employeeForm.employee_id,
+      gender: employeeForm.gender,
+      birth_date: '',
+      id_card: '',
+      phone: employeeForm.phone,
+      email: employeeForm.email,
+      department_id: selectedDepartment.value.id,
+      department_name: selectedDepartment.value.name,
+      position: employeeForm.position,
+      hire_date: employeeForm.hire_date,
+      probation_months: 3,
+      work_location: '上海总部',
+      status: employeeForm.status,
+      created_at: new Date().toISOString().split('T')[0],
+      updated_at: new Date().toISOString().split('T')[0]
+    }
+    employees.value.push(newEmployee)
+
+    // 更新部门员工数量
+    const deptIndex = departments.value.findIndex(d => d.id === selectedDepartment.value!.id)
+    if (deptIndex !== -1) {
+      departments.value[deptIndex].employee_count++
+    }
+
+    alert('员工添加成功！')
+  }
+
+  closeEmployeeModal()
+}
+
+const closeEmployeeModal = () => {
+  showEmployeeModal.value = false
+  resetEmployeeForm()
+}
+
+const resetEmployeeForm = () => {
+  Object.assign(employeeForm, {
+    id: 0,
+    name: '',
+    employee_id: '',
+    gender: 'male',
+    position: '',
+    phone: '',
+    email: '',
+    hire_date: '',
+    status: 'active'
+  })
 }
 </script>
 
@@ -917,13 +1200,21 @@ const getEmployeeStatusText = (status: string): string => {
   padding: 20px;
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
 .section-title {
-  margin: 0 0 16px 0;
+  margin: 0;
   font-size: 16px;
   font-weight: 600;
   color: var(--color-text-primary);
   border-bottom: 1px solid var(--color-border);
   padding-bottom: 8px;
+  flex: 1;
 }
 
 .info-grid {
@@ -1050,6 +1341,50 @@ const getEmployeeStatusText = (status: string): string => {
 .employees-table td {
   font-size: 14px;
   color: var(--color-text-primary);
+}
+
+.employee-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.action-btn-small {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn-small--primary {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
+
+.action-btn-small--primary:hover {
+  background: #16a34a;
+  color: white;
+}
+
+.action-btn-small--danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.action-btn-small--danger:hover {
+  background: #dc2626;
+  color: white;
+}
+
+/* 员工表单样式 */
+.employee-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 /* 响应式设计 */
