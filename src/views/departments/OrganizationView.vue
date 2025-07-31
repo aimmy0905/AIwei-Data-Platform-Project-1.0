@@ -49,10 +49,14 @@
               :key="department.id"
               :department="department"
               :level="0"
+              :employees="employees"
               @view="viewDepartment"
               @edit="editDepartment"
               @delete="deleteDepartment"
               @add-child="addChildDepartment"
+              @add-employee="addEmployeeToDepartment"
+              @edit-employee="editEmployeeInDepartment"
+              @remove-employee="removeEmployeeFromDepartment"
             />
           </div>
         </div>
@@ -737,8 +741,13 @@ const getEmployeeStatusText = (status: string): string => {
 }
 
 // 员工管理方法
-const addEmployeeToDepartment = () => {
-  if (!selectedDepartment.value) return
+const addEmployeeToDepartment = (department?: Department) => {
+  // 如果传入了部门参数，使用传入的部门；否则使用当前选中的部门
+  const targetDepartment = department || selectedDepartment.value
+  if (!targetDepartment) return
+
+  // 设置当前操作的部门
+  selectedDepartment.value = targetDepartment
   resetEmployeeForm()
   isEditingEmployee.value = false
   showEmployeeModal.value = true
