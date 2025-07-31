@@ -394,9 +394,9 @@ import {
 import {
   mockInfluencerData,
   mockKOLs,
-  mockPostData,
-  mockCustomers,
-  mockProjects,
+  mockInfluencerPostData as mockPostData,
+  mockInfluencerCustomers as mockCustomers,
+  mockInfluencerProjects as mockProjects,
   mockInfluencerStats
 } from '@/mock/influencer-data'
 import InfluencerDataModal from '@/components/projects/InfluencerDataModal.vue'

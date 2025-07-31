@@ -853,6 +853,24 @@ export const additionalPerformanceRecords: PerformanceRecord[] = [
     evaluator_id: 6,
     evaluator_name: '陈主管',
     data_metrics: {
+      new_service_fee: {
+        target: 0,
+        actual: 0,
+        score: 0,
+        weight: 0
+      },
+      new_orders: {
+        target: 0,
+        actual: 0,
+        score: 0,
+        weight: 0
+      },
+      new_customers: {
+        target: 0,
+        actual: 0,
+        score: 0,
+        weight: 0
+      },
       service_fee: {
         target: 300000,
         actual: 285000,

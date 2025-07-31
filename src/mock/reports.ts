@@ -254,6 +254,25 @@ export const mockGetMeetings = (filters: any = {}) => {
   })
 }
 
+// 获取仪表板截图
+export const mockGetDashboardScreenshots = () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: [
+          {
+            id: 'screenshot-1',
+            projectId: 'project-1',
+            url: '/screenshots/dashboard-2023-12-01.png',
+            createdAt: '2023-12-01T23:59:59Z'
+          }
+        ]
+      })
+    }, 300)
+  })
+}
+
 export const mockCreateWeeklyReport = (reportData: any) => {
   return new Promise((resolve) => {
     setTimeout(() => {

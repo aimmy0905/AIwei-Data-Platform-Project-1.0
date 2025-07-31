@@ -2822,7 +2822,7 @@ export interface RenewalCustomerData {
   renewalProbability: number // 续费概率
   estimatedRenewalAmount: number // 预估续费金额
   renewalPriority: 'high' | 'medium' | 'low' // 续费优先级
-  renewalStatus: 'pending' | 'contacted' | 'negotiating' | 'confirmed' // 续费状态
+  renewalStatus: 'pending' | 'contacted' | 'negotiating' | 'confirmed' | 'declined' // 续费状态
   // 客户价值
   historicalValue: number // 历史总价值
   averageQuarterlyValue: number // 平均季度价值
@@ -2843,6 +2843,13 @@ export interface DepartmentMetrics {
   profitGrowthRate: number // 毛利增长率
   customerGrowthRate: number // 客户增长率
   targetCompletionRate: number // 目标完成率
+}
+
+// 新订单服务费数据
+export interface NewOrderServiceFeeData {
+  totalAmount: number // 总金额
+  platformDistribution: Record<string, number> // 平台分布
+  monthlyTrend: Array<{ month: string; amount: number }> // 月度趋势
 }
 
 // 部门平台分析数据
