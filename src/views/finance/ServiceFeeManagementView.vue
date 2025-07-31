@@ -1,9 +1,8 @@
 <template>
-  <div class="service-fee-management">
-    <!-- 页面头部 -->
-    <div class="page-header">
-      <div class="page-header__main">
-        <div class="page-header__title">
+  <div class="project-data-panel">
+    <div class="panel-header">
+      <div class="header-content">
+        <div class="header-title">
           <button
             v-if="showBackButton"
             class="back-btn"
@@ -13,199 +12,212 @@
             <ArrowLeft :size="20" />
           </button>
           <div>
-            <h1 class="page-title">服务费管理</h1>
-            <p class="page-description">管理客户项目的服务费收款记录</p>
+            <h3>服务费管理</h3>
+            <p>管理客户项目的服务费收款记录</p>
           </div>
         </div>
       </div>
-      <div class="page-header__actions">
-        <button class="btn btn--primary" @click="showCreateModal = true">
+      <div class="header-actions">
+        <button class="action-btn action-btn--primary" @click="showCreateModal = true">
           <Plus :size="16" />
           新建收款记录
         </button>
       </div>
     </div>
 
-    <!-- 筛选与搜索区域 -->
-    <div class="filter-section">
-      <div class="filter-row">
-        <div class="search-wrapper">
-          <Search :size="16" class="search-icon" />
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="搜索客户名称、项目名称..."
-            class="search-input"
-          />
-        </div>
+    <div class="project-content">
+      <!-- 搜索和筛选区域 -->
+      <div class="search-filter-section">
+        <div class="search-section">
+          <div class="filter-section">
+            <div class="filter-row">
+              <div class="search-wrapper">
+                <Search :size="16" class="search-icon" />
+                <input
+                  v-model="searchQuery"
+                  type="text"
+                  placeholder="搜索客户名称、项目名称..."
+                  class="search-input"
+                />
+              </div>
 
-        <div class="filter-controls">
-          <select v-model="filters.customerId" class="filter-select">
-            <option value="">全部客户</option>
-            <option v-for="customer in customers" :key="customer.id" :value="customer.id">
-              {{ customer.name }}
-            </option>
-          </select>
+              <div class="filter-controls">
+                <select v-model="filters.customerId" class="filter-select">
+                  <option value="">全部客户</option>
+                  <option v-for="customer in customers" :key="customer.id" :value="customer.id">
+                    {{ customer.name }}
+                  </option>
+                </select>
 
-          <select v-model="filters.projectId" class="filter-select">
-            <option value="">全部项目</option>
-            <option v-for="project in projects" :key="project.id" :value="project.id">
-              {{ project.name }}
-            </option>
-          </select>
+                <select v-model="filters.projectId" class="filter-select">
+                  <option value="">全部项目</option>
+                  <option v-for="project in projects" :key="project.id" :value="project.id">
+                    {{ project.name }}
+                  </option>
+                </select>
 
-          <select v-model="filters.paymentType" class="filter-select">
-            <option value="">全部类型</option>
-            <option value="首次付款">首次付款</option>
-            <option value="续费">续费</option>
-          </select>
+                <select v-model="filters.paymentType" class="filter-select">
+                  <option value="">全部类型</option>
+                  <option value="首次付款">首次付款</option>
+                  <option value="续费">续费</option>
+                </select>
 
-          <input
-            v-model="filters.startDate"
-            type="date"
-            class="filter-input"
-            placeholder="开始日期"
-          />
+                <input
+                  v-model="filters.startDate"
+                  type="date"
+                  class="filter-input"
+                  placeholder="开始日期"
+                />
 
-          <input
-            v-model="filters.endDate"
-            type="date"
-            class="filter-input"
-            placeholder="结束日期"
-          />
+                <input
+                  v-model="filters.endDate"
+                  type="date"
+                  class="filter-input"
+                  placeholder="结束日期"
+                />
 
-          <select v-model="filters.creator" class="filter-select">
-            <option value="">全部创建人</option>
-            <option v-for="creator in creators" :key="creator" :value="creator">
-              {{ creator }}
-            </option>
-          </select>
+                <select v-model="filters.creator" class="filter-select">
+                  <option value="">全部创建人</option>
+                  <option v-for="creator in creators" :key="creator" :value="creator">
+                    {{ creator }}
+                  </option>
+                </select>
 
-          <button class="btn btn--secondary" @click="resetFilters">
-            <RotateCcw :size="16" />
-            重置
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 数据表格 -->
-    <div class="table-section">
-      <div class="table-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th @click="sortBy('customerName')" class="sortable">
-                客户名称
-                <ChevronUp v-if="sortField === 'customerName' && sortOrder === 'asc'" :size="14" />
-                <ChevronDown v-if="sortField === 'customerName' && sortOrder === 'desc'" :size="14" />
-              </th>
-              <th @click="sortBy('projectName')" class="sortable">
-                项目名称
-                <ChevronUp v-if="sortField === 'projectName' && sortOrder === 'asc'" :size="14" />
-                <ChevronDown v-if="sortField === 'projectName' && sortOrder === 'desc'" :size="14" />
-              </th>
-              <th @click="sortBy('paymentDate')" class="sortable">
-                收款日期
-                <ChevronUp v-if="sortField === 'paymentDate' && sortOrder === 'asc'" :size="14" />
-                <ChevronDown v-if="sortField === 'paymentDate' && sortOrder === 'desc'" :size="14" />
-              </th>
-              <th @click="sortBy('paymentAmount')" class="sortable">
-                收款金额
-                <ChevronUp v-if="sortField === 'paymentAmount' && sortOrder === 'asc'" :size="14" />
-                <ChevronDown v-if="sortField === 'paymentAmount' && sortOrder === 'desc'" :size="14" />
-              </th>
-              <th>服务周期</th>
-              <th>收款类型</th>
-              <th>备注</th>
-              <th @click="sortBy('creator')" class="sortable">
-                创建人
-                <ChevronUp v-if="sortField === 'creator' && sortOrder === 'asc'" :size="14" />
-                <ChevronDown v-if="sortField === 'creator' && sortOrder === 'desc'" :size="14" />
-              </th>
-              <th @click="sortBy('createTime')" class="sortable">
-                创建时间
-                <ChevronUp v-if="sortField === 'createTime' && sortOrder === 'asc'" :size="14" />
-                <ChevronDown v-if="sortField === 'createTime' && sortOrder === 'desc'" :size="14" />
-              </th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="record in paginatedRecords" :key="record.id" class="table-row">
-              <td class="customer-name">{{ record.customerName }}</td>
-              <td class="project-name">{{ record.projectName }}</td>
-              <td class="payment-date">{{ formatDate(record.paymentDate) }}</td>
-              <td class="payment-amount">${{ formatCurrency(record.paymentAmount) }}</td>
-              <td class="service-period">{{ record.servicePeriod }}</td>
-              <td>
-                <span class="payment-type-badge" :class="getPaymentTypeBadgeClass(record.paymentType)">
-                  {{ record.paymentType }}
-                </span>
-              </td>
-              <td class="remark" :title="record.remark">{{ record.remark || '-' }}</td>
-              <td class="creator">{{ record.creator }}</td>
-              <td class="create-time">{{ formatDateTime(record.createTime) }}</td>
-              <td class="actions">
-                <div class="action-buttons">
-                  <button class="btn btn--small btn--outline" @click="editRecord(record)">
-                    <Edit :size="14" />
-                    编辑
-                  </button>
-                  <button class="btn btn--small btn--danger-outline" @click="deleteRecord(record)">
-                    <Trash2 :size="14" />
-                    删除
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- 空状态 -->
-        <div v-if="filteredRecords.length === 0" class="empty-state">
-          <FileX :size="48" />
-          <p>{{ searchQuery || hasActiveFilters ? '没有找到匹配的记录' : '暂无收款记录' }}</p>
-          <button class="btn btn--primary" @click="showCreateModal = true">
-            <Plus :size="16" />
-            新建收款记录
-          </button>
+                <button class="action-btn action-btn--secondary" @click="resetFilters">
+                  <RotateCcw :size="16" />
+                  重置
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- 分页 -->
-      <div v-if="totalPages > 1" class="pagination">
-        <button
-          class="pagination-btn"
-          :disabled="currentPage === 1"
-          @click="currentPage = 1"
-        >
-          首页
-        </button>
-        <button
-          class="pagination-btn"
-          :disabled="currentPage === 1"
-          @click="currentPage--"
-        >
-          上一页
-        </button>
-        <span class="pagination-info">
-          第 {{ currentPage }} 页，共 {{ totalPages }} 页，{{ totalRecords }} 条记录
-        </span>
-        <button
-          class="pagination-btn"
-          :disabled="currentPage === totalPages"
-          @click="currentPage++"
-        >
-          下一页
-        </button>
-        <button
-          class="pagination-btn"
-          :disabled="currentPage === totalPages"
-          @click="currentPage = totalPages"
-        >
-          末页
-        </button>
+      <!-- 数据表格区域 -->
+      <div class="project-table-section">
+        <div class="table-header">
+          <div class="table-header__left">
+            <h3>收款记录</h3>
+            <span class="record-count">共 {{ totalRecords }} 条记录</span>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th @click="sortBy('customerName')" class="sortable">
+                  客户名称
+                  <ChevronUp v-if="sortField === 'customerName' && sortOrder === 'asc'" :size="14" />
+                  <ChevronDown v-if="sortField === 'customerName' && sortOrder === 'desc'" :size="14" />
+                </th>
+                <th @click="sortBy('projectName')" class="sortable">
+                  项目名称
+                  <ChevronUp v-if="sortField === 'projectName' && sortOrder === 'asc'" :size="14" />
+                  <ChevronDown v-if="sortField === 'projectName' && sortOrder === 'desc'" :size="14" />
+                </th>
+                <th @click="sortBy('paymentDate')" class="sortable">
+                  收款日期
+                  <ChevronUp v-if="sortField === 'paymentDate' && sortOrder === 'asc'" :size="14" />
+                  <ChevronDown v-if="sortField === 'paymentDate' && sortOrder === 'desc'" :size="14" />
+                </th>
+                <th @click="sortBy('paymentAmount')" class="sortable">
+                  收款金额
+                  <ChevronUp v-if="sortField === 'paymentAmount' && sortOrder === 'asc'" :size="14" />
+                  <ChevronDown v-if="sortField === 'paymentAmount' && sortOrder === 'desc'" :size="14" />
+                </th>
+                <th>服务周期</th>
+                <th>收款类型</th>
+                <th>备注</th>
+                <th @click="sortBy('creator')" class="sortable">
+                  创建人
+                  <ChevronUp v-if="sortField === 'creator' && sortOrder === 'asc'" :size="14" />
+                  <ChevronDown v-if="sortField === 'creator' && sortOrder === 'desc'" :size="14" />
+                </th>
+                <th @click="sortBy('createTime')" class="sortable">
+                  创建时间
+                  <ChevronUp v-if="sortField === 'createTime' && sortOrder === 'asc'" :size="14" />
+                  <ChevronDown v-if="sortField === 'createTime' && sortOrder === 'desc'" :size="14" />
+                </th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="record in paginatedRecords" :key="record.id" class="table-row">
+                <td class="customer-name">{{ record.customerName }}</td>
+                <td class="project-name">{{ record.projectName }}</td>
+                <td class="payment-date">{{ formatDate(record.paymentDate) }}</td>
+                <td class="payment-amount">${{ formatCurrency(record.paymentAmount) }}</td>
+                <td class="service-period">{{ record.servicePeriod }}</td>
+                <td>
+                  <span class="payment-type-badge" :class="getPaymentTypeBadgeClass(record.paymentType)">
+                    {{ record.paymentType }}
+                  </span>
+                </td>
+                <td class="remark" :title="record.remark">{{ record.remark || '-' }}</td>
+                <td class="creator">{{ record.creator }}</td>
+                <td class="create-time">{{ formatDateTime(record.createTime) }}</td>
+                <td class="actions">
+                  <div class="action-buttons">
+                    <button class="btn btn--small btn--outline" @click="editRecord(record)">
+                      <Edit :size="14" />
+                      编辑
+                    </button>
+                    <button class="btn btn--small btn--danger-outline" @click="deleteRecord(record)">
+                      <Trash2 :size="14" />
+                      删除
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- 空状态 -->
+          <div v-if="filteredRecords.length === 0" class="empty-state">
+            <FileX :size="48" />
+            <p>{{ searchQuery || hasActiveFilters ? '没有找到匹配的记录' : '暂无收款记录' }}</p>
+            <button class="action-btn action-btn--primary" @click="showCreateModal = true">
+              <Plus :size="16" />
+              新建收款记录
+            </button>
+          </div>
+        </div>
+
+        <!-- 分页 -->
+        <div v-if="totalPages > 1" class="pagination">
+          <button
+            class="pagination-btn"
+            :disabled="currentPage === 1"
+            @click="currentPage = 1"
+          >
+            首页
+          </button>
+          <button
+            class="pagination-btn"
+            :disabled="currentPage === 1"
+            @click="currentPage--"
+          >
+            上一页
+          </button>
+          <span class="pagination-info">
+            第 {{ currentPage }} 页，共 {{ totalPages }} 页，{{ totalRecords }} 条记录
+          </span>
+          <button
+            class="pagination-btn"
+            :disabled="currentPage === totalPages"
+            @click="currentPage++"
+          >
+            下一页
+          </button>
+          <button
+            class="pagination-btn"
+            :disabled="currentPage === totalPages"
+            @click="currentPage = totalPages"
+          >
+            末页
+          </button>
+        </div>
       </div>
     </div>
 
@@ -335,10 +347,10 @@
         </div>
 
         <div class="modal-footer">
-          <button class="btn btn--secondary" @click="closeModal">
+          <button class="action-btn action-btn--secondary" @click="closeModal">
             取消
           </button>
-          <button class="btn btn--primary" @click="saveRecord" :disabled="saving">
+          <button class="action-btn action-btn--primary" @click="saveRecord" :disabled="saving">
             {{ saving ? '保存中...' : '保存' }}
           </button>
         </div>
@@ -738,30 +750,43 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.service-fee-management {
-  padding: 0;
+.project-data-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
 }
 
-/* 页面头部 */
-.page-header {
+.panel-header {
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border-light);
+  background: white;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--spacing-xl);
-  flex-wrap: wrap;
-  gap: var(--spacing-md);
+  align-items: center;
 }
 
-.page-header__main {
+.header-content {
   flex: 1;
-  min-width: 300px;
 }
 
-.page-header__title {
+.header-title {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-xs);
+}
+
+.header-content h3 {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.header-content p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 .back-btn {
@@ -779,33 +804,31 @@ onMounted(async () => {
   color: var(--color-text-primary);
 }
 
-.page-title {
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
-  margin: 0 0 var(--spacing-xs) 0;
-}
-
-.page-description {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  margin: 0;
-}
-
-.page-header__actions {
+.header-actions {
   display: flex;
-  gap: var(--spacing-sm);
-  align-items: center;
-  flex-wrap: wrap;
+  gap: var(--spacing-md);
 }
 
-/* 筛选区域 */
-.filter-section {
+.project-content {
+  padding: var(--spacing-lg);
+}
+
+.search-filter-section {
+  margin-bottom: var(--spacing-xl);
+}
+
+.search-section {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-lg);
   padding: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
+}
+
+.filter-section {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
 }
 
 .filter-row {
@@ -818,6 +841,7 @@ onMounted(async () => {
 .search-wrapper {
   position: relative;
   min-width: 280px;
+  flex: 1;
 }
 
 .search-icon {
@@ -842,7 +866,7 @@ onMounted(async () => {
 .search-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
 }
 
 .filter-controls {
@@ -867,15 +891,38 @@ onMounted(async () => {
 .filter-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
 }
 
-/* 表格区域 */
-.table-section {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-xl);
+.project-table-section {
+  margin-bottom: var(--spacing-xl);
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.table-header__left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.table-header__left h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.record-count {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
 }
 
 .table-container {
@@ -943,13 +990,13 @@ onMounted(async () => {
 }
 
 .payment-type-badge--first {
-  background: rgba(82, 196, 26, 0.1);
+  background: var(--color-success-light);
   color: var(--color-success);
 }
 
 .payment-type-badge--renewal {
-  background: rgba(24, 144, 255, 0.1);
-  color: var(--color-info);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
 }
 
 .remark {
@@ -969,7 +1016,51 @@ onMounted(async () => {
   align-items: center;
 }
 
-/* 按钮样式 */
+/* Action Button Styles */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  text-decoration: none;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.action-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.action-btn--primary {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.action-btn--primary:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  color: white;
+}
+
+.action-btn--secondary {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.action-btn--secondary:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Legacy Button Styles for Table */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -986,27 +1077,6 @@ onMounted(async () => {
   color: var(--color-text-primary);
 }
 
-.btn--primary {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: white;
-}
-
-.btn--primary:hover {
-  background: var(--color-primary-hover);
-  border-color: var(--color-primary-hover);
-}
-
-.btn--secondary {
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-}
-
-.btn--secondary:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
-
 .btn--small {
   padding: var(--spacing-xs) var(--spacing-sm);
   font-size: var(--font-size-xs);
@@ -1016,28 +1086,28 @@ onMounted(async () => {
 .btn--outline:hover {
   border-color: var(--color-primary);
   color: var(--color-primary);
-  background: rgba(59, 130, 246, 0.05);
+  background: rgba(24, 144, 255, 0.05);
 }
 
 .btn--danger-outline:hover {
-  border-color: var(--color-error);
-  color: var(--color-error);
+  border-color: var(--color-danger);
+  color: var(--color-danger);
   background: rgba(239, 68, 68, 0.05);
 }
 
-/* 空状态 */
+/* Empty State */
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-lg);
-  padding: var(--spacing-2xl);
+  padding: var(--spacing-4xl);
   color: var(--color-text-secondary);
   text-align: center;
 }
 
-/* 分页 */
+/* Pagination */
 .pagination {
   display: flex;
   align-items: center;
@@ -1073,7 +1143,7 @@ onMounted(async () => {
   margin: 0 var(--spacing-md);
 }
 
-/* 模态框样式 */
+/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1090,7 +1160,7 @@ onMounted(async () => {
 .modal-content {
   background: var(--color-surface);
   border-radius: var(--border-radius-lg);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-xl);
   max-width: 800px;
   width: 90%;
   max-height: 90vh;
@@ -1139,7 +1209,7 @@ onMounted(async () => {
   border-top: 1px solid var(--color-border);
 }
 
-/* 表单样式 */
+/* Form Styles */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -1164,7 +1234,7 @@ onMounted(async () => {
 
 .form-label.required::after {
   content: ' *';
-  color: var(--color-error);
+  color: var(--color-danger);
 }
 
 .form-input,
@@ -1184,19 +1254,19 @@ onMounted(async () => {
 .form-textarea:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
 }
 
 .form-input--error,
 .form-select--error,
 .form-textarea--error {
-  border-color: var(--color-error);
+  border-color: var(--color-danger);
 }
 
 .form-input--error:focus,
 .form-select--error:focus,
 .form-textarea--error:focus {
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
 }
 
 .form-textarea {
@@ -1208,7 +1278,7 @@ onMounted(async () => {
 
 .error-message {
   font-size: var(--font-size-xs);
-  color: var(--color-error);
+  color: var(--color-danger);
 }
 
 .radio-group {
@@ -1245,7 +1315,7 @@ onMounted(async () => {
   margin-top: var(--spacing-xs);
 }
 
-/* 响应式设计 */
+/* Responsive Design */
 @media (max-width: 1024px) {
   .filter-row {
     flex-direction: column;
@@ -1277,12 +1347,13 @@ onMounted(async () => {
 }
 
 @media (max-width: 768px) {
-  .page-header {
+  .panel-header {
     flex-direction: column;
     align-items: stretch;
+    gap: var(--spacing-md);
   }
 
-  .page-header__actions {
+  .header-actions {
     justify-content: center;
   }
 

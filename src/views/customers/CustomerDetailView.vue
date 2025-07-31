@@ -62,14 +62,45 @@
           <MessageSquare :size="16" />
           添加Q&A
         </button>
-        <button
-          v-if="!isEditMode"
-          class="action-btn action-btn--primary"
-          @click="showMoreActions"
-        >
-          <MoreHorizontal :size="16" />
-          更多操作
-        </button>
+        <!-- 更多操作下拉菜单 -->
+        <div v-if="!isEditMode" class="dropdown-container">
+          <button
+            class="action-btn action-btn--primary dropdown-trigger"
+            @click="toggleMoreActions"
+            ref="moreActionsButton"
+          >
+            <MoreHorizontal :size="16" />
+            更多操作
+          </button>
+
+          <!-- 下拉菜单 -->
+          <div
+            v-if="showMoreActionsMenu"
+            class="dropdown-menu dropdown-menu--detail"
+            @click.stop
+          >
+            <button class="dropdown-item" @click="viewCustomerProjects">
+              <Briefcase :size="14" />
+              客户项目
+            </button>
+            <button class="dropdown-item" @click="viewServiceFeeRecords">
+              <DollarSign :size="14" />
+              服务费记录
+            </button>
+            <button class="dropdown-item" @click="viewReviewRecords">
+              <Star :size="14" />
+              客户评价
+            </button>
+            <button class="dropdown-item" @click="viewCustomerAccount">
+              <User :size="14" />
+              客户账号
+            </button>
+            <button class="dropdown-item" @click="addCustomerQA">
+              <MessageSquare :size="14" />
+              客户QA
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -107,6 +138,14 @@
             >
               <RefreshCw :size="16" />
               续费记录
+            </button>
+            <button
+              class="tab-btn"
+              :class="{ 'tab-btn--active': activeTab === 'reviews' }"
+              @click="activeTab = 'reviews'"
+            >
+              <Star :size="16" />
+              客户评价记录
             </button>
           </div>
         </div>
@@ -1287,11 +1326,15 @@
                       <th>项目时间</th>
                       <th>项目类型</th>
                       <th>项目状态</th>
+                      <th>合作周期</th>
                       <th>合作平台</th>
                       <th>合同编号</th>
-                      <th>服务费</th>
-                      <th>余额</th>
-                      <th>负责团队</th>
+                      <th>核算新单数</th>
+                      <th>首次到账服务费</th>
+                      <th>首次到账日期</th>
+                      <th>项目服务费</th>
+                      <th>负责运营团队</th>
+                      <th>销售人员</th>
                       <th>操作</th>
                     </tr>
                   </thead>
@@ -1316,6 +1359,7 @@
                           {{ getProjectStatusText(project.status) }}
                         </span>
                       </td>
+                      <td class="cooperation-period">{{ (project as any).cooperationPeriod || '-' }}</td>
                       <td>
                         <div class="platform-tags">
                           <span v-for="platform in project.cooperationPlatforms" :key="platform" class="platform-tag">
@@ -1324,33 +1368,88 @@
                         </div>
                       </td>
                       <td class="contract-number">{{ project.contractNumber || '-' }}</td>
+                      <td class="new-order-count">{{ (project as any).newOrderCount || 0 }}</td>
+                      <td class="first-service-fee">${{ formatNumber((project as any).firstServiceFee || 0) }}</td>
+                      <td class="first-payment-date">{{ formatDate((project as any).firstPaymentDate) || '-' }}</td>
                       <td class="service-fee">${{ formatNumber(project.serviceFee || 0) }}</td>
-                      <td class="balance" :class="{ 'balance-low': (project.balance || 0) < 1000 }">
-                        ${{ formatNumber(project.balance || 0) }}
-                      </td>
                       <td class="operation-team">{{ project.operationTeam || '-' }}</td>
+                      <td class="sales-person">{{ (project as any).salesPerson || '-' }}</td>
                       <td class="project-actions">
                         <div class="action-buttons">
-                          <button class="action-btn action-btn--small" @click="viewProjectDashboard(project)">
+                          <button
+                            class="action-btn-text action-btn-text--primary"
+                            @click="viewProjectDashboard(project)"
+                          >
                             <BarChart3 :size="14" />
                             <span>数据面板</span>
                           </button>
-                          <button class="action-btn action-btn--small" @click="manageProjectGoals(project)">
+                          <button
+                            class="action-btn-text action-btn-text--secondary"
+                            @click="manageProjectGoals(project)"
+                          >
                             <Target :size="14" />
                             <span>项目目标</span>
                           </button>
-                          <button class="action-btn action-btn--small" @click="manageProjectAccounts(project)">
-                            <CreditCard :size="14" />
-                            <span>投放账号</span>
-                          </button>
-                          <button class="action-btn action-btn--small" @click="viewProjectReports(project)">
-                            <FileText :size="14" />
-                            <span>项目报告</span>
-                          </button>
-                          <button class="action-btn action-btn--small" @click="editProject(project)">
-                            <Edit :size="14" />
-                            <span>编辑项目</span>
-                          </button>
+                          <div class="dropdown-container">
+                            <button
+                              class="action-btn-text action-btn-text--secondary dropdown-trigger"
+                              @click="toggleProjectDropdown(project.id)"
+                            >
+                              <MoreHorizontal :size="14" />
+                              <span>更多</span>
+                            </button>
+                            <div v-if="activeProjectDropdown === project.id" class="dropdown-menu dropdown-menu--project" @click.stop>
+                              <button
+                                class="dropdown-item"
+                                @click="manageProjectAccounts(project)"
+                              >
+                                <Monitor :size="14" />
+                                <span>投放账号</span>
+                              </button>
+                              <button
+                                class="dropdown-item"
+                                @click="viewRenewalRecords(project)"
+                              >
+                                <DollarSign :size="14" />
+                                <span>续费记录</span>
+                              </button>
+                              <button
+                                class="dropdown-item"
+                                @click="viewProjectReports(project)"
+                              >
+                                <FileText :size="14" />
+                                <span>周报/月报</span>
+                              </button>
+                              <button
+                                class="dropdown-item"
+                                @click="manageProjectActivities(project)"
+                              >
+                                <Calendar :size="14" />
+                                <span>活动管理</span>
+                              </button>
+                              <button
+                                class="dropdown-item"
+                                @click="viewCustomerReviews(project)"
+                              >
+                                <Star :size="14" />
+                                <span>客户评价</span>
+                              </button>
+                              <button
+                                class="dropdown-item"
+                                @click="manageInfluencerData(project)"
+                              >
+                                <Users :size="14" />
+                                <span>红人数据</span>
+                              </button>
+                              <button
+                                class="dropdown-item"
+                                @click="editProject(project)"
+                              >
+                                <Edit :size="14" />
+                                <span>编辑项目</span>
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       </td>
                     </tr>
@@ -1504,6 +1603,71 @@
                       </tbody>
                     </table>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 客户评价记录标签页 -->
+          <div v-if="activeTab === 'reviews'" class="reviews-content">
+            <div class="content-section">
+              <div class="section-header">
+                <h3 class="section-title">
+                  <Star :size="20" />
+                  客户评价记录
+                </h3>
+              </div>
+
+              <!-- 评价记录表格 -->
+              <div class="table-container">
+                <div class="table-wrapper">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>项目名称</th>
+                        <th>评价月份</th>
+                        <th>综合评分</th>
+                        <th>问题处理</th>
+                        <th>专业能力</th>
+                        <th>服务态度</th>
+                        <th>评价人员</th>
+                        <th>负责团队</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="review in customerReviews" :key="review.id" class="table-row">
+                        <td class="project-name">{{ review.projectName }}</td>
+                        <td class="evaluation-month">{{ review.evaluationMonth }}</td>
+                        <td class="overall-rating">
+                          <div class="rating-display" :class="getRatingClass(review.overallRating)">
+                            <Star :size="14" :fill="'currentColor'" />
+                            {{ review.overallRating }}
+                          </div>
+                        </td>
+                        <td class="rating-score">{{ review.problemHandlingRating }}</td>
+                        <td class="rating-score">{{ review.professionalRating }}</td>
+                        <td class="rating-score">{{ review.serviceAttitudeRating }}</td>
+                        <td class="evaluator">{{ review.evaluator }}</td>
+                        <td class="responsible-team">{{ review.responsibleTeam }}</td>
+                        <td class="create-time">{{ formatDate(review.createTime) }}</td>
+                        <td class="table-actions">
+                          <div class="action-buttons">
+                            <button class="action-btn-sm action-btn-sm--info" @click="viewReview(review)" title="查看详情">
+                              <Eye :size="14" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- 空状态 -->
+                <div v-if="customerReviews.length === 0" class="empty-state">
+                  <Star :size="48" />
+                  <p>暂无客户评价记录</p>
                 </div>
               </div>
             </div>
@@ -1756,16 +1920,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, reactive } from 'vue'
+import { ref, onMounted, onUnmounted, computed, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   ArrowLeft, Edit, MessageSquare, MoreHorizontal, Loader,
   Handshake, User, Globe, Users, AlertTriangle, MessageCircle,
   RefreshCw, Plus, Check, X, Phone, Mail, ExternalLink,
   Target, Clock, Languages, Shield, TrendingUp, History, DollarSign, Save, File, Briefcase,
-  BarChart3, CreditCard, FileText, Calendar
+  BarChart3, CreditCard, FileText, Calendar, Star, Eye, Monitor
 } from 'lucide-vue-next'
 import { mockGetCustomerDetail } from '@/mock/customer'
+import { customerReviews as allCustomerReviews, type CustomerReview } from '@/mock/customer-reviews'
 import type { CustomerDetail, ContactPerson, CompetitorWebsite } from '@/types'
 
 // 路由相关
@@ -1779,6 +1944,9 @@ const isEditMode = ref(false)
 const saving = ref(false)
 const activeTab = ref('info')
 const showCreateProject = ref(false)
+const showMoreActionsMenu = ref(false)
+const moreActionsButton = ref<HTMLElement | null>(null)
+const activeProjectDropdown = ref<string | null>(null)
 
 // 项目筛选
 const projectFilter = reactive({
@@ -1935,6 +2103,12 @@ const filteredProjects = computed(() => {
   return projects
 })
 
+// 客户评价记录 - 筛选当前客户的评价
+const customerReviews = computed((): CustomerReview[] => {
+  const currentCustomerId = customerId.value.toString()
+  return allCustomerReviews.filter((review: CustomerReview) => review.customerId === currentCustomerId)
+})
+
 // 方法
 const formatDate = (dateString: string): string => {
   if (!dateString) return '未设置'
@@ -2062,8 +2236,52 @@ const editProject = (project: any) => {
   // 这里可以打开项目编辑弹窗或跳转页面
 }
 
+// 项目下拉菜单管理
+const toggleProjectDropdown = (projectId: string) => {
+  activeProjectDropdown.value = activeProjectDropdown.value === projectId ? null : projectId
+}
+
+// 新增的项目操作方法
+const viewRenewalRecords = (project: any) => {
+  console.log('查看续费记录:', project.name)
+  activeProjectDropdown.value = null
+  // 这里可以跳转到续费记录页面
+}
+
+const manageProjectActivities = (project: any) => {
+  console.log('管理项目活动:', project.name)
+  activeProjectDropdown.value = null
+  router.push('/projects/activities')
+}
+
+const manageInfluencerData = (project: any) => {
+  console.log('管理红人数据:', project.name)
+  activeProjectDropdown.value = null
+  // 这里可以跳转到红人数据管理页面
+}
+
+const viewCustomerReviews = (project: any) => {
+  console.log('查看客户评价:', project.name)
+  activeProjectDropdown.value = null
+  // 切换到客户评价记录标签页
+  activeTab.value = 'reviews'
+}
+
 const goBack = () => {
   router.push('/customers')
+}
+
+// 客户评价相关方法
+const getRatingClass = (rating: number): string => {
+  if (rating >= 9) return 'rating-excellent'
+  if (rating >= 7) return 'rating-good'
+  if (rating >= 5) return 'rating-average'
+  return 'rating-poor'
+}
+
+const viewReview = (review: CustomerReview) => {
+  console.log('查看评价详情:', review.projectName)
+  // 这里可以打开评价详情弹窗
 }
 
 const goToServiceFee = () => {
@@ -2261,9 +2479,40 @@ const isValidUrl = (url: string): boolean => {
   }
 }
 
-const showMoreActions = () => {
-  console.log('显示更多操作')
-  // 这里可以显示更多操作菜单
+// 更多操作菜单相关方法
+const toggleMoreActions = () => {
+  showMoreActionsMenu.value = !showMoreActionsMenu.value
+}
+
+// 客户操作方法 - 与客户列表保持一致
+const viewCustomerProjects = () => {
+  console.log('查看客户项目:', customerDetail.value?.cooperationDetails?.customerName)
+  showMoreActionsMenu.value = false
+  // 这里可以跳转到客户项目列表页面
+}
+
+const viewServiceFeeRecords = () => {
+  console.log('查看服务费记录:', customerDetail.value?.cooperationDetails?.customerName)
+  showMoreActionsMenu.value = false
+  // 这里可以跳转到服务费记录列表页面
+}
+
+const viewReviewRecords = () => {
+  console.log('查看客户评价:', customerDetail.value?.cooperationDetails?.customerName)
+  showMoreActionsMenu.value = false
+  // 这里可以跳转到客户评价列表页面
+}
+
+const viewCustomerAccount = () => {
+  console.log('查看客户账号:', customerDetail.value?.cooperationDetails?.customerName)
+  showMoreActionsMenu.value = false
+  // 这里可以跳转到客户账号管理页面
+}
+
+const addCustomerQA = () => {
+  console.log('添加客户Q&A:', customerDetail.value?.cooperationDetails?.customerName)
+  showMoreActionsMenu.value = false
+  addQA() // 调用现有的添加Q&A方法
 }
 
 const loadCustomerDetail = async () => {
@@ -2509,11 +2758,26 @@ const validateForm = (): boolean => {
   return isValid
 }
 
+// 点击外部关闭下拉菜单
+const handleClickOutside = (event: MouseEvent) => {
+  if (showMoreActionsMenu.value && moreActionsButton.value && !moreActionsButton.value.contains(event.target as Node)) {
+    showMoreActionsMenu.value = false
+  }
+}
+
 // 生命周期
 onMounted(() => {
   // 检查是否是编辑模式
   isEditMode.value = route.query.edit === 'true'
   loadCustomerDetail()
+
+  // 添加点击外部事件监听
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  // 移除事件监听
+  document.removeEventListener('click', handleClickOutside)
 })
 </script>
 
@@ -4091,5 +4355,269 @@ onMounted(() => {
     align-items: center;
     text-align: center;
   }
+}
+
+/* 下拉菜单样式 */
+.dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  min-width: 160px;
+  padding: var(--spacing-xs) 0;
+  margin-top: var(--spacing-xs);
+}
+
+.dropdown-menu--detail {
+  min-width: 180px;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  background: none;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-primary);
+}
+
+.dropdown-item:active {
+  background: var(--color-bg-tertiary);
+}
+
+.dropdown-trigger {
+  position: relative;
+}
+
+.dropdown-trigger:focus {
+  outline: none;
+}
+
+/* 客户评价记录样式 */
+.reviews-content {
+  padding: 0;
+}
+
+.reviews-content .table-container {
+  background: var(--color-surface);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.reviews-content .data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.reviews-content .data-table th {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  padding: var(--spacing-md) var(--spacing-sm);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reviews-content .data-table td {
+  padding: var(--spacing-md) var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border-light);
+  vertical-align: middle;
+}
+
+.reviews-content .table-row:hover {
+  background: var(--color-bg-hover);
+}
+
+.reviews-content .table-row:last-child td {
+  border-bottom: none;
+}
+
+.rating-display {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-full);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xs);
+  min-width: 60px;
+  justify-content: center;
+}
+
+.rating-excellent {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.rating-good {
+  background: rgba(59, 130, 246, 0.15);
+  color: #2563eb;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.rating-average {
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.rating-poor {
+  background: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.rating-score {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  text-align: center;
+  font-size: var(--font-size-sm);
+}
+
+.project-name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.evaluation-month {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+}
+
+.evaluator {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.responsible-team {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--color-bg-secondary);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  display: inline-block;
+}
+
+.create-time {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-xs);
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+}
+
+.action-btn-sm {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.action-btn-sm--info {
+  border-color: var(--color-info);
+  color: var(--color-info);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.action-btn-sm--info:hover {
+  background: var(--color-info);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-xs);
+  justify-content: center;
+}
+
+.reviews-content .empty-state {
+  text-align: center;
+  padding: var(--spacing-3xl);
+  color: var(--color-text-secondary);
+}
+
+.reviews-content .empty-state svg {
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--spacing-md);
+}
+
+/* 项目列表操作按钮样式 */
+.action-btn-text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: none;
+  background: none;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  border-radius: var(--border-radius-sm);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.action-btn-text--primary {
+  color: var(--color-primary);
+}
+
+.action-btn-text--primary:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--color-primary-hover);
+}
+
+.action-btn-text--secondary {
+  color: var(--color-text-secondary);
+}
+
+.action-btn-text--secondary:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.dropdown-menu--project {
+  min-width: 140px;
+  z-index: 1002;
 }
 </style>

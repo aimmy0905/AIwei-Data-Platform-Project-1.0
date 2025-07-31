@@ -155,6 +155,13 @@
         </div>
       </div>
     </div>
+
+    <!-- 模块小结 -->
+    <ModuleSummary
+      :default-text="channelSummaryText"
+      placeholder="请输入渠道数据情况小结..."
+      :stats="channelSummaryStats"
+    />
   </div>
 </template>
 
@@ -162,8 +169,9 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import {
   DollarSign, Users, MousePointer, Target, TrendingUp, Award,
-  BarChart3, FileText, Settings, Edit, ArrowLeft, X
+  BarChart3, FileText, Settings, Edit, ArrowLeft, X, Check
 } from 'lucide-vue-next'
+import ModuleSummary from '@/components/common/ModuleSummary.vue'
 import type { ChannelData, ChannelSummary, ChannelDimension } from '@/types'
 import {
   mockGetChannelData,
@@ -197,6 +205,11 @@ const loading = ref(false)
 const selectedTimeRange = ref('last7days')
 const customStartDate = ref('')
 const customEndDate = ref('')
+
+// 模块小结相关状态
+const isEditingMode = ref(false)
+const summaryText = ref('渠道数据表现稳定，总用户数达到71,300，主要流量来源于自然搜索和社交媒体。建议加强付费广告投入，优化转化率较低的渠道。')
+const editingSummaryText = ref('')
 
 // 标签页配置
 const tabs = [
@@ -355,6 +368,56 @@ const loadDataByTimeRange = () => {
   console.log('根据时间范围重新加载渠道数据...')
   // 实际项目中这里会调用API获取对应时间范围的数据
   loadChannelData()
+}
+
+// 小结相关计算属性和函数
+const channelStats = computed(() => {
+  return {
+    totalUsers: channelSummary.value.totalUsers,
+    totalSales: channelSummary.value.totalRevenue
+  }
+})
+
+const channelStatusClass = computed(() => {
+  const conversionRate = channelSummary.value.averageConversionRate
+  if (conversionRate >= 8) return 'status-excellent'
+  if (conversionRate >= 5) return 'status-good'
+  if (conversionRate >= 3) return 'status-warning'
+  return 'status-danger'
+})
+
+const channelStatusText = computed(() => {
+  const statusClass = channelStatusClass.value
+  switch (statusClass) {
+    case 'status-excellent': return '优秀'
+    case 'status-good': return '良好'
+    case 'status-warning': return '一般'
+    case 'status-danger': return '需改进'
+    default: return '良好'
+  }
+})
+
+// ModuleSummary组件所需的计算属性
+const channelSummaryText = computed(() => {
+  return summaryText.value
+})
+
+const channelSummaryStats = computed(() => {
+  return [
+    { label: '总用户数', value: formatNumber(channelStats.value.totalUsers) },
+    { label: '总销售额', value: formatValue(channelStats.value.totalSales, 'currency') },
+    { label: '渠道状态', value: channelStatusText.value, type: 'badge' as const, class: channelStatusClass.value }
+  ]
+})
+
+const toggleEditMode = () => {
+  if (isEditingMode.value) {
+    summaryText.value = editingSummaryText.value
+    isEditingMode.value = false
+  } else {
+    editingSummaryText.value = summaryText.value
+    isEditingMode.value = true
+  }
 }
 
 // 生命周期
@@ -913,4 +976,6 @@ onMounted(() => {
 .channel-other {
   background: #6b7280;
 }
+
+
 </style>

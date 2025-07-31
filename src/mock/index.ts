@@ -1,11 +1,11 @@
-// 导出所有 mock 数据
-export * from './auth'
+// 导出所有 mock 数据export * from './auth'
 export * from './dashboard'
 export * from './bing-dashboard'
 export * from './menu'
 export * from './customer'
 export * from './service-fees'
 export * from './business'
+export * from './reports'
 
 // Mock菜单数据
 import type { MenuItem, UserRole } from '@/types'

@@ -1,11 +1,11 @@
 <template>
-  <div class="project-management-view">
-    <div class="page-header">
-      <div class="page-header__main">
-        <h1 class="page-title">项目管理</h1>
-        <p class="page-description">管理和分析您的项目数据，优化项目运营效率</p>
+  <div class="project-data-panel">
+    <div class="panel-header">
+      <div class="header-content">
+        <h3>项目管理</h3>
+        <p>管理和分析您的项目数据，优化项目运营效率</p>
       </div>
-      <div class="page-header__actions">
+      <div class="header-actions">
         <button
           class="action-btn action-btn--secondary"
           @click="router.push('/projects/goals')"
@@ -288,21 +288,21 @@
                         </button>
                         <button
                           class="dropdown-item"
-                          @click="viewCustomerReviews(project.id)"
+                          @click="viewCustomerReviews(project.id); activeDropdown = null"
                         >
                           <Star :size="14" />
                           <span>客户评价</span>
                         </button>
                         <button
                           class="dropdown-item"
-                          @click="manageInfluencerData(project.id)"
+                          @click="manageInfluencerData(project.id); activeDropdown = null"
                         >
                           <Users :size="14" />
                           <span>红人数据</span>
                         </button>
                         <button
                           class="dropdown-item"
-                          @click="editProject(project.id)"
+                          @click="editProject(project.id); activeDropdown = null"
                         >
                           <Edit :size="14" />
                           <span>编辑</span>
@@ -827,23 +827,54 @@ const manageProjectActivities = (projectId: number) => {
 }
 
 const viewCustomerReviews = (projectId: number) => {
-  console.log('查看客户评价:', projectId)
-  // TODO: 打开客户评价弹窗
+  const project = projects.value.find(p => p.id === projectId)
+  if (project) {
+    // 跳转到客户评价页面，并传递项目筛选参数
+    router.push({
+      name: 'customer-reviews',
+      query: {
+        projectId: projectId.toString(),
+        projectName: project.project_name,
+        customerName: project.customer_name
+      }
+    })
+  }
 }
 
 const manageInfluencerData = (projectId: number) => {
-  console.log('管理红人数据:', projectId)
-  // TODO: 打开红人数据管理弹窗
+  const project = projects.value.find(p => p.id === projectId)
+  if (project) {
+    // 跳转到红人数据管理页面
+    router.push({
+      name: 'kol-posts',
+      query: {
+        projectId: projectId.toString(),
+        projectName: project.project_name
+      }
+    })
+  }
 }
 
 const editProject = (projectId: number) => {
-  console.log('编辑项目:', projectId)
-  // TODO: 打开项目编辑弹窗
+  const project = projects.value.find(p => p.id === projectId)
+  if (project) {
+    // 跳转到项目编辑页面或打开编辑弹窗
+    console.log('编辑项目:', project.project_name)
+    // 这里可以打开编辑弹窗或跳转到编辑页面
+    // 暂时显示一个提示
+    alert(`编辑项目: ${project.project_name}`)
+  }
 }
 
 const deleteProject = (projectId: number) => {
-  console.log('删除项目:', projectId)
-  // TODO: 实现删除项目功能
+  const project = projects.value.find(p => p.id === projectId)
+  if (project && confirm(`确定要删除项目 "${project.project_name}" 吗？此操作不可撤销。`)) {
+    // 从列表中移除项目
+    projects.value = projects.value.filter(p => p.id !== projectId)
+    // 关闭下拉菜单
+    activeDropdown.value = null
+    console.log('已删除项目:', project.project_name)
+  }
 }
 
 const handleExport = (exportData: any) => {
@@ -891,39 +922,36 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.project-management-view {
-  position: relative;
-  padding: 0;
+.project-data-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
 }
 
-.page-header {
+.panel-header {
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border-light);
+  background: white;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--spacing-xl);
-  flex-wrap: wrap;
-  gap: var(--spacing-md);
+  align-items: center;
 }
 
-.page-header__main {
-  flex: 1;
-  min-width: 300px;
-}
-
-.page-title {
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
-  margin: 0 0 var(--spacing-sm) 0;
-}
-
-.page-description {
+.header-content h3 {
+  margin: 0 0 var(--spacing-xs) 0;
   font-size: var(--font-size-lg);
-  color: var(--color-text-secondary);
-  margin: 0;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
 }
 
-.page-header__actions {
+.header-content p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.header-actions {
   display: flex;
   gap: var(--spacing-sm);
   align-items: center;
@@ -963,6 +991,120 @@ onUnmounted(() => {
 .action-btn--secondary:hover {
   border-color: var(--color-primary);
   color: var(--color-primary);
+}
+
+.project-content {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.search-filter-section {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: var(--spacing-lg);
+  align-items: start;
+}
+
+.search-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.project-search {
+  max-width: 500px;
+}
+
+.search-stats {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.project-table-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  overflow: visible;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.table-header {
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 2px solid var(--color-border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  position: relative;
+}
+
+.table-header__left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.table-header__left h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.record-count {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  background: var(--color-gray-100);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-full);
+  font-weight: var(--font-weight-medium);
+}
+
+.table-header__right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.view-options {
+  display: flex;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+}
+
+.view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm);
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  width: 36px;
+  height: 36px;
+}
+
+.view-btn:hover {
+  background: var(--color-gray-50);
+  color: var(--color-text-primary);
+}
+
+.view-btn--active {
+  background: var(--color-primary);
+  color: white;
+}
+
+.view-btn--active:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
 }
 
 .action-btn--small {

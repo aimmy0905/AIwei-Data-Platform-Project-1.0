@@ -1,8 +1,49 @@
 <template>
   <div class="product-sales-panel">
     <div class="panel-header">
-      <h2 class="panel-title">产品销售呈现</h2>
-      <p class="panel-description">各产品的销售情况和库存状态</p>
+      <div class="header-content">
+        <h2 class="panel-title">产品销售呈现</h2>
+        <p class="panel-description">各产品的销售情况和库存状态</p>
+      </div>
+      <div class="header-actions">
+        <!-- 时间筛选器 -->
+        <div class="time-filter">
+          <select v-model="selectedTimeRange" @change="handleTimeRangeChange" class="time-select">
+            <option value="today">今日</option>
+            <option value="yesterday">昨天</option>
+            <option value="last7days">近7天</option>
+            <option value="last14days">近14天</option>
+            <option value="last1month">近1个月</option>
+            <option value="last3months">近3个月</option>
+            <option value="last1year">近1年</option>
+            <option value="custom">自定义时间</option>
+          </select>
+          <!-- 自定义时间选择器 -->
+          <div v-if="selectedTimeRange === 'custom'" class="custom-date-range">
+            <input
+              type="date"
+              v-model="customStartDate"
+              @change="handleCustomDateChange"
+              class="date-input"
+            />
+            <span class="date-separator">至</span>
+            <input
+              type="date"
+              v-model="customEndDate"
+              @change="handleCustomDateChange"
+              class="date-input"
+            />
+          </div>
+        </div>
+        <button class="custom-filter-btn" @click="openCustomMetricsModal">
+          <Settings :size="16" />
+          自定义指标筛选
+        </button>
+        <button class="view-all-btn" @click="viewAllProducts">
+          <Package :size="16" />
+          查看全部商品
+        </button>
+      </div>
     </div>
 
     <!-- 标签页 -->
@@ -61,6 +102,7 @@
             <thead>
               <tr>
                 <th>排名</th>
+                <th>产品图片</th>
                 <th>产品标题</th>
                 <th>产品类别</th>
                 <th>毛销售额</th>
@@ -78,6 +120,9 @@
             <tbody>
               <tr v-for="(category, index) in sortedCategoryRanking" :key="category.id">
                 <td>{{ index + 1 }}</td>
+                <td class="product-image">
+                  <img :src="category.image" :alt="category.name" />
+                </td>
                 <td>{{ category.name }}</td>
                 <td>{{ category.category }}</td>
                 <td>${{ formatNumber(category.grossSales) }}</td>
@@ -129,6 +174,7 @@
             <thead>
               <tr>
                 <th>排名</th>
+                <th>产品图片</th>
                 <th>产品SKU</th>
                 <th>产品标题</th>
                 <th>产品品类</th>
@@ -146,6 +192,9 @@
             <tbody>
               <tr v-for="(product, index) in sortedSkuRanking" :key="product.id">
                 <td>{{ index + 1 }}</td>
+                <td class="product-image">
+                  <img :src="product.image" :alt="product.name" />
+                </td>
                 <td>{{ product.sku }}</td>
                 <td>{{ product.name }}</td>
                 <td>{{ product.category }}</td>
@@ -176,30 +225,40 @@
           <table>
             <thead>
               <tr>
+                <th>产品图片</th>
+                <th>产品品类</th>
                 <th>产品标题</th>
-                <th>产品分类</th>
-                <th>总销售额</th>
-                <th>净销售额</th>
-                <th>净销售数量</th>
-                <th>平均订单价值</th>
-                <th>退货数量</th>
-                <th>退货金额</th>
-                <th>每单数量</th>
+                <th>访客数</th>
+                <th>添加到购物车</th>
+                <th>进入结账流程</th>
+                <th>到达并完成结账的访问次数</th>
+                <th>已完成结账</th>
+                <th>加购率</th>
+                <th>到达结账页面率</th>
+                <th>结账转化率</th>
+                <th>完成结账率</th>
+                <th>转化率</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="product in productSalesData" :key="product.id">
-                <td class="product-name">{{ product.name }}</td>
+                <td class="product-image">
+                  <img :src="product.image" :alt="product.name" />
+                </td>
                 <td>
                   <span class="category-tag">{{ product.category }}</span>
                 </td>
-                <td class="number">${{ formatNumber(product.totalSales) }}</td>
-                <td class="number">${{ formatNumber(product.totalSales) }}</td>
-                <td class="number">{{ formatNumber(product.netSoldQuantity) }}</td>
-                <td class="number">${{ formatNumber(product.averageOrderAmount) }}</td>
-                <td class="number">{{ formatNumber(product.refundQuantity) }}</td>
-                <td class="number">${{ formatNumber(product.refundAmount) }}</td>
-                <td class="number">{{ formatNumber(product.quantityPerOrder) }}</td>
+                <td class="product-name">{{ product.name }}</td>
+                <td class="number">{{ formatNumber(product.visitors || 0) }}</td>
+                <td class="number">{{ formatNumber(product.addToCartVisits || 0) }}</td>
+                <td class="number">{{ formatNumber(product.checkoutVisits || 0) }}</td>
+                <td class="number">{{ formatNumber(product.checkoutVisits || 0) }}</td>
+                <td class="number">{{ formatNumber(product.netSoldQuantity || 0) }}</td>
+                <td class="number">{{ formatPercentage(product.addToCartRate || 0) }}%</td>
+                <td class="number">{{ formatPercentage(product.checkoutRate || 0) }}%</td>
+                <td class="number">{{ formatPercentage(product.checkoutRate || 0) }}%</td>
+                <td class="number">{{ formatPercentage(product.purchaseRate || 0) }}%</td>
+                <td class="number">{{ formatPercentage(product.purchaseRate || 0) }}%</td>
               </tr>
             </tbody>
           </table>
@@ -214,6 +273,7 @@
           <table>
             <thead>
               <tr>
+                <th>产品图片</th>
                 <th>产品标题</th>
                 <th>产品类别</th>
                 <th>总销售额</th>
@@ -227,6 +287,9 @@
             </thead>
             <tbody>
               <tr v-for="product in productSalesData" :key="product.id">
+                <td class="product-image">
+                  <img :src="product.image" :alt="product.name" />
+                </td>
                 <td class="product-name">{{ product.name }}</td>
                 <td>
                   <span class="category-tag">{{ product.category }}</span>
@@ -245,104 +308,86 @@
       </div>
     </div>
 
-    <!-- 自定义指标筛选 -->
-    <div v-if="activeTab === 'customMetrics'" class="tab-content">
-      <div class="custom-metrics-section">
-        <div class="metrics-header">
-          <h3>自定义数据指标筛选</h3>
-          <button class="action-button" @click="openCustomMetricsModal">
-            <Settings :size="16" />
-            选择指标
-          </button>
-        </div>
 
-        <!-- 指标类别切换 -->
-        <div class="metric-category-tabs">
-          <button
-            :class="{ active: metricCategory === 'sales' }"
-            @click="metricCategory = 'sales'"
-          >
-            销量指标
-          </button>
-          <button
-            :class="{ active: metricCategory === 'traffic' }"
-            @click="metricCategory = 'traffic'"
-          >
-            流量指标
-          </button>
-        </div>
-
-        <!-- 自定义指标表格 -->
-        <div v-if="selectedMetrics.length > 0" class="custom-metrics-table">
-          <div class="data-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>产品</th>
-                  <th v-for="metricKey in selectedMetrics" :key="metricKey">
-                    {{ currentMetrics.find(m => m.key === metricKey)?.label }}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(product, index) in productSalesData" :key="product.id">
-                  <td class="product-name">{{ product.name }}</td>
-                  <td v-for="metricKey in selectedMetrics" :key="metricKey" class="metric-value">
-                    {{ formatMetricValue(
-                      product[metricKey as keyof typeof product],
-                      currentMetrics.find(m => m.key === metricKey)?.unit || ''
-                    ) }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- 空状态 -->
-        <div v-else class="empty-state">
-          <p>请点击"选择指标"按钮来选择要显示的数据指标</p>
-        </div>
-      </div>
-    </div>
 
     <!-- 自定义指标选择弹窗 -->
     <div v-if="showCustomMetricsModal" class="modal-overlay" @click="closeCustomMetricsModal">
       <div class="modal-content custom-metrics-modal" @click.stop>
         <div class="modal-header">
-          <h3>选择自定义指标</h3>
-          <button @click="closeCustomMetricsModal" class="close-btn">×</button>
+          <h3>自定义数据指标筛选</h3>
+          <button @click="closeCustomMetricsModal" class="close-btn">
+            <X :size="20" />
+          </button>
         </div>
         <div class="modal-body">
-          <div class="metric-category-selector">
-            <label>指标类别：</label>
-            <select v-model="metricCategory">
-              <option value="sales">销量指标</option>
-              <option value="traffic">流量指标</option>
-            </select>
+          <!-- 指标选择区域 -->
+          <div class="dimension-selector">
+            <h4>选择数据指标</h4>
+            <div class="dimension-categories">
+              <!-- 销量指标 -->
+              <div class="dimension-category">
+                <div class="category-header">
+                  <input
+                    type="checkbox"
+                    :checked="isAllSelected('sales')"
+                    @change="toggleCategory('sales')"
+                  />
+                  <label>销量指标</label>
+                </div>
+                <div class="dimension-items">
+                  <div
+                    v-for="metric in salesMetrics"
+                    :key="metric.key"
+                    class="dimension-item"
+                  >
+                    <input
+                      type="checkbox"
+                      :value="metric.key"
+                      v-model="selectedMetrics"
+                    />
+                    <label>{{ metric.label }}</label>
+                    <small v-if="metric.unit">({{ metric.unit }})</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 流量指标 -->
+              <div class="dimension-category">
+                <div class="category-header">
+                  <input
+                    type="checkbox"
+                    :checked="isAllSelected('traffic')"
+                    @change="toggleCategory('traffic')"
+                  />
+                  <label>流量指标</label>
+                </div>
+                <div class="dimension-items">
+                  <div
+                    v-for="metric in trafficMetrics"
+                    :key="metric.key"
+                    class="dimension-item"
+                  >
+                    <input
+                      type="checkbox"
+                      :value="metric.key"
+                      v-model="selectedMetrics"
+                    />
+                    <label>{{ metric.label }}</label>
+                    <small v-if="metric.unit">({{ metric.unit }})</small>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="metric-actions">
-            <button @click="selectAllMetrics" class="btn btn-secondary">全选</button>
-            <button @click="clearAllMetrics" class="btn btn-secondary">清空</button>
-          </div>
-
-          <div class="metrics-grid">
-            <div
-              v-for="metric in currentMetrics"
-              :key="metric.key"
-              class="metric-item"
-            >
-              <label>
-                <input
-                  type="checkbox"
-                  :value="metric.key"
-                  :checked="selectedMetrics.includes(metric.key)"
-                  @change="toggleMetric(metric.key)"
-                />
-                <span>{{ metric.label }}</span>
-                <small v-if="metric.unit">({{ metric.unit }})</small>
-              </label>
+          <!-- 数据展示区域 -->
+          <div v-if="selectedMetrics.length > 0" class="data-display">
+            <h4>已选择指标</h4>
+            <div class="selected-metrics">
+              <div v-for="metricKey in selectedMetrics" :key="metricKey" class="selected-metric">
+                <span>{{ getMetricLabel(metricKey) }}</span>
+                <span class="metric-unit">{{ getMetricUnit(metricKey) }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -540,14 +585,22 @@
         </div>
       </div>
     </div>
+
+        <!-- 模块小结 -->
+    <ModuleSummary
+      :default-text="productSummaryText"
+      placeholder="请输入产品销售情况小结..."
+      :stats="productSummaryStats"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { Settings } from 'lucide-vue-next'
+import { Settings, X, Package, Edit, Check } from 'lucide-vue-next'
 import { mockGetProductSalesData, mockGetProductSalesSummary } from '@/mock/dashboard'
 import type { ProductSalesData, ProductSalesSummary } from '@/types'
+import ModuleSummary from '@/components/common/ModuleSummary.vue'
 
 // 响应式数据
 const productSalesData = ref<ProductSalesData[]>([])
@@ -582,12 +635,16 @@ const showCustomMetricsModal = ref(false)
 const selectedMetrics = ref<string[]>([])
 const metricCategory = ref<'sales' | 'traffic'>('sales')
 
+// 时间筛选
+const selectedTimeRange = ref('last7days')
+const customStartDate = ref('')
+const customEndDate = ref('')
+
 // 标签页配置
 const tabs = [
   { id: 'ranking', name: '销量排名' },
   { id: 'traffic', name: '产品流量' },
-  { id: 'salesData', name: '产品销售数据' },
-  { id: 'customMetrics', name: '自定义指标筛选' }
+  { id: 'salesData', name: '产品销售数据' }
 ]
 
 const rankingSubTabs = [
@@ -738,9 +795,47 @@ const customMetricsData = computed(() => {
   })
 })
 
+// 模块小结相关计算属性
+const productSummaryText = computed(() => {
+  return '产品销售表现良好，库存状态正常。建议重点关注转化率较低的产品，优化产品描述和定价策略，提升整体销售效果。'
+})
+
+const productSummaryStats = computed(() => {
+  const totalProducts = productSalesData.value.length
+  const totalSales = summary.value.totalRevenue
+  const avgConversionRate = summary.value.averageConversionRate
+
+  let statusClass = 'status-good'
+  let statusText = '良好'
+
+  if (avgConversionRate >= 8) {
+    statusClass = 'status-excellent'
+    statusText = '优秀'
+  } else if (avgConversionRate >= 5) {
+    statusClass = 'status-good'
+    statusText = '良好'
+  } else if (avgConversionRate >= 3) {
+    statusClass = 'status-warning'
+    statusText = '一般'
+  } else {
+    statusClass = 'status-danger'
+    statusText = '需改进'
+  }
+
+  return [
+    { label: '产品总数', value: totalProducts },
+    { label: '总销售额', value: `$${formatNumber(totalSales)}` },
+    { label: '销售状态', value: statusText, type: 'badge' as const, class: statusClass }
+  ]
+})
+
 // 工具方法
 const formatNumber = (num: number): string => {
   return num.toLocaleString()
+}
+
+const formatPercentage = (num: number): string => {
+  return num.toFixed(1)
 }
 
 const getStockStatusText = (status: string): string => {
@@ -852,6 +947,13 @@ const closeCustomMetricsModal = () => {
   showCustomMetricsModal.value = false
 }
 
+// 查看全部商品
+const viewAllProducts = () => {
+  console.log('查看全部商品')
+  // 这里可以导航到商品列表页面或打开商品管理模态框
+  // 例如: router.push('/products') 或打开模态框
+}
+
 const toggleMetric = (metricKey: string) => {
   const index = selectedMetrics.value.indexOf(metricKey)
   if (index > -1) {
@@ -867,6 +969,78 @@ const selectAllMetrics = () => {
 
 const clearAllMetrics = () => {
   selectedMetrics.value = []
+}
+
+// 分类选择相关函数
+const isAllSelected = (category: 'sales' | 'traffic'): boolean => {
+  const categoryMetrics = category === 'sales' ? salesMetrics : trafficMetrics
+  return categoryMetrics.every(metric => selectedMetrics.value.includes(metric.key))
+}
+
+const toggleCategory = (category: 'sales' | 'traffic') => {
+  const categoryMetrics = category === 'sales' ? salesMetrics : trafficMetrics
+
+  if (isAllSelected(category)) {
+    // 如果全选了，则取消全选
+    categoryMetrics.forEach(metric => {
+      const index = selectedMetrics.value.indexOf(metric.key)
+      if (index > -1) {
+        selectedMetrics.value.splice(index, 1)
+      }
+    })
+  } else {
+    // 如果没有全选，则全选
+    categoryMetrics.forEach(metric => {
+      if (!selectedMetrics.value.includes(metric.key)) {
+        selectedMetrics.value.push(metric.key)
+      }
+    })
+  }
+}
+
+const getMetricLabel = (metricKey: string): string => {
+  const allMetrics = [...salesMetrics, ...trafficMetrics]
+  const metric = allMetrics.find(m => m.key === metricKey)
+  return metric?.label || metricKey
+}
+
+const getMetricUnit = (metricKey: string): string => {
+  const allMetrics = [...salesMetrics, ...trafficMetrics]
+  const metric = allMetrics.find(m => m.key === metricKey)
+  return metric?.unit || ''
+}
+
+// 数据加载函数
+const loadProductSalesData = async () => {
+  try {
+    const [salesResponse, summaryResponse] = await Promise.all([
+      mockGetProductSalesData(),
+      mockGetProductSalesSummary()
+    ])
+
+    if (salesResponse.success && salesResponse.data) {
+      productSalesData.value = salesResponse.data
+    }
+
+    if (summaryResponse.success && summaryResponse.data) {
+      summary.value = summaryResponse.data
+    }
+  } catch (error) {
+    console.error('加载产品销售数据失败:', error)
+  }
+}
+
+// 时间筛选处理函数
+const handleTimeRangeChange = () => {
+  // 当时间范围改变时，重新加载数据
+  loadProductSalesData()
+}
+
+const handleCustomDateChange = () => {
+  if (customStartDate.value && customEndDate.value) {
+    // 当自定义日期改变时，重新加载数据
+    loadProductSalesData()
+  }
 }
 
 const formatMetricValue = (value: any, unit: string) => {
@@ -886,23 +1060,8 @@ const formatMetricValue = (value: any, unit: string) => {
 }
 
 // 生命周期
-onMounted(async () => {
-  try {
-    const [salesResponse, summaryResponse] = await Promise.all([
-      mockGetProductSalesData(),
-      mockGetProductSalesSummary()
-    ])
-
-    if (salesResponse.success && salesResponse.data) {
-      productSalesData.value = salesResponse.data
-    }
-
-    if (summaryResponse.success && summaryResponse.data) {
-      summary.value = summaryResponse.data
-    }
-  } catch (error) {
-    console.error('加载产品销售数据失败:', error)
-  }
+onMounted(() => {
+  loadProductSalesData()
 })
 </script>
 
@@ -919,6 +1078,14 @@ onMounted(async () => {
   margin-bottom: 24px;
   padding-bottom: 16px;
   border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.header-content {
+  flex: 1;
 }
 
 .panel-title {
@@ -932,6 +1099,363 @@ onMounted(async () => {
   margin: 0;
   font-size: 14px;
   color: #6b7280;
+}
+
+/* Header Actions - 保持与 WebsiteDataPanel 一致的样式 */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.time-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.time-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.custom-date-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+}
+
+.date-input {
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.date-separator {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.custom-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.custom-filter-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.view-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-all-btn:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+/* 自定义指标模态框样式 - 与 CustomDimensionModal 保持一致 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.custom-metrics-modal {
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 1200px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.close-btn:hover {
+  background: #f3f4f6;
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.dimension-selector h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.dimension-categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.dimension-category {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.category-header label {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dimension-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dimension-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dimension-item label {
+  cursor: pointer;
+  flex: 1;
+}
+
+.dimension-item small {
+  color: #6b7280;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.data-display {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.data-display h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.selected-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.selected-metric {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #f3f4f6;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.metric-unit {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover {
+  background: #e5e7eb;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+  border: 1px solid #3b82f6;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+}
+
+/* 响应式设计 - 保持与 WebsiteDataPanel 一致 */
+@media (max-width: 768px) {
+  .panel-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .time-filter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .custom-date-range {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+
+  .time-select {
+    min-width: auto;
+  }
+
+  .custom-filter-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* 模态框响应式设计 */
+  .custom-metrics-modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .dimension-categories {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .modal-header {
+    padding: 16px;
+  }
+
+  .modal-footer {
+    padding: 16px;
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
+
+/* 产品图片样式 */
+.product-image {
+  width: 60px;
+  text-align: center;
+  padding: 8px;
+}
+
+.product-image img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  transition: transform 0.2s;
+}
+
+.product-image img:hover {
+  transform: scale(1.1);
 }
 
 .summary-cards {
@@ -1009,7 +1533,7 @@ onMounted(async () => {
 .tab-content {
   background: white;
   border-radius: 8px;
-  padding: 20px;
+  padding: 24px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 

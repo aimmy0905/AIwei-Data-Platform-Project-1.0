@@ -1,97 +1,99 @@
 <template>
-  <div class="customer-reviews-view">
-    <div class="page-header">
-      <div class="page-header__main">
-        <h1 class="page-title">客户评价管理</h1>
-        <p class="page-description">记录和管理客户对项目服务的评价反馈</p>
+  <div class="project-data-panel">
+    <div class="panel-header">
+      <div class="header-content">
+        <h3>客户评价管理</h3>
+        <p>记录和管理客户对项目服务的评价反馈</p>
       </div>
-      <div class="page-header__actions">
+      <div class="header-actions">
         <!-- 操作按钮已移除 -->
       </div>
     </div>
 
-    <div class="reviews-content">
+    <div class="project-content">
       <!-- 搜索和筛选区域 -->
       <div class="search-filter-section">
         <div class="search-section">
-          <SearchInput
-            v-model="searchQuery"
-            placeholder="搜索客户名称、项目名称、评价人..."
-            @search="handleSearch"
-            @clear="handleSearchClear"
-            class="reviews-search"
-          />
-          <div class="search-stats" v-if="searchQuery">
-            找到 <strong>{{ filteredReviews.length }}</strong> 个结果
-          </div>
-        </div>
+          <div class="filter-section">
+            <div class="filter-row">
+              <div class="search-wrapper">
+                <SearchInput
+                  v-model="searchQuery"
+                  placeholder="搜索客户名称、项目名称、评价人..."
+                  @search="handleSearch"
+                  @clear="handleSearchClear"
+                  class="reviews-search"
+                />
+                <div class="search-stats" v-if="searchQuery">
+                  找到 <strong>{{ filteredReviews.length }}</strong> 个结果
+                </div>
+              </div>
 
-        <div class="filter-section">
-          <div class="filter-row">
-            <div class="filter-group">
-              <label class="filter-label">客户</label>
-              <select v-model="filters.customerId" @change="handleFilterChange" class="filter-select">
-                <option value="">全部客户</option>
-                <option v-for="customer in customers" :key="customer.id" :value="customer.id">
-                  {{ customer.name }}
-                </option>
-              </select>
+              <div class="filter-controls">
+                <div class="filter-group">
+                  <label class="filter-label">客户</label>
+                  <select v-model="filters.customerId" @change="handleFilterChange" class="filter-select">
+                    <option value="">全部客户</option>
+                    <option v-for="customer in customers" :key="customer.id" :value="customer.id">
+                      {{ customer.name }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="filter-group">
+                  <label class="filter-label">项目</label>
+                  <select v-model="filters.projectId" @change="handleFilterChange" class="filter-select">
+                    <option value="">全部项目</option>
+                    <option v-for="project in availableProjects" :key="project.id" :value="project.id">
+                      {{ project.name }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="filter-group">
+                  <label class="filter-label">评价月份</label>
+                  <input
+                    type="month"
+                    v-model="filters.evaluationMonth"
+                    @change="handleFilterChange"
+                    class="filter-input"
+                  />
+                </div>
+
+                <div class="filter-group">
+                  <label class="filter-label">综合评分</label>
+                  <select v-model="filters.ratingFilter" @change="handleFilterChange" class="filter-select">
+                    <option value="">全部评分</option>
+                    <option value="9-10">优秀 (9-10分)</option>
+                    <option value="7-8">良好 (7-8分)</option>
+                    <option value="5-6">一般 (5-6分)</option>
+                    <option value="1-4">较差 (1-4分)</option>
+                  </select>
+                </div>
+
+                <button class="filter-clear-btn" @click="clearFilters" v-if="hasActiveFilters">
+                  <X :size="14" />
+                  清除筛选
+                </button>
+              </div>
             </div>
-
-            <div class="filter-group">
-              <label class="filter-label">项目</label>
-              <select v-model="filters.projectId" @change="handleFilterChange" class="filter-select">
-                <option value="">全部项目</option>
-                <option v-for="project in availableProjects" :key="project.id" :value="project.id">
-                  {{ project.name }}
-                </option>
-              </select>
-            </div>
-
-            <div class="filter-group">
-              <label class="filter-label">评价月份</label>
-              <input
-                type="month"
-                v-model="filters.evaluationMonth"
-                @change="handleFilterChange"
-                class="filter-input"
-              />
-            </div>
-
-            <div class="filter-group">
-              <label class="filter-label">综合评分</label>
-              <select v-model="filters.ratingFilter" @change="handleFilterChange" class="filter-select">
-                <option value="">全部评分</option>
-                <option value="9-10">优秀 (9-10分)</option>
-                <option value="7-8">良好 (7-8分)</option>
-                <option value="5-6">一般 (5-6分)</option>
-                <option value="1-4">较差 (1-4分)</option>
-              </select>
-            </div>
-
-            <button class="filter-clear-btn" @click="clearFilters" v-if="hasActiveFilters">
-              <X :size="14" />
-              清除筛选
-            </button>
           </div>
         </div>
       </div>
 
       <!-- 评价列表 -->
-      <div class="reviews-list">
-        <div class="list-header">
-          <div class="list-actions">
-                         <!-- 批量操作已移除 -->
-            <div class="list-info">
-              共 {{ totalReviews }} 条评价记录
-            </div>
+      <div class="project-table-section">
+        <div class="table-header">
+          <div class="table-header__left">
+            <h3>评价记录</h3>
+            <span class="record-count">共 {{ totalReviews }} 条记录</span>
           </div>
         </div>
 
-        <div class="reviews-table-container">
+        <div class="table-container">
           <table class="reviews-table">
             <thead>
-                             <tr>
+              <tr>
                 <th class="sortable" @click="handleSort('customerName')">
                   客户名称
                   <ChevronUp v-if="sortField === 'customerName' && sortOrder === 'asc'" :size="14" />
@@ -114,23 +116,23 @@
                 </th>
                 <th>问题处理</th>
                 <th>专业能力</th>
-                                 <th>服务态度</th>
-                 <th>评价人</th>
-                 <th class="sortable" @click="handleSort('responsibleTeam')">
-                   负责团队
-                   <ChevronUp v-if="sortField === 'responsibleTeam' && sortOrder === 'asc'" :size="14" />
-                   <ChevronDown v-if="sortField === 'responsibleTeam' && sortOrder === 'desc'" :size="14" />
-                 </th>
-                 <th class="sortable" @click="handleSort('createTime')">
-                   创建时间
-                   <ChevronUp v-if="sortField === 'createTime' && sortOrder === 'asc'" :size="14" />
-                   <ChevronDown v-if="sortField === 'createTime' && sortOrder === 'desc'" :size="14" />
-                 </th>
-                 <th class="table-actions">操作</th>
+                <th>服务态度</th>
+                <th>评价人</th>
+                <th class="sortable" @click="handleSort('responsibleTeam')">
+                  负责团队
+                  <ChevronUp v-if="sortField === 'responsibleTeam' && sortOrder === 'asc'" :size="14" />
+                  <ChevronDown v-if="sortField === 'responsibleTeam' && sortOrder === 'desc'" :size="14" />
+                </th>
+                <th class="sortable" @click="handleSort('createTime')">
+                  创建时间
+                  <ChevronUp v-if="sortField === 'createTime' && sortOrder === 'asc'" :size="14" />
+                  <ChevronDown v-if="sortField === 'createTime' && sortOrder === 'desc'" :size="14" />
+                </th>
+                <th class="table-actions">操作</th>
               </tr>
             </thead>
             <tbody>
-                             <tr v-for="review in displayedReviews" :key="review.id" class="table-row">
+              <tr v-for="review in displayedReviews" :key="review.id" class="table-row">
                 <td class="customer-name">{{ review.customerName }}</td>
                 <td class="project-name">{{ review.projectName }}</td>
                 <td class="evaluation-month">{{ review.evaluationMonth }}</td>
@@ -142,10 +144,10 @@
                 </td>
                 <td class="rating-score">{{ review.problemHandlingRating }}</td>
                 <td class="rating-score">{{ review.professionalRating }}</td>
-                                 <td class="rating-score">{{ review.serviceAttitudeRating }}</td>
-                 <td class="evaluator">{{ review.evaluator }}</td>
-                 <td class="responsible-team">{{ review.responsibleTeam }}</td>
-                 <td class="create-time">{{ formatDate(review.createTime) }}</td>
+                <td class="rating-score">{{ review.serviceAttitudeRating }}</td>
+                <td class="evaluator">{{ review.evaluator }}</td>
+                <td class="responsible-team">{{ review.responsibleTeam }}</td>
+                <td class="create-time">{{ formatDate(review.createTime) }}</td>
                 <td class="table-actions">
                   <div class="action-buttons">
                     <button class="action-btn-sm action-btn-sm--info" @click="viewReview(review)" title="查看详情">
@@ -459,216 +461,193 @@ watch([searchQuery, filters], () => {
 </script>
 
 <style scoped>
-.customer-reviews-view {
-  padding: 24px;
-  background-color: #f8fafc;
-  min-height: 100vh;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 32px;
-  background: white;
-  padding: 24px;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.page-header__main h1 {
-  font-size: 28px;
-  font-weight: 600;
-  color: #1a202c;
-  margin: 0 0 8px 0;
-}
-
-.page-header__main p {
-  color: #64748b;
-  margin: 0;
-  font-size: 16px;
-}
-
-.page-header__actions {
-  display: flex;
-  gap: 12px;
-}
-
-.action-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.action-btn--primary {
-  background-color: #3b82f6;
-  color: white;
-}
-
-.action-btn--primary:hover {
-  background-color: #2563eb;
-}
-
-.action-btn--secondary {
-  background-color: #f1f5f9;
-  color: #475569;
-  border: 1px solid #e2e8f0;
-}
-
-.action-btn--secondary:hover {
-  background-color: #e2e8f0;
-}
-
-.reviews-content {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+.project-data-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
   overflow: hidden;
 }
 
+.panel-header {
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border-light);
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-content h3 {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.header-content p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.header-actions {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.project-content {
+  padding: var(--spacing-lg);
+}
+
 .search-filter-section {
-  padding: 24px;
-  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: var(--spacing-xl);
 }
 
 .search-section {
-  margin-bottom: 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+}
+
+.filter-section {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.filter-row {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.search-wrapper {
+  flex: 1;
+  min-width: 280px;
 }
 
 .search-stats {
-  margin-top: 8px;
-  color: #64748b;
-  font-size: 14px;
+  margin-top: var(--spacing-xs);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
 }
 
-.filter-section .filter-row {
+.filter-controls {
   display: flex;
-  gap: 16px;
-  align-items: end;
+  gap: var(--spacing-md);
+  align-items: flex-end;
   flex-wrap: wrap;
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--spacing-xs);
 }
 
 .filter-label {
-  font-size: 14px;
-  color: #374151;
-  font-weight: 500;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
 }
 
 .filter-select,
 .filter-input {
-  padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
   min-width: 140px;
+}
+
+.filter-select:focus,
+.filter-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
 }
 
 .filter-clear-btn {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 8px 12px;
-  background-color: #f3f4f6;
-  color: #6b7280;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-background);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--font-size-sm);
+  transition: all var(--duration-fast);
 }
 
 .filter-clear-btn:hover {
-  background-color: #e5e7eb;
+  background: var(--color-background-hover);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
-.reviews-list {
-  padding: 0;
+.project-table-section {
+  margin-bottom: var(--spacing-xl);
 }
 
-.list-header {
-  padding: 16px 24px;
-  border-bottom: 1px solid #e2e8f0;
-  background-color: #f8fafc;
-}
-
-.list-actions {
+.table-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border-light);
 }
 
-.batch-actions {
+.table-header__left {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }
 
-.selected-count {
-  color: #3b82f6;
-  font-weight: 500;
-  font-size: 14px;
+.table-header__left h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
 }
 
-.batch-btn {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px solid;
-  cursor: pointer;
-  font-size: 14px;
+.record-count {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
 }
 
-.batch-btn--danger {
-  background-color: #fef2f2;
-  color: #dc2626;
-  border-color: #fecaca;
-}
-
-.batch-btn--secondary {
-  background-color: #f8fafc;
-  color: #64748b;
-  border-color: #e2e8f0;
-}
-
-.list-info {
-  color: #64748b;
-  font-size: 14px;
-}
-
-.reviews-table-container {
+.table-container {
   overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  margin-bottom: var(--spacing-lg);
 }
 
 .reviews-table {
   width: 100%;
   border-collapse: collapse;
+  background: var(--color-surface);
 }
 
 .reviews-table th,
 .reviews-table td {
-  padding: 12px 16px;
+  padding: var(--spacing-md);
   text-align: left;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .reviews-table th {
-  background-color: #f8fafc;
-  font-weight: 600;
-  color: #374151;
-  font-size: 14px;
+  background: var(--color-background);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
 }
 
 .reviews-table th.sortable {
@@ -678,7 +657,11 @@ watch([searchQuery, filters], () => {
 }
 
 .reviews-table th.sortable:hover {
-  background-color: #f1f5f9;
+  background: var(--color-background-hover);
+}
+
+.table-row:hover {
+  background: var(--color-background);
 }
 
 .table-checkbox {
@@ -692,66 +675,66 @@ watch([searchQuery, filters], () => {
 .rating-display {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-weight: 600;
+  gap: var(--spacing-xs);
+  font-weight: var(--font-weight-semibold);
 }
 
 .rating-excellent {
-  color: #059669;
+  color: var(--color-success);
 }
 
 .rating-good {
-  color: #3b82f6;
+  color: var(--color-primary);
 }
 
 .rating-average {
-  color: #f59e0b;
+  color: var(--color-warning);
 }
 
 .rating-poor {
-  color: #dc2626;
+  color: var(--color-danger);
 }
 
 .rating-score {
-  font-weight: 500;
-  color: #374151;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
 }
 
 .responsible-team {
-  font-weight: 500;
-  color: #3b82f6;
-  background-color: #eff6ff;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
 }
 
 .action-buttons {
   display: flex;
-  gap: 4px;
+  gap: var(--spacing-xs);
 }
 
 .action-btn-sm {
-  padding: 6px;
+  padding: var(--spacing-xs);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-md);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--duration-fast);
 }
 
 .action-btn-sm--info {
-  background-color: #e0f2fe;
-  color: #0891b2;
+  background: var(--color-info-light);
+  color: var(--color-info);
 }
 
 .action-btn-sm--primary {
-  background-color: #dbeafe;
-  color: #2563eb;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
 }
 
 .action-btn-sm--danger {
-  background-color: #fef2f2;
-  color: #dc2626;
+  background: var(--color-danger-light);
+  color: var(--color-danger);
 }
 
 .action-btn-sm:hover {
@@ -762,21 +745,23 @@ watch([searchQuery, filters], () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
-  padding: 20px;
-  border-top: 1px solid #e2e8f0;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--color-border);
 }
 
 .pagination-btn {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 8px 12px;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
   cursor: pointer;
-  color: #64748b;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  transition: all var(--duration-fast);
 }
 
 .pagination-btn:disabled {
@@ -785,32 +770,97 @@ watch([searchQuery, filters], () => {
 }
 
 .pagination-btn:not(:disabled):hover {
-  background-color: #f1f5f9;
+  background: var(--color-background-hover);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .pagination-pages {
   display: flex;
-  gap: 4px;
+  gap: var(--spacing-xs);
 }
 
 .pagination-page {
-  padding: 8px 12px;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
   cursor: pointer;
-  color: #64748b;
+  color: var(--color-text-secondary);
   min-width: 40px;
   text-align: center;
+  font-size: var(--font-size-sm);
+  transition: all var(--duration-fast);
 }
 
 .pagination-page.active {
-  background-color: #3b82f6;
+  background: var(--color-primary);
   color: white;
-  border-color: #3b82f6;
+  border-color: var(--color-primary);
 }
 
 .pagination-page:not(.active):hover {
-  background-color: #f1f5f9;
+  background: var(--color-background-hover);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-wrapper {
+    min-width: auto;
+  }
+
+  .filter-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-group {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .filter-select,
+  .filter-input {
+    min-width: auto;
+    flex: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .panel-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-md);
+  }
+
+  .header-actions {
+    justify-content: center;
+  }
+
+  .table-container {
+    font-size: var(--font-size-xs);
+  }
+
+  .reviews-table th,
+  .reviews-table td {
+    padding: var(--spacing-sm);
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+  }
+
+  .filter-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 </style>
