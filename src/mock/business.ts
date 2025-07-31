@@ -1,3 +1,21 @@
+// 添加缺失的类型定义
+interface AccountBalanceData {
+  totalBalance: number
+  availableBalance: number
+  pendingBalance: number
+  currency: string
+}
+
+interface GoogleAdsOverviewData {
+  totalSpend: number
+  totalImpressions: number
+  totalClicks: number
+  averageCTR: number
+  averageCPC: number
+  conversions: number
+  conversionRate: number
+}
+
 import type {
   BusinessRole,
   MetricCardProps,

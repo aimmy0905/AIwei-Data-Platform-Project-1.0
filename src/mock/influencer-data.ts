@@ -1,7 +1,7 @@
 import type { InfluencerData, MonthlyPostData, KOLBasicInfo, InfluencerDataStats } from '@/types'
 
-// 模拟客户数据
-export const mockCustomers = [
+// 模拟客户数据（红人数据专用）
+export const mockInfluencerCustomers = [
   { id: '1', name: '美妆品牌A' },
   { id: '2', name: '科技公司B' },
   { id: '3', name: '时尚品牌C' },
@@ -9,8 +9,8 @@ export const mockCustomers = [
   { id: '5', name: '运动品牌E' }
 ]
 
-// 模拟项目数据
-export const mockProjects = [
+// 模拟项目数据（红人数据专用）
+export const mockInfluencerProjects = [
   { id: '1', name: '春季新品推广', customerId: '1', customerName: '美妆品牌A' },
   { id: '2', name: '夏季防晒系列', customerId: '1', customerName: '美妆品牌A' },
   { id: '3', name: '新机发布营销', customerId: '2', customerName: '科技公司B' },
@@ -200,7 +200,7 @@ export const mockKOLs: KOLBasicInfo[] = [
 ]
 
 // 模拟发帖数据（月度统计）
-export const mockPostData: MonthlyPostData[] = [
+export const mockInfluencerPostData: MonthlyPostData[] = [
   {
     id: '1',
     month: '2024-03',

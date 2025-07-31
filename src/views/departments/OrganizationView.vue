@@ -269,7 +269,7 @@
             <div class="detail-section">
               <div class="section-header">
                 <h4 class="section-title">部门员工 ({{ departmentEmployees.length }}人)</h4>
-                <button class="action-btn action-btn--primary" @click="addEmployeeToDepartment">
+                <button class="action-btn action-btn--primary" @click="() => addEmployeeToDepartment()">
                   <Plus :size="16" />
                   添加员工
                 </button>

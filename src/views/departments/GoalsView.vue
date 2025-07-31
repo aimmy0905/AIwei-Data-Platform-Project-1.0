@@ -638,7 +638,8 @@ const isFormValid = computed(() => {
   return goalForm.employee_id > 0 &&
          goalForm.period.trim() !== '' &&
          goalForm.period_type !== '' &&
-         goalForm.employee_type !== ''
+         goalForm.employee_type !== '' &&
+         (goalForm.employee_type === 'sales' || goalForm.employee_type === 'operations')
 })
 
 // 生命周期
@@ -703,13 +704,15 @@ const viewGoal = (goal: EmployeeGoal) => {
 }
 
 const copyGoal = (goal: EmployeeGoal) => {
-  const newGoal = { ...goal }
-  delete newGoal.id
+  const { id, ...newGoal } = goal
   newGoal.period = new Date().toISOString().slice(0, 7) // 当前月份
   newGoal.created_at = new Date().toISOString().split('T')[0]
   newGoal.updated_at = new Date().toISOString().split('T')[0]
 
-  Object.assign(goalForm, newGoal)
+  Object.assign(goalForm, {
+    ...newGoal,
+    id: 0 // 重置ID为0表示新建
+  })
   isEditing.value = false
   showGoalModal.value = true
 }
@@ -722,7 +725,7 @@ const deleteGoal = (goal: EmployeeGoal) => {
 }
 
 const submitGoal = () => {
-  if (!isFormValid.value) return
+  if (!isFormValid.value || goalForm.employee_type === '') return
 
   if (isEditing.value) {
     // 更新目标
@@ -736,8 +739,8 @@ const submitGoal = () => {
         department_id: employee?.department_id || 0,
         department_name: employee?.department_name || '',
         period: goalForm.period,
-        period_type: goalForm.period_type,
-        employee_type: goalForm.employee_type,
+        period_type: goalForm.period_type as 'monthly' | 'quarterly' | 'yearly',
+        employee_type: goalForm.employee_type as 'sales' | 'operations',
         sales_goals: goalForm.employee_type === 'sales' ? goalForm.sales_goals : undefined,
         operations_goals: goalForm.employee_type === 'operations' ? goalForm.operations_goals : undefined,
         status: goalForm.status,
@@ -756,8 +759,8 @@ const submitGoal = () => {
       department_id: employee?.department_id || 0,
       department_name: employee?.department_name || '',
       period: goalForm.period,
-      period_type: goalForm.period_type,
-      employee_type: goalForm.employee_type,
+      period_type: goalForm.period_type as 'monthly' | 'quarterly' | 'yearly',
+      employee_type: goalForm.employee_type as 'sales' | 'operations',
       sales_goals: goalForm.employee_type === 'sales' ? goalForm.sales_goals : undefined,
       operations_goals: goalForm.employee_type === 'operations' ? goalForm.operations_goals : undefined,
       status: goalForm.status,
