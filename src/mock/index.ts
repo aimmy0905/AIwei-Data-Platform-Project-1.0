@@ -6,6 +6,12 @@ export * from './customer'
 export * from './service-fees'
 export * from './business'
 export * from './reports'
+export * from './auth'
+export * from './projects'
+export * from './departments'
+export * from './customer-reviews'
+export * from './service-fees'
+export * from './influencer-data'
 
 // Mock菜单数据
 import type { MenuItem, UserRole } from '@/types'
