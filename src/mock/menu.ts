@@ -272,21 +272,6 @@ export const mockMenuItems: MenuItem[] = [
     roles: ['superAdmin', 'manager']
   },
   {
-    id: 'performance-management',
-    name: '业绩管理',
-    icon: 'TrendingUp',
-    children: [
-      {
-        id: 'performance-dashboard',
-        name: '业绩看板',
-        icon: 'BarChart3',
-        path: '/performance/dashboard',
-        roles: ['superAdmin', 'manager', 'staff', 'sales']
-      }
-    ],
-    roles: ['superAdmin', 'manager', 'staff', 'sales']
-  },
-  {
     id: 'projects',
     name: '项目管理',
     icon: 'FolderOpen',

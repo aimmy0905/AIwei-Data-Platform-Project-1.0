@@ -35,12 +35,12 @@ export const mockDepartments: Department[] = [
     name: '销售一部',
     code: 'SALES_1',
     parent_id: 2,
-    manager_id: 3,
+    manager_id: 3, // 对应李主管
     manager_name: '李主管',
     description: '负责华东地区销售业务',
     sort_order: 1,
     status: 'active',
-    employee_count: 8,
+    employee_count: 3, // 实际员工数
     created_at: '2023-01-01',
     updated_at: '2023-01-01'
   },

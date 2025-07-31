@@ -43,7 +43,7 @@
             <div class="no-data-icon">🏢</div>
             <div class="no-data-text">暂无部门数据</div>
           </div>
-          <div v-else class="department-tree">
+          <div v-else class="organization-tree">
             <DepartmentTreeNode
               v-for="department in filteredDepartments"
               :key="department.id"
@@ -464,7 +464,7 @@ import {
 } from 'lucide-vue-next'
 import { mockDepartments, allEmployees, buildDepartmentTree } from '@/mock/departments'
 import type { Department, Employee } from '@/types/departments'
-import DepartmentTreeNode from '@/components/departments/DepartmentTreeNode.vue'
+import DepartmentTreeNode from '@/components/departments/DepartmentTreeNodeNew.vue'
 
 // 响应式数据
 const searchKeyword = ref('')
@@ -994,8 +994,11 @@ const resetEmployeeForm = () => {
   font-size: 16px;
 }
 
-.department-tree {
-  border-top: 1px solid var(--color-border-light);
+.organization-tree {
+  padding: 24px;
+  background: #f8fafc;
+  min-height: 400px;
+  border-radius: 12px;
 }
 
 /* 弹窗样式 */

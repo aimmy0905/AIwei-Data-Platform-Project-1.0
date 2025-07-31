@@ -1,28 +1,71 @@
 <template>
-  <div class="department-node" :class="{ 'department-node--expanded': isExpanded }">
-    <div class="node-content" :style="{ paddingLeft: `${level * 24}px` }">
-      <div class="node-toggle" @click="toggleExpanded">
+  <div class="department-node" :class="{
+    'department-node--expanded': isExpanded,
+    'department-node--leaf': isLeafDepartment
+  }">
+    <!-- 主要部门信息 -->
+    <div class="node-header" :style="{ paddingLeft: `${level * 20}px` }">
+      <!-- 展开/收起按钮 -->
+      <button
+        v-if="hasChildren || (isLeafDepartment && regularEmployees.length > 0)"
+        class="node-toggle"
+        @click="toggleExpanded"
+        :aria-label="isExpanded ? '收起' : '展开'"
+      >
         <ChevronRight
-          v-if="hasChildren"
           :size="16"
           class="toggle-icon"
           :class="{ 'toggle-icon--expanded': isExpanded }"
         />
-        <div v-else class="toggle-placeholder"></div>
-      </div>
+      </button>
+      <div v-else class="node-toggle-placeholder"></div>
 
-      <div class="node-info" @click="handleNodeClick">
+      <!-- 部门基本信息 -->
+      <div class="node-main" @click="handleNodeClick">
         <div class="node-icon">
-          <Building :size="18" />
+          <Building :size="20" />
         </div>
-        <div class="node-details">
-          <div class="node-name">{{ department.name }}</div>
-          <div class="node-meta">
-            <span class="node-code">{{ department.code }}</span>
-            <span class="node-count">({{ department.employee_count }}人)</span>
-            <span v-if="department.manager_name" class="node-manager">
-              负责人：{{ department.manager_name }}
-            </span>
+
+        <div class="node-content">
+          <div class="node-primary">
+            <h3 class="node-title">{{ department.name }}</h3>
+            <div class="node-badges">
+              <span class="badge badge--code">{{ department.code }}</span>
+              <span class="badge badge--count">{{ getTotalEmployeeCount }}人</span>
+              <span
+                class="badge badge--status"
+                :class="`badge--${department.status}`"
+              >
+                {{ department.status === 'active' ? '启用' : '停用' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- 部门经理信息 -->
+          <div v-if="departmentManager" class="node-manager">
+            <div class="manager-avatar">
+              <span class="manager-initial">{{ departmentManager.name.charAt(0) }}</span>
+            </div>
+            <div class="manager-info">
+              <div class="manager-name">{{ departmentManager.name }}</div>
+              <div class="manager-meta">
+                <span class="manager-position">{{ departmentManager.position }}</span>
+                <span class="manager-phone">{{ departmentManager.phone }}</span>
+              </div>
+            </div>
+            <div class="manager-status">
+              <span class="status-badge" :class="getEmployeeStatusClass(departmentManager.status)">
+                {{ getEmployeeStatusText(departmentManager.status) }}
+              </span>
+            </div>
+          </div>
+
+          <!-- 无经理提示 -->
+          <div v-else-if="isLeafDepartment" class="node-manager node-manager--empty">
+            <div class="manager-empty-icon">
+              <Building :size="16" />
+            </div>
+            <div class="manager-empty-text">暂未指定部门经理</div>
           </div>
         </div>
       </div>
@@ -68,8 +111,8 @@
       </div>
     </div>
 
-    <!-- 员工列表 -->
-    <div v-if="isExpanded && departmentEmployees.length > 0" class="node-employees">
+    <!-- 员工列表 - 只在最底层部门显示 -->
+    <div v-if="isExpanded && isLeafDepartment && regularEmployees.length > 0" class="node-employees">
       <div class="employees-header" @click="toggleEmployeesExpanded">
         <div class="employees-header-left">
           <ChevronRight
@@ -77,7 +120,7 @@
             class="employees-toggle-icon"
             :class="{ 'employees-toggle-icon--expanded': isEmployeesExpanded }"
           />
-          <span class="employees-title">部门员工 ({{ departmentEmployees.length }}人)</span>
+          <span class="employees-title">部门员工 ({{ regularEmployees.length }}人)</span>
         </div>
         <button
           class="add-employee-btn"
@@ -89,7 +132,7 @@
       </div>
       <div v-if="isEmployeesExpanded" class="employees-list">
         <div
-          v-for="employee in departmentEmployees"
+          v-for="employee in regularEmployees"
           :key="employee.id"
           class="employee-item"
         >
@@ -180,13 +223,41 @@ const hasChildren = computed(() => {
   return props.department.children && props.department.children.length > 0
 })
 
+// 判断是否为最底层部门（叶子节点）
+const isLeafDepartment = computed(() => {
+  return !hasChildren.value
+})
+
+// 获取当前部门的所有员工
 const departmentEmployees = computed(() => {
   if (!props.employees) return []
   return props.employees.filter(emp => emp.department_id === props.department.id)
 })
 
+// 获取部门经理
+const departmentManager = computed(() => {
+  if (!props.department.manager_id || !props.employees) return null
+  return props.employees.find(emp => emp.id === props.department.manager_id)
+})
+
+// 获取普通员工（排除部门经理）
+const regularEmployees = computed(() => {
+  return departmentEmployees.value.filter(emp => emp.id !== props.department.manager_id)
+})
+
+// 获取总员工数（包括子部门）
+const getTotalEmployeeCount = computed(() => {
+  if (isLeafDepartment.value) {
+    // 最底层部门：返回实际员工数
+    return departmentEmployees.value.length
+  } else {
+    // 上级部门：返回配置的员工数（包含子部门统计）
+    return props.department.employee_count || 0
+  }
+})
+
 const toggleExpanded = () => {
-  if (hasChildren.value || departmentEmployees.value.length > 0) {
+  if (hasChildren.value || (isLeafDepartment.value && regularEmployees.value.length > 0)) {
     isExpanded.value = !isExpanded.value
   }
 }
@@ -309,8 +380,87 @@ const getEmployeeStatusText = (status: string): string => {
   font-weight: 500;
 }
 
-.node-manager {
+/* 部门经理信息样式 */
+.manager-info {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--color-background);
+  border-radius: 6px;
+  border-left: 3px solid var(--color-primary);
+}
+
+.manager-label {
+  font-size: 11px;
   color: var(--color-text-secondary);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.manager-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.manager-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.manager-position {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.manager-phone {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-family: monospace;
+}
+
+.manager-status {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.manager-info--empty {
+  border-left-color: var(--color-border);
+  background: var(--color-surface);
+}
+
+.manager-empty {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* 优化节点间距 */
+.node-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.node-count {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+/* 最底层部门特殊样式 */
+.department-node--leaf {
+  border-left: 2px solid var(--color-success);
+}
+
+.department-node--leaf .node-name {
+  color: var(--color-success);
+  font-weight: 600;
 }
 
 .node-status {
