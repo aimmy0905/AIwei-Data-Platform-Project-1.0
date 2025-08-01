@@ -58,7 +58,7 @@ export interface PerformanceRecord {
   period_type: 'monthly' | 'quarterly' | 'yearly'
   evaluator_id: number
   evaluator_name: string
-  
+
   // 数据指标评分 (40分)
   data_metrics: {
     new_service_fee: {
@@ -92,7 +92,7 @@ export interface PerformanceRecord {
       weight: number
     }
   }
-  
+
   // 客户评分 (30分)
   customer_rating: {
     satisfaction: number // 客户满意度
@@ -100,7 +100,7 @@ export interface PerformanceRecord {
     response_speed: number // 响应速度
     total_score: number
   }
-  
+
   // 上级评分 (30分)
   supervisor_rating: {
     work_attitude: number // 工作态度
@@ -109,7 +109,7 @@ export interface PerformanceRecord {
     innovation: number // 创新能力
     total_score: number
   }
-  
+
   total_score: number
   grade: 'excellent' | 'good' | 'average' | 'poor' // 优秀、良好、一般、较差
   rank_in_department: number
@@ -129,7 +129,7 @@ export interface EmployeeGoal {
   period: string
   period_type: 'monthly' | 'quarterly' | 'yearly'
   employee_type: 'sales' | 'operations'
-  
+
   // 销售目标
   sales_goals?: {
     new_service_fee: {
@@ -145,7 +145,7 @@ export interface EmployeeGoal {
       weight: number
     }
   }
-  
+
   // 运营目标
   operations_goals?: {
     service_fee: {
@@ -157,7 +157,7 @@ export interface EmployeeGoal {
       weight: number
     }
   }
-  
+
   status: 'active' | 'completed' | 'cancelled'
   created_by: number
   created_by_name: string
@@ -195,4 +195,147 @@ export interface DepartmentStats {
   }
   goals_completion_rate: number
   period: string
+}
+
+// 新的绩效管理系统类型定义
+
+// 用户角色类型
+export type UserRole = 'general_manager' | 'sales_director' | 'sales_manager' | 'project_director' | 'project_manager' | 'sales_staff' | 'operations_staff'
+
+// 考核周期类型
+export type PeriodType = 'monthly' | 'quarterly' | 'yearly'
+
+// 部门类型
+export type DepartmentType = 'sales' | 'operations'
+
+// 职级类型
+export type PositionLevel = 'staff' | 'manager' | 'director' | 'general_manager'
+
+// 数据指标配置
+export interface MetricConfig {
+  id: string
+  name: string
+  department: DepartmentType
+  position_level: PositionLevel
+  period_type: PeriodType
+  weight: number // 权重百分比
+  target_field: string
+  unit: string
+  description: string
+}
+
+// 智能方案考核项目
+export interface IntelligentAssessmentItem {
+  id: string
+  name: string
+  description: string
+  max_score: number
+}
+
+// 智能方案考核配置
+export interface IntelligentAssessmentConfig {
+  id: string
+  department: DepartmentType
+  position_level: PositionLevel
+  evaluator_role: UserRole
+  items: IntelligentAssessmentItem[]
+  weight: number // 权重百分比
+}
+
+// 权重配置
+export interface WeightConfig {
+  department: DepartmentType
+  position_level: PositionLevel
+  data_weight: number // 数据指标权重
+  customer_weight: number // 客户评价权重
+  intelligent_weight: number // 智能方案考核权重
+}
+
+// 绩效目标设置
+export interface PerformanceTarget {
+  id: number
+  employee_id: number
+  period: string
+  period_type: PeriodType
+  metrics: Record<string, number> // 各项指标的目标值
+  created_by: number
+  created_at: string
+  updated_at: string
+}
+
+// 绩效评分记录
+export interface PerformanceRating {
+  id: number
+  employee_id: number
+  period: string
+  period_type: PeriodType
+  rater_id: number
+  rater_role: UserRole
+  assessment_type: 'customer' | 'intelligent'
+  scores: Record<string, number>
+  total_score: number
+  comments?: string
+  created_at: string
+  updated_at: string
+}
+
+// 新的完整绩效记录
+export interface NewPerformanceRecord {
+  id: number
+  employee_id: number
+  employee_name: string
+  employee_position: string
+  department_id: number
+  department_name: string
+  department_type: DepartmentType
+  position_level: PositionLevel
+  period: string
+  period_type: PeriodType
+
+  // 数据指标得分
+  data_metrics: {
+    [key: string]: {
+      target: number
+      actual: number
+      completion_rate: number
+      score: number
+      weight: number
+    }
+  }
+  data_score: number
+  data_weight: number
+
+  // 客户评价得分
+  customer_ratings: {
+    [key: string]: number
+  }
+  customer_score: number
+  customer_weight: number
+
+  // 智能方案考核得分
+  intelligent_ratings: {
+    [key: string]: number
+  }
+  intelligent_score: number
+  intelligent_weight: number
+
+  // 综合得分
+  total_score: number
+  grade: 'S' | 'A' | 'B' | 'C' | 'D'
+  rank_in_department: number
+  rank_in_company: number
+
+  // 状态和时间
+  status: 'draft' | 'in_progress' | 'completed' | 'approved'
+  created_at: string
+  updated_at: string
+
+  // 评价人信息
+  evaluators: {
+    customer?: number[]
+    intelligent?: number
+  }
+
+  // 备注
+  comments?: string
 }

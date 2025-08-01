@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多层级绩效考核管理系统</title>
+    <style>
+        :root {
+            --color-primary: #3b82f6;
+            --color-surface: #ffffff;
+            --color-background: #f8fafc;
+            --color-border: #e2e8f0;
+            --color-border-light: #f1f5f9;
+            --color-text-primary: #1e293b;
+            --color-text-secondary: #64748b;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .demo-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .demo-header h1 {
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        
+        .demo-header p {
+            color: #64748b;
+            font-size: 16px;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .feature-card {
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+        }
+        
+        .feature-card h3 {
+            margin: 0 0 12px 0;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .feature-card ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #64748b;
+        }
+        
+        .feature-card li {
+            margin-bottom: 6px;
+        }
+        
+        .system-overview {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .system-overview h3 {
+            margin: 0 0 16px 0;
+            color: #0c4a6e;
+        }
+        
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        
+        .overview-item {
+            background: white;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #bae6fd;
+        }
+        
+        .overview-item h4 {
+            margin: 0 0 8px 0;
+            color: #0c4a6e;
+            font-size: 14px;
+        }
+        
+        .overview-item p {
+            margin: 0;
+            color: #0369a1;
+            font-size: 13px;
+        }
+        
+        .role-permissions {
+            background: #f0fdf4;
+            border: 1px solid #16a34a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .role-permissions h3 {
+            margin: 0 0 16px 0;
+            color: #14532d;
+        }
+        
+        .permissions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .permission-item {
+            background: white;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #bbf7d0;
+        }
+        
+        .permission-item h4 {
+            margin: 0 0 8px 0;
+            color: #14532d;
+            font-size: 14px;
+        }
+        
+        .permission-item ul {
+            margin: 0;
+            padding-left: 16px;
+            color: #166534;
+            font-size: 13px;
+        }
+        
+        .permission-item li {
+            margin-bottom: 4px;
+        }
+        
+        .assessment-structure {
+            background: #fefce8;
+            border: 1px solid #eab308;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .assessment-structure h3 {
+            margin: 0 0 16px 0;
+            color: #713f12;
+        }
+        
+        .structure-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+        
+        .structure-item {
+            background: white;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #fde047;
+        }
+        
+        .structure-item h4 {
+            margin: 0 0 12px 0;
+            color: #713f12;
+            font-size: 14px;
+        }
+        
+        .weight-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 8px;
+            background: #fefce8;
+            border-radius: 4px;
+        }
+        
+        .weight-name {
+            font-size: 13px;
+            color: #854d0e;
+        }
+        
+        .weight-value {
+            font-weight: 600;
+            color: #713f12;
+        }
+        
+        .metrics-list {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 0 0;
+        }
+        
+        .metrics-list li {
+            padding: 4px 0;
+            color: #92400e;
+            font-size: 12px;
+        }
+        
+        .metrics-list li::before {
+            content: "•";
+            color: #eab308;
+            margin-right: 6px;
+        }
+        
+        .demo-actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .demo-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .demo-btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #a855f7 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>🎯 多层级绩效考核管理系统</h1>
+            <p>完整的企业级绩效管理解决方案，支持<span class="highlight">月度、季度、年度</span>多维度考核</p>
+        </div>
+        
+        <div class="system-overview">
+            <h3>🏢 系统核心功能概览</h3>
+            <div class="overview-grid">
+                <div class="overview-item">
+                    <h4>📅 时间维度切换</h4>
+                    <p>支持月度、季度、年度考核周期的灵活切换，查看历史数据和设置未来目标</p>
+                </div>
+                <div class="overview-item">
+                    <h4>📊 综合考核体系</h4>
+                    <p>数据指标、客户评价、智能方案三维度综合评估，权重可配置</p>
+                </div>
+                <div class="overview-item">
+                    <h4>🎯 分层级管理</h4>
+                    <p>按部门和职级分类的差异化考核指标，精准匹配岗位要求</p>
+                </div>
+                <div class="overview-item">
+                    <h4>🔐 权限控制</h4>
+                    <p>基于角色的权限管理，确保数据安全和操作规范</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>🎯 数据指标体系</h3>
+                <ul>
+                    <li><strong>运营部门</strong>：服务费、返点目标完成率</li>
+                    <li><strong>销售部门</strong>：新单服务费、单量、续费金额</li>
+                    <li><strong>管理层</strong>：个人业绩 + 团队业绩双重考核</li>
+                    <li><strong>智能计算</strong>：自动计算完成率和得分</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3>⭐ 智能方案考核</h3>
+                <ul>
+                    <li><strong>项目经理</strong>：团队管理、客户评价管理、知识输出</li>
+                    <li><strong>普通员工</strong>：客户服务、工作质量、沟通协作</li>
+                    <li><strong>销售经理</strong>：成员成长、流程规范、策略辅导</li>
+                    <li><strong>销售人员</strong>：客户拜访量、成交转化率</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3>📱 交互设计</h3>
+                <ul>
+                    <li><strong>时间切换器</strong>：直观的周期选择界面</li>
+                    <li><strong>多视图模式</strong>：表格视图和卡片视图切换</li>
+                    <li><strong>智能筛选</strong>：部门、职级、状态多维筛选</li>
+                    <li><strong>实时排序</strong>：支持各项指标的升降序排列</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3>📈 数据可视化</h3>
+                <ul>
+                    <li><strong>统计概览</strong>：参与人数、平均得分、完成进度</li>
+                    <li><strong>趋势分析</strong>：历史数据对比和趋势展示</li>
+                    <li><strong>排名展示</strong>：部门内排名和全公司排名</li>
+                    <li><strong>进度跟踪</strong>：考核完成进度和截止提醒</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="role-permissions">
+            <h3>🔐 角色权限体系</h3>
+            <div class="permissions-grid">
+                <div class="permission-item">
+                    <h4>👑 总经理</h4>
+                    <ul>
+                        <li>查看全公司所有数据</li>
+                        <li>设置所有员工目标</li>
+                        <li>审批所有考核结果</li>
+                        <li>导出完整数据报告</li>
+                    </ul>
+                </div>
+                
+                <div class="permission-item">
+                    <h4>📊 销售总监</h4>
+                    <ul>
+                        <li>查看销售部门全部数据</li>
+                        <li>为销售经理评分和设置目标</li>
+                        <li>审核销售团队考核</li>
+                        <li>制定销售考核策略</li>
+                    </ul>
+                </div>
+                
+                <div class="permission-item">
+                    <h4>🎯 销售经理</h4>
+                    <ul>
+                        <li>查看下属销售人员数据</li>
+                        <li>为销售人员评分和设置目标</li>
+                        <li>录入客户拜访数据</li>
+                        <li>管理团队绩效</li>
+                    </ul>
+                </div>
+                
+                <div class="permission-item">
+                    <h4>🔧 项目总监</h4>
+                    <ul>
+                        <li>查看运营部门全部数据</li>
+                        <li>为项目经理评分和设置目标</li>
+                        <li>审核运营团队考核</li>
+                        <li>优化运营考核流程</li>
+                    </ul>
+                </div>
+                
+                <div class="permission-item">
+                    <h4>📋 项目经理</h4>
+                    <ul>
+                        <li>查看下属员工数据</li>
+                        <li>为运营人员评分和设置目标</li>
+                        <li>管理客户评价</li>
+                        <li>培训团队成员</li>
+                    </ul>
+                </div>
+                
+                <div class="permission-item">
+                    <h4>👤 普通员工</h4>
+                    <ul>
+                        <li>查看个人绩效数据</li>
+                        <li>查看历史考核记录</li>
+                        <li>查看目标完成进度</li>
+                        <li>接收考核通知</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="assessment-structure">
+            <h3>⚖️ 考核权重结构</h3>
+            <div class="structure-grid">
+                <div class="structure-item">
+                    <h4>运营部门 - 普通员工</h4>
+                    <div class="weight-info">
+                        <span class="weight-name">数据指标</span>
+                        <span class="weight-value">40%</span>
+                    </div>
+                    <div class="weight-info">
+                        <span class="weight-name">客户评价</span>
+                        <span class="weight-value">30%</span>
+                    </div>
+                    <div class="weight-info">
+                        <span class="weight-name">智能方案</span>
+                        <span class="weight-value">30%</span>
+                    </div>
+                    <ul class="metrics-list">
+                        <li>服务费目标完成率 (50%)</li>
+                        <li>返点目标完成率 (50%)</li>
+                    </ul>
+                </div>
+                
+                <div class="structure-item">
+                    <h4>运营部门 - 项目经理</h4>
+                    <div class="weight-info">
+                        <span class="weight-name">数据指标</span>
+                        <span class="weight-value">50%</span>
+                    </div>
+                    <div class="weight-info">
+                        <span class="weight-name">客户评价</span>
+                        <span class="weight-value">25%</span>
+                    </div>
+                    <div class="weight-info">
+                        <span class="weight-name">智能方案</span>
+                        <span class="weight-value">25%</span>
+                    </div>
+                    <ul class="metrics-list">
+                        <li>季度服务费目标 (50%)</li>
+                        <li>季度返点目标 (50%)</li>
+                    </ul>
+                </div>
+                
+                <div class="structure-item">
+                    <h4>销售部门 - 销售人员</h4>
+                    <div class="weight-info">
+                        <span class="weight-name">数据指标</span>
+                        <span class="weight-value">60%</span>
+                    </div>
+                    <div class="weight-info">
+                        <span class="weight-name">客户评价</span>
+                        <span class="weight-value">20%</span>
+                    </div>
+                    <div class="weight-info">
+                        <span class="weight-name">智能方案</span>
+                        <span class="weight-value">20%</span>
+                    </div>
+                    <ul class="metrics-list">
+                        <li>新单服务费 (40%)</li>
+                        <li>新单单量 (30%)</li>
+                        <li>续费金额 (30%)</li>
+                    </ul>
+                </div>
+                
+                <div class="structure-item">
+                    <h4>销售部门 - 销售经理</h4>
+                    <div class="weight-info">
+                        <span class="weight-name">数据指标</span>
+                        <span class="weight-value">50%</span>
+                    </div>
+                    <div class="weight-info">
+                        <span class="weight-name">客户评价</span>
+                        <span class="weight-value">25%</span>
+                    </div>
+                    <div class="weight-info">
+                        <span class="weight-name">智能方案</span>
+                        <span class="weight-value">25%</span>
+                    </div>
+                    <ul class="metrics-list">
+                        <li>个人新单服务费 (25%)</li>
+                        <li>个人新单单量 (25%)</li>
+                        <li>团队新单服务费 (25%)</li>
+                        <li>团队续费服务费 (25%)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-actions">
+            <a href="http://localhost:5174/" class="demo-btn">
+                🚀 查看完整系统演示
+            </a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>销售部门绩效考核更新 - 客户评价列删除</title>
+    <style>
+        :root {
+            --color-primary: #3b82f6;
+            --color-surface: #ffffff;
+            --color-background: #f8fafc;
+            --color-border: #e2e8f0;
+            --color-text-primary: #1e293b;
+            --color-text-secondary: #64748b;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-error: #ef4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--color-background);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: var(--color-surface);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            font-size: 18px;
+            color: var(--color-text-secondary);
+        }
+        
+        .update-card {
+            background: var(--color-surface);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--color-success);
+        }
+        
+        .update-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .update-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--color-success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .update-title h2 {
+            font-size: 24px;
+            color: var(--color-success);
+        }
+        
+        .changes-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .change-section {
+            background: var(--color-surface);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .change-section.before {
+            border-left: 4px solid var(--color-error);
+        }
+        
+        .change-section.after {
+            border-left: 4px solid var(--color-success);
+        }
+        
+        .change-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .change-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .before .change-icon {
+            background: var(--color-error);
+        }
+        
+        .after .change-icon {
+            background: var(--color-success);
+        }
+        
+        .change-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .before .change-title {
+            color: var(--color-error);
+        }
+        
+        .after .change-title {
+            color: var(--color-success);
+        }
+        
+        .table-preview {
+            background: #f8fafc;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 16px;
+        }
+        
+        .table-header {
+            background: var(--color-background);
+            padding: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .table-columns {
+            display: grid;
+            gap: 12px;
+            padding: 12px;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+        }
+        
+        .before .table-columns {
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+        }
+        
+        .after .table-columns {
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+        }
+        
+        .column {
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            text-align: center;
+            border: 1px solid var(--color-border);
+        }
+        
+        .column.removed {
+            background: #fef2f2;
+            color: var(--color-error);
+            text-decoration: line-through;
+        }
+        
+        .weight-comparison {
+            background: var(--color-surface);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .weight-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--color-text-primary);
+        }
+        
+        .weight-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .weight-item {
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--color-border);
+        }
+        
+        .weight-item.before {
+            background: #fef2f2;
+        }
+        
+        .weight-item.after {
+            background: #f0fdf4;
+        }
+        
+        .weight-label {
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .weight-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .weight-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .weight-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .weight-name {
+            color: var(--color-text-primary);
+        }
+        
+        .weight-value {
+            font-weight: 600;
+        }
+        
+        .before .weight-value {
+            color: var(--color-error);
+        }
+        
+        .after .weight-value {
+            color: var(--color-success);
+        }
+        
+        .removed-item {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        
+        .benefits-section {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+        
+        .benefits-title {
+            color: #0c4a6e;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .benefits-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .benefits-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 8px 0;
+            color: #0369a1;
+        }
+        
+        .benefit-icon {
+            width: 20px;
+            height: 20px;
+            background: #0ea5e9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        .action-section {
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: var(--color-primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin: 0 8px;
+        }
+        
+        .btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+        
+        .btn--secondary {
+            background: var(--color-surface);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+        }
+        
+        .btn--secondary:hover {
+            background: var(--color-background);
+            border-color: var(--color-primary);
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #a855f7 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 销售部门绩效考核更新</h1>
+            <p>客户评价列已删除，权重重新分配</p>
+        </div>
+        
+        <div class="update-card">
+            <div class="update-title">
+                <div class="update-icon">✓</div>
+                <h2>更新完成报告</h2>
+            </div>
+            
+            <p style="color: var(--color-text-secondary); margin-bottom: 20px;">
+                根据业务需求，已成功删除销售部门绩效考核列表中的<span class="highlight">客户评价列</span>，
+                并重新调整了数据指标和智能方案的权重分配，确保总权重仍为100%。
+            </p>
+        </div>
+        
+        <div class="changes-grid">
+            <div class="change-section before">
+                <div class="change-header">
+                    <div class="change-icon">×</div>
+                    <div class="change-title">修改前</div>
+                </div>
+                <div class="table-preview">
+                    <div class="table-header">销售部门考核列表</div>
+                    <div class="table-columns">
+                        <div class="column">员工信息</div>
+                        <div class="column">数据得分</div>
+                        <div class="column removed">客户评价</div>
+                        <div class="column">智能方案</div>
+                        <div class="column">综合得分</div>
+                        <div class="column">操作</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="change-section after">
+                <div class="change-header">
+                    <div class="change-icon">✓</div>
+                    <div class="change-title">修改后</div>
+                </div>
+                <div class="table-preview">
+                    <div class="table-header">销售部门考核列表</div>
+                    <div class="table-columns">
+                        <div class="column">员工信息</div>
+                        <div class="column">数据得分</div>
+                        <div class="column">智能方案</div>
+                        <div class="column">综合得分</div>
+                        <div class="column">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="weight-comparison">
+            <div class="weight-title">🎯 权重配置调整对比</div>
+            <div class="weight-grid">
+                <div class="weight-item before">
+                    <div class="weight-label">销售人员 - 修改前</div>
+                    <ul class="weight-list">
+                        <li>
+                            <span class="weight-name">数据指标</span>
+                            <span class="weight-value">60%</span>
+                        </li>
+                        <li class="removed-item">
+                            <span class="weight-name">客户评价</span>
+                            <span class="weight-value">20%</span>
+                        </li>
+                        <li>
+                            <span class="weight-name">智能方案</span>
+                            <span class="weight-value">20%</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="weight-item after">
+                    <div class="weight-label">销售人员 - 修改后</div>
+                    <ul class="weight-list">
+                        <li>
+                            <span class="weight-name">数据指标</span>
+                            <span class="weight-value">70%</span>
+                        </li>
+                        <li>
+                            <span class="weight-name">智能方案</span>
+                            <span class="weight-value">30%</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="weight-item before">
+                    <div class="weight-label">销售经理 - 修改前</div>
+                    <ul class="weight-list">
+                        <li>
+                            <span class="weight-name">数据指标</span>
+                            <span class="weight-value">50%</span>
+                        </li>
+                        <li class="removed-item">
+                            <span class="weight-name">客户评价</span>
+                            <span class="weight-value">25%</span>
+                        </li>
+                        <li>
+                            <span class="weight-name">智能方案</span>
+                            <span class="weight-value">25%</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="weight-item after">
+                    <div class="weight-label">销售经理 - 修改后</div>
+                    <ul class="weight-list">
+                        <li>
+                            <span class="weight-name">数据指标</span>
+                            <span class="weight-value">65%</span>
+                        </li>
+                        <li>
+                            <span class="weight-name">智能方案</span>
+                            <span class="weight-value">35%</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="benefits-section">
+            <div class="benefits-title">💡 更新带来的优势</div>
+            <ul class="benefits-list">
+                <li>
+                    <div class="benefit-icon">1</div>
+                    <div>
+                        <strong>简化考核流程</strong> - 减少了客户评价数据收集的复杂性，提高考核效率
+                    </div>
+                </li>
+                <li>
+                    <div class="benefit-icon">2</div>
+                    <div>
+                        <strong>突出业绩导向</strong> - 增加数据指标权重，更加注重销售业绩表现
+                    </div>
+                </li>
+                <li>
+                    <div class="benefit-icon">3</div>
+                    <div>
+                        <strong>强化能力考核</strong> - 提升智能方案权重，重视销售技能和工作能力
+                    </div>
+                </li>
+                <li>
+                    <div class="benefit-icon">4</div>
+                    <div>
+                        <strong>界面更简洁</strong> - 减少表格列数，提升用户体验和数据可读性
+                    </div>
+                </li>
+                <li>
+                    <div class="benefit-icon">5</div>
+                    <div>
+                        <strong>保持一致性</strong> - 运营部门仍保留客户评价，销售部门专注于业绩指标
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="action-section">
+            <a href="test-performance-system.html" class="btn">
+                📋 查看系统概览
+            </a>
+            <a href="#" class="btn btn--secondary" onclick="alert('请启动开发服务器后访问 http://localhost:5173/#/departments/performance')">
+                🚀 查看更新后的系统
+            </a>
+        </div>
+        
+        <div style="margin-top: 40px; padding: 20px; background: var(--color-surface); border-radius: 8px; text-align: center;">
+            <h3 style="margin-bottom: 12px; color: var(--color-text-primary);">🎉 更新完成</h3>
+            <p style="color: var(--color-text-secondary);">
+                销售部门绩效考核列表的客户评价列已成功删除，<br>
+                权重重新分配完成，系统功能正常运行。<br>
+                <span class="highlight">数据指标权重提升，智能方案权重增加</span>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
