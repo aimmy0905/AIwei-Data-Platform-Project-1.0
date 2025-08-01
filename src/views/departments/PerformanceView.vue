@@ -96,13 +96,13 @@
     <div class="stats-overview">
       <div class="stat-card stat-card--primary">
         <div class="stat-icon">
-          <Users :size="24" />
+          <Users :size="20" />
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ stats.totalEmployees }}</div>
           <div class="stat-label">参与考核人数</div>
           <div class="stat-trend">
-            <TrendingUp :size="14" />
+            <TrendingUp :size="12" />
             <span>+5.2%</span>
           </div>
         </div>
@@ -110,13 +110,13 @@
 
       <div class="stat-card stat-card--success">
         <div class="stat-icon">
-          <Award :size="24" />
+          <Award :size="20" />
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ stats.averageScore.toFixed(1) }}</div>
           <div class="stat-label">平均综合得分</div>
           <div class="stat-trend">
-            <TrendingUp :size="14" />
+            <TrendingUp :size="12" />
             <span>+2.1%</span>
           </div>
         </div>
@@ -124,7 +124,7 @@
 
       <div class="stat-card stat-card--info">
         <div class="stat-icon">
-          <CheckCircle :size="24" />
+          <CheckCircle :size="20" />
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ stats.completedCount }}</div>
@@ -143,13 +143,13 @@
 
       <div class="stat-card stat-card--warning">
         <div class="stat-icon">
-          <Clock :size="24" />
+          <Clock :size="20" />
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ stats.pendingCount }}</div>
           <div class="stat-label">待完成考核</div>
           <div class="stat-deadline">
-            <AlertCircle :size="14" />
+            <AlertCircle :size="12" />
             <span>{{ daysUntilDeadline }}天截止</span>
           </div>
         </div>
@@ -200,13 +200,18 @@
               <th>职位</th>
               <th>考核周期</th>
               <th @click="sortBy('data_score')" class="sortable">
-                数据得分
+                {{ getDataScoreLabel() }}
                 <ChevronUp v-if="sortField === 'data_score' && sortOrder === 'asc'" :size="14" />
                 <ChevronDown v-if="sortField === 'data_score' && sortOrder === 'desc'" :size="14" />
               </th>
-
+              <!-- 客户评价列 - 仅运营部门显示 -->
+              <th v-if="shouldShowCustomerScore()" @click="sortBy('customer_score')" class="sortable">
+                客户评价
+                <ChevronUp v-if="sortField === 'customer_score' && sortOrder === 'asc'" :size="14" />
+                <ChevronDown v-if="sortField === 'customer_score' && sortOrder === 'desc'" :size="14" />
+              </th>
               <th @click="sortBy('intelligent_score')" class="sortable">
-                智能方案
+                {{ getIntelligentScoreLabel() }}
                 <ChevronUp v-if="sortField === 'intelligent_score' && sortOrder === 'asc'" :size="14" />
                 <ChevronDown v-if="sortField === 'intelligent_score' && sortOrder === 'desc'" :size="14" />
               </th>
@@ -245,13 +250,38 @@
                 <div class="score-cell">
                   <span class="score-value">{{ record.data_score.toFixed(1) }}</span>
                   <span class="score-weight">({{ record.data_weight }}%)</span>
+                  <div class="score-breakdown" v-if="record.department_type === 'sales'">
+                    <small>{{ getSalesDataBreakdown(record) }}</small>
+                  </div>
+                  <div class="score-breakdown" v-else>
+                    <small>{{ getOperationsDataBreakdown(record) }}</small>
+                  </div>
                 </div>
               </td>
-
+              <!-- 客户评价列 - 仅运营部门显示 -->
+              <td v-if="shouldShowCustomerScore()">
+                <div class="score-cell" v-if="record.department_type === 'operations'">
+                  <span class="score-value">{{ (record.customer_score || 0).toFixed(1) }}</span>
+                  <span class="score-weight">({{ record.customer_weight }}%)</span>
+                  <div class="score-breakdown">
+                    <small>服务质量评价</small>
+                  </div>
+                </div>
+                <div class="score-cell score-na" v-else>
+                  <span class="score-value">-</span>
+                  <span class="score-weight">不适用</span>
+                </div>
+              </td>
               <td>
                 <div class="score-cell">
                   <span class="score-value">{{ record.intelligent_score.toFixed(1) }}</span>
                   <span class="score-weight">({{ record.intelligent_weight }}%)</span>
+                  <div class="score-breakdown" v-if="record.department_type === 'sales'">
+                    <small>{{ getSalesIntelligentBreakdown(record) }}</small>
+                  </div>
+                  <div class="score-breakdown" v-else>
+                    <small>{{ getOperationsIntelligentBreakdown(record) }}</small>
+                  </div>
                 </div>
               </td>
               <td>
@@ -942,6 +972,71 @@ const getCompletionRateClass = (rate: number) => {
   return 'completion-poor'
 }
 
+// 部门特定的表格列显示方法
+const shouldShowCustomerScore = () => {
+  // 如果选择了特定部门，根据部门决定是否显示客户评价列
+  if (selectedDepartment.value === 'sales') return false
+  if (selectedDepartment.value === 'operations') return true
+  // 如果显示全部部门，检查是否有运营部门的记录
+  return filteredRecords.value.some(record => record.department_type === 'operations')
+}
+
+const getDataScoreLabel = () => {
+  if (selectedDepartment.value === 'sales') return '业绩指标'
+  if (selectedDepartment.value === 'operations') return '服务指标'
+  return '数据得分'
+}
+
+const getIntelligentScoreLabel = () => {
+  if (selectedDepartment.value === 'sales') return '销售能力'
+  if (selectedDepartment.value === 'operations') return '职能方案'
+  return '智能方案'
+}
+
+// 销售部门数据指标细分
+const getSalesDataBreakdown = (record: any) => {
+  const breakdowns = []
+  if (record.metrics?.new_service_fee) {
+    const rate = (record.metrics.new_service_fee / 100000 * 100).toFixed(0)
+    breakdowns.push(`新单服务费: ${rate}%`)
+  }
+  if (record.metrics?.new_orders) {
+    const rate = (record.metrics.new_orders / 50 * 100).toFixed(0)
+    breakdowns.push(`新单数量: ${rate}%`)
+  }
+  return breakdowns.join(' | ') || '业绩完成情况'
+}
+
+// 运营部门数据指标细分
+const getOperationsDataBreakdown = (record: any) => {
+  const breakdowns = []
+  if (record.metrics?.service_fee) {
+    const rate = (record.metrics.service_fee / 80000 * 100).toFixed(0)
+    breakdowns.push(`服务费: ${rate}%`)
+  }
+  if (record.metrics?.rebate) {
+    const rate = (record.metrics.rebate / 20000 * 100).toFixed(0)
+    breakdowns.push(`返点: ${rate}%`)
+  }
+  return breakdowns.join(' | ') || '服务完成情况'
+}
+
+// 销售部门智能方案细分
+const getSalesIntelligentBreakdown = (record: any) => {
+  if (record.employee_position?.includes('经理')) {
+    return '团队管理 | 流程规范 | 策略制定'
+  }
+  return '客户拜访 | 销售技能 | 目标达成'
+}
+
+// 运营部门智能方案细分
+const getOperationsIntelligentBreakdown = (record: any) => {
+  if (record.employee_position?.includes('经理')) {
+    return '团队管理 | 客户评价 | 知识输出'
+  }
+  return '服务质量 | 沟通协作 | 工作执行'
+}
+
 // 权限检查方法
 const canEditRecord = (record: NewPerformanceRecord) => {
   // 只有总经理和相关管理层可以编辑
@@ -1294,6 +1389,19 @@ const exportData = () => {
     grid-template-columns: 1fr;
     gap: 12px;
   }
+
+  .stat-card {
+    padding: 14px;
+    min-height: 70px;
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+  }
 }
 
 .stat-card {
@@ -1575,6 +1683,29 @@ const exportData = () => {
 .score-weight {
   font-size: 11px;
   color: var(--color-text-secondary);
+}
+
+.score-breakdown {
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+.score-breakdown small {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.score-na {
+  opacity: 0.5;
+}
+
+.score-na .score-value {
+  color: var(--color-text-tertiary);
 }
 
 .total-score-cell .score-value {

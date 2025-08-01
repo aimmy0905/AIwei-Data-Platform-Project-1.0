@@ -284,42 +284,42 @@ export const intelligentAssessmentConfigs: IntelligentAssessmentConfig[] = [
   }
 ]
 
-// 权重配置
+// 权重配置 - 根据部门特性优化
 export const weightConfigs: WeightConfig[] = [
-  // 运营部门 - 普通员工
+  // 运营部门 - 普通员工：平衡服务质量和运营效率
   {
     department: 'operations',
     position_level: 'staff',
-    data_weight: 40,
-    customer_weight: 30,
-    intelligent_weight: 30
+    data_weight: 45,        // 服务指标权重适中
+    customer_weight: 35,    // 重视客户评价
+    intelligent_weight: 20  // 基础职能评价
   },
 
-  // 运营部门 - 项目经理
+  // 运营部门 - 项目经理：重视管理能力和服务质量
   {
     department: 'operations',
     position_level: 'manager',
-    data_weight: 50,
-    customer_weight: 25,
-    intelligent_weight: 25
+    data_weight: 40,        // 服务指标权重
+    customer_weight: 30,    // 客户评价权重
+    intelligent_weight: 30  // 管理能力评价
   },
 
-  // 销售部门 - 销售人员
+  // 销售部门 - 销售人员：突出业绩指标和销售能力
   {
     department: 'sales',
     position_level: 'staff',
-    data_weight: 70,
-    customer_weight: 0,
-    intelligent_weight: 30
+    data_weight: 75,        // 重点突出业绩指标
+    customer_weight: 0,     // 不适用客户评价
+    intelligent_weight: 25  // 销售技能评价
   },
 
-  // 销售部门 - 销售经理
+  // 销售部门 - 销售经理：平衡个人业绩和团队管理
   {
     department: 'sales',
     position_level: 'manager',
-    data_weight: 65,
-    customer_weight: 0,
-    intelligent_weight: 35
+    data_weight: 60,        // 业绩指标权重
+    customer_weight: 0,     // 不适用客户评价
+    intelligent_weight: 40  // 管理和策略能力
   }
 ]
 
@@ -557,6 +557,142 @@ export const newPerformanceRecords: NewPerformanceRecord[] = [
     },
 
     comments: '新单略有不足，但续费表现优秀'
+  },
+
+  // 运营部门 - 项目经理
+  {
+    id: 6,
+    employee_id: 6,
+    employee_name: '张项目',
+    employee_position: '项目经理',
+    department_id: 2,
+    department_name: '运营部',
+    department_type: 'operations',
+    position_level: 'manager',
+    period: '2024-Q1',
+    period_type: 'quarterly',
+
+    data_metrics: {
+      service_fee: {
+        target: 800000,
+        actual: 850000,
+        completion_rate: 106.25,
+        score: 42.5,
+        weight: 50
+      },
+      rebate: {
+        target: 200000,
+        actual: 195000,
+        completion_rate: 97.5,
+        score: 39,
+        weight: 50
+      }
+    },
+    data_score: 81.5,
+    data_weight: 40,
+
+    customer_ratings: {
+      satisfaction: 4.6,
+      service_quality: 4.5,
+      response_speed: 4.4,
+      professionalism: 4.7
+    },
+    customer_score: 92.4,
+    customer_weight: 30,
+
+    intelligent_ratings: {
+      team_management: 18,
+      customer_evaluation_management: 17,
+      knowledge_output: 19,
+      talent_development: 16,
+      cross_team_cooperation: 18
+    },
+    intelligent_score: 88,
+    intelligent_weight: 30,
+
+    total_score: 86.8,
+    grade: 'A',
+    rank_in_department: 1,
+    rank_in_company: 5,
+
+    status: 'completed',
+    created_at: '2024-04-01',
+    updated_at: '2024-04-01',
+
+    evaluators: {
+      customer: [201, 202, 203, 204],
+      intelligent: 6
+    },
+
+    comments: '团队管理能力强，客户满意度高，知识输出质量优秀'
+  },
+
+  // 运营部门 - 普通员工
+  {
+    id: 7,
+    employee_id: 8,
+    employee_name: '李运营',
+    employee_position: '运营专员',
+    department_id: 2,
+    department_name: '运营部',
+    department_type: 'operations',
+    position_level: 'staff',
+    period: '2024-01',
+    period_type: 'monthly',
+
+    data_metrics: {
+      service_fee: {
+        target: 80000,
+        actual: 75000,
+        completion_rate: 93.75,
+        score: 42.2,
+        weight: 50
+      },
+      rebate: {
+        target: 20000,
+        actual: 22000,
+        completion_rate: 110,
+        score: 49.5,
+        weight: 50
+      }
+    },
+    data_score: 91.7,
+    data_weight: 45,
+
+    customer_ratings: {
+      satisfaction: 4.3,
+      service_quality: 4.4,
+      response_speed: 4.2,
+      professionalism: 4.5
+    },
+    customer_score: 87.0,
+    customer_weight: 35,
+
+    intelligent_ratings: {
+      customer_service: 17,
+      work_quality: 18,
+      communication_cooperation: 16,
+      work_initiative: 19,
+      growth_contribution: 17
+    },
+    intelligent_score: 87,
+    intelligent_weight: 20,
+
+    total_score: 89.3,
+    grade: 'A',
+    rank_in_department: 2,
+    rank_in_company: 4,
+
+    status: 'completed',
+    created_at: '2024-02-01',
+    updated_at: '2024-02-01',
+
+    evaluators: {
+      customer: [201, 202, 203],
+      intelligent: 7
+    },
+
+    comments: '服务质量稳定，客户反馈良好，工作积极主动'
   }
 ]
 
