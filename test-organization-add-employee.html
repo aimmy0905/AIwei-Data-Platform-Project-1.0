@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>组织架构页面 - 统一添加员工功能</title>
+    <style>
+        :root {
+            --color-primary: #3b82f6;
+            --color-surface: #ffffff;
+            --color-background: #f8fafc;
+            --color-border: #e2e8f0;
+            --color-border-light: #f1f5f9;
+            --color-text-primary: #1e293b;
+            --color-text-secondary: #64748b;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .demo-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .demo-header h1 {
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        
+        .demo-header p {
+            color: #64748b;
+            font-size: 16px;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .comparison-item {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .comparison-header {
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .comparison-before .comparison-header {
+            background: #fef2f2;
+            color: #dc2626;
+            border-bottom: 1px solid #fecaca;
+        }
+        
+        .comparison-after .comparison-header {
+            background: #f0fdf4;
+            color: #16a34a;
+            border-bottom: 1px solid #bbf7d0;
+        }
+        
+        .comparison-content {
+            padding: 20px;
+        }
+        
+        .modal-preview {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            max-width: 1200px;
+            width: 95%;
+            min-width: 900px;
+            margin: 0 auto;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            background: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+        
+        .modal-close {
+            background: transparent;
+            border: 1px solid var(--color-border);
+            color: var(--color-text-secondary);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .employee-form-unified {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .form-sections {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+        
+        .form-section {
+            margin-bottom: 40px;
+        }
+        
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .form-section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--color-border);
+        }
+        
+        .form-section-header h4 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .form-group--full {
+            grid-column: 1 / -1;
+        }
+        
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+        
+        .form-input,
+        .form-select,
+        .form-textarea {
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+        }
+        
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        
+        .radio-item input[type="radio"] {
+            margin: 0;
+        }
+        
+        .radio-label {
+            font-size: 14px;
+            color: var(--color-text-primary);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 20px 32px;
+            border-top: 1px solid var(--color-border);
+            background: var(--color-background);
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn--secondary {
+            background: var(--color-background);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+        }
+        
+        .btn--secondary:hover {
+            background: #e2e8f0;
+        }
+        
+        .btn--primary {
+            background: var(--color-primary);
+            color: white;
+        }
+        
+        .btn--primary:hover {
+            background: #2563eb;
+        }
+        
+        .improvements {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f0f9ff;
+            border-radius: 8px;
+            border: 1px solid #0ea5e9;
+        }
+        
+        .improvements h3 {
+            margin: 0 0 16px 0;
+            color: #0c4a6e;
+        }
+        
+        .improvements ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #0c4a6e;
+        }
+        
+        .improvements li {
+            margin-bottom: 8px;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-list li::before {
+            content: "✓";
+            color: #16a34a;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .old-feature-list li::before {
+            content: "✗";
+            color: #dc2626;
+        }
+        
+        @media (max-width: 1200px) {
+            .modal-preview {
+                min-width: auto;
+                width: 95%;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-sections {
+                padding: 20px;
+            }
+            
+            .form-section {
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>🏢 组织架构页面 - 统一添加员工功能</h1>
+            <p>与员工管理页面保持完全一致的添加员工体验</p>
+        </div>
+        
+        <div class="comparison-grid">
+            <div class="comparison-item comparison-before">
+                <div class="comparison-header">❌ 优化前的组织架构添加员工</div>
+                <div class="comparison-content">
+                    <ul class="feature-list old-feature-list">
+                        <li>使用中等宽度模态框（600px）</li>
+                        <li>只有基础字段（姓名、工号、职务等）</li>
+                        <li>缺少联系方式详细信息</li>
+                        <li>缺少身份证、地址等基本信息</li>
+                        <li>没有紧急联系人信息</li>
+                        <li>缺少试用期、工作地点等工作信息</li>
+                        <li>表单字段不完整</li>
+                        <li>与员工管理页面体验不一致</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="comparison-item comparison-after">
+                <div class="comparison-header">✅ 优化后的组织架构添加员工</div>
+                <div class="comparison-content">
+                    <ul class="feature-list">
+                        <li>使用宽屏模态框（1200px）</li>
+                        <li>完整的基本信息字段</li>
+                        <li>详细的联系方式信息</li>
+                        <li>包含身份证、地址等信息</li>
+                        <li>支持紧急联系人设置</li>
+                        <li>完整的工作信息配置</li>
+                        <li>与员工管理页面完全一致</li>
+                        <li>统一的用户体验</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-preview">
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h3 class="modal-title">新建员工</h3>
+                <button class="modal-close">×</button>
+            </div>
+            
+            <!-- 统一表单内容 -->
+            <form class="employee-form-unified">
+                <div class="form-sections">
+                    
+                    <!-- 基本信息区域 -->
+                    <div class="form-section">
+                        <div class="form-section-header">
+                            <span>👤</span>
+                            <h4>基本信息</h4>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">姓名 *</label>
+                                <input type="text" class="form-input" placeholder="请输入姓名" required />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">工号 *</label>
+                                <input type="text" class="form-input" placeholder="请输入工号" required />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">性别</label>
+                                <div class="radio-group">
+                                    <label class="radio-item">
+                                        <input type="radio" name="gender" value="male" checked />
+                                        <span class="radio-label">男</span>
+                                    </label>
+                                    <label class="radio-item">
+                                        <input type="radio" name="gender" value="female" />
+                                        <span class="radio-label">女</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">出生日期</label>
+                                <input type="date" class="form-input" />
+                            </div>
+                            <div class="form-group form-group--full">
+                                <label class="form-label">身份证号</label>
+                                <input type="text" class="form-input" placeholder="请输入身份证号" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 联系方式区域 -->
+                    <div class="form-section">
+                        <div class="form-section-header">
+                            <span>📞</span>
+                            <h4>联系方式</h4>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">手机号码 *</label>
+                                <input type="tel" class="form-input" placeholder="请输入手机号码" required />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">邮箱地址 *</label>
+                                <input type="email" class="form-input" placeholder="请输入邮箱地址" required />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">微信号</label>
+                                <input type="text" class="form-input" placeholder="请输入微信号" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">QQ号</label>
+                                <input type="text" class="form-input" placeholder="请输入QQ号" />
+                            </div>
+                            <div class="form-group form-group--full">
+                                <label class="form-label">联系地址</label>
+                                <textarea class="form-textarea" rows="2" placeholder="请输入联系地址"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">紧急联系人</label>
+                                <input type="text" class="form-input" placeholder="请输入紧急联系人" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">紧急联系电话</label>
+                                <input type="tel" class="form-input" placeholder="请输入紧急联系电话" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 工作信息区域 -->
+                    <div class="form-section">
+                        <div class="form-section-header">
+                            <span>💼</span>
+                            <h4>工作信息</h4>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">所属部门 *</label>
+                                <select class="form-select" required>
+                                    <option value="">请选择部门</option>
+                                    <option value="1" selected>技术部</option>
+                                    <option value="2">市场部</option>
+                                    <option value="3">销售部</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">职务 *</label>
+                                <select class="form-select" required>
+                                    <option value="">请选择职务</option>
+                                    <option value="部门经理">部门经理</option>
+                                    <option value="高级专员" selected>高级专员</option>
+                                    <option value="专员">专员</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">直属上级</label>
+                                <select class="form-select">
+                                    <option value="" selected>请选择直属上级</option>
+                                    <option value="1">张三 (部门经理)</option>
+                                    <option value="2">李四 (副经理)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">入职日期 *</label>
+                                <input type="date" class="form-input" required />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">试用期(月)</label>
+                                <input type="number" class="form-input" value="3" min="0" max="12" placeholder="请输入试用期月数" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">工作地点</label>
+                                <input type="text" class="form-input" placeholder="请输入工作地点" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">状态</label>
+                                <div class="radio-group">
+                                    <label class="radio-item">
+                                        <input type="radio" name="status" value="active" checked />
+                                        <span class="radio-label">在职</span>
+                                    </label>
+                                    <label class="radio-item">
+                                        <input type="radio" name="status" value="probation" />
+                                        <span class="radio-label">试用</span>
+                                    </label>
+                                    <label class="radio-item">
+                                        <input type="radio" name="status" value="inactive" />
+                                        <span class="radio-label">停用</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group form-group--full">
+                                <label class="form-label">备注</label>
+                                <textarea class="form-textarea" rows="3" placeholder="请输入备注信息"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- 表单操作按钮 -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn--secondary">
+                        <span>×</span>
+                        取消
+                    </button>
+                    <button type="submit" class="btn btn--primary">
+                        <span>💾</span>
+                        创建员工
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="improvements">
+            <h3>🎯 统一优化成果</h3>
+            <ul>
+                <li><strong>完全一致的表单结构</strong>：与员工管理页面使用相同的字段、布局和验证规则</li>
+                <li><strong>统一的页面布局</strong>：采用1200px宽屏设计，整合所有编辑内容到同一页面</li>
+                <li><strong>统一的交互体验</strong>：相同的模态框宽度、表单分区设计、操作按钮样式</li>
+                <li><strong>统一的视觉设计</strong>：相同的间距、字体、颜色规范和响应式设计</li>
+                <li><strong>功能一致性保证</strong>：数据处理、表单提交、成功反馈等方面完全一致</li>
+                <li><strong>完整的字段支持</strong>：包含基本信息、联系方式、工作信息的所有字段</li>
+                <li><strong>智能默认设置</strong>：自动设置当前部门为默认选择</li>
+                <li><strong>统一的验证规则</strong>：与员工管理页面相同的表单验证逻辑</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

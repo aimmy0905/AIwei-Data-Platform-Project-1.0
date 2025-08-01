@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>优化后的员工详情页面</title>
+    <style>
+        :root {
+            --color-primary: #3b82f6;
+            --color-surface: #ffffff;
+            --color-background: #f8fafc;
+            --color-border: #e2e8f0;
+            --color-border-light: #f1f5f9;
+            --color-text-primary: #1e293b;
+            --color-text-secondary: #64748b;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .demo-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .demo-header h1 {
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        
+        .demo-header p {
+            color: #64748b;
+            font-size: 16px;
+        }
+        
+        .modal-preview {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .employee-detail-modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .employee-avatar-header {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .employee-name {
+            margin: 0 0 8px 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .employee-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .employee-id {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            background: rgba(34, 197, 94, 0.2);
+            color: #16a34a;
+        }
+        
+        .modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .employee-detail-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--color-border);
+            background: var(--color-background);
+        }
+        
+        .detail-tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 24px;
+            border: none;
+            background: transparent;
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .detail-tab--active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+            background: rgba(59, 130, 246, 0.05);
+        }
+        
+        .employee-detail-content {
+            padding: 24px;
+        }
+        
+        .detail-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .detail-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .detail-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--color-background);
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .detail-card-header h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+        
+        .detail-card-body {
+            padding: 20px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--color-border-light);
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-row label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+        }
+        
+        .detail-row span {
+            font-size: 14px;
+            color: var(--color-text-primary);
+            font-weight: 500;
+        }
+        
+        .employee-detail-footer {
+            background: var(--color-background);
+            border-top: 1px solid var(--color-border);
+            padding: 20px 24px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn--secondary {
+            background: var(--color-background);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+        }
+        
+        .btn--primary {
+            background: var(--color-primary);
+            color: white;
+        }
+        
+        .btn--success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+        
+        .improvements {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f0f9ff;
+            border-radius: 8px;
+            border: 1px solid #0ea5e9;
+        }
+        
+        .improvements h3 {
+            margin: 0 0 16px 0;
+            color: #0c4a6e;
+        }
+        
+        .improvements ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #0c4a6e;
+        }
+        
+        .improvements li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>🎨 优化后的员工详情页面</h1>
+            <p>全新设计的员工详情模态框，提供更好的用户体验和信息展示</p>
+        </div>
+        
+        <div class="modal-preview">
+            <!-- 模态框头部 -->
+            <div class="employee-detail-modal-header">
+                <div class="modal-header-content">
+                    <div class="employee-avatar-header">王</div>
+                    <div class="employee-title-info">
+                        <h3 class="employee-name">王总</h3>
+                        <div class="employee-meta">
+                            <span class="employee-id">工号: CEO001</span>
+                            <span class="status-badge">在职</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="modal-close">×</button>
+            </div>
+            
+            <!-- 标签页导航 -->
+            <div class="employee-detail-tabs">
+                <button class="detail-tab detail-tab--active">
+                    👤 基本信息
+                </button>
+                <button class="detail-tab">
+                    💼 工作信息
+                </button>
+                <button class="detail-tab">
+                    📞 联系方式
+                </button>
+            </div>
+            
+            <!-- 内容区域 -->
+            <div class="employee-detail-content">
+                <div class="detail-cards">
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <span>👤</span>
+                            <h4>个人信息</h4>
+                        </div>
+                        <div class="detail-card-body">
+                            <div class="detail-row">
+                                <label>姓名</label>
+                                <span>王总</span>
+                            </div>
+                            <div class="detail-row">
+                                <label>性别</label>
+                                <span>男</span>
+                            </div>
+                            <div class="detail-row">
+                                <label>出生日期</label>
+                                <span>1985-03-15</span>
+                            </div>
+                            <div class="detail-row">
+                                <label>身份证号</label>
+                                <span>320***********1234</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <span>📍</span>
+                            <h4>地址信息</h4>
+                        </div>
+                        <div class="detail-card-body">
+                            <div class="detail-row">
+                                <label>居住地址</label>
+                                <span>北京市朝阳区</span>
+                            </div>
+                            <div class="detail-row">
+                                <label>工作地点</label>
+                                <span>总经理办公室</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部操作 -->
+            <div class="employee-detail-footer">
+                <button class="btn btn--secondary">
+                    <span>×</span>
+                    关闭
+                </button>
+                <button class="btn btn--primary">
+                    <span>✏️</span>
+                    编辑员工
+                </button>
+                <button class="btn btn--success">
+                    <span>🏆</span>
+                    查看绩效
+                </button>
+            </div>
+        </div>
+        
+        <div class="improvements">
+            <h3>🚀 优化亮点</h3>
+            <ul>
+                <li><strong>渐变头部设计</strong>：使用渐变背景和头像展示，提升视觉效果</li>
+                <li><strong>标签页导航</strong>：将信息分类展示，提高信息查找效率</li>
+                <li><strong>卡片式布局</strong>：使用卡片组织信息，层次更清晰</li>
+                <li><strong>悬停效果</strong>：添加卡片悬停动画，增强交互体验</li>
+                <li><strong>响应式设计</strong>：自适应不同屏幕尺寸</li>
+                <li><strong>完整信息展示</strong>：包含个人信息、工作信息、联系方式等</li>
+                <li><strong>操作按钮优化</strong>：底部操作区域，支持多种操作</li>
+                <li><strong>动画过渡</strong>：标签页切换带有淡入动画效果</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

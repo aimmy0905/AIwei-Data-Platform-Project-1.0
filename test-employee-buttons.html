@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>员工管理按钮测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .action-btn-with-text {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .action-btn-with-text--info {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+        
+        .action-btn-with-text--info:hover {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .action-btn-with-text--primary {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+        }
+        
+        .action-btn-with-text--primary:hover {
+            background: #16a34a;
+            color: white;
+        }
+        
+        .action-btn-with-text--success {
+            background: rgba(168, 85, 247, 0.1);
+            color: #a855f7;
+        }
+        
+        .action-btn-with-text--success:hover {
+            background: #a855f7;
+            color: white;
+        }
+        
+        .action-btn-with-text--danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+        
+        .action-btn-with-text--danger:hover {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .icon {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h2>员工管理操作按钮测试</h2>
+        <p>这是新的带文字标签的操作按钮样式：</p>
+        
+        <div class="action-buttons">
+            <button class="action-btn-with-text action-btn-with-text--info" title="查看详情">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <span>查看</span>
+            </button>
+            <button class="action-btn-with-text action-btn-with-text--primary" title="编辑">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="m18.5 2.5-3 3L22 12l-3 3-3-3 3-3z"></path>
+                </svg>
+                <span>编辑</span>
+            </button>
+            <button class="action-btn-with-text action-btn-with-text--success" title="绩效记录">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8" r="7"></circle>
+                    <polyline points="8.21,13.89 7,23 12,20 17,23 15.79,13.88"></polyline>
+                </svg>
+                <span>绩效</span>
+            </button>
+            <button class="action-btn-with-text action-btn-with-text--danger" title="删除">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3,6 5,6 21,6"></polyline>
+                    <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+                </svg>
+                <span>删除</span>
+            </button>
+        </div>
+        
+        <p><strong>改进说明：</strong></p>
+        <ul>
+            <li>✅ 为每个操作按钮添加了清晰的中文文字标签</li>
+            <li>✅ 保持了图标和文字的合理搭配</li>
+            <li>✅ 使用了符合中文界面标准的简洁文字</li>
+            <li>✅ 保持了原有的按钮功能和交互效果</li>
+            <li>✅ 优化了按钮间距和布局</li>
+        </ul>
+    </div>
+</body>
+</html>
