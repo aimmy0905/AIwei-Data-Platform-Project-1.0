@@ -25,7 +25,6 @@ export interface Employee {
   gender: 'male' | 'female'
   birth_date: string
   id_card: string
-  avatar?: string
   phone: string
   email: string
   wechat?: string

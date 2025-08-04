@@ -531,6 +531,38 @@
               </div>
             </div>
 
+            <!-- 客户评价得分 -->
+            <div v-if="selectedRecord.customer_score > 0" class="detail-section">
+              <h4 class="section-title">
+                <Star :size="20" />
+                客户评价得分
+              </h4>
+              <div class="score-breakdown-detail">
+                <div class="score-category">
+                  <div class="category-header">
+                    <h5>客户评价得分</h5>
+                    <span class="category-score">{{ selectedRecord.customer_score.toFixed(1) }} (权重: {{ selectedRecord.customer_weight }}%)</span>
+                  </div>
+                  <div class="customer-ratings-list">
+                    <div v-for="(rating, key) in selectedRecord.customer_ratings" :key="key" class="customer-rating-item">
+                      <div class="rating-info">
+                        <span class="rating-name">{{ getCustomerRatingName(key) }}</span>
+                        <div class="rating-stars">
+                          <span v-for="star in 5" :key="star" class="star" :class="{ 'star-filled': star <= rating }">
+                            ★
+                          </span>
+                        </div>
+                      </div>
+                      <div class="rating-score">
+                        <span class="rating-value">{{ rating.toFixed(1) }}</span>
+                        <span class="rating-max">/5.0</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- 评价备注 -->
             <div v-if="selectedRecord.comments" class="detail-section">
               <h4 class="section-title">
@@ -963,6 +995,18 @@ const getIntelligentRatingName = (key: string) => {
     if (item) return item.name
   }
   return key
+}
+
+const getCustomerRatingName = (key: string) => {
+  const ratingMap: Record<string, string> = {
+    satisfaction: '客户满意度',
+    service_quality: '服务质量',
+    response_speed: '响应速度',
+    professionalism: '专业性',
+    communication: '沟通能力',
+    problem_solving: '问题解决能力'
+  }
+  return ratingMap[key] || key
 }
 
 const getCompletionRateClass = (rate: number) => {
@@ -1830,8 +1874,13 @@ const exportData = () => {
 
 .total-score {
   font-weight: 700;
-  font-size: 16px;
+  font-size: 20px;
   text-align: center;
+  color: var(--color-primary);
+  background: linear-gradient(135deg, var(--color-primary), #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .score--excellent {
@@ -1852,12 +1901,21 @@ const exportData = () => {
 
 .grade-badge,
 .status-badge {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
   text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.grade-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .grade--excellent {
@@ -2021,15 +2079,17 @@ const exportData = () => {
 
 .modal-container {
   background: var(--color-surface);
-  border-radius: 8px;
+  border-radius: 16px;
   max-height: 90vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--color-border);
 }
 
 .modal-container--large {
-  width: 1000px;
+  width: 1200px;
   max-width: 95vw;
 }
 
@@ -2037,9 +2097,9 @@ const exportData = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-background-secondary);
+  padding: 24px 32px;
+  border-bottom: 2px solid var(--color-border);
+  background: linear-gradient(135deg, var(--color-background-secondary), var(--color-surface));
 }
 
 .modal-header-actions {
@@ -2049,10 +2109,14 @@ const exportData = () => {
 }
 
 .modal-title {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
   color: var(--color-text-primary);
   margin: 0;
+  background: linear-gradient(135deg, var(--color-primary), #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .modal-close {
@@ -2077,52 +2141,277 @@ const exportData = () => {
 .modal-content {
   flex: 1;
   overflow-y: auto;
-  padding: 24px;
+  padding: 32px;
+  background: #fafbfc;
 }
 
 /* 绩效详情样式 */
 .performance-detail {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 28px;
 }
 
 .detail-section {
-  background: var(--color-background);
-  border-radius: 8px;
-  padding: 20px;
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--color-border);
+  transition: all 0.2s ease;
+}
+
+.detail-section:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .section-title {
-  margin: 0 0 16px 0;
-  font-size: 16px;
+  margin: 0 0 20px 0;
+  font-size: 18px;
   font-weight: 600;
   color: var(--color-text-primary);
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: 8px;
+  border-bottom: 2px solid var(--color-primary);
+  padding-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-title svg {
+  color: var(--color-primary);
 }
 
 .info-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
 }
 
 .info-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
+  padding: 16px;
+  background: var(--color-background);
+  border-radius: 8px;
+  border: 1px solid var(--color-border-light);
+  transition: all 0.2s ease;
 }
 
-.info-label {
-  font-size: 12px;
+.info-item:hover {
+  background: var(--color-background-secondary);
+  border-color: var(--color-primary);
+}
+
+.info-item label {
+  font-size: 13px;
   color: var(--color-text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-item span {
+  font-size: 15px;
+  color: var(--color-text-primary);
   font-weight: 500;
 }
 
-.info-value {
-  font-size: 14px;
+/* 得分详情样式 */
+.score-breakdown-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.score-category {
+  background: var(--color-background);
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid var(--color-border-light);
+  transition: all 0.2s ease;
+}
+
+.score-category:hover {
+  background: var(--color-background-secondary);
+  border-color: var(--color-primary);
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.category-header h5 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
   color: var(--color-text-primary);
+}
+
+.category-score {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: rgba(59, 130, 246, 0.1);
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.metrics-list,
+.intelligent-ratings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.metric-item,
+.intelligent-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.metric-item:hover,
+.intelligent-item:hover {
+  background: var(--color-background-secondary);
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.metric-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.metric-name,
+.intelligent-name {
+  font-weight: 500;
+  color: var(--color-text-primary);
+  font-size: 14px;
+}
+
+.metric-progress {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.metric-score,
+.intelligent-score {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.completion-rate {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.completion-rate.high {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.completion-rate.medium {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.completion-rate.low {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.score {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+/* 客户评价样式 */
+.customer-ratings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.customer-rating-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.customer-rating-item:hover {
+  background: var(--color-background-secondary);
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.rating-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.rating-name {
+  font-weight: 500;
+  color: var(--color-text-primary);
+  font-size: 14px;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.star {
+  font-size: 16px;
+  color: #e5e7eb;
+  transition: color 0.2s ease;
+}
+
+.star-filled {
+  color: #fbbf24;
+}
+
+.rating-score {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.rating-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.rating-max {
+  font-size: 12px;
+  color: var(--color-text-secondary);
 }
 
 /* 考核内容样式 */
@@ -2143,13 +2432,6 @@ const exportData = () => {
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
-}
-
-.metric-item {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  padding: 16px;
 }
 
 .metric-header {
@@ -2349,6 +2631,43 @@ const exportData = () => {
   .modal-container--large {
     width: 95vw;
     margin: 20px;
+    border-radius: 12px;
+  }
+
+  .modal-header {
+    padding: 20px 24px;
+  }
+
+  .modal-content {
+    padding: 24px 20px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .score-breakdown-detail {
+    gap: 20px;
+  }
+
+  .category-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .metric-item,
+  .intelligent-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .metric-score,
+  .intelligent-score {
+    align-items: flex-start;
+    width: 100%;
   }
 
   .modal-header-actions {

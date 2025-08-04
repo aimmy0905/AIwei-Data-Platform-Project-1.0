@@ -99,12 +99,6 @@
               <tr v-for="employee in paginatedEmployees" :key="employee.id" class="employee-row">
                 <td>
                   <div class="employee-info">
-                    <div class="employee-avatar">
-                      <img v-if="employee.avatar" :src="employee.avatar" :alt="employee.name" />
-                      <div v-else class="avatar-placeholder">
-                        {{ employee.name.charAt(0) }}
-                      </div>
-                    </div>
                     <div class="employee-details">
                       <div class="employee-name">{{ employee.name }}</div>
                       <div class="employee-gender">{{ employee.gender === 'male' ? '男' : '女' }}</div>
@@ -1400,33 +1394,6 @@ const getEmployeeStatusText = (status: string): string => {
 .employee-info {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-.employee-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.employee-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  background: var(--color-primary);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 16px;
 }
 
 .employee-details {

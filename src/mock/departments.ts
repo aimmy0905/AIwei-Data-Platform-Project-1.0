@@ -153,7 +153,6 @@ export const mockEmployees: Employee[] = [
     gender: 'male',
     birth_date: '1975-03-15',
     id_card: '310101197503150001',
-    avatar: '/avatars/ceo.jpg',
     phone: '13800138001',
     email: 'ceo@aiwei.com',
     wechat: 'ceo_wang',
