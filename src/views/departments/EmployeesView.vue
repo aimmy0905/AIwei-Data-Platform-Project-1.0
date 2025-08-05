@@ -654,154 +654,13 @@
       </div>
     </div>
 
-    <!-- 绩效记录模态框 -->
-    <div v-if="showPerformanceModal && selectedEmployee" class="modal-overlay" @click="closePerformanceModal">
-      <div class="modal-container modal-container--large" @click.stop>
-        <div class="modal-header">
-          <h3 class="modal-title">全部绩效记录</h3>
-          <button class="modal-close" @click="closePerformanceModal">
-            <X :size="20" />
-          </button>
-        </div>
-
-        <!-- 筛选器 -->
-        <div class="modal-filters">
-          <div class="filter-group">
-            <label class="filter-label">时间范围:</label>
-            <select v-model="performanceTimeFilter" class="filter-select">
-              <option value="monthly">月度绩效</option>
-              <option value="quarterly">季度绩效</option>
-              <option value="yearly">年度绩效</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label class="filter-label">年份:</label>
-            <select v-model="performanceYear" class="filter-select">
-              <option value="2024">2024年</option>
-              <option value="2023">2023年</option>
-              <option value="2022">2022年</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="modal-body">
-          <div class="performance-history">
-            <div class="employee-summary">
-              <h4>{{ selectedEmployee.name }}</h4>
-              <p>{{ selectedEmployee.department_name }} - {{ selectedEmployee.position }}</p>
-            </div>
-
-            <div class="performance-timeline">
-              <div class="timeline-item" v-for="record in filteredPerformanceRecords" :key="record.period">
-                <div class="timeline-header">
-                  <div class="timeline-date">{{ record.period }}</div>
-                  <div class="timeline-summary">
-                    <span class="summary-score">综合得分: {{ record.totalScore }}</span>
-                    <span class="summary-grade" :class="getPerformanceGradeColor(record.grade)">{{ getPerformanceGradeText(record.grade) }}</span>
-                  </div>
-                </div>
-
-                <div class="timeline-content">
-                  <!-- 根据部门显示不同的详细得分 -->
-                  <div v-if="isOperationsDepartment(selectedEmployee.department_name)" class="detailed-scores">
-                    <div class="score-category">
-                      <h5 class="category-title">数据得分 ({{ record.dataScore }}分)</h5>
-                      <div class="score-details">
-                        <div class="detail-item">
-                          <span class="detail-label">服务费目标</span>
-                          <span class="detail-value">{{ record.serviceTarget }}分</span>
-                          <span class="detail-rate">({{ record.serviceRate }}%)</span>
-                        </div>
-                        <div class="detail-item">
-                          <span class="detail-label">返点目标</span>
-                          <span class="detail-value">{{ record.rebateTarget }}分</span>
-                          <span class="detail-rate">({{ record.rebateRate }}%)</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="score-category">
-                      <h5 class="category-title">客户评价 ({{ record.customerScore }}分)</h5>
-                      <div class="score-details">
-                        <div class="detail-item">
-                          <span class="detail-label">客户满意度</span>
-                          <span class="detail-value">{{ record.satisfaction }}分</span>
-                        </div>
-                        <div class="detail-item">
-                          <span class="detail-label">服务质量</span>
-                          <span class="detail-value">{{ record.serviceQuality }}分</span>
-                        </div>
-                        <div class="detail-item">
-                          <span class="detail-label">响应速度</span>
-                          <span class="detail-value">{{ record.responseSpeed }}分</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="score-category">
-                      <h5 class="category-title">职能方案 ({{ record.functionalScore }}分)</h5>
-                      <div class="score-details">
-                        <div v-if="selectedEmployee.position.includes('经理')" class="detail-item">
-                          <span class="detail-label">团队成员管理</span>
-                          <span class="detail-value">{{ record.teamManagement }}分</span>
-                        </div>
-                        <div v-else class="detail-item">
-                          <span class="detail-label">客户服务能力</span>
-                          <span class="detail-value">{{ record.customerService }}分</span>
-                        </div>
-                        <div class="detail-item">
-                          <span class="detail-label">专业工作质量</span>
-                          <span class="detail-value">{{ record.workQuality }}分</span>
-                        </div>
-                        <div class="detail-item">
-                          <span class="detail-label">沟通与协助</span>
-                          <span class="detail-value">{{ record.communication }}分</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- 销售部门详细得分 -->
-                  <div v-else class="detailed-scores">
-                    <div class="score-category">
-                      <h5 class="category-title">月度提成 ({{ record.monthlyCommission }}分)</h5>
-                      <div class="score-details">
-                        <div class="detail-item">
-                          <span class="detail-label">新增服务费</span>
-                          <span class="detail-value">{{ record.newServiceFee }}分</span>
-                        </div>
-                        <div class="detail-item">
-                          <span class="detail-label">新增订单数</span>
-                          <span class="detail-value">{{ record.newOrders }}分</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="score-category">
-                      <h5 class="category-title">绩效底薪奖金 ({{ record.performanceBonus }}分)</h5>
-                      <div class="score-details">
-                        <div class="detail-item">
-                          <span class="detail-label">客户维护</span>
-                          <span class="detail-value">{{ record.customerMaintenance }}分</span>
-                        </div>
-                        <div class="detail-item">
-                          <span class="detail-label">业务拓展</span>
-                          <span class="detail-value">{{ record.businessExpansion }}分</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn--secondary" @click="closePerformanceModal">关闭</button>
-          <button class="btn btn--primary" @click="exportEmployeePerformance">导出该员工数据</button>
-        </div>
-      </div>
-    </div>
+    <!-- 全部绩效记录模态框 -->
+    <AllPerformanceModal
+      :visible="showPerformanceModal"
+      :employee="selectedEmployee"
+      :department-type="getEmployeeDepartmentType(selectedEmployee)"
+      @close="closePerformanceModal"
+    />
 
     <!-- 删除确认模态框 -->
     <div v-if="showDeleteModal && selectedEmployee" class="modal-overlay" @click="closeDeleteModal">
@@ -871,7 +730,8 @@ import {
   Save
 } from 'lucide-vue-next'
 import { allEmployees, mockDepartments, mockPositions } from '@/mock/departments'
-import type { Employee, Department } from '@/types/departments'
+import type { Employee, Department, DepartmentType } from '@/types/departments'
+import AllPerformanceModal from '@/components/performance/AllPerformanceModal.vue'
 
 // 响应式数据
 const currentPage = ref(1)
@@ -892,9 +752,7 @@ const isLoading = ref(false)
 const message = ref('')
 const messageType = ref<'success' | 'error' | 'info'>('info')
 
-// 绩效相关数据
-const performanceTimeFilter = ref('monthly')
-const performanceYear = ref('2024')
+// 绩效相关数据（保留以备兼容性）
 
 // 筛选条件
 const filters = reactive({
@@ -1265,94 +1123,26 @@ const getEmployeeStatusText = (status: string): string => {
   return statusMap[status] || status
 }
 
-// 绩效相关方法
-const isOperationsDepartment = (departmentName: string): boolean => {
-  return departmentName.includes('运营')
-}
+// 绩效相关方法（已迁移到AllPerformanceModal组件）
 
-const getPerformanceGradeColor = (grade: string): string => {
-  const gradeMap: Record<string, string> = {
-    excellent: 'grade-excellent',
-    good: 'grade-good',
-    average: 'grade-average',
-    poor: 'grade-poor'
+// 获取员工部门类型
+const getEmployeeDepartmentType = (employee: Employee | null): DepartmentType => {
+  if (!employee) return 'operations'
+
+  const departmentName = employee.department_name || ''
+
+  // 根据部门名称判断类型
+  if (departmentName.includes('销售') || departmentName.includes('商务')) {
+    return 'sales'
+  } else if (departmentName.includes('运营') || departmentName.includes('优化')) {
+    return 'operations'
   }
-  return gradeMap[grade] || 'grade-average'
+
+  // 默认返回运营部门类型
+  return 'operations'
 }
 
-const getPerformanceGradeText = (grade: string): string => {
-  const gradeMap: Record<string, string> = {
-    excellent: '优秀',
-    good: '良好',
-    average: '一般',
-    poor: '待改进'
-  }
-  return gradeMap[grade] || grade
-}
-
-const exportEmployeePerformance = () => {
-  if (selectedEmployee.value) {
-    alert(`导出 ${selectedEmployee.value.name} 的绩效数据...`)
-  }
-}
-
-// 模拟绩效记录数据
-const filteredPerformanceRecords = computed(() => {
-  // 这里应该根据selectedEmployee、performanceTimeFilter和performanceYear来过滤数据
-  // 现在返回模拟数据
-  return [
-    {
-      period: '2024年1月',
-      totalScore: 86.5,
-      grade: 'good',
-      dataScore: 45,
-      serviceTarget: 22,
-      serviceRate: 88,
-      rebateTarget: 23,
-      rebateRate: 92,
-      customerScore: 26,
-      satisfaction: 9,
-      serviceQuality: 8,
-      responseSpeed: 9,
-      functionalScore: 15.5,
-      teamManagement: 8,
-      customerService: 7.5,
-      workQuality: 8,
-      communication: 7.5,
-      monthlyCommission: 40,
-      newServiceFee: 20,
-      newOrders: 20,
-      performanceBonus: 30,
-      customerMaintenance: 15,
-      businessExpansion: 15
-    },
-    {
-      period: '2023年12月',
-      totalScore: 82.3,
-      grade: 'good',
-      dataScore: 42,
-      serviceTarget: 20,
-      serviceRate: 80,
-      rebateTarget: 22,
-      rebateRate: 88,
-      customerScore: 25,
-      satisfaction: 8,
-      serviceQuality: 8,
-      responseSpeed: 9,
-      functionalScore: 15.3,
-      teamManagement: 7.5,
-      customerService: 7.8,
-      workQuality: 8,
-      communication: 7.5,
-      monthlyCommission: 38,
-      newServiceFee: 18,
-      newOrders: 20,
-      performanceBonus: 28,
-      customerMaintenance: 14,
-      businessExpansion: 14
-    }
-  ]
-})
+// 绩效记录数据已迁移到AllPerformanceModal组件中处理
 </script>
 
 <style scoped>
