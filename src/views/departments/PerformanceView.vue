@@ -977,20 +977,7 @@ onMounted(() => {
   min-width: 0;
 }
 
-.employee-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 16px;
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
-  flex-shrink: 0;
-}
+
 
 .employee-details {
   flex: 1;
