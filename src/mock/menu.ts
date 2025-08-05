@@ -327,10 +327,10 @@ export const mockMenuItems: MenuItem[] = [
     icon: 'Settings',
     children: [
       {
-        id: 'users',
-        name: '用户管理',
+        id: 'roles',
+        name: '角色管理',
         icon: 'UserCog',
-        path: '/settings/users',
+        path: '/settings/roles',
         roles: ['superAdmin']
       },
       {
