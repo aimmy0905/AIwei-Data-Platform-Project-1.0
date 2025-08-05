@@ -336,8 +336,7 @@ const router = createRouter({
       meta: { requiresAuth: true },
       children: [
         {
-          path: 'theme',
-          name: 'settings-theme',
+          path: 'them          name: 'settings-theme',
           component: () => import('@/views/settings/ThemeView.vue')
         }
       ]

@@ -223,31 +223,58 @@ export interface MetricConfig {
   description: string
 }
 
-// 智能方案考核项目
-export interface IntelligentAssessmentItem {
+// 职能方案考核项目（运营部门）
+export interface FunctionalAssessmentItem {
   id: string
   name: string
   description: string
   max_score: number
 }
 
-// 智能方案考核配置
-export interface IntelligentAssessmentConfig {
+// 职能方案考核配置（运营部门）
+export interface FunctionalAssessmentConfig {
   id: string
-  department: DepartmentType
+  department: 'operations'
   position_level: PositionLevel
   evaluator_role: UserRole
-  items: IntelligentAssessmentItem[]
+  items: FunctionalAssessmentItem[]
   weight: number // 权重百分比
 }
 
-// 权重配置
-export interface WeightConfig {
-  department: DepartmentType
+// 过程管理指标项目（销售部门）
+export interface ProcessManagementItem {
+  id: string
+  name: string
+  description: string
+  max_score: number
+  input_type: 'manual' | 'calculated' // 手动录入或系统计算
+}
+
+// 过程管理指标配置（销售部门）
+export interface ProcessManagementConfig {
+  id: string
+  department: 'sales'
+  position_level: PositionLevel
+  evaluator_role: UserRole
+  items: ProcessManagementItem[]
+  weight: number // 权重百分比
+}
+
+// 运营部门权重配置
+export interface OperationsWeightConfig {
+  department: 'operations'
   position_level: PositionLevel
   data_weight: number // 数据指标权重
   customer_weight: number // 客户评价权重
-  intelligent_weight: number // 智能方案考核权重
+  functional_weight: number // 职能方案权重
+}
+
+// 销售部门权重配置
+export interface SalesWeightConfig {
+  department: 'sales'
+  position_level: PositionLevel
+  monthly_commission_weight: number // 月度提成权重 (通常100%)
+  performance_bonus_weight: number // 绩效底薪奖金权重
 }
 
 // 绩效目标设置
@@ -278,22 +305,29 @@ export interface PerformanceRating {
   updated_at: string
 }
 
-// 新的完整绩效记录
-export interface NewPerformanceRecord {
+// 运营部门绩效记录
+export interface OperationsPerformanceRecord {
   id: number
   employee_id: number
   employee_name: string
   employee_position: string
   department_id: number
   department_name: string
-  department_type: DepartmentType
+  department_type: 'operations'
   position_level: PositionLevel
   period: string
   period_type: PeriodType
 
   // 数据指标得分
   data_metrics: {
-    [key: string]: {
+    service_fee: {
+      target: number
+      actual: number
+      completion_rate: number
+      score: number
+      weight: number
+    }
+    rebate: {
       target: number
       actual: number
       completion_rate: number
@@ -306,17 +340,20 @@ export interface NewPerformanceRecord {
 
   // 客户评价得分
   customer_ratings: {
-    [key: string]: number
+    satisfaction: number
+    service_quality: number
+    response_speed: number
+    professionalism: number
   }
   customer_score: number
   customer_weight: number
 
-  // 智能方案考核得分
-  intelligent_ratings: {
+  // 职能方案考核得分
+  functional_ratings: {
     [key: string]: number
   }
-  intelligent_score: number
-  intelligent_weight: number
+  functional_score: number
+  functional_weight: number
 
   // 综合得分
   total_score: number
@@ -332,7 +369,78 @@ export interface NewPerformanceRecord {
   // 评价人信息
   evaluators: {
     customer?: number[]
-    intelligent?: number
+    functional?: number
+  }
+
+  // 备注
+  comments?: string
+}
+
+// 销售部门绩效记录
+export interface SalesPerformanceRecord {
+  id: number
+  employee_id: number
+  employee_name: string
+  employee_position: string
+  department_id: number
+  department_name: string
+  department_type: 'sales'
+  position_level: PositionLevel
+  period: string
+  period_type: 'monthly' // 销售部门只有月度考核
+
+  // 月度提成 - 数据评分(月度完成率)
+  monthly_commission: {
+    new_service_fee: {
+      target: number
+      actual: number
+      completion_rate: number
+      score: number
+      weight: number
+    }
+    new_orders: {
+      target: number
+      actual: number
+      completion_rate: number
+      score: number
+      weight: number
+    }
+  }
+  monthly_commission_score: number
+  monthly_commission_weight: number // 100%
+
+  // 绩效底薪奖金 - 数据评分+过程管理指标
+  performance_bonus: {
+    data_metrics: {
+      [key: string]: {
+        target: number
+        actual: number
+        completion_rate: number
+        score: number
+        weight: number
+      }
+    }
+    process_management: {
+      [key: string]: number // 人工录入的评分
+    }
+  }
+  performance_bonus_score: number
+  performance_bonus_weight: number
+
+  // 综合得分
+  total_score: number
+  grade: 'S' | 'A' | 'B' | 'C' | 'D'
+  rank_in_department: number
+  rank_in_company: number
+
+  // 状态和时间
+  status: 'draft' | 'in_progress' | 'completed' | 'approved'
+  created_at: string
+  updated_at: string
+
+  // 评价人员记录
+  evaluators?: {
+    process_management?: number
   }
 
   // 备注
