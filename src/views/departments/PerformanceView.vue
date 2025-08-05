@@ -504,80 +504,87 @@
               </div>
             </div>
 
-                        <!-- 销售部门得分明细 -->
-            <div v-if="selectedRecord.department_type === 'sales'" class="score-details">
-              <!-- 月度提成详细 -->
-              <div class="score-item expandable">
-                <div class="score-item-header">
-                  <span class="score-item-name">月度提成</span>
-                  <span class="score-item-weight">(权重: 50%)</span>
+            <!-- 销售部门得分明细 -->
+            <div v-if="selectedRecord.department_type === 'sales'" class="score-sections">
+              <!-- 月度提成 -->
+              <div class="score-section">
+                <div class="section-header">
+                  <h4 class="section-subtitle">月度提成 (50分)</h4>
                 </div>
-                <div class="score-item-value">
-                  <span class="score-number">{{ ((selectedRecord as SalesPerformanceRecord).monthly_commission_score || 0).toFixed(1) }}</span>
-                  <div class="score-bar">
-                    <div class="score-fill" :style="{ width: `${(selectedRecord as SalesPerformanceRecord).monthly_commission_score || 0}%` }"></div>
+
+                <!-- 月度提成卡片 -->
+                <div class="metric-cards">
+                  <div class="metric-card">
+                    <div class="metric-header">
+                      <span class="metric-name">新增服务费</span>
+                      <span class="metric-score">89分</span>
+                    </div>
+                    <div class="metric-details">
+                      <span class="metric-detail">目标: ¥80,000 | 实际: ¥76,000</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: 95%"></div>
+                      <span class="progress-text">95%</span>
+                    </div>
                   </div>
-                </div>
-                <!-- 月度提成子项明细 -->
-                <div class="score-sub-items">
-                  <div class="sub-items-table">
-                    <div class="table-header">
-                      <span class="col-name">指标项目</span>
-                      <span class="col-target">目标</span>
-                      <span class="col-actual">实际</span>
-                      <span class="col-rate">完成率</span>
-                      <span class="col-score">得分</span>
+
+                  <div class="metric-card">
+                    <div class="metric-header">
+                      <span class="metric-name">新增订单数</span>
+                      <span class="metric-score">84分</span>
                     </div>
-                    <div class="table-row">
-                      <span class="col-name">新增服务费</span>
-                      <span class="col-target">¥{{ ((selectedRecord as SalesPerformanceRecord).monthly_commission?.new_service_fee?.target || 80000).toLocaleString() }}</span>
-                      <span class="col-actual">¥{{ ((selectedRecord as SalesPerformanceRecord).monthly_commission?.new_service_fee?.actual || 76000).toLocaleString() }}</span>
-                      <span class="col-rate completion-rate">{{ ((selectedRecord as SalesPerformanceRecord).monthly_commission?.new_service_fee?.completion_rate || 95).toFixed(1) }}%</span>
-                      <span class="col-score score-value">{{ ((selectedRecord as SalesPerformanceRecord).monthly_commission?.new_service_fee?.score || 89).toFixed(1) }}</span>
+                    <div class="metric-details">
+                      <span class="metric-detail">目标: 25单 | 实际: 22单</span>
                     </div>
-                    <div class="table-row">
-                      <span class="col-name">新增订单数</span>
-                      <span class="col-target">{{ ((selectedRecord as SalesPerformanceRecord).monthly_commission?.new_orders?.target || 25) }}单</span>
-                      <span class="col-actual">{{ ((selectedRecord as SalesPerformanceRecord).monthly_commission?.new_orders?.actual || 22) }}单</span>
-                      <span class="col-rate completion-rate">{{ ((selectedRecord as SalesPerformanceRecord).monthly_commission?.new_orders?.completion_rate || 88).toFixed(1) }}%</span>
-                      <span class="col-score score-value">{{ ((selectedRecord as SalesPerformanceRecord).monthly_commission?.new_orders?.score || 84).toFixed(1) }}</span>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: 88%"></div>
+                      <span class="progress-text">88%</span>
+                    </div>
+                  </div>
+
+                  <div class="metric-card">
+                    <div class="metric-header">
+                      <span class="metric-name">新单客户数</span>
+                      <span class="metric-score">92分</span>
+                    </div>
+                    <div class="metric-details">
+                      <span class="metric-detail">目标: 15个 | 实际: 16个</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: 107%"></div>
+                      <span class="progress-text">107%</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- 绩效底薪奖金详细 -->
-              <div class="score-item expandable">
-                <div class="score-item-header">
-                  <span class="score-item-name">绩效底薪奖金</span>
-                  <span class="score-item-weight">(权重: 50%)</span>
+              <!-- 绩效底薪奖金 -->
+              <div class="score-section">
+                <div class="section-header">
+                  <h4 class="section-subtitle">绩效底薪奖金 (50分)</h4>
                 </div>
-                <div class="score-item-value">
-                  <span class="score-number">{{ ((selectedRecord as SalesPerformanceRecord).performance_bonus_score || 0).toFixed(1) }}</span>
-                  <div class="score-bar">
-                    <div class="score-fill" :style="{ width: `${(selectedRecord as SalesPerformanceRecord).performance_bonus_score || 0}%` }"></div>
+
+                <div class="evaluation-grid">
+                  <div class="eval-item">
+                    <span class="eval-label">客户维护质量</span>
+                    <span class="eval-score">87分</span>
+                  </div>
+                  <div class="eval-item">
+                    <span class="eval-label">销售流程规范</span>
+                    <span class="eval-score">92分</span>
+                  </div>
+                  <div class="eval-item">
+                    <span class="eval-label">团队协作</span>
+                    <span class="eval-score">85分</span>
+                  </div>
+                  <div class="eval-item">
+                    <span class="eval-label">学习成长</span>
+                    <span class="eval-score">90分</span>
                   </div>
                 </div>
-                <!-- 绩效底薪奖金子项明细 -->
-                <div class="score-sub-items">
-                  <div class="sub-items-grid">
-                    <div class="grid-item">
-                      <span class="grid-label">客户维护质量</span>
-                      <span class="grid-value">{{ ((selectedRecord as SalesPerformanceRecord).performance_bonus?.process_management?.customer_maintenance || 87).toFixed(1) }}</span>
-                    </div>
-                    <div class="grid-item">
-                      <span class="grid-label">销售流程规范</span>
-                      <span class="grid-value">{{ ((selectedRecord as SalesPerformanceRecord).performance_bonus?.process_management?.sales_process || 92).toFixed(1) }}</span>
-                    </div>
-                    <div class="grid-item">
-                      <span class="grid-label">团队协作</span>
-                      <span class="grid-value">{{ ((selectedRecord as SalesPerformanceRecord).performance_bonus?.process_management?.teamwork || 85).toFixed(1) }}</span>
-                    </div>
-                    <div class="grid-item">
-                      <span class="grid-label">学习成长</span>
-                      <span class="grid-value">{{ ((selectedRecord as SalesPerformanceRecord).performance_bonus?.process_management?.learning_growth || 90).toFixed(1) }}</span>
-                    </div>
-                  </div>
+
+                <div class="section-total">
+                  <span class="total-label">总分: 88.5分</span>
                 </div>
               </div>
             </div>
@@ -813,13 +820,22 @@
           </button>
         </div>
 
-        <!-- 部门选择 -->
+        <!-- 部门和员工选择 -->
         <div class="modal-filters">
           <div class="filter-group">
             <label class="filter-label">目标部门:</label>
-            <select v-model="targetDepartment" class="filter-select">
+            <select v-model="targetDepartment" class="filter-select" @change="onDepartmentChange">
               <option value="operations">运营部门</option>
               <option value="sales">销售部门</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">选择员工:</label>
+            <select v-model="targetEmployee" class="filter-select">
+              <option value="">请选择员工</option>
+              <option v-for="employee in availableEmployees" :key="employee.id" :value="employee.id">
+                {{ employee.name }} - {{ employee.position }}
+              </option>
             </select>
           </div>
           <div class="filter-group">
@@ -833,11 +849,11 @@
         </div>
 
         <div class="modal-body">
-          <!-- 运营部门目标设置 -->
+                    <!-- 运营部门目标设置 -->
           <div v-if="targetDepartment === 'operations'" class="target-settings">
             <div class="department-notice">
-              <h4>运营部门绩效目标</h4>
-              <p>设置运营部门的数据指标和职能方案目标</p>
+              <h4>运营部门数据指标目标</h4>
+              <p>设置运营部门的数据指标目标（只有数据指标可以设置目标）</p>
             </div>
 
             <div class="target-categories">
@@ -852,38 +868,6 @@
                     <label class="target-label">返点目标 (¥)</label>
                     <input type="number" class="target-input" v-model="operationsTargets.rebateTarget" placeholder="请输入返点目标">
                   </div>
-                  <div class="target-item">
-                    <label class="target-label">新客户数量</label>
-                    <input type="number" class="target-input" v-model="operationsTargets.newCustomers" placeholder="请输入新客户目标数量">
-                  </div>
-                </div>
-              </div>
-
-              <div class="target-category">
-                <h5 class="category-title">客户评价目标</h5>
-                <div class="target-items">
-                  <div class="target-item">
-                    <label class="target-label">客户满意度 (分)</label>
-                    <input type="number" class="target-input" v-model="operationsTargets.customerSatisfaction" min="0" max="10" step="0.1" placeholder="0-10分">
-                  </div>
-                  <div class="target-item">
-                    <label class="target-label">服务质量 (分)</label>
-                    <input type="number" class="target-input" v-model="operationsTargets.serviceQuality" min="0" max="10" step="0.1" placeholder="0-10分">
-                  </div>
-                </div>
-              </div>
-
-              <div class="target-category">
-                <h5 class="category-title">职能方案目标</h5>
-                <div class="target-items">
-                  <div class="target-item">
-                    <label class="target-label">项目完成率 (%)</label>
-                    <input type="number" class="target-input" v-model="operationsTargets.projectCompletion" min="0" max="100" placeholder="请输入完成率目标">
-                  </div>
-                  <div class="target-item">
-                    <label class="target-label">团队协作评分 (分)</label>
-                    <input type="number" class="target-input" v-model="operationsTargets.teamwork" min="0" max="10" step="0.1" placeholder="0-10分">
-                  </div>
                 </div>
               </div>
             </div>
@@ -892,43 +876,25 @@
           <!-- 销售部门目标设置 -->
           <div v-else class="target-settings">
             <div class="department-notice">
-              <h4>销售部门绩效目标</h4>
-              <p>设置销售部门的月度提成和绩效奖金目标</p>
+              <h4>销售部门数据指标目标</h4>
+              <p>设置销售部门的数据指标目标（只有数据指标可以设置目标）</p>
             </div>
 
             <div class="target-categories">
               <div class="target-category">
-                <h5 class="category-title">月度提成目标</h5>
+                <h5 class="category-title">数据指标目标</h5>
                 <div class="target-items">
                   <div class="target-item">
-                    <label class="target-label">新增服务费 (¥)</label>
-                    <input type="number" class="target-input" v-model="salesTargets.newServiceFee" placeholder="请输入新增服务费目标">
+                    <label class="target-label">新单服务费 (¥)</label>
+                    <input type="number" class="target-input" v-model="salesTargets.newServiceFee" placeholder="请输入新单服务费目标">
                   </div>
                   <div class="target-item">
-                    <label class="target-label">新增订单数 (单)</label>
-                    <input type="number" class="target-input" v-model="salesTargets.newOrders" placeholder="请输入新增订单目标">
+                    <label class="target-label">新单单量 (单)</label>
+                    <input type="number" class="target-input" v-model="salesTargets.newOrders" placeholder="请输入新单单量目标">
                   </div>
                   <div class="target-item">
-                    <label class="target-label">客户转化率 (%)</label>
-                    <input type="number" class="target-input" v-model="salesTargets.conversionRate" min="0" max="100" placeholder="请输入转化率目标">
-                  </div>
-                </div>
-              </div>
-
-              <div class="target-category">
-                <h5 class="category-title">绩效底薪奖金目标</h5>
-                <div class="target-items">
-                  <div class="target-item">
-                    <label class="target-label">客户维护数量</label>
-                    <input type="number" class="target-input" v-model="salesTargets.customerMaintenance" placeholder="请输入客户维护目标数量">
-                  </div>
-                  <div class="target-item">
-                    <label class="target-label">业务拓展项目</label>
-                    <input type="number" class="target-input" v-model="salesTargets.businessExpansion" placeholder="请输入业务拓展目标">
-                  </div>
-                  <div class="target-item">
-                    <label class="target-label">客户满意度 (分)</label>
-                    <input type="number" class="target-input" v-model="salesTargets.customerSatisfaction" min="0" max="10" step="0.1" placeholder="0-10分">
+                    <label class="target-label">新单客户数 (个)</label>
+                    <input type="number" class="target-input" v-model="salesTargets.newCustomers" placeholder="请输入新单客户数目标">
                   </div>
                 </div>
               </div>
@@ -1179,27 +1145,20 @@ const performanceYear = ref('2024')
 
 // 目标设置数据
 const targetDepartment = ref('operations')
+const targetEmployee = ref('')
 const targetPeriod = ref('monthly')
 
-// 运营部门目标
+// 运营部门目标（仅数据指标）
 const operationsTargets = ref({
   serviceFeeTarget: 0,
-  rebateTarget: 0,
-  newCustomers: 0,
-  customerSatisfaction: 8.5,
-  serviceQuality: 8.5,
-  projectCompletion: 90,
-  teamwork: 8.0
+  rebateTarget: 0
 })
 
-// 销售部门目标
+// 销售部门目标（仅数据指标）
 const salesTargets = ref({
   newServiceFee: 0,
   newOrders: 0,
-  conversionRate: 15,
-  customerMaintenance: 0,
-  businessExpansion: 0,
-  customerSatisfaction: 8.5
+  newCustomers: 0
 })
 
 // 计算属性
@@ -1277,6 +1236,27 @@ const generatePerformanceHistory = (timeFilter: string, year: string) => {
 // 筛选后的绩效记录
 const filteredPerformanceRecords = computed(() => {
   return generatePerformanceHistory(performanceTimeFilter.value, performanceYear.value)
+})
+
+// 可选择的员工列表
+const availableEmployees = computed(() => {
+  if (targetDepartment.value === 'operations') {
+    return [
+      { id: 'emp001', name: '李优化师', position: '优化师' },
+      { id: 'emp002', name: '陈经理', position: '项目经理' },
+      { id: 'emp003', name: '王优化师', position: 'Google优化师' },
+      { id: 'emp004', name: '张优化师', position: 'Meta优化师' },
+      { id: 'emp005', name: '刘优化师', position: 'Bing优化师' }
+    ]
+  } else {
+    return [
+      { id: 'emp006', name: '赵销售', position: '销售专员' },
+      { id: 'emp007', name: '钱经理', position: '销售经理' },
+      { id: 'emp008', name: '孙销售', position: '高级销售' },
+      { id: 'emp009', name: '李主管', position: '销售主管' },
+      { id: 'emp010', name: '周销售', position: '销售专员' }
+    ]
+  }
 })
 
 const availablePeriodTypes = computed(() => {
@@ -1510,11 +1490,25 @@ const saveRating = () => {
   showRatingModal.value = false
 }
 
+// 部门变更处理
+const onDepartmentChange = () => {
+  targetEmployee.value = '' // 重置员工选择
+}
+
 // 保存目标设置
 const saveTargets = () => {
+  // 验证员工选择
+  if (!targetEmployee.value) {
+    alert('请选择要设置目标的员工！')
+    return
+  }
+
+  const selectedEmployee = availableEmployees.value.find(emp => emp.id === targetEmployee.value)
+
   if (targetDepartment.value === 'operations') {
-    console.log('保存运营部门目标:', {
+    console.log('保存运营部门数据指标目标:', {
       department: '运营部门',
+      employee: selectedEmployee,
       period: targetPeriod.value,
       targets: operationsTargets.value
     })
@@ -1525,21 +1519,22 @@ const saveTargets = () => {
       return
     }
 
-    alert(`运营部门${targetPeriod.value === 'monthly' ? '月度' : targetPeriod.value === 'quarterly' ? '季度' : '年度'}目标设置成功！\n服务费目标: ¥${operationsTargets.value.serviceFeeTarget.toLocaleString()}\n返点目标: ¥${operationsTargets.value.rebateTarget.toLocaleString()}`)
+    alert(`已为员工【${selectedEmployee?.name}】设置运营部门${targetPeriod.value === 'monthly' ? '月度' : targetPeriod.value === 'quarterly' ? '季度' : '年度'}数据指标目标！\n服务费目标: ¥${operationsTargets.value.serviceFeeTarget.toLocaleString()}\n返点目标: ¥${operationsTargets.value.rebateTarget.toLocaleString()}`)
   } else {
-    console.log('保存销售部门目标:', {
+    console.log('保存销售部门数据指标目标:', {
       department: '销售部门',
+      employee: selectedEmployee,
       period: targetPeriod.value,
       targets: salesTargets.value
     })
 
     // 验证必填字段
-    if (!salesTargets.value.newServiceFee || !salesTargets.value.newOrders) {
-      alert('请填写新增服务费和新增订单数目标！')
+    if (!salesTargets.value.newServiceFee || !salesTargets.value.newOrders || !salesTargets.value.newCustomers) {
+      alert('请填写新单服务费、新单单量和新单客户数目标！')
       return
     }
 
-    alert(`销售部门${targetPeriod.value === 'monthly' ? '月度' : targetPeriod.value === 'quarterly' ? '季度' : '年度'}目标设置成功！\n新增服务费: ¥${salesTargets.value.newServiceFee.toLocaleString()}\n新增订单数: ${salesTargets.value.newOrders}单`)
+    alert(`已为员工【${selectedEmployee?.name}】设置销售部门${targetPeriod.value === 'monthly' ? '月度' : targetPeriod.value === 'quarterly' ? '季度' : '年度'}数据指标目标！\n新单服务费: ¥${salesTargets.value.newServiceFee.toLocaleString()}\n新单单量: ${salesTargets.value.newOrders}单\n新单客户数: ${salesTargets.value.newCustomers}个`)
   }
 
   showTargetModal.value = false
