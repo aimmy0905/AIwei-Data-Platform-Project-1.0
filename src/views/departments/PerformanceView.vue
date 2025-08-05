@@ -812,32 +812,132 @@
             </svg>
           </button>
         </div>
+
+        <!-- 筛选器 -->
+        <div class="modal-filters">
+          <div class="filter-group">
+            <label class="filter-label">时间范围:</label>
+            <select v-model="performanceTimeFilter" class="filter-select">
+              <option value="monthly">月度绩效</option>
+              <option value="quarterly">季度绩效</option>
+              <option value="yearly">年度绩效</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">年份:</label>
+            <select v-model="performanceYear" class="filter-select">
+              <option value="2024">2024年</option>
+              <option value="2023">2023年</option>
+              <option value="2022">2022年</option>
+            </select>
+          </div>
+        </div>
+
         <div class="modal-body">
           <div v-if="selectedRecord" class="performance-history">
             <div class="employee-summary">
               <h4>{{ selectedRecord.employee_name }}</h4>
               <p>{{ selectedRecord.department_name }} - {{ selectedRecord.employee_position }}</p>
             </div>
+
             <div class="performance-timeline">
-              <div class="timeline-item" v-for="i in 6" :key="i">
-                <div class="timeline-date">2024年{{ 7-i }}月</div>
+              <div class="timeline-item" v-for="record in filteredPerformanceRecords" :key="record.period">
+                <div class="timeline-header">
+                  <div class="timeline-date">{{ record.period }}</div>
+                  <div class="timeline-summary">
+                    <span class="summary-score">综合得分: {{ record.totalScore }}</span>
+                    <span class="summary-grade" :class="getGradeColor(record.grade)">{{ record.grade }}级</span>
+                  </div>
+                </div>
+
                 <div class="timeline-content">
-                  <div class="score-grid">
-                    <div class="score-item">
-                      <span class="score-label">数据得分</span>
-                      <span class="score-value">{{ (Math.random() * 20 + 80).toFixed(1) }}</span>
+                  <!-- 运营部门详细得分 -->
+                  <div v-if="selectedRecord.department_type === 'operations'" class="detailed-scores">
+                    <div class="score-category">
+                      <h5 class="category-title">数据得分 ({{ record.dataScore }}分)</h5>
+                      <div class="score-details">
+                        <div class="detail-item">
+                          <span class="detail-label">服务费目标</span>
+                          <span class="detail-value">{{ record.serviceTarget }}分</span>
+                          <span class="detail-rate">({{ record.serviceRate }}%)</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">返点目标</span>
+                          <span class="detail-value">{{ record.rebateTarget }}分</span>
+                          <span class="detail-rate">({{ record.rebateRate }}%)</span>
+                        </div>
+                      </div>
                     </div>
-                    <div class="score-item">
-                      <span class="score-label">客户评价</span>
-                      <span class="score-value">{{ (Math.random() * 20 + 80).toFixed(1) }}</span>
+
+                    <div class="score-category">
+                      <h5 class="category-title">客户评价 ({{ record.customerScore }}分)</h5>
+                      <div class="score-details">
+                        <div class="detail-item">
+                          <span class="detail-label">客户满意度</span>
+                          <span class="detail-value">{{ record.satisfaction }}分</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">服务质量</span>
+                          <span class="detail-value">{{ record.serviceQuality }}分</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">响应速度</span>
+                          <span class="detail-value">{{ record.responseSpeed }}分</span>
+                        </div>
+                      </div>
                     </div>
-                    <div class="score-item">
-                      <span class="score-label">职能方案</span>
-                      <span class="score-value">{{ (Math.random() * 20 + 80).toFixed(1) }}</span>
+
+                    <div class="score-category">
+                      <h5 class="category-title">职能方案 ({{ record.functionalScore }}分)</h5>
+                      <div class="score-details">
+                        <div v-if="selectedRecord.employee_position.includes('经理')" class="detail-item">
+                          <span class="detail-label">团队成员管理</span>
+                          <span class="detail-value">{{ record.teamManagement }}分</span>
+                        </div>
+                        <div v-else class="detail-item">
+                          <span class="detail-label">客户服务能力</span>
+                          <span class="detail-value">{{ record.customerService }}分</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">专业工作质量</span>
+                          <span class="detail-value">{{ record.workQuality }}分</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">沟通与协助</span>
+                          <span class="detail-value">{{ record.communication }}分</span>
+                        </div>
+                      </div>
                     </div>
-                    <div class="score-item total">
-                      <span class="score-label">综合得分</span>
-                      <span class="score-value">{{ (Math.random() * 20 + 80).toFixed(1) }}</span>
+                  </div>
+
+                  <!-- 销售部门详细得分 -->
+                  <div v-else class="detailed-scores">
+                    <div class="score-category">
+                      <h5 class="category-title">月度提成 ({{ record.monthlyCommission }}分)</h5>
+                      <div class="score-details">
+                        <div class="detail-item">
+                          <span class="detail-label">新增服务费</span>
+                          <span class="detail-value">{{ record.newServiceFee }}分</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">新增订单数</span>
+                          <span class="detail-value">{{ record.newOrders }}分</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="score-category">
+                      <h5 class="category-title">绩效底薪奖金 ({{ record.performanceBonus }}分)</h5>
+                      <div class="score-details">
+                        <div class="detail-item">
+                          <span class="detail-label">客户维护</span>
+                          <span class="detail-value">{{ record.customerMaintenance }}分</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">业务拓展</span>
+                          <span class="detail-value">{{ record.businessExpansion }}分</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -930,6 +1030,10 @@ const functionalRatings = ref({
   growth: 0
 })
 
+// 全部绩效筛选器
+const performanceTimeFilter = ref('monthly')
+const performanceYear = ref('2024')
+
 // 计算属性
 const departments = computed(() => [
   { value: 'operations' as DepartmentType, label: '运营部门', icon: Building2 },
@@ -953,6 +1057,58 @@ const functionalTotalScore = computed(() => {
            functionalRatings.value.initiative +
            functionalRatings.value.growth
   }
+})
+
+// 生成模拟绩效历史数据
+const generatePerformanceHistory = (timeFilter: string, year: string) => {
+  const records = []
+  let periods = []
+
+  if (timeFilter === 'monthly') {
+    periods = ['12月', '11月', '10月', '9月', '8月', '7月', '6月', '5月', '4月', '3月', '2月', '1月']
+  } else if (timeFilter === 'quarterly') {
+    periods = ['Q4', 'Q3', 'Q2', 'Q1']
+  } else {
+    periods = [year]
+  }
+
+  periods.forEach(period => {
+    const baseScore = Math.random() * 20 + 80
+    records.push({
+      period: timeFilter === 'yearly' ? `${year}年` : `${year}年${period}`,
+      totalScore: baseScore.toFixed(1),
+      grade: baseScore >= 90 ? 'A' : baseScore >= 80 ? 'B' : baseScore >= 70 ? 'C' : 'D',
+      dataScore: (Math.random() * 20 + 80).toFixed(1),
+      customerScore: (Math.random() * 20 + 80).toFixed(1),
+      functionalScore: (Math.random() * 20 + 80).toFixed(1),
+      // 详细分项
+      serviceTarget: (Math.random() * 10 + 40).toFixed(1),
+      serviceRate: (Math.random() * 20 + 85).toFixed(1),
+      rebateTarget: (Math.random() * 10 + 40).toFixed(1),
+      rebateRate: (Math.random() * 20 + 85).toFixed(1),
+      satisfaction: (Math.random() * 5 + 8).toFixed(1),
+      serviceQuality: (Math.random() * 5 + 8).toFixed(1),
+      responseSpeed: (Math.random() * 5 + 8).toFixed(1),
+      teamManagement: (Math.random() * 5 + 15).toFixed(1),
+      customerService: (Math.random() * 2 + 3).toFixed(1),
+      workQuality: (Math.random() * 2 + 3).toFixed(1),
+      communication: (Math.random() * 2 + 3).toFixed(1),
+      // 销售部门数据
+      monthlyCommission: (Math.random() * 20 + 80).toFixed(1),
+      performanceBonus: (Math.random() * 20 + 80).toFixed(1),
+      newServiceFee: (Math.random() * 10 + 40).toFixed(1),
+      newOrders: (Math.random() * 10 + 40).toFixed(1),
+      customerMaintenance: (Math.random() * 10 + 40).toFixed(1),
+      businessExpansion: (Math.random() * 10 + 40).toFixed(1)
+    })
+  })
+
+  return records
+}
+
+// 筛选后的绩效记录
+const filteredPerformanceRecords = computed(() => {
+  return generatePerformanceHistory(performanceTimeFilter.value, performanceYear.value)
 })
 
 const availablePeriodTypes = computed(() => {
@@ -1901,7 +2057,45 @@ onMounted(() => {
 }
 
 .modal-content--large {
-  max-width: 800px;
+  max-width: 900px;
+}
+
+/* 模态框筛选器样式 */
+.modal-filters {
+  display: flex;
+  gap: 20px;
+  padding: 20px 24px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  font-size: 14px;
+  color: #374151;
+  min-width: 120px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 .modal-header {
@@ -2171,11 +2365,38 @@ onMounted(() => {
 
 .timeline-item {
   display: flex;
-  gap: 20px;
-  padding: 16px;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
   background: #f9fafb;
   border-radius: 8px;
   border-left: 4px solid #4f46e5;
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.timeline-summary {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.summary-score {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 14px;
+}
+
+.summary-grade {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .timeline-date {
@@ -2224,6 +2445,62 @@ onMounted(() => {
 
 .score-item.total .score-value {
   color: #4f46e5;
+}
+
+/* 详细得分样式 */
+.detailed-scores {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.score-category {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.category-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.score-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 6px;
+}
+
+.detail-label {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.detail-rate {
+  font-size: 12px;
+  color: #6b7280;
+  margin-left: 8px;
 }
 
 /* 子项明细样式 */

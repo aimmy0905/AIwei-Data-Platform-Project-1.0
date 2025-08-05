@@ -350,7 +350,8 @@ const router = createRouter({
     },
 
     // 捕获所有未匹配的路由
-        path: '/:pathMatch(.*)*',
+    {
+      path: '/:pathMatch(.*)*',
       name: 'not-found',
       redirect: { name: 'login' }
     }
