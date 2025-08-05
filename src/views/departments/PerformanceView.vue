@@ -298,6 +298,12 @@
                   <button class="btn-icon" @click="editRecord(record)" title="编辑">
                     <Edit :size="14" />
                   </button>
+                  <button class="btn-icon" @click="rateEmployee(record)" title="评分">
+                    <Star :size="14" />
+                  </button>
+                  <button class="btn-icon" @click="viewAllPerformance(record)" title="查看全部绩效">
+                    <BarChart :size="14" />
+                  </button>
                 </div>
               </div>
             </div>
@@ -328,6 +334,523 @@
         </div>
       </div>
     </section>
+
+    <!-- 模态框组件 -->
+    <!-- 绩效详情模态框 -->
+    <div v-if="showDetailsModal" class="modal-overlay" @click="closeDetailsModal">
+      <div class="modal-content performance-details-modal" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">{{ selectedRecord?.employee_name }} - 绩效考核详情</h3>
+          <div class="modal-actions">
+            <button class="action-btn edit-btn" @click="editRecord(selectedRecord)">
+              <Edit :size="16" />
+              编辑考核
+            </button>
+            <button class="action-btn print-btn" @click="printReport">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6,9 6,2 18,2 18,9"></polyline>
+                <path d="M6,18H4a2,2,0,0,1-2-2V11a2,2,0,0,1,2-2H20a2,2,0,0,1,2,2v5a2,2,0,0,1-2,2H18"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+              </svg>
+              打印报告
+            </button>
+            <button class="modal-close-btn" @click="closeDetailsModal">
+              <X :size="20" />
+            </button>
+          </div>
+        </div>
+
+        <div class="modal-body" v-if="selectedRecord">
+          <!-- 基本信息区域 -->
+          <div class="basic-info-section">
+            <h3 class="section-title">基本信息</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">员工姓名</span>
+                <span class="info-value">{{ selectedRecord.employee_name }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">所属部门</span>
+                <span class="info-value">{{ selectedRecord.department_name }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">考核周期</span>
+                <span class="info-value">{{ formatPeriod(selectedRecord.period, selectedRecord.period_type) }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">考核人</span>
+                <span class="info-value">李主管</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">考核时间</span>
+                <span class="info-value">2023/8/1</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">状态</span>
+                <span class="info-value status-completed">已完成</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 考核内容 -->
+          <div class="evaluation-content">
+            <h3 class="section-title">考核内容</h3>
+
+            <!-- 运营部门得分明细 -->
+            <div v-if="selectedRecord.department_type === 'operations'" class="score-sections">
+              <!-- 项目经理评分结构 -->
+              <div v-if="selectedRecord.employee_position.includes('经理')">
+                <!-- 季度奖金 (业绩完成率) -->
+                <div class="score-section">
+                  <div class="section-header">
+                    <h4 class="section-subtitle">季度奖金 (业绩完成率) - 100%</h4>
+                  </div>
+                  <div class="evaluation-grid">
+                    <div class="eval-item">
+                      <span class="eval-label">服务费目标</span>
+                      <span class="eval-score">100%</span>
+                    </div>
+                    <div class="eval-item">
+                      <span class="eval-label">返点目标</span>
+                      <span class="eval-score">100%</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 数据评分 (季度任务达标率) -->
+                <div class="score-section">
+                  <div class="section-header">
+                    <h4 class="section-subtitle">数据评分 (季度任务达标率) - 100%</h4>
+                  </div>
+                </div>
+
+                <!-- 职能方案 (过程管理指标) -->
+                <div class="score-section">
+                  <div class="section-header">
+                    <h4 class="section-subtitle">职能方案 (过程管理指标)</h4>
+                  </div>
+                  <div class="evaluation-grid">
+                    <div class="eval-item">
+                      <span class="eval-label">团队成员管理</span>
+                      <span class="eval-score">20%</span>
+                    </div>
+                    <div class="eval-item">
+                      <span class="eval-label">组内客户评论</span>
+                      <span class="eval-score">20%</span>
+                    </div>
+                    <div class="eval-item">
+                      <span class="eval-label">知识沉淀及输出</span>
+                      <span class="eval-score">20%</span>
+                    </div>
+                    <div class="eval-item">
+                      <span class="eval-label">培养及输出新人</span>
+                      <span class="eval-score">20%</span>
+                    </div>
+                    <div class="eval-item">
+                      <span class="eval-label">跨团队协助及合作</span>
+                      <span class="eval-score">20%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 项目成员/优化师评分结构 -->
+              <div v-else>
+                <!-- 数据评分 80% -->
+                <div class="score-section">
+                  <div class="section-header">
+                    <h4 class="section-subtitle">数据评分 - 80%</h4>
+                  </div>
+                  <div class="evaluation-grid">
+                    <div class="eval-item">
+                      <span class="eval-label">服务费目标</span>
+                      <span class="eval-score">100%</span>
+                    </div>
+                    <div class="eval-item">
+                      <span class="eval-label">返点目标</span>
+                      <span class="eval-score">100%</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 职能方案 20% -->
+                <div class="score-section">
+                  <div class="section-header">
+                    <h4 class="section-subtitle">职能方案 - 20%</h4>
+                  </div>
+                  <div class="evaluation-grid">
+                    <div class="eval-item">
+                      <span class="eval-label">客户服务能力</span>
+                      <span class="eval-score">20%</span>
+                    </div>
+                    <div class="eval-item">
+                      <span class="eval-label">专业工作质量</span>
+                      <span class="eval-score">20%</span>
+                    </div>
+                    <div class="eval-item">
+                      <span class="eval-label">沟通与协助</span>
+                      <span class="eval-score">20%</span>
+                    </div>
+                    <div class="eval-item">
+                      <span class="eval-label">工作积极性及执行力</span>
+                      <span class="eval-score">20%</span>
+                    </div>
+                    <div class="eval-item">
+                      <span class="eval-label">成长与贡献</span>
+                      <span class="eval-score">20%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+                        <!-- 销售部门得分明细 -->
+            <div v-if="selectedRecord.department_type === 'sales'" class="score-details">
+              <!-- 月度提成详细 -->
+              <div class="score-item expandable">
+                <div class="score-item-header">
+                  <span class="score-item-name">月度提成</span>
+                  <span class="score-item-weight">(权重: 50%)</span>
+                </div>
+                <div class="score-item-value">
+                  <span class="score-number">{{ ((selectedRecord as SalesPerformanceRecord).monthly_commission_score || 0).toFixed(1) }}</span>
+                  <div class="score-bar">
+                    <div class="score-fill" :style="{ width: `${(selectedRecord as SalesPerformanceRecord).monthly_commission_score || 0}%` }"></div>
+                  </div>
+                </div>
+                <!-- 月度提成子项明细 -->
+                <div class="score-sub-items">
+                  <div class="sub-items-table">
+                    <div class="table-header">
+                      <span class="col-name">指标项目</span>
+                      <span class="col-target">目标</span>
+                      <span class="col-actual">实际</span>
+                      <span class="col-rate">完成率</span>
+                      <span class="col-score">得分</span>
+                    </div>
+                    <div class="table-row">
+                      <span class="col-name">新增服务费</span>
+                      <span class="col-target">¥{{ ((selectedRecord as SalesPerformanceRecord).monthly_commission?.new_service_fee?.target || 80000).toLocaleString() }}</span>
+                      <span class="col-actual">¥{{ ((selectedRecord as SalesPerformanceRecord).monthly_commission?.new_service_fee?.actual || 76000).toLocaleString() }}</span>
+                      <span class="col-rate completion-rate">{{ ((selectedRecord as SalesPerformanceRecord).monthly_commission?.new_service_fee?.completion_rate || 95).toFixed(1) }}%</span>
+                      <span class="col-score score-value">{{ ((selectedRecord as SalesPerformanceRecord).monthly_commission?.new_service_fee?.score || 89).toFixed(1) }}</span>
+                    </div>
+                    <div class="table-row">
+                      <span class="col-name">新增订单数</span>
+                      <span class="col-target">{{ ((selectedRecord as SalesPerformanceRecord).monthly_commission?.new_orders?.target || 25) }}单</span>
+                      <span class="col-actual">{{ ((selectedRecord as SalesPerformanceRecord).monthly_commission?.new_orders?.actual || 22) }}单</span>
+                      <span class="col-rate completion-rate">{{ ((selectedRecord as SalesPerformanceRecord).monthly_commission?.new_orders?.completion_rate || 88).toFixed(1) }}%</span>
+                      <span class="col-score score-value">{{ ((selectedRecord as SalesPerformanceRecord).monthly_commission?.new_orders?.score || 84).toFixed(1) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 绩效底薪奖金详细 -->
+              <div class="score-item expandable">
+                <div class="score-item-header">
+                  <span class="score-item-name">绩效底薪奖金</span>
+                  <span class="score-item-weight">(权重: 50%)</span>
+                </div>
+                <div class="score-item-value">
+                  <span class="score-number">{{ ((selectedRecord as SalesPerformanceRecord).performance_bonus_score || 0).toFixed(1) }}</span>
+                  <div class="score-bar">
+                    <div class="score-fill" :style="{ width: `${(selectedRecord as SalesPerformanceRecord).performance_bonus_score || 0}%` }"></div>
+                  </div>
+                </div>
+                <!-- 绩效底薪奖金子项明细 -->
+                <div class="score-sub-items">
+                  <div class="sub-items-grid">
+                    <div class="grid-item">
+                      <span class="grid-label">客户维护质量</span>
+                      <span class="grid-value">{{ ((selectedRecord as SalesPerformanceRecord).performance_bonus?.process_management?.customer_maintenance || 87).toFixed(1) }}</span>
+                    </div>
+                    <div class="grid-item">
+                      <span class="grid-label">销售流程规范</span>
+                      <span class="grid-value">{{ ((selectedRecord as SalesPerformanceRecord).performance_bonus?.process_management?.sales_process || 92).toFixed(1) }}</span>
+                    </div>
+                    <div class="grid-item">
+                      <span class="grid-label">团队协作</span>
+                      <span class="grid-value">{{ ((selectedRecord as SalesPerformanceRecord).performance_bonus?.process_management?.teamwork || 85).toFixed(1) }}</span>
+                    </div>
+                    <div class="grid-item">
+                      <span class="grid-label">学习成长</span>
+                      <span class="grid-value">{{ ((selectedRecord as SalesPerformanceRecord).performance_bonus?.process_management?.learning_growth || 90).toFixed(1) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 考核结果 -->
+            <div class="evaluation-results">
+              <h3 class="section-title">考核结果</h3>
+
+              <div class="results-grid">
+                <div class="result-card">
+                  <div class="result-label">总分</div>
+                  <div class="result-value total-score">86.25分</div>
+                </div>
+                <div class="result-card">
+                  <div class="result-label">等级</div>
+                  <div class="result-value grade-value">良好</div>
+                </div>
+                <div class="result-card">
+                  <div class="result-label">部门排名</div>
+                  <div class="result-value rank-value">第3名</div>
+                </div>
+              </div>
+
+              <div class="improvement-suggestion">
+                <h4 class="suggestion-title">改进建议</h4>
+                <p class="suggestion-text">需要提升新客户开发能力，加强与客户的沟通技巧</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 编辑记录模态框 -->
+    <div v-if="showEditModal" class="modal-overlay" @click="showEditModal = false">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">编辑绩效记录</h3>
+          <button class="modal-close" @click="showEditModal = false">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div v-if="selectedRecord" class="edit-form">
+            <div class="form-group">
+              <label class="form-label">员工姓名</label>
+              <input type="text" :value="selectedRecord.employee_name" readonly class="form-input readonly">
+            </div>
+            <div class="form-group">
+              <label class="form-label">部门</label>
+              <input type="text" :value="selectedRecord.department_name" readonly class="form-input readonly">
+            </div>
+            <div class="form-group">
+              <label class="form-label">综合得分</label>
+              <input type="number" :value="selectedRecord.total_score" class="form-input" min="0" max="100" step="0.1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">等级</label>
+              <select class="form-select">
+                <option value="S" :selected="selectedRecord.grade === 'S'">S级</option>
+                <option value="A" :selected="selectedRecord.grade === 'A'">A级</option>
+                <option value="B" :selected="selectedRecord.grade === 'B'">B级</option>
+                <option value="C" :selected="selectedRecord.grade === 'C'">C级</option>
+                <option value="D" :selected="selectedRecord.grade === 'D'">D级</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn--secondary" @click="showEditModal = false">取消</button>
+          <button class="btn btn--primary" @click="saveEdit">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 评分模态框 -->
+    <div v-if="showRatingModal" class="modal-overlay" @click="showRatingModal = false">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">员工评分</h3>
+          <button class="modal-close" @click="showRatingModal = false">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div v-if="selectedRecord" class="rating-form">
+            <div class="employee-info-section">
+              <h4>{{ selectedRecord.employee_name }}</h4>
+              <p>{{ selectedRecord.department_name }} - {{ selectedRecord.employee_position }}</p>
+            </div>
+
+            <div class="rating-notice">
+              <p><strong>注意：</strong>此评分专门针对职能方案部分的评价</p>
+            </div>
+
+                        <div class="functional-rating-section">
+              <!-- 项目经理评分 -->
+              <div v-if="selectedRecord.employee_position.includes('经理')">
+                <h5 class="section-title">职能方案评分 - 过程管理指标</h5>
+                <p class="section-description">请根据项目经理在过程管理方面的表现进行评分，每项满分20分</p>
+
+                <div class="rating-items">
+                  <div class="rating-item">
+                    <label class="rating-label">团队成员管理</label>
+                    <div class="rating-input-group">
+                      <input type="number" class="rating-input" min="0" max="20" step="0.1" placeholder="0-20分" v-model="functionalRatings.teamManagement">
+                      <span class="rating-suffix">分</span>
+                    </div>
+                    <p class="rating-description">评估对团队成员的管理能力和领导效果</p>
+                  </div>
+
+                  <div class="rating-item">
+                    <label class="rating-label">组内客户评论</label>
+                    <div class="rating-input-group">
+                      <input type="number" class="rating-input" min="0" max="20" step="0.1" placeholder="0-20分" v-model="functionalRatings.customerFeedback">
+                      <span class="rating-suffix">分</span>
+                    </div>
+                    <p class="rating-description">评估团队内客户满意度和反馈质量</p>
+                  </div>
+
+                  <div class="rating-item">
+                    <label class="rating-label">知识沉淀及输出</label>
+                    <div class="rating-input-group">
+                      <input type="number" class="rating-input" min="0" max="20" step="0.1" placeholder="0-20分" v-model="functionalRatings.knowledgeOutput">
+                      <span class="rating-suffix">分</span>
+                    </div>
+                    <p class="rating-description">评估知识管理和经验输出能力</p>
+                  </div>
+
+                  <div class="rating-item">
+                    <label class="rating-label">培养及输出新人</label>
+                    <div class="rating-input-group">
+                      <input type="number" class="rating-input" min="0" max="20" step="0.1" placeholder="0-20分" v-model="functionalRatings.mentoring">
+                      <span class="rating-suffix">分</span>
+                    </div>
+                    <p class="rating-description">评估新员工培养和人才发展能力</p>
+                  </div>
+
+                  <div class="rating-item">
+                    <label class="rating-label">跨团队协助及合作</label>
+                    <div class="rating-input-group">
+                      <input type="number" class="rating-input" min="0" max="20" step="0.1" placeholder="0-20分" v-model="functionalRatings.crossTeamwork">
+                      <span class="rating-suffix">分</span>
+                    </div>
+                    <p class="rating-description">评估跨部门协作和团队配合能力</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 优化师评分 -->
+              <div v-else>
+                <h5 class="section-title">职能方案评分 (20分)</h5>
+                <p class="section-description">请根据优化师在职能方案方面的表现进行评分，每项满分4分</p>
+
+                <div class="rating-items">
+                  <div class="rating-item">
+                    <label class="rating-label">客户服务能力</label>
+                    <div class="rating-input-group">
+                      <input type="number" class="rating-input" min="0" max="4" step="0.1" placeholder="0-4分" v-model="functionalRatings.customerService">
+                      <span class="rating-suffix">分</span>
+                    </div>
+                    <p class="rating-description">评估客户服务质量和响应能力</p>
+                  </div>
+
+                  <div class="rating-item">
+                    <label class="rating-label">专业工作质量</label>
+                    <div class="rating-input-group">
+                      <input type="number" class="rating-input" min="0" max="4" step="0.1" placeholder="0-4分" v-model="functionalRatings.workQuality">
+                      <span class="rating-suffix">分</span>
+                    </div>
+                    <p class="rating-description">评估专业技能和工作完成质量</p>
+                  </div>
+
+                  <div class="rating-item">
+                    <label class="rating-label">沟通与协助</label>
+                    <div class="rating-input-group">
+                      <input type="number" class="rating-input" min="0" max="4" step="0.1" placeholder="0-4分" v-model="functionalRatings.communication">
+                      <span class="rating-suffix">分</span>
+                    </div>
+                    <p class="rating-description">评估沟通能力和协助他人的表现</p>
+                  </div>
+
+                  <div class="rating-item">
+                    <label class="rating-label">工作积极性及执行力</label>
+                    <div class="rating-input-group">
+                      <input type="number" class="rating-input" min="0" max="4" step="0.1" placeholder="0-4分" v-model="functionalRatings.initiative">
+                      <span class="rating-suffix">分</span>
+                    </div>
+                    <p class="rating-description">评估工作主动性和任务执行能力</p>
+                  </div>
+
+                  <div class="rating-item">
+                    <label class="rating-label">成长与贡献</label>
+                    <div class="rating-input-group">
+                      <input type="number" class="rating-input" min="0" max="4" step="0.1" placeholder="0-4分" v-model="functionalRatings.growth">
+                      <span class="rating-suffix">分</span>
+                    </div>
+                    <p class="rating-description">评估个人成长和对团队的贡献</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="total-score-display">
+                <span class="total-label">职能方案总分：</span>
+                <span class="total-value">{{ functionalTotalScore.toFixed(1) }}分</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn--secondary" @click="showRatingModal = false">取消</button>
+          <button class="btn btn--primary" @click="saveRating">提交评分</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 查看全部绩效模态框 -->
+    <div v-if="showAllPerformanceModal" class="modal-overlay" @click="showAllPerformanceModal = false">
+      <div class="modal-content modal-content--large" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">全部绩效记录</h3>
+          <button class="modal-close" @click="showAllPerformanceModal = false">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div v-if="selectedRecord" class="performance-history">
+            <div class="employee-summary">
+              <h4>{{ selectedRecord.employee_name }}</h4>
+              <p>{{ selectedRecord.department_name }} - {{ selectedRecord.employee_position }}</p>
+            </div>
+            <div class="performance-timeline">
+              <div class="timeline-item" v-for="i in 6" :key="i">
+                <div class="timeline-date">2024年{{ 7-i }}月</div>
+                <div class="timeline-content">
+                  <div class="score-grid">
+                    <div class="score-item">
+                      <span class="score-label">数据得分</span>
+                      <span class="score-value">{{ (Math.random() * 20 + 80).toFixed(1) }}</span>
+                    </div>
+                    <div class="score-item">
+                      <span class="score-label">客户评价</span>
+                      <span class="score-value">{{ (Math.random() * 20 + 80).toFixed(1) }}</span>
+                    </div>
+                    <div class="score-item">
+                      <span class="score-label">职能方案</span>
+                      <span class="score-value">{{ (Math.random() * 20 + 80).toFixed(1) }}</span>
+                    </div>
+                    <div class="score-item total">
+                      <span class="score-label">综合得分</span>
+                      <span class="score-value">{{ (Math.random() * 20 + 80).toFixed(1) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn--secondary" @click="showAllPerformanceModal = false">关闭</button>
+          <button class="btn btn--primary" @click="exportEmployeeData">导出该员工数据</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -351,7 +874,8 @@ import {
   Eye,
   Edit,
   Building2,
-  ShoppingCart
+  ShoppingCart,
+  X
 } from 'lucide-vue-next'
 
 // 导入新的配置和数据
@@ -386,12 +910,50 @@ const viewMode = ref<'table' | 'card'>('table')
 // 模态框状态
 const showTargetModal = ref(false)
 const showRatingModal = ref(false)
+const showEditModal = ref(false)
+const showAllPerformanceModal = ref(false)
+const selectedRecord = ref<OperationsPerformanceRecord | SalesPerformanceRecord | null>(null)
+
+// 职能方案评分数据
+const functionalRatings = ref({
+  // 项目经理评分项 (每项0-20分)
+  teamManagement: 0,
+  customerFeedback: 0,
+  knowledgeOutput: 0,
+  mentoring: 0,
+  crossTeamwork: 0,
+  // 优化师评分项 (每项0-4分)
+  customerService: 0,
+  workQuality: 0,
+  communication: 0,
+  initiative: 0,
+  growth: 0
+})
 
 // 计算属性
 const departments = computed(() => [
   { value: 'operations' as DepartmentType, label: '运营部门', icon: Building2 },
   { value: 'sales' as DepartmentType, label: '销售部门', icon: ShoppingCart }
 ])
+
+// 职能方案总分计算
+const functionalTotalScore = computed(() => {
+  if (selectedRecord.value?.employee_position.includes('经理')) {
+    // 项目经理：5项，每项最高20分
+    return functionalRatings.value.teamManagement +
+           functionalRatings.value.customerFeedback +
+           functionalRatings.value.knowledgeOutput +
+           functionalRatings.value.mentoring +
+           functionalRatings.value.crossTeamwork
+  } else {
+    // 优化师：5项，每项最高4分
+    return functionalRatings.value.customerService +
+           functionalRatings.value.workQuality +
+           functionalRatings.value.communication +
+           functionalRatings.value.initiative +
+           functionalRatings.value.growth
+  }
+})
 
 const availablePeriodTypes = computed(() => {
   const types = [
@@ -495,20 +1057,173 @@ const formatPeriod = (period: string, periodType: PeriodType) => {
   return period
 }
 
+// 绩效详情模态框状态
+const showDetailsModal = ref(false)
+
 const viewDetails = (record: OperationsPerformanceRecord | SalesPerformanceRecord) => {
-  console.log('查看详情:', record)
+  selectedRecord.value = record
+  showDetailsModal.value = true
+}
+
+const closeDetailsModal = () => {
+  showDetailsModal.value = false
+  selectedRecord.value = null
 }
 
 const editRecord = (record: OperationsPerformanceRecord | SalesPerformanceRecord) => {
   console.log('编辑记录:', record)
+  // 打开编辑模态框
+  showEditModal.value = true
+  selectedRecord.value = record
+}
+
+const rateEmployee = (record: OperationsPerformanceRecord | SalesPerformanceRecord) => {
+  console.log('评分员工:', record)
+  // 打开评分模态框
+  showRatingModal.value = true
+  selectedRecord.value = record
+}
+
+const viewAllPerformance = (record: OperationsPerformanceRecord | SalesPerformanceRecord) => {
+  console.log('查看全部绩效:', record)
+  // 打开全部绩效模态框
+  showAllPerformanceModal.value = true
+  selectedRecord.value = record
 }
 
 const refreshData = () => {
   console.log('刷新数据')
+  // 重新加载数据
+  location.reload()
 }
 
 const exportData = () => {
   console.log('导出数据')
+  // 导出当前筛选的数据
+  const dataToExport = filteredRecords.value
+  const csvContent = generateCSV(dataToExport)
+  downloadCSV(csvContent, `performance-data-${new Date().toISOString().split('T')[0]}.csv`)
+}
+
+// 生成CSV内容
+const generateCSV = (data: any[]) => {
+  if (data.length === 0) return ''
+
+  const headers = ['员工姓名', '部门', '职位', '考核周期', '综合得分', '等级']
+  const csvRows = [headers.join(',')]
+
+  data.forEach(record => {
+    const row = [
+      record.employee_name,
+      record.department_name,
+      record.employee_position,
+      formatPeriod(record.period, record.period_type),
+      record.total_score.toFixed(1),
+      record.grade
+    ]
+    csvRows.push(row.join(','))
+  })
+
+  return csvRows.join('\n')
+}
+
+// 下载CSV文件
+const downloadCSV = (content: string, filename: string) => {
+  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  if (link.download !== undefined) {
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', filename)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+}
+
+// 保存编辑
+const saveEdit = () => {
+  console.log('保存编辑:', selectedRecord.value)
+  // 这里可以添加实际的保存逻辑
+  alert('编辑已保存！')
+  showEditModal.value = false
+}
+
+// 保存评分
+const saveRating = () => {
+  console.log('保存职能方案评分:', {
+    employee: selectedRecord.value?.employee_name,
+    ratings: functionalRatings.value,
+    totalScore: functionalTotalScore.value
+  })
+
+  // 验证评分
+  if (functionalTotalScore.value === 0) {
+    alert('请至少为一个评分项目打分！')
+    return
+  }
+
+  // 这里可以添加实际的评分保存逻辑
+  alert(`职能方案评分已提交！\n总分：${functionalTotalScore.value.toFixed(1)}分`)
+
+  // 重置评分数据
+  functionalRatings.value = {
+    // 项目经理评分项
+    teamManagement: 0,
+    customerFeedback: 0,
+    knowledgeOutput: 0,
+    mentoring: 0,
+    crossTeamwork: 0,
+    // 优化师评分项
+    customerService: 0,
+    workQuality: 0,
+    communication: 0,
+    initiative: 0,
+    growth: 0
+  }
+
+  showRatingModal.value = false
+}
+
+// 导出员工数据
+const exportEmployeeData = () => {
+  if (!selectedRecord.value) return
+
+  const employeeData = {
+    name: selectedRecord.value.employee_name,
+    department: selectedRecord.value.department_name,
+    position: selectedRecord.value.employee_position,
+    scores: [
+      { period: '2024年1月', total: 84.9, grade: 'A' },
+      { period: '2024年2月', total: 87.2, grade: 'A' },
+      { period: '2024年3月', total: 82.1, grade: 'B' },
+      { period: '2024年4月', total: 89.5, grade: 'A' },
+      { period: '2024年5月', total: 91.3, grade: 'S' },
+      { period: '2024年6月', total: 88.7, grade: 'A' }
+    ]
+  }
+
+  const csvContent = generateEmployeeCSV(employeeData)
+  downloadCSV(csvContent, `${selectedRecord.value.employee_name}-performance-history.csv`)
+}
+
+// 生成员工绩效CSV
+const generateEmployeeCSV = (data: any) => {
+  const headers = ['考核周期', '综合得分', '等级']
+  const csvRows = [headers.join(',')]
+
+  data.scores.forEach((score: any) => {
+    const row = [score.period, score.total, score.grade]
+    csvRows.push(row.join(','))
+  })
+
+  return csvRows.join('\n')
+}
+
+// 打印报告
+const printReport = () => {
+  window.print()
 }
 
 // 生命周期
@@ -1077,8 +1792,9 @@ onMounted(() => {
 
 .action-buttons-cell {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .btn-icon {
@@ -1157,5 +1873,1076 @@ onMounted(() => {
 .score-label {
   color: #6b7280;
   font-size: 14px;
+}
+
+/* 模态框样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-content--large {
+  max-width: 800px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  color: #374151;
+  background: #f3f4f6;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* 表单样式 */
+.edit-form, .rating-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-input {
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.form-input.readonly {
+  background: #f9fafb;
+  color: #6b7280;
+}
+
+.form-select {
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* 评分表单样式 */
+.employee-info-section {
+  text-align: center;
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.employee-info-section h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.employee-info-section p {
+  color: #6b7280;
+  margin: 0;
+}
+
+.rating-notice {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.rating-notice p {
+  margin: 0;
+  color: #92400e;
+  font-size: 14px;
+}
+
+.functional-rating-section {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.functional-rating-section .section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.section-description {
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.rating-items {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.rating-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+  background: #f8fafc;
+}
+
+.rating-item .rating-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.rating-description {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 8px 0 0 0;
+  line-height: 1.4;
+}
+
+.total-score-display {
+  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+  border: 1px solid #c4b5fd;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+.total-label {
+  font-size: 14px;
+  color: #6b7280;
+  margin-right: 8px;
+}
+
+.total-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #4f46e5;
+}
+
+.rating-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rating-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rating-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.rating-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rating-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.rating-suffix {
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 绩效历史样式 */
+.employee-summary {
+  text-align: center;
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.employee-summary h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.employee-summary p {
+  color: #6b7280;
+  margin: 0;
+}
+
+.performance-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 20px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border-left: 4px solid #4f46e5;
+}
+
+.timeline-date {
+  font-weight: 600;
+  color: #4f46e5;
+  min-width: 80px;
+  font-size: 14px;
+}
+
+.timeline-content {
+  flex: 1;
+}
+
+.score-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.score-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.score-item.total {
+  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+  border-color: #c4b5fd;
+}
+
+.score-item .score-label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.score-item .score-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.score-item.total .score-value {
+  color: #4f46e5;
+}
+
+/* 子项明细样式 */
+.score-sub-items {
+  margin-top: 16px;
+  padding: 16px;
+  background: #fafbfc;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+/* 表格布局样式 */
+.sub-items-table {
+  width: 100%;
+}
+
+.table-header,
+.table-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  gap: 12px;
+  padding: 12px 0;
+  align-items: center;
+}
+
+.table-header {
+  border-bottom: 2px solid #e5e7eb;
+  font-weight: 600;
+  color: #374151;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table-row {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.col-name {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.col-target,
+.col-actual {
+  font-size: 14px;
+  color: #374151;
+}
+
+.completion-rate {
+  font-size: 12px;
+  color: #059669;
+  background: #d1fae5;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.score-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #4f46e5;
+  text-align: center;
+}
+
+/* 网格布局样式 */
+.sub-items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.grid-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.grid-item:hover {
+  border-color: #4f46e5;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.1);
+}
+
+.grid-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.grid-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #4f46e5;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .table-header,
+  .table-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .table-header span,
+  .table-row span {
+    padding: 4px 0;
+  }
+
+  .sub-items-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.expandable {
+  position: relative;
+}
+
+/* 按钮样式 */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn--primary {
+  background: #4f46e5;
+  color: white;
+}
+
+.btn--primary:hover {
+  background: #4338ca;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.btn--secondary {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.btn--secondary:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+/* 绩效详情模态框样式 */
+.performance-details-modal {
+  max-width: 1000px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.edit-btn:hover {
+  background: #2563eb;
+}
+
+.print-btn {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.print-btn:hover {
+  background: #e5e7eb;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+/* 基本信息区域 */
+.basic-info-section {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.info-label {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 14px;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.status-completed {
+  color: #059669;
+  background: #d1fae5;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+/* 考核内容区域 */
+.evaluation-content {
+  margin-bottom: 32px;
+}
+
+.score-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.score-section {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.section-subtitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 16px;
+}
+
+/* 指标卡片 */
+.metric-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.metric-card {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.metric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.metric-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.metric-score {
+  font-size: 16px;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.metric-details {
+  margin-bottom: 12px;
+}
+
+.metric-detail {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.progress-bar {
+  position: relative;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  position: absolute;
+  right: 8px;
+  top: -20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* 评分网格 */
+.evaluation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.eval-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.eval-label {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.eval-score {
+  font-size: 14px;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.section-total {
+  text-align: right;
+  padding: 12px 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.total-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* 考核结果 */
+.evaluation-results {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #e5e7eb;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.result-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+}
+
+.result-label {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.result-value {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.total-score {
+  color: #1f2937;
+}
+
+.grade-value {
+  color: #3b82f6;
+}
+
+.rank-value {
+  color: #374151;
+}
+
+.improvement-suggestion {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.suggestion-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.suggestion-text {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .evaluation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .results-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+.employee-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 24px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.employee-info-detailed {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.employee-avatar-large {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 24px;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.employee-details-large {
+  flex: 1;
+}
+
+.employee-name-large {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.employee-position-large {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.employee-department {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.summary-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  min-width: 200px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.total-score-large {
+  font-size: 24px;
+  font-weight: 800;
+  color: #4f46e5;
+}
+
+.grade-badge-large {
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.score-breakdown {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #e5e7eb;
+}
+
+.breakdown-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.score-details {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.score-item {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+}
+
+.score-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.score-item-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.score-item-weight {
+  font-size: 12px;
+  color: #64748b;
+  background: #e2e8f0;
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+.score-item-value {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.score-number {
+  font-size: 20px;
+  font-weight: 700;
+  color: #4f46e5;
+  min-width: 60px;
+}
+
+.score-bar {
+  flex: 1;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.score-fill {
+  height: 100%;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.grade-explanation {
+  margin-top: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 12px;
+  border: 1px solid #f59e0b;
+}
+
+.grade-explanation h5 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 8px;
+}
+
+.grade-description {
+  font-size: 14px;
+  color: #92400e;
+  line-height: 1.5;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .performance-details-modal {
+    max-width: 95vw;
+    margin: 20px;
+  }
+
+  .employee-summary {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .summary-stats {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .stat-item {
+    min-width: auto;
+    flex: 1;
+  }
 }
 </style>

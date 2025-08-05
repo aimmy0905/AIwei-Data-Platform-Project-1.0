@@ -336,7 +336,8 @@ const router = createRouter({
       meta: { requiresAuth: true },
       children: [
         {
-          path: 'them          name: 'settings-theme',
+          path: 'theme',
+          name: 'settings-theme',
           component: () => import('@/views/settings/ThemeView.vue')
         }
       ]
@@ -349,8 +350,7 @@ const router = createRouter({
     },
 
     // 捕获所有未匹配的路由
-    {
-      path: '/:pathMatch(.*)*',
+        path: '/:pathMatch(.*)*',
       name: 'not-found',
       redirect: { name: 'login' }
     }
