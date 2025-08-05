@@ -800,6 +800,149 @@
       </div>
     </div>
 
+    <!-- 设置目标模态框 -->
+    <div v-if="showTargetModal" class="modal-overlay" @click="showTargetModal = false">
+      <div class="modal-content modal-content--large" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">设置绩效目标</h3>
+          <button class="modal-close" @click="showTargetModal = false">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- 部门选择 -->
+        <div class="modal-filters">
+          <div class="filter-group">
+            <label class="filter-label">目标部门:</label>
+            <select v-model="targetDepartment" class="filter-select">
+              <option value="operations">运营部门</option>
+              <option value="sales">销售部门</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">考核周期:</label>
+            <select v-model="targetPeriod" class="filter-select">
+              <option value="monthly">月度目标</option>
+              <option value="quarterly">季度目标</option>
+              <option value="yearly">年度目标</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-body">
+          <!-- 运营部门目标设置 -->
+          <div v-if="targetDepartment === 'operations'" class="target-settings">
+            <div class="department-notice">
+              <h4>运营部门绩效目标</h4>
+              <p>设置运营部门的数据指标和职能方案目标</p>
+            </div>
+
+            <div class="target-categories">
+              <div class="target-category">
+                <h5 class="category-title">数据指标目标</h5>
+                <div class="target-items">
+                  <div class="target-item">
+                    <label class="target-label">服务费目标 (¥)</label>
+                    <input type="number" class="target-input" v-model="operationsTargets.serviceFeeTarget" placeholder="请输入服务费目标">
+                  </div>
+                  <div class="target-item">
+                    <label class="target-label">返点目标 (¥)</label>
+                    <input type="number" class="target-input" v-model="operationsTargets.rebateTarget" placeholder="请输入返点目标">
+                  </div>
+                  <div class="target-item">
+                    <label class="target-label">新客户数量</label>
+                    <input type="number" class="target-input" v-model="operationsTargets.newCustomers" placeholder="请输入新客户目标数量">
+                  </div>
+                </div>
+              </div>
+
+              <div class="target-category">
+                <h5 class="category-title">客户评价目标</h5>
+                <div class="target-items">
+                  <div class="target-item">
+                    <label class="target-label">客户满意度 (分)</label>
+                    <input type="number" class="target-input" v-model="operationsTargets.customerSatisfaction" min="0" max="10" step="0.1" placeholder="0-10分">
+                  </div>
+                  <div class="target-item">
+                    <label class="target-label">服务质量 (分)</label>
+                    <input type="number" class="target-input" v-model="operationsTargets.serviceQuality" min="0" max="10" step="0.1" placeholder="0-10分">
+                  </div>
+                </div>
+              </div>
+
+              <div class="target-category">
+                <h5 class="category-title">职能方案目标</h5>
+                <div class="target-items">
+                  <div class="target-item">
+                    <label class="target-label">项目完成率 (%)</label>
+                    <input type="number" class="target-input" v-model="operationsTargets.projectCompletion" min="0" max="100" placeholder="请输入完成率目标">
+                  </div>
+                  <div class="target-item">
+                    <label class="target-label">团队协作评分 (分)</label>
+                    <input type="number" class="target-input" v-model="operationsTargets.teamwork" min="0" max="10" step="0.1" placeholder="0-10分">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 销售部门目标设置 -->
+          <div v-else class="target-settings">
+            <div class="department-notice">
+              <h4>销售部门绩效目标</h4>
+              <p>设置销售部门的月度提成和绩效奖金目标</p>
+            </div>
+
+            <div class="target-categories">
+              <div class="target-category">
+                <h5 class="category-title">月度提成目标</h5>
+                <div class="target-items">
+                  <div class="target-item">
+                    <label class="target-label">新增服务费 (¥)</label>
+                    <input type="number" class="target-input" v-model="salesTargets.newServiceFee" placeholder="请输入新增服务费目标">
+                  </div>
+                  <div class="target-item">
+                    <label class="target-label">新增订单数 (单)</label>
+                    <input type="number" class="target-input" v-model="salesTargets.newOrders" placeholder="请输入新增订单目标">
+                  </div>
+                  <div class="target-item">
+                    <label class="target-label">客户转化率 (%)</label>
+                    <input type="number" class="target-input" v-model="salesTargets.conversionRate" min="0" max="100" placeholder="请输入转化率目标">
+                  </div>
+                </div>
+              </div>
+
+              <div class="target-category">
+                <h5 class="category-title">绩效底薪奖金目标</h5>
+                <div class="target-items">
+                  <div class="target-item">
+                    <label class="target-label">客户维护数量</label>
+                    <input type="number" class="target-input" v-model="salesTargets.customerMaintenance" placeholder="请输入客户维护目标数量">
+                  </div>
+                  <div class="target-item">
+                    <label class="target-label">业务拓展项目</label>
+                    <input type="number" class="target-input" v-model="salesTargets.businessExpansion" placeholder="请输入业务拓展目标">
+                  </div>
+                  <div class="target-item">
+                    <label class="target-label">客户满意度 (分)</label>
+                    <input type="number" class="target-input" v-model="salesTargets.customerSatisfaction" min="0" max="10" step="0.1" placeholder="0-10分">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn--secondary" @click="showTargetModal = false">取消</button>
+          <button class="btn btn--primary" @click="saveTargets">保存目标</button>
+        </div>
+      </div>
+    </div>
+
     <!-- 查看全部绩效模态框 -->
     <div v-if="showAllPerformanceModal" class="modal-overlay" @click="showAllPerformanceModal = false">
       <div class="modal-content modal-content--large" @click.stop>
@@ -1033,6 +1176,31 @@ const functionalRatings = ref({
 // 全部绩效筛选器
 const performanceTimeFilter = ref('monthly')
 const performanceYear = ref('2024')
+
+// 目标设置数据
+const targetDepartment = ref('operations')
+const targetPeriod = ref('monthly')
+
+// 运营部门目标
+const operationsTargets = ref({
+  serviceFeeTarget: 0,
+  rebateTarget: 0,
+  newCustomers: 0,
+  customerSatisfaction: 8.5,
+  serviceQuality: 8.5,
+  projectCompletion: 90,
+  teamwork: 8.0
+})
+
+// 销售部门目标
+const salesTargets = ref({
+  newServiceFee: 0,
+  newOrders: 0,
+  conversionRate: 15,
+  customerMaintenance: 0,
+  businessExpansion: 0,
+  customerSatisfaction: 8.5
+})
 
 // 计算属性
 const departments = computed(() => [
@@ -1340,6 +1508,41 @@ const saveRating = () => {
   }
 
   showRatingModal.value = false
+}
+
+// 保存目标设置
+const saveTargets = () => {
+  if (targetDepartment.value === 'operations') {
+    console.log('保存运营部门目标:', {
+      department: '运营部门',
+      period: targetPeriod.value,
+      targets: operationsTargets.value
+    })
+
+    // 验证必填字段
+    if (!operationsTargets.value.serviceFeeTarget || !operationsTargets.value.rebateTarget) {
+      alert('请填写服务费目标和返点目标！')
+      return
+    }
+
+    alert(`运营部门${targetPeriod.value === 'monthly' ? '月度' : targetPeriod.value === 'quarterly' ? '季度' : '年度'}目标设置成功！\n服务费目标: ¥${operationsTargets.value.serviceFeeTarget.toLocaleString()}\n返点目标: ¥${operationsTargets.value.rebateTarget.toLocaleString()}`)
+  } else {
+    console.log('保存销售部门目标:', {
+      department: '销售部门',
+      period: targetPeriod.value,
+      targets: salesTargets.value
+    })
+
+    // 验证必填字段
+    if (!salesTargets.value.newServiceFee || !salesTargets.value.newOrders) {
+      alert('请填写新增服务费和新增订单数目标！')
+      return
+    }
+
+    alert(`销售部门${targetPeriod.value === 'monthly' ? '月度' : targetPeriod.value === 'quarterly' ? '季度' : '年度'}目标设置成功！\n新增服务费: ¥${salesTargets.value.newServiceFee.toLocaleString()}\n新增订单数: ${salesTargets.value.newOrders}单`)
+  }
+
+  showTargetModal.value = false
 }
 
 // 导出员工数据
@@ -2501,6 +2704,92 @@ onMounted(() => {
   font-size: 12px;
   color: #6b7280;
   margin-left: 8px;
+}
+
+/* 目标设置样式 */
+.target-settings {
+  padding: 20px 0;
+}
+
+.department-notice {
+  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+  border: 1px solid #c4b5fd;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.department-notice h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #4f46e5;
+  margin-bottom: 8px;
+}
+
+.department-notice p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 14px;
+}
+
+.target-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.target-category {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.target-category .category-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.target-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.target-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.target-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.target-input {
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.target-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.target-input::placeholder {
+  color: #9ca3af;
 }
 
 /* 子项明细样式 */
