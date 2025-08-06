@@ -231,9 +231,9 @@ const departmentProfitData = ref<DepartmentProfitData[]>([
 const yearlyProfitTotal = computed(() => {
   const totalRow = departmentProfitData.value.find(item => item.department === '运营')
   if (!totalRow) return 0
-  return totalRow.profitContribution.google + 
-         totalRow.profitContribution.fb + 
-         totalRow.profitContribution.criteo + 
+  return totalRow.profitContribution.google +
+         totalRow.profitContribution.fb +
+         totalRow.profitContribution.criteo +
          totalRow.profitContribution.bing
 })
 
@@ -241,9 +241,9 @@ const quarterlyProfitTotal = computed(() => {
   // 当前季度总额 (这里用Q1的数据作为示例)
   const q1Row = departmentProfitData.value.find(item => item.department === '运营一部')
   if (!q1Row) return 0
-  return q1Row.profitContribution.google + 
-         q1Row.profitContribution.fb + 
-         q1Row.profitContribution.criteo + 
+  return q1Row.profitContribution.google +
+         q1Row.profitContribution.fb +
+         q1Row.profitContribution.criteo +
          q1Row.profitContribution.bing
 })
 
@@ -386,6 +386,68 @@ const getGrowthClass = (rate: number) => {
   display: flex;
   flex-direction: column;
   gap: 24px;
+}
+
+/* 统计概览样式 */
+.statistics-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid #e8e8e8;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #1890ff;
+  color: #fff;
+  border-radius: 6px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #595959;
+  font-weight: 500;
+}
+
+.stat-card__content {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.stat-unit {
+  font-size: 14px;
+  color: #8c8c8c;
 }
 
 /* 表格样式 */
