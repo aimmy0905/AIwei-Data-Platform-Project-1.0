@@ -58,6 +58,13 @@
         @quarter-change="handleQuarterChange"
       />
 
+      <!-- 平台新增及流失（总计）模块 -->
+      <PlatformAnalysisModule
+        :loading="loading"
+        @time-range-change="handleTimeRangeChange"
+        @quarter-change="handleQuarterChange"
+      />
+
     </div>
   </div>
 </template>
@@ -70,6 +77,7 @@ import OperationTargetCompletionModule from '@/components/business/OperationTarg
 import DepartmentTargetCompletionModule from '@/components/business/DepartmentTargetCompletionModule.vue'
 import CustomerAnalysisModule from '@/components/business/CustomerAnalysisModule.vue'
 import DepartmentCustomerAnalysisListModule from '@/components/business/DepartmentCustomerAnalysisListModule.vue'
+import PlatformAnalysisModule from '@/components/business/PlatformAnalysisModule.vue'
 import type {
   BusinessRole,
   OperationTargetData,

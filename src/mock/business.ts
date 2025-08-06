@@ -2824,7 +2824,73 @@ export const businessAPI = {
   getBingOptimizerMetrics: () => Promise.resolve({...googleOptimizerMetrics, platform: 'bing'}),
 
   // 获取Bing账户余额数据
-  getBingAccountBalance: () => Promise.resolve(googleAccountBalance)
+  getBingAccountBalance: () => Promise.resolve(googleAccountBalance),
+
+  // ============ 平台分析 API 函数 ============
+
+  // 获取平台分析数据
+  getPlatformAnalysisData: () => Promise.resolve([
+    {
+      platformName: 'Google Ads',
+      totalProjects: 45,
+      activeProjects: 38,
+      newProjects: 8,
+      churnedProjects: 3,
+      rebate: 285000,
+      serviceFee: 450000,
+      profit: 165000,
+      status: 'active',
+      color: '#4285f4'
+    },
+    {
+      platformName: 'Facebook Ads',
+      totalProjects: 32,
+      activeProjects: 28,
+      newProjects: 5,
+      churnedProjects: 2,
+      rebate: 195000,
+      serviceFee: 320000,
+      profit: 125000,
+      status: 'active',
+      color: '#1877f2'
+    },
+    {
+      platformName: 'Bing Ads',
+      totalProjects: 18,
+      activeProjects: 15,
+      newProjects: 3,
+      churnedProjects: 1,
+      rebate: 95000,
+      serviceFee: 180000,
+      profit: 85000,
+      status: 'warning',
+      color: '#00809d'
+    },
+    {
+      platformName: 'Criteo',
+      totalProjects: 12,
+      activeProjects: 10,
+      newProjects: 2,
+      churnedProjects: 0,
+      rebate: 65000,
+      serviceFee: 120000,
+      profit: 55000,
+      status: 'active',
+      color: '#ff6900'
+    },
+    {
+      platformName: 'Amazon Ads',
+      totalProjects: 8,
+      activeProjects: 6,
+      newProjects: 1,
+      churnedProjects: 2,
+      rebate: 35000,
+      serviceFee: 80000,
+      profit: 45000,
+      status: 'warning',
+      color: '#ff9900'
+    }
+  ])
 }
 
 export default businessAPI
