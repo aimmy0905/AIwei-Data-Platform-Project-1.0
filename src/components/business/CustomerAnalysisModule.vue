@@ -2,7 +2,28 @@
   <div class="customer-analysis-module">
     <div class="analysis-module__header">
       <h3 class="analysis-module__title">{{ title }}</h3>
-
+      <div class="analysis-module__controls">
+        <div class="time-controls">
+          <button
+            v-for="timeRange in timeRanges"
+            :key="timeRange.key"
+            class="time-btn"
+            :class="{ 'time-btn--active': currentTimeRange === timeRange.key }"
+            @click="handleTimeRangeChange(timeRange.key)"
+          >
+            {{ timeRange.label }}
+          </button>
+        </div>
+        <div class="quarter-controls">
+          <button class="quarter-nav-btn" @click="previousQuarter">
+            <ChevronLeft :size="16" />
+          </button>
+          <button class="quarter-display">{{ currentQuarter }}</button>
+          <button class="quarter-nav-btn" @click="nextQuarter" :disabled="isNextDisabled">
+            <ChevronRight :size="16" />
+          </button>
+        </div>
+      </div>
     </div>
 
     <div class="analysis-module__content">
@@ -267,7 +288,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Users, UserCheck, UserPlus, UserX } from 'lucide-vue-next'
+import { Users, UserCheck, UserPlus, UserX, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import PieChart from '@/components/charts/PieChart.vue'
 import BarChart from '@/components/charts/BarChart.vue'
 import type { CustomerAnalysisData, DepartmentCustomerAnalysis } from '@/types'
@@ -287,7 +308,38 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   'view-change': [view: string]
   'chart-click': [data: any]
+  'time-range-change': [timeRange: string]
+  'quarter-change': [quarter: string]
 }>()
+
+// 时间选择器状态
+const currentTimeRange = ref('quarter')
+const currentQuarter = ref('2025年Q1')
+
+const timeRanges = [
+  { key: 'year', label: '年' },
+  { key: 'quarter', label: '季' },
+  { key: 'month', label: '月' }
+]
+
+const isNextDisabled = computed(() => {
+  return currentQuarter.value.includes('Q4')
+})
+
+const handleTimeRangeChange = (timeRange: string) => {
+  currentTimeRange.value = timeRange
+  emit('time-range-change', timeRange)
+}
+
+const previousQuarter = () => {
+  emit('quarter-change', 'previous')
+}
+
+const nextQuarter = () => {
+  if (!isNextDisabled.value) {
+    emit('quarter-change', 'next')
+  }
+}
 
 const currentView = ref<'customerCount' | 'profit' | 'serviceFee' | 'rebate'>('customerCount')
 
@@ -549,6 +601,80 @@ watch(currentView, (view) => {
   font-size: 18px;
   font-weight: 600;
   color: #262626;
+}
+
+.analysis-module__controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.time-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.time-btn {
+  padding: 6px 12px;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  color: #595959;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.time-btn:hover {
+  border-color: #40a9ff;
+  color: #40a9ff;
+}
+
+.time-btn--active {
+  background: #1890ff;
+  border-color: #1890ff;
+  color: #fff;
+}
+
+.quarter-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quarter-nav-btn {
+  padding: 4px;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  color: #595959;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.quarter-nav-btn:hover:not(:disabled) {
+  border-color: #40a9ff;
+  color: #40a9ff;
+}
+
+.quarter-nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quarter-display {
+  padding: 6px 12px;
+  border: 1px solid #d9d9d9;
+  background: #fafafa;
+  color: #262626;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 100px;
+  text-align: center;
 }
 
 

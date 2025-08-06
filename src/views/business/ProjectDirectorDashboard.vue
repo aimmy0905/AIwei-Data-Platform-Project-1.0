@@ -48,6 +48,15 @@
         @chart-click="handleCustomerChartClick"
       />
 
+      <!-- 部门客户分析模块 -->
+      <DepartmentCustomerAnalysisListModule
+        :department-data="departmentCustomerAnalysisData"
+        :loading="loading"
+        @department-click="handleDepartmentClick"
+        @view-change="handleCustomerViewChange"
+        @time-range-change="handleTimeRangeChange"
+        @quarter-change="handleQuarterChange"
+      />
 
     </div>
   </div>
@@ -60,6 +69,7 @@ import RoleSwitcher from '@/components/business/RoleSwitcher.vue'
 import OperationTargetCompletionModule from '@/components/business/OperationTargetCompletionModule.vue'
 import DepartmentTargetCompletionModule from '@/components/business/DepartmentTargetCompletionModule.vue'
 import CustomerAnalysisModule from '@/components/business/CustomerAnalysisModule.vue'
+import DepartmentCustomerAnalysisListModule from '@/components/business/DepartmentCustomerAnalysisListModule.vue'
 import type {
   BusinessRole,
   OperationTargetData,
@@ -93,7 +103,7 @@ const handleRoleChange = (role: string) => {
   currentRole.value = role
 }
 
-const handleTimeRangeChange = (timeRange: TimeRange) => {
+const handleTimeRangeChange = (timeRange: TimeRange | string) => {
   console.log('Time range changed:', timeRange)
   // 根据时间筛选重新加载数据
   loadDashboardData()
