@@ -93,6 +93,13 @@
         @quarter-change="handleQuarterChange"
       />
 
+      <!-- 部门客户质量评估（部门）模块 -->
+      <DepartmentCustomerQualityAssessmentModule
+        :loading="loading"
+        @time-range-change="handleTimeRangeChange"
+        @quarter-change="handleQuarterChange"
+      />
+
     </div>
   </div>
 </template>
@@ -110,6 +117,7 @@ import DepartmentPlatformAnalysisModule from '@/components/business/DepartmentPl
 import PlatformProfitContributionModule from '@/components/business/PlatformProfitContributionModule.vue'
 import DepartmentProfitContributionModule from '@/components/business/DepartmentProfitContributionModule.vue'
 import CustomerQualityAssessmentModule from '@/components/business/CustomerQualityAssessmentModule.vue'
+import DepartmentCustomerQualityAssessmentModule from '@/components/business/DepartmentCustomerQualityAssessmentModule.vue'
 import type {
   BusinessRole,
   OperationTargetData,
