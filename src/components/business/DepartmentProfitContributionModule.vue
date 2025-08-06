@@ -4,7 +4,7 @@
       <h3 class="analysis-module__title">平台毛利贡献分析（部门）</h3>
       <div class="analysis-module__controls">
         <div class="time-controls">
-          <button
+              <button
             v-for="timeRange in timeRanges"
             :key="timeRange.key"
             class="time-btn"
@@ -12,8 +12,8 @@
             @click="handleTimeRangeChange(timeRange.key)"
           >
             {{ timeRange.label }}
-          </button>
-        </div>
+              </button>
+            </div>
         <div class="quarter-controls">
           <button class="quarter-nav-btn" @click="previousQuarter">
             <ChevronLeft :size="16" />
@@ -22,9 +22,9 @@
           <button class="quarter-nav-btn" @click="nextQuarter" :disabled="isNextDisabled">
             <ChevronRight :size="16" />
           </button>
+          </div>
         </div>
-      </div>
-    </div>
+          </div>
 
     <div class="analysis-module__content">
       <!-- 统计概览卡片 -->
@@ -35,12 +35,12 @@
               <TrendingUp :size="24" />
             </div>
             <span class="stat-label">年度平台毛利贡献总额</span>
-          </div>
+                </div>
           <div class="stat-card__content">
             <div class="stat-value">{{ formatCurrency(yearlyProfitTotal) }}</div>
             <div class="stat-unit">万元</div>
-          </div>
         </div>
+      </div>
 
         <div class="stat-card">
           <div class="stat-card__header">
@@ -48,13 +48,13 @@
               <BarChart3 :size="24" />
             </div>
             <span class="stat-label">季度平台毛利贡献总额</span>
-          </div>
+            </div>
           <div class="stat-card__content">
             <div class="stat-value">{{ formatCurrency(quarterlyProfitTotal) }}</div>
             <div class="stat-unit">万元</div>
           </div>
         </div>
-      </div>
+          </div>
 
       <!-- 部门毛利贡献数据列表 -->
       <div class="platform-table-container">
@@ -118,7 +118,7 @@
             </tr>
           </tbody>
         </table>
-      </div>
+              </div>
     </div>
   </div>
 </template>
