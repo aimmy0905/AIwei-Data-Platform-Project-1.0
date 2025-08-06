@@ -21,6 +21,7 @@
               <th colspan="3" class="target-group-header">目标</th>
               <th colspan="3" class="completion-group-header">实际完成</th>
               <th colspan="3" class="comparison-group-header">完成率</th>
+              <th colspan="3" class="difference-group-header">完成差值</th>
             </tr>
             <tr>
               <th class="target-header">合计毛利</th>
@@ -32,6 +33,9 @@
               <th class="comparison-header">合计毛利</th>
               <th class="comparison-header">服务费</th>
               <th class="comparison-header">返点</th>
+              <th class="difference-header">合计毛利</th>
+              <th class="difference-header">服务费</th>
+              <th class="difference-header">返点</th>
             </tr>
           </thead>
           <tbody>
@@ -48,6 +52,9 @@
               <td class="comparison-cell" :class="getCompletionClass(annualTargetData.achievements.totalProfitRate)">{{ annualTargetData.achievements.totalProfitRate.toFixed(1) }}%</td>
               <td class="comparison-cell" :class="getCompletionClass(annualTargetData.achievements.serviceFeeRate)">{{ annualTargetData.achievements.serviceFeeRate.toFixed(1) }}%</td>
               <td class="comparison-cell" :class="getCompletionClass(annualTargetData.achievements.rebateRate)">{{ annualTargetData.achievements.rebateRate.toFixed(1) }}%</td>
+              <td class="difference-cell" :class="getDifferenceClass(annualTargetData.achievements.totalProfitActual - annualTargetData.targets.totalProfitTarget)">{{ formatCurrencyDifference(annualTargetData.achievements.totalProfitActual - annualTargetData.targets.totalProfitTarget) }}</td>
+              <td class="difference-cell" :class="getDifferenceClass(annualTargetData.achievements.serviceFeeActual - annualTargetData.targets.serviceFeeTarget)">{{ formatCurrencyDifference(annualTargetData.achievements.serviceFeeActual - annualTargetData.targets.serviceFeeTarget) }}</td>
+              <td class="difference-cell" :class="getDifferenceClass(annualTargetData.achievements.rebateActual - annualTargetData.targets.rebateTarget)">{{ formatCurrencyDifference(annualTargetData.achievements.rebateActual - annualTargetData.targets.rebateTarget) }}</td>
             </tr>
             <!-- 季度行 -->
             <tr v-for="quarter in props.operationTargets" :key="quarter.quarter" class="quarterly-row">
@@ -61,6 +68,9 @@
               <td class="comparison-cell" :class="getCompletionClass(quarter.achievements.totalProfitRate)">{{ quarter.achievements.totalProfitRate.toFixed(1) }}%</td>
               <td class="comparison-cell" :class="getCompletionClass(quarter.achievements.serviceFeeRate)">{{ quarter.achievements.serviceFeeRate.toFixed(1) }}%</td>
               <td class="comparison-cell" :class="getCompletionClass(quarter.achievements.rebateRate)">{{ quarter.achievements.rebateRate.toFixed(1) }}%</td>
+              <td class="difference-cell" :class="getDifferenceClass(quarter.achievements.totalProfitActual - quarter.targets.totalProfitTarget)">{{ formatCurrencyDifference(quarter.achievements.totalProfitActual - quarter.targets.totalProfitTarget) }}</td>
+              <td class="difference-cell" :class="getDifferenceClass(quarter.achievements.serviceFeeActual - quarter.targets.serviceFeeTarget)">{{ formatCurrencyDifference(quarter.achievements.serviceFeeActual - quarter.targets.serviceFeeTarget) }}</td>
+              <td class="difference-cell" :class="getDifferenceClass(quarter.achievements.rebateActual - quarter.targets.rebateTarget)">{{ formatCurrencyDifference(quarter.achievements.rebateActual - quarter.targets.rebateTarget) }}</td>
             </tr>
           </tbody>
         </table>
@@ -148,6 +158,23 @@ const getCompletionClass = (rate: number) => {
   if (rate >= 60) return 'average'
   return 'poor'
 }
+
+const formatCurrencyDifference = (value: number): string => {
+  const prefix = value >= 0 ? '+' : ''
+  if (Math.abs(value) >= 100000000) {
+    return `${prefix}${(value / 100000000).toFixed(2)}亿`
+  } else if (Math.abs(value) >= 10000) {
+    return `${prefix}${(value / 10000).toFixed(2)}万`
+  } else {
+    return `${prefix}${value.toLocaleString()}`
+  }
+}
+
+const getDifferenceClass = (difference: number) => {
+  if (difference > 0) return 'positive'
+  if (difference < 0) return 'negative'
+  return 'neutral'
+}
 </script>
 
 <style scoped>
@@ -193,7 +220,7 @@ const getCompletionClass = (rate: number) => {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
-  min-width: 1000px;
+  min-width: 1300px;
 }
 
 .operation-targets-table th {
@@ -250,6 +277,18 @@ const getCompletionClass = (rate: number) => {
   font-weight: 600;
 }
 
+.difference-group-header {
+  background: #f9f0ff !important;
+  color: #722ed1 !important;
+  font-weight: 600;
+}
+
+.difference-header {
+  background: #f9f0ff !important;
+  color: #722ed1 !important;
+  font-weight: 600;
+}
+
 /* 数据单元格样式 */
 .target-cell {
   background: #f0f8ff !important;
@@ -266,6 +305,11 @@ const getCompletionClass = (rate: number) => {
 .comparison-cell {
   background: #fffbf0 !important;
   font-weight: 600;
+}
+
+.difference-cell {
+  background: #fafafa !important;
+  font-weight: 500;
 }
 
 /* 完成率颜色样式 */
@@ -287,6 +331,22 @@ const getCompletionClass = (rate: number) => {
 .comparison-cell.poor {
   color: #ff4d4f !important;
   font-weight: 600;
+}
+
+/* 完成差值颜色样式 */
+.difference-cell.positive {
+  color: #52c41a !important;
+  font-weight: 600;
+}
+
+.difference-cell.negative {
+  color: #ff4d4f !important;
+  font-weight: 600;
+}
+
+.difference-cell.neutral {
+  color: #8c8c8c !important;
+  font-weight: 500;
 }
 
 /* 行样式 */

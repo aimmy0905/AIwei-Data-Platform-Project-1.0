@@ -11,117 +11,64 @@
     </div>
 
     <div class="target-completion-module__content">
-      <!-- 部门列表表格 -->
-      <div class="department-table-section">
-        <div class="department-table">
-          <div class="department-table__header">
-            <div class="col-department">部门</div>
-            <div class="col-target">目标设置</div>
-            <div class="col-actual">实际完成</div>
-            <div class="col-rate">完成率</div>
-            <div class="col-ranking">排名</div>
-          </div>
-          <div class="department-table__body">
-            <div 
-              v-for="department in departmentTargets" 
-              :key="department.departmentId"
-              class="department-row"
-            >
-              <div class="col-department">
-                <div class="department-info">
-                  <span class="department-name">{{ department.departmentName }}</span>
-                  <span class="department-id">{{ department.departmentId }}</span>
-                </div>
-              </div>
-              <div class="col-target">
-                <div class="target-metrics">
-                  <div class="metric-item">
-                    <span class="metric-label">毛利:</span>
-                    <span class="metric-value">{{ formatCurrency(department.targets.totalProfitTarget) }}</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-label">服务费:</span>
-                    <span class="metric-value">{{ formatCurrency(department.targets.serviceFeeTarget) }}</span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-label">返点:</span>
-                    <span class="metric-value">{{ formatCurrency(department.targets.rebateTarget) }}</span>
-                  </div>
-                  <div class="target-percentage">
-                    占比: {{ department.targets.targetPercentage.toFixed(1) }}%
-                  </div>
-                </div>
-              </div>
-              <div class="col-actual">
-                <div class="actual-metrics">
-                  <div class="metric-item">
-                    <span class="metric-label">毛利:</span>
-                    <span class="metric-value" :class="getGapClass(department.achievements.totalProfitGap)">
-                      {{ formatCurrency(department.achievements.totalProfitActual) }}
-                    </span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-label">服务费:</span>
-                    <span class="metric-value" :class="getGapClass(department.achievements.serviceFeeGap)">
-                      {{ formatCurrency(department.achievements.serviceFeeActual) }}
-                    </span>
-                  </div>
-                  <div class="metric-item">
-                    <span class="metric-label">返点:</span>
-                    <span class="metric-value" :class="getGapClass(department.achievements.rebateGap)">
-                      {{ formatCurrency(department.achievements.rebateActual) }}
-                    </span>
-                  </div>
-                  <div class="completion-percentage">
-                    占比: {{ department.achievements.completionPercentage.toFixed(1) }}%
-                  </div>
-                </div>
-              </div>
-              <div class="col-rate">
-                <div class="completion-rates">
-                  <div class="rate-item">
-                    <span class="rate-label">毛利:</span>
-                    <div class="rate-progress">
-                      <div 
-                        class="rate-bar" 
-                        :class="getRateClass(department.achievements.totalProfitRate)"
-                        :style="{ width: Math.min(department.achievements.totalProfitRate, 100) + '%' }"
-                      ></div>
-                      <span class="rate-text">{{ department.achievements.totalProfitRate.toFixed(1) }}%</span>
-                    </div>
-                  </div>
-                  <div class="rate-item">
-                    <span class="rate-label">服务费:</span>
-                    <div class="rate-progress">
-                      <div 
-                        class="rate-bar" 
-                        :class="getRateClass(department.achievements.serviceFeeRate)"
-                        :style="{ width: Math.min(department.achievements.serviceFeeRate, 100) + '%' }"
-                      ></div>
-                      <span class="rate-text">{{ department.achievements.serviceFeeRate.toFixed(1) }}%</span>
-                    </div>
-                  </div>
-                  <div class="rate-item">
-                    <span class="rate-label">返点:</span>
-                    <div class="rate-progress">
-                      <div 
-                        class="rate-bar" 
-                        :class="getRateClass(department.achievements.rebateRate)"
-                        :style="{ width: Math.min(department.achievements.rebateRate, 100) + '%' }"
-                      ></div>
-                      <span class="rate-text">{{ department.achievements.rebateRate.toFixed(1) }}%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-ranking">
-                <div class="ranking-badge" :class="getRankingClass(getDepartmentRanking(department))">
-                  #{{ getDepartmentRanking(department) }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <!-- 部门目标完成表格 -->
+      <div class="department-targets-table-container">
+        <table class="department-targets-table">
+          <thead>
+            <tr>
+              <th rowspan="2" class="department-header">部门</th>
+              <th colspan="3" class="target-group-header">目标</th>
+              <th colspan="3" class="completion-group-header">实际完成</th>
+              <th colspan="3" class="rate-group-header">完成率</th>
+              <th colspan="3" class="difference-group-header">完成差值</th>
+            </tr>
+            <tr>
+              <th class="target-header">合计毛利</th>
+              <th class="target-header">服务费目标</th>
+              <th class="target-header">返点目标</th>
+              <th class="completion-header">合计毛利完成</th>
+              <th class="completion-header">服务费完成</th>
+              <th class="completion-header">返点完成</th>
+              <th class="rate-header">总毛利率</th>
+              <th class="rate-header">服务费率</th>
+              <th class="rate-header">返点率</th>
+              <th class="difference-header">服务费差</th>
+              <th class="difference-header">返点差</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- 运营部门总计行 -->
+            <tr v-if="operationsSummaryData" class="operations-summary-row">
+              <td class="operations-cell">运营部门</td>
+              <td class="target-cell">{{ formatCurrency(operationsSummaryData.targets.totalProfitTarget) }}</td>
+              <td class="target-cell">{{ formatCurrency(operationsSummaryData.targets.serviceFeeTarget) }}</td>
+              <td class="target-cell">{{ formatCurrency(operationsSummaryData.targets.rebateTarget) }}</td>
+              <td class="completion-cell">{{ formatCurrency(operationsSummaryData.achievements.totalProfitActual) }}</td>
+              <td class="completion-cell">{{ formatCurrency(operationsSummaryData.achievements.serviceFeeActual) }}</td>
+              <td class="completion-cell">{{ formatCurrency(operationsSummaryData.achievements.rebateActual) }}</td>
+              <td class="rate-cell" :class="getCompletionClass(operationsSummaryData.achievements.totalProfitRate)">{{ operationsSummaryData.achievements.totalProfitRate.toFixed(1) }}%</td>
+              <td class="rate-cell" :class="getCompletionClass(operationsSummaryData.achievements.serviceFeeRate)">{{ operationsSummaryData.achievements.serviceFeeRate.toFixed(1) }}%</td>
+              <td class="rate-cell" :class="getCompletionClass(operationsSummaryData.achievements.rebateRate)">{{ operationsSummaryData.achievements.rebateRate.toFixed(1) }}%</td>
+              <td class="difference-cell" :class="getDifferenceClass(operationsSummaryData.achievements.serviceFeeActual - operationsSummaryData.targets.serviceFeeTarget)">{{ formatCurrencyDifference(operationsSummaryData.achievements.serviceFeeActual - operationsSummaryData.targets.serviceFeeTarget) }}</td>
+              <td class="difference-cell" :class="getDifferenceClass(operationsSummaryData.achievements.rebateActual - operationsSummaryData.targets.rebateTarget)">{{ formatCurrencyDifference(operationsSummaryData.achievements.rebateActual - operationsSummaryData.targets.rebateTarget) }}</td>
+            </tr>
+            <!-- 各部门行 -->
+            <tr v-for="department in departmentTargets" :key="department.departmentId" class="department-row">
+              <td class="department-cell">{{ department.departmentName }}</td>
+              <td class="target-cell">{{ formatCurrency(department.targets.totalProfitTarget) }}</td>
+              <td class="target-cell">{{ formatCurrency(department.targets.serviceFeeTarget) }}</td>
+              <td class="target-cell">{{ formatCurrency(department.targets.rebateTarget) }}</td>
+              <td class="completion-cell">{{ formatCurrency(department.achievements.totalProfitActual) }}</td>
+              <td class="completion-cell">{{ formatCurrency(department.achievements.serviceFeeActual) }}</td>
+              <td class="completion-cell">{{ formatCurrency(department.achievements.rebateActual) }}</td>
+              <td class="rate-cell" :class="getCompletionClass(department.achievements.totalProfitRate)">{{ department.achievements.totalProfitRate.toFixed(1) }}%</td>
+              <td class="rate-cell" :class="getCompletionClass(department.achievements.serviceFeeRate)">{{ department.achievements.serviceFeeRate.toFixed(1) }}%</td>
+              <td class="rate-cell" :class="getCompletionClass(department.achievements.rebateRate)">{{ department.achievements.rebateRate.toFixed(1) }}%</td>
+              <td class="difference-cell" :class="getDifferenceClass(department.achievements.serviceFeeActual - department.targets.serviceFeeTarget)">{{ formatCurrencyDifference(department.achievements.serviceFeeActual - department.targets.serviceFeeTarget) }}</td>
+              <td class="difference-cell" :class="getDifferenceClass(department.achievements.rebateActual - department.targets.rebateTarget)">{{ formatCurrencyDifference(department.achievements.rebateActual - department.targets.rebateTarget) }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <!-- 目标占比分析 -->
@@ -155,8 +102,16 @@
         <div class="chart-container">
           <div class="chart-header">
             <h4 class="chart-title">完成情况占比</h4>
-            <div class="chart-total">
-              总计: {{ formatChartTotal() }}
+            <div class="chart-toggle">
+              <button
+                v-for="type in chartTypes"
+                :key="type.value"
+                class="toggle-btn"
+                :class="{ 'toggle-btn--active': currentCompletionChartType === type.value }"
+                @click="currentCompletionChartType = type.value"
+              >
+                {{ type.label }}
+              </button>
             </div>
           </div>
           <div class="chart-content">
@@ -167,25 +122,14 @@
               :show-legend="true"
               @click="handleChartClick"
             />
+            <div class="chart-total">
+              总计: {{ formatCompletionChartTotal() }}
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- 部门对比图表 -->
-      <div class="department-comparison-chart">
-        <div class="chart-header">
-          <h4 class="chart-title">部门目标vs实际对比</h4>
-        </div>
-        <div class="chart-content">
-          <BarChart
-            :data="departmentComparisonData"
-            :height="'400px'"
-            :show-legend="true"
-            :stack="false"
-            @click="handleDepartmentClick"
-          />
-        </div>
-      </div>
+
     </div>
   </div>
 </template>
@@ -193,7 +137,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import PieChart from '@/components/charts/PieChart.vue'
-import BarChart from '@/components/charts/BarChart.vue'
 import TimeRangePicker from './TimeRangePicker.vue'
 import type { DepartmentTargetData, TimeRange } from '@/types'
 
@@ -220,6 +163,7 @@ const selectedTimeRange = ref<TimeRange>({
 })
 
 const currentChartType = ref<'profit' | 'serviceFee' | 'rebate'>('profit')
+const currentCompletionChartType = ref<'profit' | 'serviceFee' | 'rebate'>('profit')
 
 const chartTypes = [
   { value: 'profit' as const, label: '毛利' },
@@ -244,13 +188,40 @@ const targetDistributionData = computed(() => {
 const completionDistributionData = computed(() => {
   return props.departmentTargets.map(dept => ({
     name: dept.departmentName,
-    value: currentChartType.value === 'profit' 
+    value: currentCompletionChartType.value === 'profit'
       ? dept.achievements.totalProfitActual
-      : currentChartType.value === 'serviceFee'
+      : currentCompletionChartType.value === 'serviceFee'
         ? dept.achievements.serviceFeeActual
         : dept.achievements.rebateActual,
     color: getDepartmentColor(dept.departmentId)
   }))
+})
+
+// 运营部门汇总数据
+const operationsSummaryData = computed(() => {
+  if (props.departmentTargets.length === 0) return null
+
+  const totalTargets = props.departmentTargets.reduce((acc, dept) => ({
+    totalProfitTarget: acc.totalProfitTarget + dept.targets.totalProfitTarget,
+    serviceFeeTarget: acc.serviceFeeTarget + dept.targets.serviceFeeTarget,
+    rebateTarget: acc.rebateTarget + dept.targets.rebateTarget
+  }), { totalProfitTarget: 0, serviceFeeTarget: 0, rebateTarget: 0 })
+
+  const totalAchievements = props.departmentTargets.reduce((acc, dept) => ({
+    totalProfitActual: acc.totalProfitActual + dept.achievements.totalProfitActual,
+    serviceFeeActual: acc.serviceFeeActual + dept.achievements.serviceFeeActual,
+    rebateActual: acc.rebateActual + dept.achievements.rebateActual
+  }), { totalProfitActual: 0, serviceFeeActual: 0, rebateActual: 0 })
+
+  return {
+    targets: totalTargets,
+    achievements: {
+      ...totalAchievements,
+      totalProfitRate: totalTargets.totalProfitTarget > 0 ? (totalAchievements.totalProfitActual / totalTargets.totalProfitTarget) * 100 : 0,
+      serviceFeeRate: totalTargets.serviceFeeTarget > 0 ? (totalAchievements.serviceFeeActual / totalTargets.serviceFeeTarget) * 100 : 0,
+      rebateRate: totalTargets.rebateTarget > 0 ? (totalAchievements.rebateActual / totalTargets.rebateTarget) * 100 : 0
+    }
+  }
 })
 
 // 部门对比图表数据
@@ -325,8 +296,19 @@ const formatCurrency = (value: number): string => {
 const formatChartTotal = () => {
   const total = props.departmentTargets.reduce((sum, dept) => {
     return sum + (currentChartType.value === 'profit' 
-      ? dept.achievements.totalProfitActual
+      ? dept.targets.totalProfitTarget
       : currentChartType.value === 'serviceFee'
+        ? dept.targets.serviceFeeTarget
+        : dept.targets.rebateTarget)
+  }, 0)
+  return formatCurrency(total)
+}
+
+const formatCompletionChartTotal = () => {
+  const total = props.departmentTargets.reduce((sum, dept) => {
+    return sum + (currentCompletionChartType.value === 'profit'
+      ? dept.achievements.totalProfitActual
+      : currentCompletionChartType.value === 'serviceFee'
         ? dept.achievements.serviceFeeActual
         : dept.achievements.rebateActual)
   }, 0)
@@ -364,6 +346,30 @@ const getDepartmentColor = (departmentId: string) => {
   const index = props.departmentTargets.findIndex(d => d.departmentId === departmentId)
   return colors[index % colors.length]
 }
+
+const getCompletionClass = (rate: number) => {
+  if (rate >= 100) return 'excellent'
+  if (rate >= 80) return 'good'
+  if (rate >= 60) return 'average'
+  return 'poor'
+}
+
+const formatCurrencyDifference = (value: number): string => {
+  const prefix = value >= 0 ? '+' : ''
+  if (Math.abs(value) >= 100000000) {
+    return `${prefix}${(value / 100000000).toFixed(2)}亿`
+  } else if (Math.abs(value) >= 10000) {
+    return `${prefix}${(value / 10000).toFixed(2)}万`
+  } else {
+    return `${prefix}${value.toLocaleString()}`
+  }
+}
+
+const getDifferenceClass = (difference: number) => {
+  if (difference > 0) return 'positive'
+  if (difference < 0) return 'negative'
+  return 'neutral'
+}
 </script>
 
 <style scoped>
@@ -397,42 +403,181 @@ const getDepartmentColor = (departmentId: string) => {
   gap: 32px;
 }
 
-/* 部门表格 */
-.department-table {
-  border: 1px solid #f0f0f0;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.department-table__header {
-  display: grid;
-  grid-template-columns: 1.5fr 2fr 2fr 2fr 1fr;
-  background: #fafafa;
-  padding: 12px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #8c8c8c;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.department-table__body {
+/* 部门目标表格 */
+.department-targets-table-container {
+  overflow-x: auto;
   background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
 }
 
-.department-row {
-  display: grid;
-  grid-template-columns: 1.5fr 2fr 2fr 2fr 1fr;
-  padding: 20px 16px;
-  border-bottom: 1px solid #f5f5f5;
-  transition: background-color 0.2s;
+.department-targets-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 1200px;
+}
+
+.department-targets-table th {
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  padding: 12px 8px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #595959;
+}
+
+.department-targets-table td {
+  border: 1px solid #f0f0f0;
+  padding: 12px 8px;
+  text-align: center;
+  font-size: 13px;
+  vertical-align: middle;
 }
 
 .department-row:hover {
-  background: #fafafa;
+  background: #f0f8ff !important;
 }
 
-.department-row:last-child {
-  border-bottom: none;
+/* 表头样式 */
+.department-header {
+  background: #f0f2f5 !important;
+  color: #262626 !important;
+  font-weight: 600;
+}
+
+.target-group-header {
+  background: #e6f7ff !important;
+  color: #1890ff !important;
+  font-weight: 600;
+}
+
+.completion-group-header {
+  background: #f6ffed !important;
+  color: #52c41a !important;
+  font-weight: 600;
+}
+
+.rate-group-header {
+  background: #fff7e6 !important;
+  color: #faad14 !important;
+  font-weight: 600;
+}
+
+.difference-group-header {
+  background: #f9f0ff !important;
+  color: #722ed1 !important;
+  font-weight: 600;
+}
+
+.target-header {
+  background: #e6f7ff !important;
+  color: #1890ff !important;
+  font-weight: 600;
+}
+
+.completion-header {
+  background: #f6ffed !important;
+  color: #52c41a !important;
+  font-weight: 600;
+}
+
+.rate-header {
+  background: #fff7e6 !important;
+  color: #faad14 !important;
+  font-weight: 600;
+}
+
+.difference-header {
+  background: #f9f0ff !important;
+  color: #722ed1 !important;
+  font-weight: 600;
+}
+
+/* 数据单元格样式 */
+.department-cell {
+  background: #f0f2f5 !important;
+  color: #262626 !important;
+  font-weight: 600;
+  text-align: left !important;
+}
+
+.target-cell {
+  background: #f0f8ff !important;
+  color: #1890ff !important;
+  font-weight: 500;
+}
+
+.completion-cell {
+  background: #f6ffed !important;
+  color: #52c41a !important;
+  font-weight: 500;
+}
+
+.rate-cell {
+  background: #fffbf0 !important;
+  font-weight: 600;
+}
+
+.difference-cell {
+  background: #fafafa !important;
+  font-weight: 500;
+}
+
+/* 完成率颜色样式 */
+.rate-cell.excellent {
+  color: #52c41a !important;
+}
+
+.rate-cell.good {
+  color: #1890ff !important;
+}
+
+.rate-cell.average {
+  color: #faad14 !important;
+}
+
+.rate-cell.poor {
+  color: #ff4d4f !important;
+}
+
+/* 完成差值颜色样式 */
+.difference-cell.positive {
+  color: #52c41a !important;
+  font-weight: 600;
+}
+
+.difference-cell.negative {
+  color: #ff4d4f !important;
+  font-weight: 600;
+}
+
+.difference-cell.neutral {
+  color: #8c8c8c !important;
+  font-weight: 500;
+}
+
+/* 运营部门汇总行样式 */
+.operations-summary-row {
+  background: #f9f9f9 !important;
+  font-weight: 600;
+  border-bottom: 2px solid #d9d9d9 !important;
+}
+
+.operations-cell {
+  background: #e6f7ff !important;
+  color: #1890ff !important;
+  font-weight: 700;
+  text-align: left !important;
+  font-size: 14px;
+}
+
+.operations-summary-row .target-cell,
+.operations-summary-row .completion-cell,
+.operations-summary-row .rate-cell,
+.operations-summary-row .difference-cell {
+  font-weight: 600;
 }
 
 .department-info {
