@@ -256,10 +256,10 @@
               <td class="rebate-cell">¥303.13万</td>
               <td class="rebate-cell">¥114.00万</td>
               <td class="rebate-cell">¥64.13万</td>
-              <td class="profit-cell">¥1567.50万</td>
-              <td class="profit-cell">¥1110.63万</td>
-              <td class="profit-cell">¥418.00万</td>
-              <td class="profit-cell">¥235.13万</td>
+              <td class="renewal-amount-cell">¥1567.50万</td>
+              <td class="renewal-amount-cell">¥1110.63万</td>
+              <td class="renewal-amount-cell">¥418.00万</td>
+              <td class="renewal-amount-cell">¥235.13万</td>
             </tr>
             <tr class="quarter-row">
               <td>Q1季度</td>
@@ -283,10 +283,10 @@
               <td class="rebate-cell">¥69.47万</td>
               <td class="rebate-cell">¥26.63万</td>
               <td class="rebate-cell">¥14.96万</td>
-              <td class="profit-cell">¥365.75万</td>
-              <td class="profit-cell">¥254.72万</td>
-              <td class="profit-cell">¥97.88万</td>
-              <td class="profit-cell">¥54.86万</td>
+              <td class="renewal-amount-cell">¥365.75万</td>
+              <td class="renewal-amount-cell">¥254.72万</td>
+              <td class="renewal-amount-cell">¥97.88万</td>
+              <td class="renewal-amount-cell">¥54.86万</td>
             </tr>
             <tr class="quarter-row">
               <td>Q2季度</td>
@@ -310,10 +310,10 @@
               <td class="rebate-cell">¥79.69万</td>
               <td class="rebate-cell">¥30.38万</td>
               <td class="rebate-cell">¥17.10万</td>
-              <td class="profit-cell">¥418.00万</td>
-              <td class="profit-cell">¥293.44万</td>
-              <td class="profit-cell">¥111.13万</td>
-              <td class="profit-cell">¥62.70万</td>
+              <td class="renewal-amount-cell">¥418.00万</td>
+              <td class="renewal-amount-cell">¥293.44万</td>
+              <td class="renewal-amount-cell">¥111.13万</td>
+              <td class="renewal-amount-cell">¥62.70万</td>
             </tr>
             <tr class="quarter-row">
               <td>Q3季度</td>
@@ -337,10 +337,10 @@
               <td class="rebate-cell">¥87.16万</td>
               <td class="rebate-cell">¥33.19万</td>
               <td class="rebate-cell">¥18.69万</td>
-              <td class="profit-cell">¥457.13万</td>
-              <td class="profit-cell">¥319.91万</td>
-              <td class="profit-cell">¥123.44万</td>
-              <td class="profit-cell">¥69.04万</td>
+              <td class="renewal-amount-cell">¥457.13万</td>
+              <td class="renewal-amount-cell">¥319.91万</td>
+              <td class="renewal-amount-cell">¥123.44万</td>
+              <td class="renewal-amount-cell">¥69.04万</td>
             </tr>
             <tr class="quarter-row">
               <td>Q4季度</td>
@@ -364,10 +364,10 @@
               <td class="rebate-cell">¥66.81万</td>
               <td class="rebate-cell">¥23.81万</td>
               <td class="rebate-cell">¥13.37万</td>
-              <td class="profit-cell">¥326.63万</td>
-              <td class="profit-cell">¥242.56万</td>
-              <td class="profit-cell">¥85.56万</td>
-              <td class="profit-cell">¥48.52万</td>
+              <td class="renewal-amount-cell">¥326.63万</td>
+              <td class="renewal-amount-cell">¥242.56万</td>
+              <td class="renewal-amount-cell">¥85.56万</td>
+              <td class="renewal-amount-cell">¥48.52万</td>
             </tr>
           </tbody>
         </table>
@@ -433,10 +433,10 @@
               <td class="rebate-cell">¥42.75万</td>
               <td class="rebate-cell">¥17.81万</td>
               <td class="rebate-cell">¥10.69万</td>
-              <td class="profit-cell">¥235.13万</td>
-              <td class="profit-cell">¥156.75万</td>
-              <td class="profit-cell">¥65.31万</td>
-              <td class="profit-cell">¥39.19万</td>
+              <td class="renewal-amount-cell">¥235.13万</td>
+              <td class="renewal-amount-cell">¥156.75万</td>
+              <td class="renewal-amount-cell">¥65.31万</td>
+              <td class="renewal-amount-cell">¥39.19万</td>
               <td class="completion-rate-cell excellent">95.0%</td>
             </tr>
             <tr class="customer-row">
@@ -458,10 +458,10 @@
               <td class="rebate-cell">¥33.75万</td>
               <td class="rebate-cell">¥13.50万</td>
               <td class="rebate-cell">¥8.44万</td>
-              <td class="profit-cell">¥185.63万</td>
-              <td class="profit-cell">¥123.75万</td>
-              <td class="profit-cell">¥49.50万</td>
-              <td class="profit-cell">¥30.94万</td>
+              <td class="renewal-amount-cell">¥185.63万</td>
+              <td class="renewal-amount-cell">¥123.75万</td>
+              <td class="renewal-amount-cell">¥49.50万</td>
+              <td class="renewal-amount-cell">¥30.94万</td>
               <td class="completion-rate-cell good">90.0%</td>
             </tr>
             <tr class="customer-row">
@@ -483,10 +483,10 @@
               <td class="rebate-cell">¥24.00万</td>
               <td class="rebate-cell">¥9.00万</td>
               <td class="rebate-cell">¥6.00万</td>
-              <td class="profit-cell">¥132.00万</td>
-              <td class="profit-cell">¥88.00万</td>
-              <td class="profit-cell">¥33.00万</td>
-              <td class="profit-cell">¥22.00万</td>
+              <td class="renewal-amount-cell">¥132.00万</td>
+              <td class="renewal-amount-cell">¥88.00万</td>
+              <td class="renewal-amount-cell">¥33.00万</td>
+              <td class="renewal-amount-cell">¥22.00万</td>
               <td class="completion-rate-cell average">80.0%</td>
             </tr>
             <tr class="customer-row">
@@ -508,10 +508,10 @@
               <td class="rebate-cell">¥17.06万</td>
               <td class="rebate-cell">¥6.09万</td>
               <td class="rebate-cell">¥3.66万</td>
-              <td class="profit-cell">¥89.38万</td>
-              <td class="profit-cell">¥62.56万</td>
-              <td class="profit-cell">¥22.34万</td>
-              <td class="profit-cell">¥13.41万</td>
+              <td class="renewal-amount-cell">¥89.38万</td>
+              <td class="renewal-amount-cell">¥62.56万</td>
+              <td class="renewal-amount-cell">¥22.34万</td>
+              <td class="renewal-amount-cell">¥13.41万</td>
               <td class="completion-rate-cell poor">65.0%</td>
             </tr>
             <tr class="customer-row">
@@ -533,10 +533,10 @@
               <td class="rebate-cell">¥19.59万</td>
               <td class="rebate-cell">¥7.13万</td>
               <td class="rebate-cell">¥4.28万</td>
-              <td class="profit-cell">¥104.50万</td>
-              <td class="profit-cell">¥71.84万</td>
-              <td class="profit-cell">¥26.13万</td>
-              <td class="profit-cell">¥15.68万</td>
+              <td class="renewal-amount-cell">¥104.50万</td>
+              <td class="renewal-amount-cell">¥71.84万</td>
+              <td class="renewal-amount-cell">¥26.13万</td>
+              <td class="renewal-amount-cell">¥15.68万</td>
               <td class="completion-rate-cell excellent">95.0%</td>
             </tr>
           </tbody>
@@ -1121,7 +1121,7 @@
               <td>新客户</td>
               <td>2024-03-20</td>
               <td>2024-03-20</td>
-              <td class="profit-cell">¥653.13万</td>
+              <td class="renewal-amount-cell">¥653.13万</td>
               <td class="service-fee-cell">¥418.50万</td>
               <td class="rebate-cell">¥234.63万</td>
               <td class="consumption-cell">¥1,395.00万</td>
@@ -1142,7 +1142,7 @@
               <td>新客户</td>
               <td>2024-04-15</td>
               <td>2024-04-15</td>
-              <td class="profit-cell">¥567.00万</td>
+              <td class="renewal-amount-cell">¥567.00万</td>
               <td class="service-fee-cell">¥378.00万</td>
               <td class="rebate-cell">¥189.00万</td>
               <td class="consumption-cell">¥1,260.00万</td>
@@ -1163,7 +1163,7 @@
               <td>老客户</td>
               <td>2024-05-10</td>
               <td>2024-05-10</td>
-              <td class="profit-cell">¥501.30万</td>
+              <td class="renewal-amount-cell">¥501.30万</td>
               <td class="service-fee-cell">¥334.20万</td>
               <td class="rebate-cell">¥167.10万</td>
               <td class="consumption-cell">¥1,114.00万</td>
@@ -1184,7 +1184,7 @@
               <td>新客户</td>
               <td>2024-06-25</td>
               <td>2024-06-25</td>
-              <td class="profit-cell">¥464.40万</td>
+              <td class="renewal-amount-cell">¥464.40万</td>
               <td class="service-fee-cell">¥309.60万</td>
               <td class="rebate-cell">¥154.80万</td>
               <td class="consumption-cell">¥1,032.00万</td>
@@ -1205,7 +1205,7 @@
               <td>老客户</td>
               <td>2024-07-20</td>
               <td>2024-07-20</td>
-              <td class="profit-cell">¥427.80万</td>
+              <td class="renewal-amount-cell">¥427.80万</td>
               <td class="service-fee-cell">¥285.20万</td>
               <td class="rebate-cell">¥142.60万</td>
               <td class="consumption-cell">¥951.00万</td>
@@ -1226,7 +1226,7 @@
               <td>新客户</td>
               <td>2024-08-15</td>
               <td>2024-08-15</td>
-              <td class="profit-cell">¥395.10万</td>
+              <td class="renewal-amount-cell">¥395.10万</td>
               <td class="service-fee-cell">¥263.40万</td>
               <td class="rebate-cell">¥131.70万</td>
               <td class="consumption-cell">¥878.00万</td>
@@ -1247,7 +1247,7 @@
               <td>老客户</td>
               <td>2024-09-10</td>
               <td>2024-09-10</td>
-              <td class="profit-cell">¥362.70万</td>
+              <td class="renewal-amount-cell">¥362.70万</td>
               <td class="service-fee-cell">¥241.80万</td>
               <td class="rebate-cell">¥120.90万</td>
               <td class="consumption-cell">¥806.00万</td>
@@ -1268,7 +1268,7 @@
               <td>新客户</td>
               <td>2024-10-25</td>
               <td>2024-10-25</td>
-              <td class="profit-cell">¥330.30万</td>
+              <td class="renewal-amount-cell">¥330.30万</td>
               <td class="service-fee-cell">¥220.20万</td>
               <td class="rebate-cell">¥110.10万</td>
               <td class="consumption-cell">¥734.00万</td>
@@ -1301,8 +1301,8 @@
               <th rowspan="2">合作类型</th>
               <th rowspan="2">上一次合作期间</th>
               <th rowspan="2">服务到期时间</th>
-              <th rowspan="2">上一次续费项目</th>
-              <th rowspan="2">上一次续费金额</th>
+              <th rowspan="2" class="renewal-project-header">上一次续费项目</th>
+              <th rowspan="2" class="renewal-amount-header">上一次续费金额</th>
             </tr>
           </thead>
           <tbody>
@@ -1316,8 +1316,8 @@
               <td>续费客户</td>
               <td>2023-01-15 至 2023-12-15</td>
               <td>2024-12-15</td>
-              <td>Google Ads + Meta Ads</td>
-              <td class="profit-cell">¥856.50万</td>
+              <td class="renewal-project-cell">Google Ads + Meta Ads</td>
+              <td class="renewal-amount-cell">¥856.50万</td>
             </tr>
 
             <!-- 小米续费数据 -->
@@ -1330,8 +1330,8 @@
               <td>续费客户</td>
               <td>2023-02-01 至 2023-11-30</td>
               <td>2024-11-30</td>
-              <td>Meta Ads + Criteo</td>
-              <td class="profit-cell">¥642.30万</td>
+              <td class="renewal-project-cell">Meta Ads + Criteo</td>
+              <td class="renewal-amount-cell">¥642.30万</td>
             </tr>
 
             <!-- OPPO续费数据 -->
@@ -1344,8 +1344,8 @@
               <td>续费客户</td>
               <td>2023-03-10 至 2023-12-10</td>
               <td>2025-01-10</td>
-              <td>Criteo + Bing Ads</td>
-              <td class="profit-cell">¥498.60万</td>
+              <td class="renewal-project-cell">Criteo + Bing Ads</td>
+              <td class="renewal-amount-cell">¥498.60万</td>
             </tr>
 
             <!-- VIVO续费数据 -->
@@ -1358,8 +1358,8 @@
               <td>续费客户</td>
               <td>2023-04-20 至 2023-12-20</td>
               <td>2024-12-20</td>
-              <td>Bing Ads + Google Ads</td>
-              <td class="profit-cell">¥427.80万</td>
+              <td class="renewal-project-cell">Bing Ads + Google Ads</td>
+              <td class="renewal-amount-cell">¥427.80万</td>
             </tr>
 
             <!-- 一加续费数据 -->
@@ -1372,8 +1372,8 @@
               <td>续费客户</td>
               <td>2023-05-15 至 2024-02-15</td>
               <td>2025-02-15</td>
-              <td>全平台推广</td>
-              <td class="profit-cell">¥785.40万</td>
+              <td class="renewal-project-cell">全平台推广</td>
+              <td class="renewal-amount-cell">¥785.40万</td>
             </tr>
 
             <!-- 腾讯续费数据 -->
@@ -1387,7 +1387,7 @@
               <td>2023-06-10 至 2024-03-10</td>
               <td>2025-03-10</td>
               <td>Google Ads + Meta Ads</td>
-              <td class="profit-cell">¥692.15万</td>
+              <td class="renewal-amount-cell">¥692.15万</td>
             </tr>
 
             <!-- 阿里巴巴续费数据 -->
@@ -1401,7 +1401,7 @@
               <td>2023-07-05 至 2024-04-05</td>
               <td>2025-04-05</td>
               <td>Meta Ads + Criteo</td>
-              <td class="profit-cell">¥634.70万</td>
+              <td class="renewal-amount-cell">¥634.70万</td>
             </tr>
 
             <!-- 百度续费数据 -->
@@ -1414,8 +1414,8 @@
               <td>续费客户</td>
               <td>2023-08-01 至 2024-05-01</td>
               <td>2025-05-01</td>
-              <td>Criteo + Bing Ads</td>
-              <td class="profit-cell">¥578.90万</td>
+              <td class="renewal-project-cell">Criteo + Bing Ads</td>
+              <td class="renewal-amount-cell">¥578.90万</td>
             </tr>
 
             <!-- 字节跳动续费数据 -->
@@ -1428,8 +1428,8 @@
               <td>续费客户</td>
               <td>2023-09-15 至 2024-06-15</td>
               <td>2025-06-15</td>
-              <td>Bing Ads + Google Ads</td>
-              <td class="profit-cell">¥523.20万</td>
+              <td class="renewal-project-cell">Bing Ads + Google Ads</td>
+              <td class="renewal-amount-cell">¥523.20万</td>
             </tr>
 
             <!-- 美团续费数据 -->
@@ -1442,8 +1442,8 @@
               <td>续费客户</td>
               <td>2023-10-01 至 2024-07-01</td>
               <td>2025-07-01</td>
-              <td>全平台推广</td>
-              <td class="profit-cell">¥467.35万</td>
+              <td class="renewal-project-cell">全平台推广</td>
+              <td class="renewal-amount-cell">¥467.35万</td>
             </tr>
           </tbody>
         </table>
@@ -2248,6 +2248,32 @@ onMounted(async () => {
 
 .customer-profit-detail-table .customer-status-header {
   background: #f6ffed;
+  color: #52c41a;
+}
+
+/* 续费表格专用列宽设置 */
+.customer-profit-detail-table .renewal-project-header,
+.customer-profit-detail-table .renewal-project-cell {
+  min-width: 180px;
+  max-width: 200px;
+  width: 180px;
+}
+
+.customer-profit-detail-table .renewal-amount-header,
+.customer-profit-detail-table .renewal-amount-cell {
+  min-width: 120px;
+  max-width: 140px;
+  width: 120px;
+  text-align: right;
+}
+
+.customer-profit-detail-table .renewal-project-cell {
+  font-weight: 500;
+  color: #1890ff;
+}
+
+.customer-profit-detail-table .renewal-amount-cell {
+  font-weight: 600;
   color: #52c41a;
 }
 
