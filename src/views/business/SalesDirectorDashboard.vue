@@ -1283,6 +1283,173 @@
       </div>
     </div>
 
+    <!-- 续费客户名单模块 -->
+    <div class="dashboard-section">
+      <h2 class="section-title">续费客户名单</h2>
+      <div class="table-scroll-hint">
+        <span>← 表格可左右滑动查看更多列 →</span>
+      </div>
+      <div class="customer-profit-detail-table-container">
+        <table class="customer-profit-detail-table">
+          <thead>
+            <tr>
+              <th rowspan="2">客户名称</th>
+              <th rowspan="2">销售</th>
+              <th rowspan="2">优化部门</th>
+              <th rowspan="2">合作项目</th>
+              <th rowspan="2">合作时间</th>
+              <th rowspan="2">合作类型</th>
+              <th rowspan="2">上一次合作期间</th>
+              <th rowspan="2">服务到期时间</th>
+              <th rowspan="2">上一次续费项目</th>
+              <th rowspan="2">上一次续费金额</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- 华为续费数据 -->
+            <tr class="customer-row">
+              <td class="customer-name-cell">华为</td>
+              <td>销售1</td>
+              <td>优化部门A</td>
+              <td>Google Ads推广</td>
+              <td>2024-01-15 至 2024-12-15</td>
+              <td>续费客户</td>
+              <td>2023-01-15 至 2023-12-15</td>
+              <td>2024-12-15</td>
+              <td>Google Ads + Meta Ads</td>
+              <td class="profit-cell">¥856.50万</td>
+            </tr>
+
+            <!-- 小米续费数据 -->
+            <tr class="customer-row">
+              <td class="customer-name-cell">小米</td>
+              <td>销售2</td>
+              <td>优化部门B</td>
+              <td>Meta Ads推广</td>
+              <td>2024-02-01 至 2024-11-30</td>
+              <td>续费客户</td>
+              <td>2023-02-01 至 2023-11-30</td>
+              <td>2024-11-30</td>
+              <td>Meta Ads + Criteo</td>
+              <td class="profit-cell">¥642.30万</td>
+            </tr>
+
+            <!-- OPPO续费数据 -->
+            <tr class="customer-row">
+              <td class="customer-name-cell">OPPO</td>
+              <td>销售3</td>
+              <td>优化部门C</td>
+              <td>Criteo推广</td>
+              <td>2024-03-10 至 2025-01-10</td>
+              <td>续费客户</td>
+              <td>2023-03-10 至 2023-12-10</td>
+              <td>2025-01-10</td>
+              <td>Criteo + Bing Ads</td>
+              <td class="profit-cell">¥498.60万</td>
+            </tr>
+
+            <!-- VIVO续费数据 -->
+            <tr class="customer-row">
+              <td class="customer-name-cell">VIVO</td>
+              <td>销售4</td>
+              <td>优化部门D</td>
+              <td>Bing Ads推广</td>
+              <td>2024-04-20 至 2024-12-20</td>
+              <td>续费客户</td>
+              <td>2023-04-20 至 2023-12-20</td>
+              <td>2024-12-20</td>
+              <td>Bing Ads + Google Ads</td>
+              <td class="profit-cell">¥427.80万</td>
+            </tr>
+
+            <!-- 一加续费数据 -->
+            <tr class="customer-row">
+              <td class="customer-name-cell">一加</td>
+              <td>销售5</td>
+              <td>优化部门E</td>
+              <td>多平台推广</td>
+              <td>2024-05-15 至 2025-02-15</td>
+              <td>续费客户</td>
+              <td>2023-05-15 至 2024-02-15</td>
+              <td>2025-02-15</td>
+              <td>全平台推广</td>
+              <td class="profit-cell">¥785.40万</td>
+            </tr>
+
+            <!-- 腾讯续费数据 -->
+            <tr class="customer-row">
+              <td class="customer-name-cell">腾讯</td>
+              <td>销售1</td>
+              <td>优化部门A</td>
+              <td>Google Ads推广</td>
+              <td>2024-06-10 至 2025-03-10</td>
+              <td>续费客户</td>
+              <td>2023-06-10 至 2024-03-10</td>
+              <td>2025-03-10</td>
+              <td>Google Ads + Meta Ads</td>
+              <td class="profit-cell">¥692.15万</td>
+            </tr>
+
+            <!-- 阿里巴巴续费数据 -->
+            <tr class="customer-row">
+              <td class="customer-name-cell">阿里巴巴</td>
+              <td>销售2</td>
+              <td>优化部门B</td>
+              <td>Meta Ads推广</td>
+              <td>2024-07-05 至 2025-04-05</td>
+              <td>续费客户</td>
+              <td>2023-07-05 至 2024-04-05</td>
+              <td>2025-04-05</td>
+              <td>Meta Ads + Criteo</td>
+              <td class="profit-cell">¥634.70万</td>
+            </tr>
+
+            <!-- 百度续费数据 -->
+            <tr class="customer-row">
+              <td class="customer-name-cell">百度</td>
+              <td>销售3</td>
+              <td>优化部门C</td>
+              <td>Criteo推广</td>
+              <td>2024-08-01 至 2025-05-01</td>
+              <td>续费客户</td>
+              <td>2023-08-01 至 2024-05-01</td>
+              <td>2025-05-01</td>
+              <td>Criteo + Bing Ads</td>
+              <td class="profit-cell">¥578.90万</td>
+            </tr>
+
+            <!-- 字节跳动续费数据 -->
+            <tr class="customer-row">
+              <td class="customer-name-cell">字节跳动</td>
+              <td>销售4</td>
+              <td>优化部门D</td>
+              <td>Bing Ads推广</td>
+              <td>2024-09-15 至 2025-06-15</td>
+              <td>续费客户</td>
+              <td>2023-09-15 至 2024-06-15</td>
+              <td>2025-06-15</td>
+              <td>Bing Ads + Google Ads</td>
+              <td class="profit-cell">¥523.20万</td>
+            </tr>
+
+            <!-- 美团续费数据 -->
+            <tr class="customer-row">
+              <td class="customer-name-cell">美团</td>
+              <td>销售5</td>
+              <td>优化部门E</td>
+              <td>多平台推广</td>
+              <td>2024-10-01 至 2025-07-01</td>
+              <td>续费客户</td>
+              <td>2023-10-01 至 2024-07-01</td>
+              <td>2025-07-01</td>
+              <td>全平台推广</td>
+              <td class="profit-cell">¥467.35万</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
 
     </div>
   </div>
