@@ -100,6 +100,20 @@
         @quarter-change="handleQuarterChange"
       />
 
+      <!-- 客户贡献（总计）模块 -->
+      <CustomerContributionModule
+        :loading="loading"
+        @time-range-change="handleTimeRangeChange"
+        @quarter-change="handleQuarterChange"
+      />
+
+      <!-- 续费客户名单模块 -->
+      <RenewalCustomerListModule
+        :loading="loading"
+        @time-range-change="handleTimeRangeChange"
+        @quarter-change="handleQuarterChange"
+      />
+
     </div>
   </div>
 </template>
@@ -118,6 +132,8 @@ import PlatformProfitContributionModule from '@/components/business/PlatformProf
 import DepartmentProfitContributionModule from '@/components/business/DepartmentProfitContributionModule.vue'
 import CustomerQualityAssessmentModule from '@/components/business/CustomerQualityAssessmentModule.vue'
 import DepartmentCustomerQualityAssessmentModule from '@/components/business/DepartmentCustomerQualityAssessmentModule.vue'
+import CustomerContributionModule from '@/components/business/CustomerContributionModule.vue'
+import RenewalCustomerListModule from '@/components/business/RenewalCustomerListModule.vue'
 import type {
   BusinessRole,
   OperationTargetData,
