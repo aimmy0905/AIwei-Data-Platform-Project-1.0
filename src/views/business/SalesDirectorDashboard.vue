@@ -1081,19 +1081,22 @@
     <!-- 客户毛利明细模块 -->
     <div class="dashboard-section">
       <h2 class="section-title">客户毛利明细</h2>
+      <div class="table-scroll-hint">
+        <span>← 表格可左右滑动查看更多列 →</span>
+      </div>
       <div class="customer-profit-detail-table-container">
         <table class="customer-profit-detail-table">
           <thead>
             <tr>
               <th rowspan="2">客户名称</th>
               <th rowspan="2">销售</th>
-              <th rowspan="2">优化师</th>
-              <th rowspan="2">合作开始</th>
-              <th rowspan="2">合作时长</th>
+              <th rowspan="2">优化部门</th>
+              <th rowspan="2">合作项目</th>
+              <th rowspan="2">合作时间</th>
               <th rowspan="2">合作类型</th>
-              <th rowspan="2">第一次合作完成时间</th>
-              <th rowspan="2">第一次合作完成时间</th>
-              <th rowspan="2">年合计</th>
+              <th rowspan="2">第一次合同签定时间</th>
+              <th rowspan="2">第二次合同合作期间</th>
+              <th rowspan="2">毛利合计</th>
               <th rowspan="2">服务费合计</th>
               <th rowspan="2">返点合计</th>
               <th rowspan="2">消费合计</th>
@@ -1932,19 +1935,34 @@ onMounted(async () => {
 }
 
 /* 客户毛利明细表格样式 */
+.table-scroll-hint {
+  text-align: center;
+  padding: 8px 0;
+  margin-top: 10px;
+  background: #f0f8ff;
+  border: 1px solid #d6e4ff;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #1890ff;
+}
+
 .customer-profit-detail-table-container {
-  margin-top: 20px;
+  margin-top: 10px;
   border-radius: 8px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: visible;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background: #fff;
+  max-width: 100%;
 }
 
 .customer-profit-detail-table {
   width: 100%;
+  min-width: 2000px;
   border-collapse: collapse;
   font-size: 13px;
   line-height: 1.4;
+  table-layout: fixed;
 }
 
 .customer-profit-detail-table th {
@@ -1955,6 +1973,31 @@ onMounted(async () => {
   text-align: center;
   border: 1px solid #f0f0f0;
   white-space: nowrap;
+  min-width: 80px;
+}
+
+.customer-profit-detail-table th:first-child {
+  min-width: 120px;
+  width: 120px;
+}
+
+.customer-profit-detail-table th:nth-child(2),
+.customer-profit-detail-table th:nth-child(3) {
+  min-width: 80px;
+  width: 80px;
+}
+
+.customer-profit-detail-table th:nth-child(4),
+.customer-profit-detail-table th:nth-child(5),
+.customer-profit-detail-table th:nth-child(6) {
+  min-width: 100px;
+  width: 100px;
+}
+
+.customer-profit-detail-table th:nth-child(7),
+.customer-profit-detail-table th:nth-child(8) {
+  min-width: 140px;
+  width: 140px;
 }
 
 .customer-profit-detail-table td {
@@ -1962,6 +2005,8 @@ onMounted(async () => {
   text-align: center;
   border: 1px solid #f0f0f0;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .customer-profit-detail-table .customer-row {
