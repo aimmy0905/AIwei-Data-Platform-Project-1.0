@@ -2059,6 +2059,28 @@ export interface TargetComparison {
   unit: string                  // 单位
 }
 
+// 年度季度目标数据
+export interface AnnualQuarterlyTargets {
+  year: number                  // 年份
+  yearlyTarget: {
+    serviceFeeTarget: number    // 年度服务费目标
+    serviceFeeActual: number    // 年度服务费完成
+    serviceFeeCompletion: number // 年度服务费完成率
+    newOrderTarget: number      // 年度新单目标
+    newOrderActual: number      // 年度新单完成
+    newOrderCompletion: number  // 年度新单完成率
+  }
+  quarters: Array<{
+    quarter: string             // 季度标识 (Q1, Q2, Q3, Q4)
+    serviceFeeTarget: number    // 季度服务费目标
+    serviceFeeActual: number    // 季度服务费完成
+    serviceFeeCompletion: number // 季度服务费完成率
+    newOrderTarget: number      // 季度新单目标
+    newOrderActual: number      // 季度新单完成
+    newOrderCompletion: number  // 季度新单完成率
+  }>
+}
+
 // 平台数据
 export interface PlatformData {
   platform: string             // 平台名称

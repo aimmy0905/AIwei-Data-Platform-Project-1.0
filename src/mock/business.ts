@@ -21,6 +21,7 @@ import type {
   MetricCardProps,
   Quarter,
   TargetComparison,
+  AnnualQuarterlyTargets,
   PlatformData,
   CustomerProfitData,
   ProfitSummaryData,
@@ -160,6 +161,57 @@ export const targetComparisonData: TargetComparison[] = [
     unit: '单'
   }
 ]
+
+// 年度季度目标数据
+export const annualQuarterlyTargets: AnnualQuarterlyTargets = {
+  year: 2025,
+  yearlyTarget: {
+    serviceFeeTarget: 12000000,  // 年度服务费目标 1200万
+    serviceFeeActual: 2850000,   // 年度服务费完成 285万
+    serviceFeeCompletion: 23.8,  // 年度完成率 23.8%
+    newOrderTarget: 720,         // 年度新单目标 720单
+    newOrderActual: 156,         // 年度新单完成 156单
+    newOrderCompletion: 21.7     // 年度新单完成率 21.7%
+  },
+  quarters: [
+    {
+      quarter: 'Q1',
+      serviceFeeTarget: 3000000,    // Q1服务费目标 300万
+      serviceFeeActual: 2850000,    // Q1服务费完成 285万
+      serviceFeeCompletion: 95.0,   // Q1服务费完成率 95%
+      newOrderTarget: 180,          // Q1新单目标 180单
+      newOrderActual: 156,          // Q1新单完成 156单
+      newOrderCompletion: 86.7      // Q1新单完成率 86.7%
+    },
+    {
+      quarter: 'Q2',
+      serviceFeeTarget: 3000000,    // Q2服务费目标 300万
+      serviceFeeActual: 0,          // Q2服务费完成 0万 (未开始)
+      serviceFeeCompletion: 0,      // Q2服务费完成率 0%
+      newOrderTarget: 180,          // Q2新单目标 180单
+      newOrderActual: 0,            // Q2新单完成 0单
+      newOrderCompletion: 0         // Q2新单完成率 0%
+    },
+    {
+      quarter: 'Q3',
+      serviceFeeTarget: 3000000,    // Q3服务费目标 300万
+      serviceFeeActual: 0,          // Q3服务费完成 0万
+      serviceFeeCompletion: 0,      // Q3服务费完成率 0%
+      newOrderTarget: 180,          // Q3新单目标 180单
+      newOrderActual: 0,            // Q3新单完成 0单
+      newOrderCompletion: 0         // Q3新单完成率 0%
+    },
+    {
+      quarter: 'Q4',
+      serviceFeeTarget: 3000000,    // Q4服务费目标 300万
+      serviceFeeActual: 0,          // Q4服务费完成 0万
+      serviceFeeCompletion: 0,      // Q4服务费完成率 0%
+      newOrderTarget: 180,          // Q4新单目标 180单
+      newOrderActual: 0,            // Q4新单完成 0单
+      newOrderCompletion: 0         // Q4新单完成率 0%
+    }
+  ]
+}
 
 // 平台分布数据
 export const platformDistributionData: PlatformData[] = [
@@ -2511,6 +2563,9 @@ export const businessAPI = {
 
   // 获取目标完成对比
   getTargetComparison: () => Promise.resolve(targetComparisonData),
+
+  // 获取年度季度目标数据
+  getAnnualQuarterlyTargets: () => Promise.resolve(annualQuarterlyTargets),
 
   // 获取平台分布数据
   getPlatformDistribution: () => Promise.resolve(platformDistributionData),

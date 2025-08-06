@@ -24,63 +24,170 @@
 
     <!-- 主要内容 -->
     <div v-else class="dashboard-content">
-      <!-- 时间选择器 -->
-      <div class="dashboard-time-selector">
-      <TimeRangePicker
-        v-model="selectedTimeRange"
-        @change="handleTimeRangeChange"
-      />
-    </div>
 
-    <!-- 核心指标卡片区域 -->
+
+        <!-- 核心指标概览 -->
     <div class="dashboard-section">
       <h2 class="section-title">核心指标概览</h2>
-      <div class="metrics-grid">
-        <MetricCard
-          v-for="metric in coreMetrics"
-          :key="metric.title"
-          v-bind="metric"
-        />
-      </div>
-    </div>
 
-    <!-- 目标完成情况模块 -->
-    <div class="dashboard-section">
-      <div class="section-header">
-        <h2 class="section-title">目标完成情况</h2>
-        <QuarterSelector
-          v-model="selectedQuarter"
-          :show-quick-select="false"
-          @change="handleQuarterChange"
-        />
-      </div>
-
-      <div class="target-comparison-grid">
-        <TargetComparisonCard
-          v-for="target in targetComparisons"
-          :key="target.targetType"
-          v-bind="target"
-        />
+      <!-- 年度和季度目标表格 -->
+      <div v-if="annualQuarterlyTargets" class="annual-quarterly-targets">
+        <div class="targets-table-container">
+          <table class="targets-table">
+            <thead>
+              <tr>
+                <th rowspan="2">年度</th>
+                <th rowspan="2">季度</th>
+                <th colspan="2" class="target-group-header">目标</th>
+                <th colspan="2" class="completion-group-header">完成</th>
+                <th colspan="2" class="comparison-group-header">完成对比</th>
+                <th colspan="3" class="baseline-group-header">完成基准</th>
+              </tr>
+                          <tr>
+              <th class="target-header">服务费目标</th>
+              <th class="target-header">新单目标</th>
+              <th class="completion-header">服务费完成</th>
+              <th class="completion-header">单量完成</th>
+              <th class="comparison-header">服务费完成对比</th>
+              <th class="comparison-header">新单完成对比</th>
+              <th class="baseline-header">完成基准</th>
+              <th class="baseline-header">服务费基准</th>
+              <th class="baseline-header">订单基准</th>
+            </tr>
+            </thead>
+            <tbody>
+              <!-- 年度总计行 -->
+              <tr class="annual-row">
+                <td rowspan="5">{{ annualQuarterlyTargets.year }}年</td>
+                <td>{{ annualQuarterlyTargets.year }}年</td>
+                <td class="target-cell">{{ formatCurrency(annualQuarterlyTargets.yearlyTarget.serviceFeeTarget) }}</td>
+                <td class="target-cell">{{ annualQuarterlyTargets.yearlyTarget.newOrderTarget }}单</td>
+                <td class="completion-cell">{{ formatCurrency(annualQuarterlyTargets.yearlyTarget.serviceFeeActual) }}</td>
+                <td class="completion-cell">{{ annualQuarterlyTargets.yearlyTarget.newOrderActual }}单</td>
+                <td class="comparison-cell">{{ annualQuarterlyTargets.yearlyTarget.serviceFeeCompletion }}%</td>
+                <td class="comparison-cell">{{ annualQuarterlyTargets.yearlyTarget.newOrderCompletion }}%</td>
+                <td class="baseline-cell">{{ annualQuarterlyTargets.yearlyTarget.serviceFeeCompletion }}%</td>
+                <td class="baseline-cell">{{ annualQuarterlyTargets.yearlyTarget.serviceFeeCompletion }}%</td>
+                <td class="baseline-cell">{{ annualQuarterlyTargets.yearlyTarget.newOrderCompletion }}%</td>
+              </tr>
+              <!-- 季度行 -->
+              <tr v-for="quarter in annualQuarterlyTargets.quarters" :key="quarter.quarter" class="quarterly-row">
+                <td>{{ quarter.quarter }}季度</td>
+                <td class="target-cell">{{ formatCurrency(quarter.serviceFeeTarget) }}</td>
+                <td class="target-cell">{{ quarter.newOrderTarget }}单</td>
+                <td class="completion-cell">{{ formatCurrency(quarter.serviceFeeActual) }}</td>
+                <td class="completion-cell">{{ quarter.newOrderActual }}单</td>
+                <td class="comparison-cell" :class="getCompletionClass(quarter.serviceFeeCompletion)">{{ quarter.serviceFeeCompletion }}%</td>
+                <td class="comparison-cell" :class="getCompletionClass(quarter.newOrderCompletion)">{{ quarter.newOrderCompletion }}%</td>
+                <td class="baseline-cell">{{ quarter.serviceFeeCompletion }}%</td>
+                <td class="baseline-cell">{{ quarter.serviceFeeCompletion }}%</td>
+                <td class="baseline-cell">{{ quarter.newOrderCompletion }}%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <!-- 新单服务费及单量完成模块 -->
     <div class="dashboard-section">
-      <h2 class="section-title">新单服务费及单量完成</h2>
-      <div class="platform-analysis-grid">
-        <div class="platform-summary-card">
-          <h3>服务费总计</h3>
-          <div class="summary-value">{{ formatCurrency(platformSummary.totalServiceFee) }}</div>
-          <PieChart :data="platformChartData" height="200px" />
-        </div>
+      <h2 class="section-title">年度新单服务费及单量完成</h2>
 
-        <div class="platform-summary-card">
-          <h3>单量总计</h3>
-          <div class="summary-value">{{ platformSummary.totalOrders }}单</div>
-          <BarChart :data="platformBarChartData" height="200px" />
-        </div>
+      <div class="new-order-completion-table-container">
+        <table class="new-order-completion-table">
+          <thead>
+            <tr>
+              <th rowspan="2" class="year-header">年度</th>
+              <th rowspan="2" class="quarter-header">季度</th>
+              <th colspan="5" class="service-fee-header">新单服务费（2025年）</th>
+              <th colspan="5" class="order-count-header">新单单量</th>
+            </tr>
+            <tr>
+              <th class="service-fee-platform-header">Google</th>
+              <th class="service-fee-platform-header">Meta</th>
+              <th class="service-fee-platform-header">Criteo</th>
+              <th class="service-fee-platform-header">Bing</th>
+              <th class="service-fee-platform-header">内容营销及其它</th>
+              <th class="order-count-platform-header">Google</th>
+              <th class="order-count-platform-header">Meta</th>
+              <th class="order-count-platform-header">Criteo</th>
+              <th class="order-count-platform-header">Bing</th>
+              <th class="order-count-platform-header">内容营销及其它</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="year-row">
+              <td rowspan="5">2025年</td>
+              <td>2025年</td>
+              <td class="service-fee-cell">¥1,200.00万</td>
+              <td class="service-fee-cell">¥850.00万</td>
+              <td class="service-fee-cell">¥320.00万</td>
+              <td class="service-fee-cell">¥180.00万</td>
+              <td class="service-fee-cell">¥150.00万</td>
+              <td class="order-count-cell">720单</td>
+              <td class="order-count-cell">510单</td>
+              <td class="order-count-cell">192单</td>
+              <td class="order-count-cell">108单</td>
+              <td class="order-count-cell">90单</td>
+            </tr>
+            <tr class="quarter-row">
+              <td>Q1季度</td>
+              <td class="service-fee-cell">¥280.00万</td>
+              <td class="service-fee-cell">¥195.00万</td>
+              <td class="service-fee-cell">¥75.00万</td>
+              <td class="service-fee-cell">¥42.00万</td>
+              <td class="service-fee-cell">¥35.00万</td>
+              <td class="order-count-cell">168单</td>
+              <td class="order-count-cell">117单</td>
+              <td class="order-count-cell">45单</td>
+              <td class="order-count-cell">25单</td>
+              <td class="order-count-cell">21单</td>
+            </tr>
+            <tr class="quarter-row">
+              <td>Q2季度</td>
+              <td class="service-fee-cell">¥320.00万</td>
+              <td class="service-fee-cell">¥225.00万</td>
+              <td class="service-fee-cell">¥85.00万</td>
+              <td class="service-fee-cell">¥48.00万</td>
+              <td class="service-fee-cell">¥40.00万</td>
+              <td class="order-count-cell">192单</td>
+              <td class="order-count-cell">135单</td>
+              <td class="order-count-cell">51单</td>
+              <td class="order-count-cell">29单</td>
+              <td class="order-count-cell">24单</td>
+            </tr>
+            <tr class="quarter-row">
+              <td>Q3季度</td>
+              <td class="service-fee-cell">¥350.00万</td>
+              <td class="service-fee-cell">¥245.00万</td>
+              <td class="service-fee-cell">¥95.00万</td>
+              <td class="service-fee-cell">¥53.00万</td>
+              <td class="service-fee-cell">¥44.00万</td>
+              <td class="order-count-cell">210单</td>
+              <td class="order-count-cell">147单</td>
+              <td class="order-count-cell">57单</td>
+              <td class="order-count-cell">32单</td>
+              <td class="order-count-cell">26单</td>
+            </tr>
+            <tr class="quarter-row">
+              <td>Q4季度</td>
+              <td class="service-fee-cell">¥250.00万</td>
+              <td class="service-fee-cell">¥185.00万</td>
+              <td class="service-fee-cell">¥65.00万</td>
+              <td class="service-fee-cell">¥37.00万</td>
+              <td class="service-fee-cell">¥31.00万</td>
+              <td class="order-count-cell">150单</td>
+              <td class="order-count-cell">111单</td>
+              <td class="order-count-cell">39单</td>
+              <td class="order-count-cell">22单</td>
+              <td class="order-count-cell">19单</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
+
+
 
     <!-- 新签客户毛利完成模块 -->
     <div class="dashboard-section">
@@ -89,22 +196,178 @@
         <table class="profit-analysis-table">
           <thead>
             <tr>
-              <th>平台</th>
-              <th>新单单量</th>
-              <th>服务费</th>
-              <th>消费</th>
-              <th>返点</th>
-              <th>毛利</th>
+              <th rowspan="2">年度</th>
+              <th rowspan="2">季度</th>
+              <th colspan="4" class="service-fee-group-header">服务费目标</th>
+              <th colspan="4" class="order-count-group-header">新单单量</th>
+              <th colspan="4" class="service-fee-actual-group-header">服务费</th>
+              <th colspan="4" class="consumption-group-header">消费</th>
+              <th colspan="4" class="rebate-group-header">返点</th>
+              <th colspan="4" class="profit-group-header">毛利</th>
+            </tr>
+            <tr>
+              <th class="service-fee-header">Google</th>
+              <th class="service-fee-header">Meta</th>
+              <th class="service-fee-header">Criteo</th>
+              <th class="service-fee-header">Bing</th>
+              <th class="order-count-header">Google</th>
+              <th class="order-count-header">Meta</th>
+              <th class="order-count-header">Criteo</th>
+              <th class="order-count-header">Bing</th>
+              <th class="service-fee-actual-header">Google</th>
+              <th class="service-fee-actual-header">Meta</th>
+              <th class="service-fee-actual-header">Criteo</th>
+              <th class="service-fee-actual-header">Bing</th>
+              <th class="consumption-header">Google</th>
+              <th class="consumption-header">Meta</th>
+              <th class="consumption-header">Criteo</th>
+              <th class="consumption-header">Bing</th>
+              <th class="rebate-header">Google</th>
+              <th class="rebate-header">Meta</th>
+              <th class="rebate-header">Criteo</th>
+              <th class="rebate-header">Bing</th>
+              <th class="profit-header">Google</th>
+              <th class="profit-header">Meta</th>
+              <th class="profit-header">Criteo</th>
+              <th class="profit-header">Bing</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(platform, key) in customerProfitData?.platforms || {}" :key="key">
-              <td class="platform-name">{{ getPlatformName(key as string) }}</td>
-              <td>{{ (platform as any).orderCount }}</td>
-              <td>{{ formatCurrency((platform as any).serviceFee) }}</td>
-              <td>{{ formatCurrency((platform as any).consumption) }}</td>
-              <td>{{ formatCurrency((platform as any).rebate) }}</td>
-              <td class="profit-value">{{ formatCurrency((platform as any).profit) }}</td>
+            <tr class="year-row">
+              <td rowspan="5">2025年</td>
+              <td>2025年</td>
+              <td class="service-fee-cell">¥1200.00万</td>
+              <td class="service-fee-cell">¥850.00万</td>
+              <td class="service-fee-cell">¥320.00万</td>
+              <td class="service-fee-cell">¥180.00万</td>
+              <td class="order-count-cell">720单</td>
+              <td class="order-count-cell">510单</td>
+              <td class="order-count-cell">192单</td>
+              <td class="order-count-cell">108单</td>
+              <td class="service-fee-actual-cell">¥1140.00万</td>
+              <td class="service-fee-actual-cell">¥807.50万</td>
+              <td class="service-fee-actual-cell">¥304.00万</td>
+              <td class="service-fee-actual-cell">¥171.00万</td>
+              <td class="consumption-cell">¥8550.00万</td>
+              <td class="consumption-cell">¥6062.50万</td>
+              <td class="consumption-cell">¥2280.00万</td>
+              <td class="consumption-cell">¥1282.50万</td>
+              <td class="rebate-cell">¥427.50万</td>
+              <td class="rebate-cell">¥303.13万</td>
+              <td class="rebate-cell">¥114.00万</td>
+              <td class="rebate-cell">¥64.13万</td>
+              <td class="profit-cell">¥1567.50万</td>
+              <td class="profit-cell">¥1110.63万</td>
+              <td class="profit-cell">¥418.00万</td>
+              <td class="profit-cell">¥235.13万</td>
+            </tr>
+            <tr class="quarter-row">
+              <td>Q1季度</td>
+              <td class="service-fee-cell">¥280.00万</td>
+              <td class="service-fee-cell">¥195.00万</td>
+              <td class="service-fee-cell">¥75.00万</td>
+              <td class="service-fee-cell">¥42.00万</td>
+              <td class="order-count-cell">168单</td>
+              <td class="order-count-cell">117单</td>
+              <td class="order-count-cell">45单</td>
+              <td class="order-count-cell">25单</td>
+              <td class="service-fee-actual-cell">¥266.00万</td>
+              <td class="service-fee-actual-cell">¥185.25万</td>
+              <td class="service-fee-actual-cell">¥71.25万</td>
+              <td class="service-fee-actual-cell">¥39.90万</td>
+              <td class="consumption-cell">¥1995.00万</td>
+              <td class="consumption-cell">¥1389.38万</td>
+              <td class="consumption-cell">¥532.50万</td>
+              <td class="consumption-cell">¥299.25万</td>
+              <td class="rebate-cell">¥99.75万</td>
+              <td class="rebate-cell">¥69.47万</td>
+              <td class="rebate-cell">¥26.63万</td>
+              <td class="rebate-cell">¥14.96万</td>
+              <td class="profit-cell">¥365.75万</td>
+              <td class="profit-cell">¥254.72万</td>
+              <td class="profit-cell">¥97.88万</td>
+              <td class="profit-cell">¥54.86万</td>
+            </tr>
+            <tr class="quarter-row">
+              <td>Q2季度</td>
+              <td class="service-fee-cell">¥320.00万</td>
+              <td class="service-fee-cell">¥225.00万</td>
+              <td class="service-fee-cell">¥85.00万</td>
+              <td class="service-fee-cell">¥48.00万</td>
+              <td class="order-count-cell">192单</td>
+              <td class="order-count-cell">135单</td>
+              <td class="order-count-cell">51单</td>
+              <td class="order-count-cell">29单</td>
+              <td class="service-fee-actual-cell">¥304.00万</td>
+              <td class="service-fee-actual-cell">¥213.75万</td>
+              <td class="service-fee-actual-cell">¥80.75万</td>
+              <td class="service-fee-actual-cell">¥45.60万</td>
+              <td class="consumption-cell">¥2280.00万</td>
+              <td class="consumption-cell">¥1593.75万</td>
+              <td class="consumption-cell">¥607.50万</td>
+              <td class="consumption-cell">¥342.00万</td>
+              <td class="rebate-cell">¥114.00万</td>
+              <td class="rebate-cell">¥79.69万</td>
+              <td class="rebate-cell">¥30.38万</td>
+              <td class="rebate-cell">¥17.10万</td>
+              <td class="profit-cell">¥418.00万</td>
+              <td class="profit-cell">¥293.44万</td>
+              <td class="profit-cell">¥111.13万</td>
+              <td class="profit-cell">¥62.70万</td>
+            </tr>
+            <tr class="quarter-row">
+              <td>Q3季度</td>
+              <td class="service-fee-cell">¥350.00万</td>
+              <td class="service-fee-cell">¥245.00万</td>
+              <td class="service-fee-cell">¥95.00万</td>
+              <td class="service-fee-cell">¥53.00万</td>
+              <td class="order-count-cell">210单</td>
+              <td class="order-count-cell">147单</td>
+              <td class="order-count-cell">57单</td>
+              <td class="order-count-cell">32单</td>
+              <td class="service-fee-actual-cell">¥332.50万</td>
+              <td class="service-fee-actual-cell">¥232.75万</td>
+              <td class="service-fee-actual-cell">¥90.25万</td>
+              <td class="service-fee-actual-cell">¥50.35万</td>
+              <td class="consumption-cell">¥2492.50万</td>
+              <td class="consumption-cell">¥1743.13万</td>
+              <td class="consumption-cell">¥663.75万</td>
+              <td class="consumption-cell">¥373.88万</td>
+              <td class="rebate-cell">¥124.63万</td>
+              <td class="rebate-cell">¥87.16万</td>
+              <td class="rebate-cell">¥33.19万</td>
+              <td class="rebate-cell">¥18.69万</td>
+              <td class="profit-cell">¥457.13万</td>
+              <td class="profit-cell">¥319.91万</td>
+              <td class="profit-cell">¥123.44万</td>
+              <td class="profit-cell">¥69.04万</td>
+            </tr>
+            <tr class="quarter-row">
+              <td>Q4季度</td>
+              <td class="service-fee-cell">¥250.00万</td>
+              <td class="service-fee-cell">¥185.00万</td>
+              <td class="service-fee-cell">¥65.00万</td>
+              <td class="service-fee-cell">¥37.00万</td>
+              <td class="order-count-cell">150单</td>
+              <td class="order-count-cell">111单</td>
+              <td class="order-count-cell">39单</td>
+              <td class="order-count-cell">22单</td>
+              <td class="service-fee-actual-cell">¥237.50万</td>
+              <td class="service-fee-actual-cell">¥175.75万</td>
+              <td class="service-fee-actual-cell">¥61.75万</td>
+              <td class="service-fee-actual-cell">¥35.15万</td>
+              <td class="consumption-cell">¥1782.50万</td>
+              <td class="consumption-cell">¥1336.25万</td>
+              <td class="consumption-cell">¥476.25万</td>
+              <td class="consumption-cell">¥267.38万</td>
+              <td class="rebate-cell">¥89.13万</td>
+              <td class="rebate-cell">¥66.81万</td>
+              <td class="rebate-cell">¥23.81万</td>
+              <td class="rebate-cell">¥13.37万</td>
+              <td class="profit-cell">¥326.63万</td>
+              <td class="profit-cell">¥242.56万</td>
+              <td class="profit-cell">¥85.56万</td>
+              <td class="profit-cell">¥48.52万</td>
             </tr>
           </tbody>
         </table>
@@ -288,18 +551,18 @@
 import { ref, computed, onMounted } from 'vue'
 import { DollarSign, TrendingUp } from 'lucide-vue-next'
 import RoleSwitcher from '@/components/business/RoleSwitcher.vue'
-import TimeRangePicker from '@/components/business/TimeRangePicker.vue'
+
 import MetricCard from '@/components/business/MetricCard.vue'
 import QuarterSelector from '@/components/business/QuarterSelector.vue'
 import TargetComparisonCard from '@/components/business/TargetComparisonCard.vue'
 import PieChart from '@/components/charts/PieChart.vue'
 import BarChart from '@/components/charts/BarChart.vue'
 import type {
-  TimeRange,
   Quarter,
   BusinessRole,
   MetricCardProps,
   TargetComparison,
+  AnnualQuarterlyTargets,
   PlatformData,
   CustomerProfitData,
   ProfitSummaryData,
@@ -312,10 +575,11 @@ import { businessAPI } from '@/mock/business'
 // 状态
 const currentRole = ref('sales_director')
 const availableRoles = ref<BusinessRole[]>([])
-const selectedTimeRange = ref<TimeRange>()
+
 const selectedQuarter = ref<Quarter>()
 const coreMetrics = ref<MetricCardProps[]>([])
 const targetComparisons = ref<TargetComparison[]>([])
+const annualQuarterlyTargets = ref<AnnualQuarterlyTargets>()
 const platformData = ref<PlatformData[]>([])
 const customerProfitData = ref<CustomerProfitData>()
 const profitSummary = ref<ProfitSummaryData>()
@@ -355,11 +619,7 @@ const handleRoleChange = (role: string) => {
   console.log('角色切换至:', role)
 }
 
-const handleTimeRangeChange = (timeRange: TimeRange) => {
-  selectedTimeRange.value = timeRange
-  console.log('时间范围变更:', timeRange)
-  // 重新加载数据
-}
+
 
 const handleQuarterChange = (quarter: Quarter) => {
   selectedQuarter.value = quarter
@@ -437,6 +697,13 @@ const getTotalRenewalValue = (): number => {
   return renewalCustomers.value.reduce((sum, customer) => sum + customer.estimatedRenewalValue, 0)
 }
 
+const getCompletionClass = (rate: number): string => {
+  if (rate >= 95) return 'excellent'
+  if (rate >= 85) return 'good'
+  if (rate >= 70) return 'average'
+  return 'poor'
+}
+
 // 生命周期
 onMounted(async () => {
   // 加载数据
@@ -445,6 +712,7 @@ onMounted(async () => {
       rolesData,
       metricsData,
       targetData,
+      annualTargetsData,
       platformDistData,
       profitData,
       profitSummaryData,
@@ -455,6 +723,7 @@ onMounted(async () => {
       businessAPI.getRoles(),
       businessAPI.getSalesDirectorMetrics(),
       businessAPI.getTargetComparison(),
+      businessAPI.getAnnualQuarterlyTargets(),
       businessAPI.getPlatformDistribution(),
       businessAPI.getCustomerProfitData(),
       businessAPI.getProfitSummary(),
@@ -466,6 +735,7 @@ onMounted(async () => {
     availableRoles.value = rolesData
     coreMetrics.value = metricsData
     targetComparisons.value = targetData
+    annualQuarterlyTargets.value = annualTargetsData
     platformData.value = platformDistData
     customerProfitData.value = profitData
     profitSummary.value = profitSummaryData
@@ -511,9 +781,7 @@ onMounted(async () => {
   font-size: 14px;
 }
 
-.dashboard-time-selector {
-  margin-bottom: 24px;
-}
+
 
 .dashboard-section {
   margin-bottom: 32px;
@@ -549,6 +817,233 @@ onMounted(async () => {
   gap: 20px;
 }
 
+.annual-quarterly-targets {
+  margin-bottom: 24px;
+}
+
+.targets-table-container {
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+}
+
+.targets-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 1200px;
+}
+
+.targets-table th {
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  padding: 12px 8px;
+  text-align: center;
+  font-weight: 600;
+  color: #262626;
+  white-space: nowrap;
+}
+
+.targets-table td {
+  border: 1px solid #f0f0f0;
+  padding: 10px 8px;
+  text-align: center;
+  color: #595959;
+}
+
+.targets-table .annual-row {
+  background: #f9f9f9;
+  font-weight: 500;
+}
+
+.targets-table .annual-row td {
+  color: #262626;
+  font-weight: 500;
+}
+
+.targets-table .quarterly-row:nth-child(even) {
+  background: #fafafa;
+}
+
+.targets-table .excellent {
+  color: #52c41a;
+  font-weight: 600;
+}
+
+.targets-table .good {
+  color: #1890ff;
+  font-weight: 600;
+}
+
+.targets-table .average {
+  color: #faad14;
+  font-weight: 600;
+}
+
+.targets-table .poor {
+  color: #ff4d4f;
+  font-weight: 600;
+}
+
+/* 新单服务费及单量完成表格样式 - 与核心指标概览一致 */
+.new-order-completion-table-container {
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  margin-top: 20px;
+}
+
+.new-order-completion-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 1200px;
+}
+
+.new-order-completion-table th {
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  padding: 12px 8px;
+  text-align: center;
+  font-weight: 600;
+  color: #262626;
+  white-space: nowrap;
+}
+
+.new-order-completion-table td {
+  border: 1px solid #f0f0f0;
+  padding: 10px 8px;
+  text-align: center;
+  color: #595959;
+}
+
+.new-order-completion-table .year-row {
+  background: #f9f9f9;
+  font-weight: 500;
+}
+
+.new-order-completion-table .year-row td {
+  color: #262626;
+  font-weight: 500;
+}
+
+.new-order-completion-table .quarter-row:nth-child(even) {
+  background: #fafafa;
+}
+
+/* 核心指标概览表格 - 不同类型列的样式区分 */
+.targets-table .target-group-header {
+  background: #e6f7ff;
+  color: #1890ff;
+  font-weight: 600;
+}
+
+.targets-table .completion-group-header {
+  background: #f6ffed;
+  color: #52c41a;
+  font-weight: 600;
+}
+
+.targets-table .comparison-group-header {
+  background: #fff7e6;
+  color: #faad14;
+  font-weight: 600;
+}
+
+.targets-table .baseline-group-header {
+  background: #f0f0f0;
+  color: #595959;
+  font-weight: 600;
+}
+
+.targets-table .target-header {
+  background: #e6f7ff;
+  color: #1890ff;
+  font-weight: 600;
+}
+
+.targets-table .completion-header {
+  background: #f6ffed;
+  color: #52c41a;
+  font-weight: 600;
+}
+
+.targets-table .comparison-header {
+  background: #fff7e6;
+  color: #faad14;
+  font-weight: 600;
+}
+
+.targets-table .baseline-header {
+  background: #f0f0f0;
+  color: #595959;
+  font-weight: 600;
+}
+
+.targets-table .target-cell {
+  background: #f0f8ff;
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.targets-table .completion-cell {
+  background: #f6ffed;
+  color: #52c41a;
+  font-weight: 500;
+}
+
+.targets-table .comparison-cell {
+  background: #fffbf0;
+  font-weight: 600;
+}
+
+.targets-table .baseline-cell {
+  background: #f9f9f9;
+  color: #8c8c8c;
+  font-weight: 400;
+}
+
+/* 新单服务费及单量完成表格 - 不同类型列的样式区分 */
+.new-order-completion-table .service-fee-header {
+  background: #e6f7ff;
+  color: #1890ff;
+  font-weight: 600;
+}
+
+.new-order-completion-table .order-count-header {
+  background: #f6ffed;
+  color: #52c41a;
+  font-weight: 600;
+}
+
+.new-order-completion-table .service-fee-platform-header {
+  background: #f0f8ff;
+  color: #1890ff;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.new-order-completion-table .order-count-platform-header {
+  background: #f0fff0;
+  color: #52c41a;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.new-order-completion-table .service-fee-cell {
+  background: #f8fcff;
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.new-order-completion-table .order-count-cell {
+  background: #f8fff8;
+  color: #52c41a;
+  font-weight: 500;
+}
+
 .platform-analysis-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -577,36 +1072,217 @@ onMounted(async () => {
 }
 
 .profit-analysis-table-container {
-  overflow-x: auto;
+  overflow-x: auto !important;
+  background: #fff !important;
+  border: 1px solid #f0f0f0 !important;
+  border-radius: 6px !important;
 }
 
 .profit-analysis-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
-}
-
-.profit-analysis-table th,
-.profit-analysis-table td {
-  padding: 12px 8px;
-  text-align: right;
-  border-bottom: 1px solid #f0f0f0;
+  min-width: 2400px;
 }
 
 .profit-analysis-table th {
-  background: #fafafa;
-  font-weight: 600;
-  color: #262626;
+  background: #fafafa !important;
+  border: 1px solid #f0f0f0 !important;
+  padding: 12px 8px !important;
+  text-align: center !important;
+  font-weight: 600 !important;
+  color: #262626 !important;
+  white-space: nowrap !important;
+}
+
+.profit-analysis-table td {
+  border: 1px solid #f0f0f0 !important;
+  padding: 10px 8px !important;
+  text-align: center !important;
+  color: #595959 !important;
 }
 
 .profit-analysis-table .platform-name {
   text-align: left;
   font-weight: 500;
+  color: #262626;
 }
 
 .profit-analysis-table .profit-value {
   color: #52c41a;
   font-weight: 600;
+}
+
+/* 新签客户毛利完成表格 - 平台特定样式 */
+.profit-analysis-table .google-header,
+.profit-analysis-table .google-cell {
+  background: #e6f7ff !important;
+  color: #1890ff !important;
+  font-weight: 500;
+}
+
+.profit-analysis-table .meta-header,
+.profit-analysis-table .meta-cell {
+  background: #f6ffed !important;
+  color: #52c41a !important;
+  font-weight: 500;
+}
+
+.profit-analysis-table .criteo-header,
+.profit-analysis-table .criteo-cell {
+  background: #fff7e6 !important;
+  color: #faad14 !important;
+  font-weight: 500;
+}
+
+.profit-analysis-table .bing-header,
+.profit-analysis-table .bing-cell {
+  background: #f0f0f0 !important;
+  color: #595959 !important;
+  font-weight: 500;
+}
+
+.profit-analysis-table .total-row {
+  background: #f9f9f9 !important;
+  font-weight: 600;
+}
+
+.profit-analysis-table .total-row td {
+  background: #f9f9f9 !important;
+  color: #262626 !important;
+  font-weight: 600;
+}
+
+/* 新签客户毛利完成表格 - 组标题样式 */
+.profit-analysis-table .service-fee-group-header {
+  background: #e6f7ff !important;
+  color: #1890ff !important;
+  font-weight: 600;
+}
+
+.profit-analysis-table .order-count-group-header {
+  background: #f6ffed !important;
+  color: #52c41a !important;
+  font-weight: 600;
+}
+
+.profit-analysis-table .service-fee-actual-group-header {
+  background: #fff7e6 !important;
+  color: #faad14 !important;
+  font-weight: 600;
+}
+
+.profit-analysis-table .consumption-group-header {
+  background: #f0f0f0 !important;
+  color: #595959 !important;
+  font-weight: 600;
+}
+
+.profit-analysis-table .rebate-group-header {
+  background: #fff2f0 !important;
+  color: #ff4d4f !important;
+  font-weight: 600;
+}
+
+.profit-analysis-table .profit-group-header {
+  background: #f6ffed !important;
+  color: #52c41a !important;
+  font-weight: 600;
+}
+
+/* 新签客户毛利完成表格 - 子标题样式 */
+.profit-analysis-table .service-fee-header {
+  background: #f0f8ff !important;
+  color: #1890ff !important;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.profit-analysis-table .order-count-header {
+  background: #f0fff0 !important;
+  color: #52c41a !important;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.profit-analysis-table .service-fee-actual-header {
+  background: #fffbf0 !important;
+  color: #faad14 !important;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.profit-analysis-table .consumption-header {
+  background: #f9f9f9 !important;
+  color: #8c8c8c !important;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.profit-analysis-table .rebate-header {
+  background: #fff8f8 !important;
+  color: #ff4d4f !important;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.profit-analysis-table .profit-header {
+  background: #f0fff0 !important;
+  color: #52c41a !important;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+/* 新签客户毛利完成表格 - 数据单元格样式 */
+.profit-analysis-table .service-fee-cell {
+  background: #f8fcff !important;
+  color: #1890ff !important;
+  font-weight: 500;
+}
+
+.profit-analysis-table .order-count-cell {
+  background: #f8fff8 !important;
+  color: #52c41a !important;
+  font-weight: 500;
+}
+
+.profit-analysis-table .service-fee-actual-cell {
+  background: #fffef8 !important;
+  color: #faad14 !important;
+  font-weight: 500;
+}
+
+.profit-analysis-table .consumption-cell {
+  background: #fafafa !important;
+  color: #8c8c8c !important;
+  font-weight: 400;
+}
+
+.profit-analysis-table .rebate-cell {
+  background: #fffafa !important;
+  color: #ff4d4f !important;
+  font-weight: 500;
+}
+
+.profit-analysis-table .profit-cell {
+  background: #f8fff8 !important;
+  color: #52c41a !important;
+  font-weight: 600;
+}
+
+/* 年度和季度行样式 */
+.profit-analysis-table .year-row {
+  background: #f9f9f9 !important;
+  font-weight: 500;
+}
+
+.profit-analysis-table .year-row td {
+  color: #262626 !important;
+  font-weight: 500;
+}
+
+.profit-analysis-table .quarter-row:nth-child(even) {
+  background: #fafafa !important;
 }
 
 .profit-summary-grid {
