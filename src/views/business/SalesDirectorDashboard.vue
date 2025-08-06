@@ -862,6 +862,222 @@
       </div>
     </div>
 
+        <!-- 员工总毛利完成模块 -->
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2 class="section-title">员工总毛利完成</h2>
+        <div class="profit-filter">
+          <select v-model="selectedProfitPeriod" @change="handleProfitPeriodChange" class="time-filter-select">
+            <option value="2025">2025年</option>
+            <option value="2025-Q1">2025年 Q1季度</option>
+            <option value="2025-Q2">2025年 Q2季度</option>
+            <option value="2025-Q3">2025年 Q3季度</option>
+            <option value="2025-Q4">2025年 Q4季度</option>
+            <option value="2025-01">2025年 1月</option>
+            <option value="2025-02">2025年 2月</option>
+            <option value="2025-03">2025年 3月</option>
+            <option value="2025-04">2025年 4月</option>
+            <option value="2025-05">2025年 5月</option>
+            <option value="2025-06">2025年 6月</option>
+            <option value="2025-07">2025年 7月</option>
+            <option value="2025-08">2025年 8月</option>
+            <option value="2025-09">2025年 9月</option>
+            <option value="2025-10">2025年 10月</option>
+            <option value="2025-11">2025年 11月</option>
+            <option value="2025-12">2025年 12月</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="profit-cards-grid">
+        <div class="profit-card total-profit-card">
+          <div class="profit-card-header">
+            <div class="profit-card-icon">
+              <TrendingUp :size="24" />
+            </div>
+            <div class="profit-card-title">
+              <h3>总毛利完成</h3>
+              <p class="profit-period">{{ getTimePeriodLabel(selectedProfitPeriod) }}</p>
+            </div>
+          </div>
+          <div class="profit-card-content">
+            <div class="profit-value">{{ formatCurrency(currentProfitData.totalProfit) }}</div>
+            <div class="profit-details">
+              <div class="detail-item">
+                <span class="detail-label">新客户:</span>
+                <span class="detail-value">{{ formatCurrency(currentProfitData.newCustomerProfit) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">老客户:</span>
+                <span class="detail-value">{{ formatCurrency(currentProfitData.oldCustomerProfit) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profit-card service-fee-card">
+          <div class="profit-card-header">
+            <div class="profit-card-icon">
+              <DollarSign :size="24" />
+            </div>
+            <div class="profit-card-title">
+              <h3>服务费合计</h3>
+              <p class="profit-period">{{ getTimePeriodLabel(selectedProfitPeriod) }}</p>
+            </div>
+          </div>
+          <div class="profit-card-content">
+            <div class="profit-value">{{ formatCurrency(currentProfitData.totalServiceFee) }}</div>
+            <div class="profit-details">
+              <div class="detail-item">
+                <span class="detail-label">新客户:</span>
+                <span class="detail-value">{{ formatCurrency(currentProfitData.newCustomerServiceFee) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">老客户:</span>
+                <span class="detail-value">{{ formatCurrency(currentProfitData.oldCustomerServiceFee) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profit-card rebate-card">
+          <div class="profit-card-header">
+            <div class="profit-card-icon">
+              <TrendingUp :size="24" />
+            </div>
+            <div class="profit-card-title">
+              <h3>返点合计</h3>
+              <p class="profit-period">{{ getTimePeriodLabel(selectedProfitPeriod) }}</p>
+            </div>
+          </div>
+          <div class="profit-card-content">
+            <div class="profit-value">{{ formatCurrency(currentProfitData.totalRebate) }}</div>
+            <div class="profit-details">
+              <div class="detail-item">
+                <span class="detail-label">新客户:</span>
+                <span class="detail-value">{{ formatCurrency(currentProfitData.newCustomerRebate) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">老客户:</span>
+                <span class="detail-value">{{ formatCurrency(currentProfitData.oldCustomerRebate) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="employee-profit-table-container">
+        <table class="employee-profit-table">
+          <thead>
+            <tr>
+              <th rowspan="3">时间选择</th>
+              <th rowspan="3">年度合计</th>
+              <th colspan="3" class="target-group-header">毛利合计</th>
+              <th colspan="3" class="completion-group-header">2025年度（新客户）</th>
+              <th colspan="3" class="comparison-group-header">2025年度（老客户）</th>
+            </tr>
+            <tr>
+              <th class="target-header">总毛利完成</th>
+              <th class="target-header">服务费合计</th>
+              <th class="target-header">返点合计</th>
+              <th class="completion-header">总毛利完成</th>
+              <th class="completion-header">服务费合计</th>
+              <th class="completion-header">返点合计</th>
+              <th class="comparison-header">完成比例</th>
+              <th class="comparison-header">服务费基准</th>
+              <th class="comparison-header">订单基准</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- 年度数据 -->
+            <tr class="year-row">
+              <td rowspan="6">2025年</td>
+              <td>年度合计</td>
+              <td class="target-cell">¥3,331.26万</td>
+              <td class="target-cell">¥2,422.50万</td>
+              <td class="target-cell">¥908.76万</td>
+              <td class="completion-cell">¥2,665.01万</td>
+              <td class="completion-cell">¥1,938.00万</td>
+              <td class="completion-cell">¥727.01万</td>
+              <td class="comparison-cell excellent">80.0%</td>
+              <td class="comparison-cell excellent">80.0%</td>
+              <td class="comparison-cell excellent">80.0%</td>
+            </tr>
+
+            <!-- 销售1数据 -->
+            <tr class="personnel-row">
+              <td>销售1</td>
+              <td class="target-cell">¥653.13万</td>
+              <td class="target-cell">¥418.50万</td>
+              <td class="target-cell">¥234.63万</td>
+              <td class="completion-cell">¥522.50万</td>
+              <td class="completion-cell">¥334.80万</td>
+              <td class="completion-cell">¥187.70万</td>
+              <td class="comparison-cell excellent">80.0%</td>
+              <td class="comparison-cell excellent">80.0%</td>
+              <td class="comparison-cell excellent">80.0%</td>
+            </tr>
+
+            <!-- 销售2数据 -->
+            <tr class="personnel-row">
+              <td>销售2</td>
+              <td class="target-cell">¥567.00万</td>
+              <td class="target-cell">¥378.00万</td>
+              <td class="target-cell">¥189.00万</td>
+              <td class="completion-cell">¥453.60万</td>
+              <td class="completion-cell">¥302.40万</td>
+              <td class="completion-cell">¥151.20万</td>
+              <td class="comparison-cell excellent">80.0%</td>
+              <td class="comparison-cell excellent">80.0%</td>
+              <td class="comparison-cell excellent">80.0%</td>
+            </tr>
+
+            <!-- 销售3数据 -->
+            <tr class="personnel-row">
+              <td>销售3</td>
+              <td class="target-cell">¥501.30万</td>
+              <td class="target-cell">¥334.20万</td>
+              <td class="target-cell">¥167.10万</td>
+              <td class="completion-cell">¥401.04万</td>
+              <td class="completion-cell">¥267.36万</td>
+              <td class="completion-cell">¥133.68万</td>
+              <td class="comparison-cell excellent">80.0%</td>
+              <td class="comparison-cell excellent">80.0%</td>
+              <td class="comparison-cell excellent">80.0%</td>
+            </tr>
+
+            <!-- 销售4数据 -->
+            <tr class="personnel-row">
+              <td>销售4</td>
+              <td class="target-cell">¥464.40万</td>
+              <td class="target-cell">¥309.60万</td>
+              <td class="target-cell">¥154.80万</td>
+              <td class="completion-cell">¥371.52万</td>
+              <td class="completion-cell">¥247.68万</td>
+              <td class="completion-cell">¥123.84万</td>
+              <td class="comparison-cell excellent">80.0%</td>
+              <td class="comparison-cell excellent">80.0%</td>
+              <td class="comparison-cell excellent">80.0%</td>
+            </tr>
+
+            <!-- 销售5数据 -->
+            <tr class="personnel-row">
+              <td>销售5</td>
+              <td class="target-cell">¥427.80万</td>
+              <td class="target-cell">¥285.20万</td>
+              <td class="target-cell">¥142.60万</td>
+              <td class="completion-cell">¥342.24万</td>
+              <td class="completion-cell">¥228.16万</td>
+              <td class="completion-cell">¥114.08万</td>
+              <td class="comparison-cell excellent">80.0%</td>
+              <td class="comparison-cell excellent">80.0%</td>
+              <td class="comparison-cell excellent">80.0%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
 
     </div>
   </div>
@@ -941,6 +1157,29 @@ const targetData: Record<string, TargetDataItem> = {
   '2025-12': { serviceFeeTarget: 1900000, serviceFeeActual: 1708700, serviceFeeCompletion: 89.9, newOrderTarget: 114, newOrderActual: 103, newOrderCompletion: 90.4, overallCompletion: 90.2 }
 }
 
+// 毛利数据相关状态
+const selectedProfitPeriod = ref('2025')
+
+interface ProfitDataItem {
+  totalProfit: number
+  totalServiceFee: number
+  totalRebate: number
+  newCustomerProfit: number
+  newCustomerServiceFee: number
+  newCustomerRebate: number
+  oldCustomerProfit: number
+  oldCustomerServiceFee: number
+  oldCustomerRebate: number
+}
+
+const profitData: Record<string, ProfitDataItem> = {
+  '2025': { totalProfit: 33312600, totalServiceFee: 24225000, totalRebate: 9087600, newCustomerProfit: 26650100, newCustomerServiceFee: 19380000, newCustomerRebate: 7270100, oldCustomerProfit: 6662500, oldCustomerServiceFee: 4845000, oldCustomerRebate: 1817500 },
+  '2025-Q1': { totalProfit: 7745000, totalServiceFee: 5623000, totalRebate: 2122000, newCustomerProfit: 6196000, newCustomerServiceFee: 4498400, newCustomerRebate: 1697600, oldCustomerProfit: 1549000, oldCustomerServiceFee: 1124600, oldCustomerRebate: 424400 },
+  '2025-Q2': { totalProfit: 8863000, totalServiceFee: 6441000, totalRebate: 2422000, newCustomerProfit: 7090400, newCustomerServiceFee: 5152800, newCustomerRebate: 1937600, oldCustomerProfit: 1772600, oldCustomerServiceFee: 1288200, oldCustomerRebate: 484400 },
+  '2025-Q3': { totalProfit: 9712000, totalServiceFee: 7058500, totalRebate: 2653500, newCustomerProfit: 7769600, newCustomerServiceFee: 5646800, newCustomerRebate: 2122800, oldCustomerProfit: 1942400, oldCustomerServiceFee: 1411700, oldCustomerRebate: 530700 },
+  '2025-Q4': { totalProfit: 6992600, totalServiceFee: 5102500, totalRebate: 1890100, newCustomerProfit: 5594100, newCustomerServiceFee: 4082000, newCustomerRebate: 1512100, oldCustomerProfit: 1398500, oldCustomerServiceFee: 1020500, oldCustomerRebate: 378000 }
+}
+
 // 计算属性
 const platformSummary = computed(() => {
   const totalServiceFee = platformData.value.reduce((sum, p) => sum + p.serviceFee, 0)
@@ -951,6 +1190,11 @@ const platformSummary = computed(() => {
 // 目标总览相关计算属性
 const currentTargetData = computed(() => {
   return targetData[selectedTimePeriod.value] || targetData['2025']
+})
+
+// 毛利数据相关计算属性
+const currentProfitData = computed(() => {
+  return profitData[selectedProfitPeriod.value] || profitData['2025']
 })
 
 const platformChartData = computed(() =>
@@ -1005,6 +1249,12 @@ const getTimePeriodLabel = (period: string): string => {
     '2025-12': '2025年12月'
   }
   return labels[period] || period
+}
+
+const handleProfitPeriodChange = (event: Event) => {
+  const target = event.target as HTMLSelectElement
+  selectedProfitPeriod.value = target.value
+  console.log('毛利时间周期切换至:', target.value)
 }
 
 
@@ -1371,6 +1621,112 @@ onMounted(async () => {
 
 .overall-card .progress-fill {
   background: linear-gradient(90deg, #faad14, #ffc53d);
+}
+
+/* 毛利卡片样式 */
+.profit-filter {
+  display: flex;
+  align-items: center;
+}
+
+.profit-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  margin-top: 20px;
+  margin-bottom: 32px;
+}
+
+.profit-card {
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.profit-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.profit-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.profit-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.total-profit-card .profit-card-icon {
+  background: linear-gradient(135deg, #52c41a, #73d13d);
+}
+
+.service-fee-card .profit-card-icon {
+  background: linear-gradient(135deg, #1890ff, #40a9ff);
+}
+
+.rebate-card .profit-card-icon {
+  background: linear-gradient(135deg, #ff4d4f, #ff7875);
+}
+
+.profit-card-title h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.profit-period {
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.profit-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profit-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #262626;
+  line-height: 1;
+}
+
+.profit-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detail-label {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.detail-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #595959;
 }
 
 .metrics-grid {
@@ -2288,6 +2644,137 @@ onMounted(async () => {
 }
 
 .sales-personnel-table .personnel-row:hover {
+  background: #f0f8ff !important;
+}
+
+/* 员工总毛利完成表格样式 - 复用销售人员目标完成情况样式 */
+.employee-profit-table-container {
+  overflow-x: auto !important;
+  background: #fff !important;
+  border: 1px solid #f0f0f0 !important;
+  border-radius: 6px !important;
+}
+
+.employee-profit-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 1400px;
+}
+
+.employee-profit-table th {
+  background: #fafafa !important;
+  border: 1px solid #f0f0f0 !important;
+  padding: 12px 8px !important;
+  text-align: center !important;
+  font-weight: 600 !important;
+  color: #262626 !important;
+  white-space: nowrap !important;
+}
+
+.employee-profit-table td {
+  border: 1px solid #f0f0f0 !important;
+  padding: 10px 8px !important;
+  text-align: center !important;
+  color: #595959 !important;
+}
+
+/* 员工总毛利完成表格 - 复用现有组标题样式 */
+.employee-profit-table .target-group-header {
+  background: #e6f7ff !important;
+  color: #1890ff !important;
+  font-weight: 600;
+}
+
+.employee-profit-table .completion-group-header {
+  background: #f6ffed !important;
+  color: #52c41a !important;
+  font-weight: 600;
+}
+
+.employee-profit-table .comparison-group-header {
+  background: #fff7e6 !important;
+  color: #faad14 !important;
+  font-weight: 600;
+}
+
+.employee-profit-table .target-header {
+  background: #e6f7ff !important;
+  color: #1890ff !important;
+  font-weight: 600;
+}
+
+.employee-profit-table .completion-header {
+  background: #f6ffed !important;
+  color: #52c41a !important;
+  font-weight: 600;
+}
+
+.employee-profit-table .comparison-header {
+  background: #fff7e6 !important;
+  color: #faad14 !important;
+  font-weight: 600;
+}
+
+/* 员工总毛利完成表格 - 复用现有数据单元格样式 */
+.employee-profit-table .target-cell {
+  background: #f0f8ff !important;
+  color: #1890ff !important;
+  font-weight: 500;
+}
+
+.employee-profit-table .completion-cell {
+  background: #f6ffed !important;
+  color: #52c41a !important;
+  font-weight: 500;
+}
+
+.employee-profit-table .comparison-cell {
+  background: #fffbf0 !important;
+  font-weight: 600;
+}
+
+/* 员工总毛利完成表格 - 复用现有完成率样式 */
+.employee-profit-table .comparison-cell.excellent {
+  color: #52c41a !important;
+  font-weight: 600;
+}
+
+.employee-profit-table .comparison-cell.good {
+  color: #1890ff !important;
+  font-weight: 600;
+}
+
+.employee-profit-table .comparison-cell.average {
+  color: #faad14 !important;
+  font-weight: 600;
+}
+
+.employee-profit-table .comparison-cell.poor {
+  color: #ff4d4f !important;
+  font-weight: 600;
+}
+
+/* 员工总毛利完成表格 - 年度和人员行样式 */
+.employee-profit-table .year-row {
+  background: #f9f9f9 !important;
+  font-weight: 500;
+}
+
+.employee-profit-table .year-row td {
+  color: #262626 !important;
+  font-weight: 500;
+}
+
+.employee-profit-table .personnel-row {
+  background: #fff !important;
+}
+
+.employee-profit-table .personnel-row:nth-child(even) {
+  background: #fafafa !important;
+}
+
+.employee-profit-table .personnel-row:hover {
   background: #f0f8ff !important;
 }
 
