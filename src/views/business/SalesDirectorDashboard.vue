@@ -28,7 +28,15 @@
 
         <!-- 核心指标概览 -->
     <div class="dashboard-section">
-      <h2 class="section-title">核心指标概览</h2>
+      <div class="section-header">
+        <h2 class="section-title">核心指标概览</h2>
+        <ModuleTimeFilter
+          :initial-time-range="selectedTimeRange"
+          :initial-quarter="currentQuarter"
+          @time-range-change="handleTimeRangeChange"
+          @quarter-change="handleQuarterChange"
+        />
+      </div>
 
       <!-- 年度和季度目标表格 -->
       <div v-if="annualQuarterlyTargets" class="annual-quarterly-targets">
@@ -91,7 +99,15 @@
 
     <!-- 新单服务费及单量完成模块 -->
     <div class="dashboard-section">
-      <h2 class="section-title">年度新单服务费及单量完成</h2>
+      <div class="section-header">
+        <h2 class="section-title">年度新单服务费及单量完成</h2>
+        <ModuleTimeFilter
+          :initial-time-range="selectedTimeRange"
+          :initial-quarter="currentQuarter"
+          @time-range-change="handleTimeRangeChange"
+          @quarter-change="handleQuarterChange"
+        />
+      </div>
 
       <div class="new-order-completion-table-container">
         <table class="new-order-completion-table">
@@ -191,7 +207,15 @@
 
     <!-- 新签客户毛利完成模块 -->
     <div class="dashboard-section">
-      <h2 class="section-title">新签客户毛利完成</h2>
+      <div class="section-header">
+        <h2 class="section-title">新签客户毛利完成</h2>
+        <ModuleTimeFilter
+          :initial-time-range="selectedTimeRange"
+          :initial-quarter="currentQuarter"
+          @time-range-change="handleTimeRangeChange"
+          @quarter-change="handleQuarterChange"
+        />
+      </div>
       <div class="profit-analysis-table-container">
         <table class="profit-analysis-table">
           <thead>
@@ -376,7 +400,15 @@
 
     <!-- 客户年度毛利完成模块 -->
     <div class="dashboard-section">
-      <h2 class="section-title">客户年度毛利完成</h2>
+      <div class="section-header">
+        <h2 class="section-title">客户年度毛利完成</h2>
+        <ModuleTimeFilter
+          :initial-time-range="selectedTimeRange"
+          :initial-quarter="currentQuarter"
+          @time-range-change="handleTimeRangeChange"
+          @quarter-change="handleQuarterChange"
+        />
+      </div>
       <div class="customer-annual-profit-table-container">
         <table class="customer-annual-profit-table">
           <thead>
@@ -546,7 +578,15 @@
 
     <!-- 年度流失客户模块 -->
     <div class="dashboard-section">
-      <h2 class="section-title">年度流失客户</h2>
+      <div class="section-header">
+        <h2 class="section-title">年度流失客户</h2>
+        <ModuleTimeFilter
+          :initial-time-range="selectedTimeRange"
+          :initial-quarter="currentQuarter"
+          @time-range-change="handleTimeRangeChange"
+          @quarter-change="handleQuarterChange"
+        />
+      </div>
       <div class="annual-churn-table-container">
         <table class="annual-churn-table">
           <thead>
@@ -1080,7 +1120,15 @@
 
     <!-- 客户毛利明细模块 -->
     <div class="dashboard-section">
-      <h2 class="section-title">客户毛利明细</h2>
+      <div class="section-header">
+        <h2 class="section-title">客户毛利明细</h2>
+        <ModuleTimeFilter
+          :initial-time-range="selectedTimeRange"
+          :initial-quarter="currentQuarter"
+          @time-range-change="handleTimeRangeChange"
+          @quarter-change="handleQuarterChange"
+        />
+      </div>
       <div class="table-scroll-hint">
         <span>← 表格可左右滑动查看更多列 →</span>
       </div>
@@ -1285,7 +1333,15 @@
 
     <!-- 续费客户名单模块 -->
     <div class="dashboard-section">
-      <h2 class="section-title">续费客户名单</h2>
+      <div class="section-header">
+        <h2 class="section-title">续费客户名单</h2>
+        <ModuleTimeFilter
+          :initial-time-range="selectedTimeRange"
+          :initial-quarter="currentQuarter"
+          @time-range-change="handleTimeRangeChange"
+          @quarter-change="handleQuarterChange"
+        />
+      </div>
       <div class="table-scroll-hint">
         <span>← 表格可左右滑动查看更多列 →</span>
       </div>
@@ -1459,6 +1515,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { DollarSign, TrendingUp } from 'lucide-vue-next'
 import RoleSwitcher from '@/components/business/RoleSwitcher.vue'
+import ModuleTimeFilter from '@/components/common/ModuleTimeFilter.vue'
 
 import MetricCard from '@/components/business/MetricCard.vue'
 import QuarterSelector from '@/components/business/QuarterSelector.vue'
@@ -1495,6 +1552,16 @@ const churnAnalysis = ref<ChurnData[]>([])
 const salesPerformance = ref<SalesPersonPerformance[]>([])
 const renewalCustomers = ref<RenewalCustomerData[]>([])
 const loading = ref(true)
+
+// 时间筛选相关状态
+const selectedTimeRange = ref('quarter')
+const currentQuarter = ref('2025年Q1')
+
+const timeOptions = [
+  { label: '年', value: 'year' },
+  { label: '季', value: 'quarter' },
+  { label: '月', value: 'month' }
+]
 
 // 目标总览相关状态
 const selectedTimePeriod = ref('2025')
@@ -1586,11 +1653,34 @@ const platformBarChartData = computed(() => ({
   }]
 }))
 
+// 计算属性
+const isPrevDisabled = computed(() => {
+  return currentQuarter.value === '2025年Q1'
+})
+
+const isNextDisabled = computed(() => {
+  return currentQuarter.value === '2025年Q4'
+})
+
 // 方法
 const handleRoleChange = (role: string) => {
   currentRole.value = role
   // 这里可以添加角色切换后的数据重新加载逻辑
   console.log('角色切换至:', role)
+}
+
+// 时间筛选相关方法
+const handleTimeRangeChange = (value: string) => {
+  selectedTimeRange.value = value
+  console.log('时间范围切换至:', value)
+  // 重新加载数据
+  loadDashboardData()
+}
+
+const handleQuarterChange = (quarter: string) => {
+  currentQuarter.value = quarter
+  console.log('季度切换至:', quarter)
+  loadDashboardData()
 }
 
 // 目标总览相关方法
@@ -1714,10 +1804,10 @@ const getCompletionClass = (rate: number): string => {
   return 'poor'
 }
 
-// 生命周期
-onMounted(async () => {
-  // 加载数据
+// 数据加载方法
+const loadDashboardData = async () => {
   try {
+    loading.value = true
     const [
       rolesData,
       metricsData,
@@ -1757,6 +1847,11 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+}
+
+// 生命周期
+onMounted(async () => {
+  await loadDashboardData()
 })
 </script>
 
@@ -1791,7 +1886,81 @@ onMounted(async () => {
   font-size: 14px;
 }
 
+.dashboard-header__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
 
+.time-filter-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.time-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.time-btn {
+  padding: 6px 12px;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  color: #595959;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.time-btn:hover {
+  border-color: #40a9ff;
+  color: #40a9ff;
+}
+
+.time-btn--active {
+  background: #1890ff;
+  border-color: #1890ff;
+  color: #fff;
+}
+
+.quarter-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quarter-nav-btn {
+  padding: 4px;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  color: #595959;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quarter-nav-btn:hover:not(:disabled) {
+  border-color: #40a9ff;
+  color: #40a9ff;
+}
+
+.quarter-nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quarter-display {
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 80px;
+  text-align: center;
+  color: #262626;
+}
 
 .dashboard-section {
   margin-bottom: 32px;
