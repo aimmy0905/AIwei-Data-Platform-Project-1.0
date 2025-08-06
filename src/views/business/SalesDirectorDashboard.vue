@@ -1078,6 +1078,208 @@
       </div>
     </div>
 
+    <!-- 客户毛利明细模块 -->
+    <div class="dashboard-section">
+      <h2 class="section-title">客户毛利明细</h2>
+      <div class="customer-profit-detail-table-container">
+        <table class="customer-profit-detail-table">
+          <thead>
+            <tr>
+              <th rowspan="2">客户名称</th>
+              <th rowspan="2">销售</th>
+              <th rowspan="2">优化师</th>
+              <th rowspan="2">合作开始</th>
+              <th rowspan="2">合作时长</th>
+              <th rowspan="2">合作类型</th>
+              <th rowspan="2">第一次合作完成时间</th>
+              <th rowspan="2">第一次合作完成时间</th>
+              <th rowspan="2">年合计</th>
+              <th rowspan="2">服务费合计</th>
+              <th rowspan="2">返点合计</th>
+              <th rowspan="2">消费合计</th>
+              <th colspan="4" class="platform-group-header">消费明细</th>
+              <th rowspan="2" class="customer-status-header">客户状态</th>
+            </tr>
+            <tr>
+              <th class="platform-header">Google</th>
+              <th class="platform-header">Meta</th>
+              <th class="platform-header">Criteo</th>
+              <th class="platform-header">Bing</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- 华为数据 -->
+            <tr class="customer-row">
+              <td class="customer-name-cell">华为</td>
+              <td>销售1</td>
+              <td>优化师A</td>
+              <td>2024-01-15</td>
+              <td>12个月</td>
+              <td>新客户</td>
+              <td>2024-03-20</td>
+              <td>2024-03-20</td>
+              <td class="profit-cell">¥653.13万</td>
+              <td class="service-fee-cell">¥418.50万</td>
+              <td class="rebate-cell">¥234.63万</td>
+              <td class="consumption-cell">¥1,395.00万</td>
+              <td class="platform-cell">¥558.00万</td>
+              <td class="platform-cell">¥418.50万</td>
+              <td class="platform-cell">¥279.00万</td>
+              <td class="platform-cell">¥139.50万</td>
+              <td class="status-active">正常合作</td>
+            </tr>
+
+            <!-- 小米数据 -->
+            <tr class="customer-row">
+              <td class="customer-name-cell">小米</td>
+              <td>销售2</td>
+              <td>优化师B</td>
+              <td>2024-02-10</td>
+              <td>11个月</td>
+              <td>新客户</td>
+              <td>2024-04-15</td>
+              <td>2024-04-15</td>
+              <td class="profit-cell">¥567.00万</td>
+              <td class="service-fee-cell">¥378.00万</td>
+              <td class="rebate-cell">¥189.00万</td>
+              <td class="consumption-cell">¥1,260.00万</td>
+              <td class="platform-cell">¥504.00万</td>
+              <td class="platform-cell">¥378.00万</td>
+              <td class="platform-cell">¥252.00万</td>
+              <td class="platform-cell">¥126.00万</td>
+              <td class="status-active">正常合作</td>
+            </tr>
+
+            <!-- OPPO数据 -->
+            <tr class="customer-row">
+              <td class="customer-name-cell">OPPO</td>
+              <td>销售3</td>
+              <td>优化师C</td>
+              <td>2024-03-05</td>
+              <td>10个月</td>
+              <td>老客户</td>
+              <td>2024-05-10</td>
+              <td>2024-05-10</td>
+              <td class="profit-cell">¥501.30万</td>
+              <td class="service-fee-cell">¥334.20万</td>
+              <td class="rebate-cell">¥167.10万</td>
+              <td class="consumption-cell">¥1,114.00万</td>
+              <td class="platform-cell">¥445.60万</td>
+              <td class="platform-cell">¥334.20万</td>
+              <td class="platform-cell">¥222.80万</td>
+              <td class="platform-cell">¥111.40万</td>
+              <td class="status-active">正常合作</td>
+            </tr>
+
+            <!-- vivo数据 -->
+            <tr class="customer-row">
+              <td class="customer-name-cell">vivo</td>
+              <td>销售4</td>
+              <td>优化师D</td>
+              <td>2024-04-20</td>
+              <td>9个月</td>
+              <td>新客户</td>
+              <td>2024-06-25</td>
+              <td>2024-06-25</td>
+              <td class="profit-cell">¥464.40万</td>
+              <td class="service-fee-cell">¥309.60万</td>
+              <td class="rebate-cell">¥154.80万</td>
+              <td class="consumption-cell">¥1,032.00万</td>
+              <td class="platform-cell">¥412.80万</td>
+              <td class="platform-cell">¥309.60万</td>
+              <td class="platform-cell">¥206.40万</td>
+              <td class="platform-cell">¥103.20万</td>
+              <td class="status-active">正常合作</td>
+            </tr>
+
+            <!-- 一加数据 -->
+            <tr class="customer-row">
+              <td class="customer-name-cell">一加</td>
+              <td>销售5</td>
+              <td>优化师E</td>
+              <td>2024-05-15</td>
+              <td>8个月</td>
+              <td>老客户</td>
+              <td>2024-07-20</td>
+              <td>2024-07-20</td>
+              <td class="profit-cell">¥427.80万</td>
+              <td class="service-fee-cell">¥285.20万</td>
+              <td class="rebate-cell">¥142.60万</td>
+              <td class="consumption-cell">¥951.00万</td>
+              <td class="platform-cell">¥380.40万</td>
+              <td class="platform-cell">¥285.30万</td>
+              <td class="platform-cell">¥190.20万</td>
+              <td class="platform-cell">¥95.10万</td>
+              <td class="status-active">正常合作</td>
+            </tr>
+
+            <!-- 腾讯数据 -->
+            <tr class="customer-row">
+              <td class="customer-name-cell">腾讯</td>
+              <td>销售1</td>
+              <td>优化师A</td>
+              <td>2024-06-10</td>
+              <td>7个月</td>
+              <td>新客户</td>
+              <td>2024-08-15</td>
+              <td>2024-08-15</td>
+              <td class="profit-cell">¥395.10万</td>
+              <td class="service-fee-cell">¥263.40万</td>
+              <td class="rebate-cell">¥131.70万</td>
+              <td class="consumption-cell">¥878.00万</td>
+              <td class="platform-cell">¥351.20万</td>
+              <td class="platform-cell">¥263.40万</td>
+              <td class="platform-cell">¥175.60万</td>
+              <td class="platform-cell">¥87.80万</td>
+              <td class="status-active">正常合作</td>
+            </tr>
+
+            <!-- 阿里巴巴数据 -->
+            <tr class="customer-row">
+              <td class="customer-name-cell">阿里巴巴</td>
+              <td>销售2</td>
+              <td>优化师B</td>
+              <td>2024-07-05</td>
+              <td>6个月</td>
+              <td>老客户</td>
+              <td>2024-09-10</td>
+              <td>2024-09-10</td>
+              <td class="profit-cell">¥362.70万</td>
+              <td class="service-fee-cell">¥241.80万</td>
+              <td class="rebate-cell">¥120.90万</td>
+              <td class="consumption-cell">¥806.00万</td>
+              <td class="platform-cell">¥322.40万</td>
+              <td class="platform-cell">¥241.80万</td>
+              <td class="platform-cell">¥161.20万</td>
+              <td class="platform-cell">¥80.60万</td>
+              <td class="status-active">正常合作</td>
+            </tr>
+
+            <!-- 字节跳动数据 -->
+            <tr class="customer-row">
+              <td class="customer-name-cell">字节跳动</td>
+              <td>销售3</td>
+              <td>优化师C</td>
+              <td>2024-08-20</td>
+              <td>5个月</td>
+              <td>新客户</td>
+              <td>2024-10-25</td>
+              <td>2024-10-25</td>
+              <td class="profit-cell">¥330.30万</td>
+              <td class="service-fee-cell">¥220.20万</td>
+              <td class="rebate-cell">¥110.10万</td>
+              <td class="consumption-cell">¥734.00万</td>
+              <td class="platform-cell">¥293.60万</td>
+              <td class="platform-cell">¥220.20万</td>
+              <td class="platform-cell">¥146.80万</td>
+              <td class="platform-cell">¥73.40万</td>
+              <td class="status-active">正常合作</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
 
     </div>
   </div>
@@ -1727,6 +1929,114 @@ onMounted(async () => {
   font-size: 14px;
   font-weight: 500;
   color: #595959;
+}
+
+/* 客户毛利明细表格样式 */
+.customer-profit-detail-table-container {
+  margin-top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: #fff;
+}
+
+.customer-profit-detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.customer-profit-detail-table th {
+  background: #fafafa;
+  color: #262626;
+  font-weight: 600;
+  padding: 12px 8px;
+  text-align: center;
+  border: 1px solid #f0f0f0;
+  white-space: nowrap;
+}
+
+.customer-profit-detail-table td {
+  padding: 12px 8px;
+  text-align: center;
+  border: 1px solid #f0f0f0;
+  white-space: nowrap;
+}
+
+.customer-profit-detail-table .customer-row {
+  background: #fff;
+  transition: background-color 0.2s ease;
+}
+
+.customer-profit-detail-table .customer-row:hover {
+  background: #f8f9fa;
+}
+
+.customer-profit-detail-table .customer-name-cell {
+  font-weight: 600;
+  color: #1890ff;
+  background: #f0f8ff;
+  text-align: left;
+  padding-left: 16px;
+}
+
+.customer-profit-detail-table .profit-cell {
+  background: #f6ffed;
+  color: #52c41a;
+  font-weight: 600;
+}
+
+.customer-profit-detail-table .service-fee-cell {
+  background: #e6f7ff;
+  color: #1890ff;
+  font-weight: 600;
+}
+
+.customer-profit-detail-table .rebate-cell {
+  background: #fff2e8;
+  color: #fa8c16;
+  font-weight: 600;
+}
+
+.customer-profit-detail-table .consumption-cell {
+  background: #f9f0ff;
+  color: #722ed1;
+  font-weight: 600;
+}
+
+.customer-profit-detail-table .platform-cell {
+  background: #f0f8ff;
+  color: #1890ff;
+}
+
+.customer-profit-detail-table .status-active {
+  background: #f6ffed;
+  color: #52c41a;
+  font-weight: 500;
+}
+
+.customer-profit-detail-table .status-inactive {
+  background: #fff2f0;
+  color: #ff4d4f;
+  font-weight: 500;
+}
+
+.customer-profit-detail-table .platform-group-header {
+  background: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+}
+
+.customer-profit-detail-table .platform-header {
+  background: #f0f8ff;
+  color: #1890ff;
+  font-size: 12px;
+}
+
+.customer-profit-detail-table .customer-status-header {
+  background: #f6ffed;
+  color: #52c41a;
 }
 
 .metrics-grid {
