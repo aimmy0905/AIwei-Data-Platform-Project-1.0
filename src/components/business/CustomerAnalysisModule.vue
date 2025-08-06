@@ -18,107 +18,156 @@
     </div>
 
     <div class="analysis-module__content">
-      <!-- 数据概览卡片 -->
-      <div class="overview-cards">
-        <div class="overview-card" v-if="customerData">
-          <div class="overview-card__header">
-            <Users :size="20" />
-            <span>全部客户</span>
-          </div>
-          <div class="overview-card__content">
-            <div class="overview-metric">
-              <span class="metric-label">客户数</span>
-              <span class="metric-value">{{ customerData.allCustomers.activeCustomerCount }}家</span>
-            </div>
-            <div class="overview-metric">
-              <span class="metric-label">总毛利</span>
-              <span class="metric-value">{{ formatCurrency(customerData.allCustomers.totalProfit) }}</span>
-            </div>
-            <div class="overview-metric">
-              <span class="metric-label">服务费</span>
-              <span class="metric-value">{{ formatCurrency(customerData.allCustomers.serviceFee) }}</span>
-            </div>
-            <div class="overview-metric">
-              <span class="metric-label">返点</span>
-              <span class="metric-value">{{ formatCurrency(customerData.allCustomers.rebate) }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="overview-card card--old" v-if="customerData">
-          <div class="overview-card__header">
-            <UserCheck :size="20" />
-            <span>老客户 (2025前)</span>
-          </div>
-          <div class="overview-card__content">
-            <div class="overview-metric">
-              <span class="metric-label">客户数</span>
-              <span class="metric-value">{{ customerData.oldCustomers.activeCustomerCount }}家</span>
-            </div>
-            <div class="overview-metric">
-              <span class="metric-label">总毛利</span>
-              <span class="metric-value">{{ formatCurrency(customerData.oldCustomers.totalProfit) }}</span>
-            </div>
-            <div class="overview-metric">
-              <span class="metric-label">服务费</span>
-              <span class="metric-value">{{ formatCurrency(customerData.oldCustomers.serviceFee) }}</span>
-            </div>
-            <div class="overview-metric">
-              <span class="metric-label">返点</span>
-              <span class="metric-value">{{ formatCurrency(customerData.oldCustomers.rebate) }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="overview-card card--new" v-if="customerData">
-          <div class="overview-card__header">
-            <UserPlus :size="20" />
-            <span>新客户 (2025)</span>
-          </div>
-          <div class="overview-card__content">
-            <div class="overview-metric">
-              <span class="metric-label">客户数</span>
-              <span class="metric-value">{{ customerData.newCustomers.activeCustomerCount }}家</span>
-            </div>
-            <div class="overview-metric">
-              <span class="metric-label">总毛利</span>
-              <span class="metric-value">{{ formatCurrency(customerData.newCustomers.totalProfit) }}</span>
-            </div>
-            <div class="overview-metric">
-              <span class="metric-label">服务费</span>
-              <span class="metric-value">{{ formatCurrency(customerData.newCustomers.serviceFee) }}</span>
-            </div>
-            <div class="overview-metric">
-              <span class="metric-label">返点</span>
-              <span class="metric-value">{{ formatCurrency(customerData.newCustomers.rebate) }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="overview-card card--churn" v-if="customerData">
-          <div class="overview-card__header">
-            <UserX :size="20" />
-            <span>流失客户 (2025)</span>
-          </div>
-          <div class="overview-card__content">
-            <div class="overview-metric">
-              <span class="metric-label">客户数</span>
-              <span class="metric-value">{{ customerData.churnedCustomers.customerCount }}家</span>
-            </div>
-            <div class="overview-metric">
-              <span class="metric-label">预估流失毛利</span>
-              <span class="metric-value negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedProfitLoss) }}</span>
-            </div>
-            <div class="overview-metric">
-              <span class="metric-label">预估流失服务费</span>
-              <span class="metric-value negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedServiceFeeLoss) }}</span>
-            </div>
-            <div class="overview-metric">
-              <span class="metric-label">预估流失返点</span>
-              <span class="metric-value negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedRebateLoss) }}</span>
-            </div>
-          </div>
-        </div>
+      <!-- 数据概览表格 -->
+      <div class="overview-table-container">
+        <table class="overview-table" v-if="customerData">
+          <thead>
+            <tr>
+              <th rowspan="2" class="year-header">年度</th>
+              <th rowspan="2" class="quarter-header">季度</th>
+              <th colspan="4" class="category-header all-customers">所有客户数据 (包括存量客户和新客户)</th>
+              <th colspan="4" class="category-header new-customers">2025新客户 (新客户)</th>
+              <th colspan="4" class="category-header added-customers">2025年新增客户</th>
+              <th colspan="4" class="category-header churned-customers">2025年流失客户</th>
+              <th rowspan="2" class="summary-header">客户数</th>
+              <th rowspan="2" class="summary-header">预估流失毛利贡献</th>
+              <th rowspan="2" class="summary-header">预估流失返点</th>
+            </tr>
+            <tr>
+              <!-- 所有客户数据 -->
+              <th class="metric-header all-customers">活跃客户数</th>
+              <th class="metric-header all-customers">总毛利</th>
+              <th class="metric-header all-customers">服务费</th>
+              <th class="metric-header all-customers">返点</th>
+              <!-- 2025新客户 -->
+              <th class="metric-header new-customers">活跃客户数</th>
+              <th class="metric-header new-customers">总毛利</th>
+              <th class="metric-header new-customers">服务费</th>
+              <th class="metric-header new-customers">返点</th>
+              <!-- 2025年新增客户 -->
+              <th class="metric-header added-customers">活跃客户数</th>
+              <th class="metric-header added-customers">总毛利</th>
+              <th class="metric-header added-customers">服务费</th>
+              <th class="metric-header added-customers">返点</th>
+              <!-- 2025年流失客户 -->
+              <th class="metric-header churned-customers">活跃客户数</th>
+              <th class="metric-header churned-customers">总毛利</th>
+              <th class="metric-header churned-customers">服务费</th>
+              <th class="metric-header churned-customers">返点</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td rowspan="4" class="year-cell">2025年</td>
+              <td class="quarter-cell">Q1季度</td>
+              <!-- 所有客户数据 -->
+              <td class="data-cell all-customers">{{ customerData.allCustomers.activeCustomerCount }}家</td>
+              <td class="data-cell all-customers">{{ formatCurrency(customerData.allCustomers.totalProfit) }}</td>
+              <td class="data-cell all-customers">{{ formatCurrency(customerData.allCustomers.serviceFee) }}</td>
+              <td class="data-cell all-customers">{{ formatCurrency(customerData.allCustomers.rebate) }}</td>
+              <!-- 新客户数据 -->
+              <td class="data-cell new-customers">{{ customerData.newCustomers.activeCustomerCount }}家</td>
+              <td class="data-cell new-customers">{{ formatCurrency(customerData.newCustomers.totalProfit) }}</td>
+              <td class="data-cell new-customers">{{ formatCurrency(customerData.newCustomers.serviceFee) }}</td>
+              <td class="data-cell new-customers">{{ formatCurrency(customerData.newCustomers.rebate) }}</td>
+              <!-- 年新增客户 -->
+              <td class="data-cell added-customers">{{ customerData.newCustomers.activeCustomerCount }}家</td>
+              <td class="data-cell added-customers">{{ formatCurrency(customerData.newCustomers.totalProfit) }}</td>
+              <td class="data-cell added-customers">{{ formatCurrency(customerData.newCustomers.serviceFee) }}</td>
+              <td class="data-cell added-customers">{{ formatCurrency(customerData.newCustomers.rebate) }}</td>
+              <!-- 流失客户 -->
+              <td class="data-cell churned-customers">{{ customerData.churnedCustomers.customerCount }}家</td>
+              <td class="data-cell churned-customers negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedProfitLoss) }}</td>
+              <td class="data-cell churned-customers negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedServiceFeeLoss) }}</td>
+              <td class="data-cell churned-customers negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedRebateLoss) }}</td>
+              <!-- 汇总 -->
+              <td class="data-cell">{{ customerData.allCustomers.activeCustomerCount }}家</td>
+              <td class="data-cell negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedProfitLoss) }}</td>
+              <td class="data-cell negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedRebateLoss) }}</td>
+            </tr>
+            <tr>
+              <td class="quarter-cell">Q2季度</td>
+              <!-- 所有客户数据 -->
+              <td class="data-cell all-customers">{{ Math.round(customerData.allCustomers.activeCustomerCount * 1.05) }}家</td>
+              <td class="data-cell all-customers">{{ formatCurrency(customerData.allCustomers.totalProfit * 1.08) }}</td>
+              <td class="data-cell all-customers">{{ formatCurrency(customerData.allCustomers.serviceFee * 1.06) }}</td>
+              <td class="data-cell all-customers">{{ formatCurrency(customerData.allCustomers.rebate * 1.04) }}</td>
+              <!-- 新客户数据 -->
+              <td class="data-cell new-customers">{{ Math.round(customerData.newCustomers.activeCustomerCount * 1.15) }}家</td>
+              <td class="data-cell new-customers">{{ formatCurrency(customerData.newCustomers.totalProfit * 1.20) }}</td>
+              <td class="data-cell new-customers">{{ formatCurrency(customerData.newCustomers.serviceFee * 1.18) }}</td>
+              <td class="data-cell new-customers">{{ formatCurrency(customerData.newCustomers.rebate * 1.12) }}</td>
+              <!-- 年新增客户 -->
+              <td class="data-cell added-customers">{{ Math.round(customerData.newCustomers.activeCustomerCount * 1.25) }}家</td>
+              <td class="data-cell added-customers">{{ formatCurrency(customerData.newCustomers.totalProfit * 1.30) }}</td>
+              <td class="data-cell added-customers">{{ formatCurrency(customerData.newCustomers.serviceFee * 1.28) }}</td>
+              <td class="data-cell added-customers">{{ formatCurrency(customerData.newCustomers.rebate * 1.22) }}</td>
+              <!-- 流失客户 -->
+              <td class="data-cell churned-customers">{{ Math.round(customerData.churnedCustomers.customerCount * 0.8) }}家</td>
+              <td class="data-cell churned-customers negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedProfitLoss * 0.9) }}</td>
+              <td class="data-cell churned-customers negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedServiceFeeLoss * 0.85) }}</td>
+              <td class="data-cell churned-customers negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedRebateLoss * 0.88) }}</td>
+              <!-- 汇总 -->
+              <td class="data-cell">{{ Math.round(customerData.allCustomers.activeCustomerCount * 1.05) }}家</td>
+              <td class="data-cell negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedProfitLoss * 0.9) }}</td>
+              <td class="data-cell negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedRebateLoss * 0.88) }}</td>
+            </tr>
+            <tr>
+              <td class="quarter-cell">Q3季度</td>
+              <!-- 所有客户数据 -->
+              <td class="data-cell all-customers">{{ Math.round(customerData.allCustomers.activeCustomerCount * 1.12) }}家</td>
+              <td class="data-cell all-customers">{{ formatCurrency(customerData.allCustomers.totalProfit * 1.15) }}</td>
+              <td class="data-cell all-customers">{{ formatCurrency(customerData.allCustomers.serviceFee * 1.13) }}</td>
+              <td class="data-cell all-customers">{{ formatCurrency(customerData.allCustomers.rebate * 1.09) }}</td>
+              <!-- 新客户数据 -->
+              <td class="data-cell new-customers">{{ Math.round(customerData.newCustomers.activeCustomerCount * 1.35) }}家</td>
+              <td class="data-cell new-customers">{{ formatCurrency(customerData.newCustomers.totalProfit * 1.45) }}</td>
+              <td class="data-cell new-customers">{{ formatCurrency(customerData.newCustomers.serviceFee * 1.38) }}</td>
+              <td class="data-cell new-customers">{{ formatCurrency(customerData.newCustomers.rebate * 1.32) }}</td>
+              <!-- 年新增客户 -->
+              <td class="data-cell added-customers">{{ Math.round(customerData.newCustomers.activeCustomerCount * 1.50) }}家</td>
+              <td class="data-cell added-customers">{{ formatCurrency(customerData.newCustomers.totalProfit * 1.60) }}</td>
+              <td class="data-cell added-customers">{{ formatCurrency(customerData.newCustomers.serviceFee * 1.55) }}</td>
+              <td class="data-cell added-customers">{{ formatCurrency(customerData.newCustomers.rebate * 1.48) }}</td>
+              <!-- 流失客户 -->
+              <td class="data-cell churned-customers">{{ Math.round(customerData.churnedCustomers.customerCount * 0.6) }}家</td>
+              <td class="data-cell churned-customers negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedProfitLoss * 0.75) }}</td>
+              <td class="data-cell churned-customers negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedServiceFeeLoss * 0.70) }}</td>
+              <td class="data-cell churned-customers negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedRebateLoss * 0.72) }}</td>
+              <!-- 汇总 -->
+              <td class="data-cell">{{ Math.round(customerData.allCustomers.activeCustomerCount * 1.12) }}家</td>
+              <td class="data-cell negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedProfitLoss * 0.75) }}</td>
+              <td class="data-cell negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedRebateLoss * 0.72) }}</td>
+            </tr>
+            <tr>
+              <td class="quarter-cell">Q4季度</td>
+              <!-- 所有客户数据 -->
+              <td class="data-cell all-customers">{{ Math.round(customerData.allCustomers.activeCustomerCount * 1.18) }}家</td>
+              <td class="data-cell all-customers">{{ formatCurrency(customerData.allCustomers.totalProfit * 1.22) }}</td>
+              <td class="data-cell all-customers">{{ formatCurrency(customerData.allCustomers.serviceFee * 1.20) }}</td>
+              <td class="data-cell all-customers">{{ formatCurrency(customerData.allCustomers.rebate * 1.15) }}</td>
+              <!-- 新客户数据 -->
+              <td class="data-cell new-customers">{{ Math.round(customerData.newCustomers.activeCustomerCount * 1.55) }}家</td>
+              <td class="data-cell new-customers">{{ formatCurrency(customerData.newCustomers.totalProfit * 1.65) }}</td>
+              <td class="data-cell new-customers">{{ formatCurrency(customerData.newCustomers.serviceFee * 1.58) }}</td>
+              <td class="data-cell new-customers">{{ formatCurrency(customerData.newCustomers.rebate * 1.52) }}</td>
+              <!-- 年新增客户 -->
+              <td class="data-cell added-customers">{{ Math.round(customerData.newCustomers.activeCustomerCount * 1.75) }}家</td>
+              <td class="data-cell added-customers">{{ formatCurrency(customerData.newCustomers.totalProfit * 1.85) }}</td>
+              <td class="data-cell added-customers">{{ formatCurrency(customerData.newCustomers.serviceFee * 1.78) }}</td>
+              <td class="data-cell added-customers">{{ formatCurrency(customerData.newCustomers.rebate * 1.68) }}</td>
+              <!-- 流失客户 -->
+              <td class="data-cell churned-customers">{{ Math.round(customerData.churnedCustomers.customerCount * 0.5) }}家</td>
+              <td class="data-cell churned-customers negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedProfitLoss * 0.60) }}</td>
+              <td class="data-cell churned-customers negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedServiceFeeLoss * 0.55) }}</td>
+              <td class="data-cell churned-customers negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedRebateLoss * 0.58) }}</td>
+              <!-- 汇总 -->
+              <td class="data-cell">{{ Math.round(customerData.allCustomers.activeCustomerCount * 1.18) }}家</td>
+              <td class="data-cell negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedProfitLoss * 0.60) }}</td>
+              <td class="data-cell negative">-{{ formatCurrency(customerData.churnedCustomers.estimatedRebateLoss * 0.58) }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <!-- 占比分析图表 -->
@@ -126,6 +175,17 @@
         <div class="chart-container">
           <div class="chart-header">
             <h4 class="chart-title">{{ getChartTitle() }}</h4>
+            <div class="chart-toggle">
+              <button
+                v-for="view in viewTypes"
+                :key="view.value"
+                class="toggle-btn"
+                :class="{ 'toggle-btn--active': currentView === view.value }"
+                @click="currentView = view.value"
+              >
+                {{ view.label }}
+              </button>
+            </div>
           </div>
           <div class="chart-content">
             <PieChart
@@ -252,10 +312,10 @@ const viewTypes = [
 // 占比图表数据
 const proportionChartData = computed(() => {
   if (!props.customerData) return []
-  
+
   const data = props.customerData
   let chartData = []
-  
+
   switch (currentView.value) {
     case 'customerCount':
       chartData = [
@@ -283,16 +343,16 @@ const proportionChartData = computed(() => {
       ]
       break
   }
-  
+
   return chartData.filter(item => item.value > 0)
 })
 
 // 客户价值对比数据
 const customerValueComparisonData = computed(() => {
   if (!props.customerData) return { labels: [], datasets: [] }
-  
+
   const data = props.customerData
-  
+
   return {
     labels: ['老客户', '新客户'],
     datasets: [
@@ -461,71 +521,188 @@ watch(currentView, (view) => {
   gap: 32px;
 }
 
-/* 概览卡片 */
-.overview-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
+/* 概览表格 - 匹配部门目标表格样式 */
+.overview-table-container {
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
 }
 
-.overview-card {
+.overview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 1200px;
+}
+
+.overview-table th {
   background: #fafafa;
   border: 1px solid #f0f0f0;
-  border-radius: 8px;
-  padding: 20px;
-  transition: all 0.2s;
-}
-
-.overview-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.overview-card.card--old {
-  border-left: 4px solid #1890ff;
-}
-
-.overview-card.card--new {
-  border-left: 4px solid #52c41a;
-}
-
-.overview-card.card--churn {
-  border-left: 4px solid #ff4d4f;
-}
-
-.overview-card__header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  color: #262626;
+  padding: 12px 8px;
+  text-align: center;
+  font-size: 12px;
   font-weight: 600;
+  color: #595959;
 }
 
-.overview-card__content {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.overview-metric {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.metric-label {
+.overview-table td {
+  border: 1px solid #f0f0f0;
+  padding: 12px 8px;
+  text-align: center;
   font-size: 13px;
-  color: #8c8c8c;
+  vertical-align: middle;
 }
 
-.metric-value {
-  font-size: 14px;
+/* 表头样式 - 匹配部门表格 */
+.year-header,
+.quarter-header {
+  background: #f0f2f5 !important;
+  color: #262626 !important;
   font-weight: 600;
-  color: #262626;
 }
 
-.metric-value.negative {
-  color: #ff4d4f;
+.summary-header {
+  background: #f9f0ff !important;
+  color: #722ed1 !important;
+  font-weight: 600;
+}
+
+/* 不同数据类型的表头颜色 - 匹配部门表格样式 */
+.category-header.all-customers,
+.metric-header.all-customers {
+  background: #e6f7ff !important;
+  color: #1890ff !important;
+  font-weight: 600;
+}
+
+.category-header.new-customers,
+.metric-header.new-customers {
+  background: #f6ffed !important;
+  color: #52c41a !important;
+  font-weight: 600;
+}
+
+.category-header.added-customers,
+.metric-header.added-customers {
+  background: #fff7e6 !important;
+  color: #faad14 !important;
+  font-weight: 600;
+}
+
+.category-header.churned-customers,
+.metric-header.churned-customers {
+  background: #fff2f0 !important;
+  color: #ff4d4f !important;
+  font-weight: 600;
+}
+
+.metric-header {
+  min-width: 80px;
+}
+
+/* 表格数据单元格 - 匹配部门表格 */
+.year-cell {
+  background: #f0f2f5 !important;
+  color: #262626 !important;
+  font-weight: 600;
+  text-align: center !important;
+}
+
+.quarter-cell {
+  background: #f0f2f5 !important;
+  color: #262626 !important;
+  font-weight: 500;
+}
+
+/* 不同数据类型的数据单元格颜色 */
+.data-cell.all-customers {
+  background: #f0f8ff !important;
+  color: #1890ff !important;
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.data-cell.new-customers {
+  background: #f6ffed !important;
+  color: #52c41a !important;
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.data-cell.added-customers {
+  background: #fffbf0 !important;
+  color: #faad14 !important;
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.data-cell.churned-customers {
+  background: #fff2f0 !important;
+  color: #ff4d4f !important;
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.data-cell {
+  background: #f0f8ff !important;
+  color: #1890ff !important;
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.data-cell.empty {
+  background: #fafafa !important;
+  color: #bfbfbf !important;
+}
+
+.data-cell.negative {
+  color: #ff4d4f !important;
+  font-weight: 600;
+}
+
+.data-cell.positive {
+  color: #52c41a !important;
+  font-weight: 600;
+}
+
+/* 表格悬停效果 - 匹配部门表格 */
+.overview-table tbody tr:hover {
+  background: #f0f8ff !important;
+}
+
+.overview-table tbody tr:hover .data-cell {
+  background: #f0f8ff !important;
+}
+
+.overview-table tbody tr:hover .quarter-cell,
+.overview-table tbody tr:hover .year-cell {
+  background: #e6f7ff !important;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .overview-table {
+    min-width: 1000px;
+    font-size: 11px;
+  }
+
+  .overview-table th,
+  .overview-table td {
+    padding: 6px 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .overview-table {
+    min-width: 800px;
+    font-size: 10px;
+  }
+
+  .overview-table th,
+  .overview-table td {
+    padding: 4px 6px;
+  }
 }
 
 /* 图表区域 */
@@ -541,15 +718,44 @@ watch(currentView, (view) => {
   padding: 20px;
 }
 
-.chart-header {
-  margin-bottom: 16px;
-}
-
 .chart-title {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
   color: #262626;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.chart-toggle {
+  display: flex;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.toggle-btn {
+  padding: 6px 12px;
+  background: #fff;
+  border: none;
+  color: #595959;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.toggle-btn:hover {
+  background: #f5f5f5;
+}
+
+.toggle-btn--active {
+  background: #1890ff;
+  color: #fff;
 }
 
 .chart-content {
@@ -662,8 +868,8 @@ watch(currentView, (view) => {
     justify-content: center;
   }
 
-  .overview-cards {
-    grid-template-columns: 1fr;
+  .overview-table-container {
+    margin: 0 -16px;
   }
 
   .proportion-charts-section,
