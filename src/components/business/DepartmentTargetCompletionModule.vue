@@ -3,7 +3,7 @@
     <div class="target-completion-module__header">
       <h3 class="target-completion-module__title">项目组完成情况</h3>
       <div class="target-completion-module__controls">
-        <TimeRangePicker 
+        <TimeRangePicker
           v-model="selectedTimeRange"
           @change="handleTimeRangeChange"
         />
@@ -77,7 +77,7 @@
           <div class="chart-header">
             <h4 class="chart-title">目标分配占比</h4>
             <div class="chart-toggle">
-              <button 
+              <button
                 v-for="type in chartTypes"
                 :key="type.value"
                 class="toggle-btn"
@@ -175,7 +175,7 @@ const chartTypes = [
 const targetDistributionData = computed(() => {
   return props.departmentTargets.map(dept => ({
     name: dept.departmentName,
-    value: currentChartType.value === 'profit' 
+    value: currentChartType.value === 'profit'
       ? dept.targets.totalProfitTarget
       : currentChartType.value === 'serviceFee'
         ? dept.targets.serviceFeeTarget
@@ -224,40 +224,7 @@ const operationsSummaryData = computed(() => {
   }
 })
 
-// 部门对比图表数据
-const departmentComparisonData = computed(() => {
-  const departments = props.departmentTargets.map(dept => dept.departmentName)
-  
-  return {
-    labels: departments,
-    datasets: [
-      {
-        label: '目标毛利 (万)',
-        data: props.departmentTargets.map(dept => dept.targets.totalProfitTarget / 10000),
-        color: '#e6f7ff',
-        borderColor: '#1890ff',
-        borderWidth: 2
-      },
-      {
-        label: '实际毛利 (万)',
-        data: props.departmentTargets.map(dept => dept.achievements.totalProfitActual / 10000),
-        color: '#1890ff'
-      },
-      {
-        label: '目标服务费 (万)',
-        data: props.departmentTargets.map(dept => dept.targets.serviceFeeTarget / 10000),
-        color: '#f6ffed',
-        borderColor: '#52c41a',
-        borderWidth: 2
-      },
-      {
-        label: '实际服务费 (万)',
-        data: props.departmentTargets.map(dept => dept.achievements.serviceFeeActual / 10000),
-        color: '#52c41a'
-      }
-    ]
-  }
-})
+
 
 // 方法
 const handleTimeRangeChange = (timeRange: TimeRange) => {
@@ -274,14 +241,7 @@ const handleChartClick = (params: any) => {
   }
 }
 
-const handleDepartmentClick = (params: any) => {
-  if (params && params.name) {
-    const dept = props.departmentTargets.find(d => d.departmentName === params.name)
-    if (dept) {
-      emit('department-click', dept.departmentId)
-    }
-  }
-}
+
 
 const formatCurrency = (value: number): string => {
   if (value >= 100000000) {
@@ -295,7 +255,7 @@ const formatCurrency = (value: number): string => {
 
 const formatChartTotal = () => {
   const total = props.departmentTargets.reduce((sum, dept) => {
-    return sum + (currentChartType.value === 'profit' 
+    return sum + (currentChartType.value === 'profit'
       ? dept.targets.totalProfitTarget
       : currentChartType.value === 'serviceFee'
         ? dept.targets.serviceFeeTarget
@@ -335,7 +295,7 @@ const getRankingClass = (rank: number) => {
 
 const getDepartmentRanking = (department: DepartmentTargetData) => {
   // 根据总毛利完成率排名
-  const sorted = [...props.departmentTargets].sort((a, b) => 
+  const sorted = [...props.departmentTargets].sort((a, b) =>
     b.achievements.totalProfitRate - a.achievements.totalProfitRate
   )
   return sorted.findIndex(d => d.departmentId === department.departmentId) + 1
@@ -792,12 +752,7 @@ const getDifferenceClass = (difference: number) => {
   padding: 16px;
 }
 
-/* 对比图表 */
-.department-comparison-chart {
-  background: #fafafa;
-  border-radius: 8px;
-  padding: 20px;
-}
+
 
 @media (max-width: 1200px) {
   .department-table__header,
@@ -805,13 +760,13 @@ const getDifferenceClass = (difference: number) => {
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
   .department-table__header > div,
   .department-row > div {
     padding: 8px;
     border-bottom: 1px solid #f0f0f0;
   }
-  
+
   .department-table__header > div:last-child,
   .department-row > div:last-child {
     border-bottom: none;
