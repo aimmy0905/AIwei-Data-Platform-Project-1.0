@@ -1228,7 +1228,7 @@ export const operationTargets: OperationTargetData[] = [
 export const departmentTargets: DepartmentTargetData[] = [
   {
     departmentId: 'DEPT_001',
-    departmentName: '华东销售部',
+    departmentName: 'Q1季度',
     targets: {
       totalProfitTarget: 15000000,
       serviceFeeTarget: 9000000,
@@ -1250,7 +1250,7 @@ export const departmentTargets: DepartmentTargetData[] = [
   },
   {
     departmentId: 'DEPT_002',
-    departmentName: '华南销售部',
+    departmentName: 'Q2季度',
     targets: {
       totalProfitTarget: 12000000,
       serviceFeeTarget: 7200000,
@@ -1327,7 +1327,7 @@ export const customerAnalysisTotal: CustomerAnalysisData = {
 export const departmentCustomerAnalysis: DepartmentCustomerAnalysis[] = [
   {
     departmentId: 'DEPT_001',
-    departmentName: '华东销售部',
+    departmentName: 'Q1季度',
     customerData: {
       quarter: '2025-Q1',
       allCustomers: {
@@ -1363,7 +1363,7 @@ export const departmentCustomerAnalysis: DepartmentCustomerAnalysis[] = [
   },
   {
     departmentId: 'DEPT_002',
-    departmentName: '华南销售部',
+    departmentName: 'Q2季度',
     customerData: {
       quarter: '2025-Q1',
       allCustomers: {
@@ -1395,6 +1395,78 @@ export const departmentCustomerAnalysis: DepartmentCustomerAnalysis[] = [
       profitRanking: 1,
       customerCountRanking: 3,
       growthRanking: 1
+    }
+  },
+  {
+    departmentId: 'DEPT_003',
+    departmentName: 'Q3季度',
+    customerData: {
+      quarter: '2025-Q1',
+      allCustomers: {
+        activeCustomerCount: 65,
+        totalProfit: 9800000,
+        serviceFee: 5900000,
+        rebate: 3900000
+      },
+      oldCustomers: {
+        activeCustomerCount: 48,
+        totalProfit: 7200000,
+        serviceFee: 4300000,
+        rebate: 2900000
+      },
+      newCustomers: {
+        activeCustomerCount: 17,
+        totalProfit: 2600000,
+        serviceFee: 1600000,
+        rebate: 1000000
+      },
+      churnedCustomers: {
+        customerCount: 4,
+        estimatedProfitLoss: 520000,
+        estimatedServiceFeeLoss: 310000,
+        estimatedRebateLoss: 210000
+      }
+    },
+    departmentRanking: {
+      profitRanking: 3,
+      customerCountRanking: 2,
+      growthRanking: 3
+    }
+  },
+  {
+    departmentId: 'DEPT_004',
+    departmentName: 'Q4季度',
+    customerData: {
+      quarter: '2025-Q1',
+      allCustomers: {
+        activeCustomerCount: 52,
+        totalProfit: 7800000,
+        serviceFee: 4700000,
+        rebate: 3100000
+      },
+      oldCustomers: {
+        activeCustomerCount: 39,
+        totalProfit: 5850000,
+        serviceFee: 3500000,
+        rebate: 2350000
+      },
+      newCustomers: {
+        activeCustomerCount: 13,
+        totalProfit: 1950000,
+        serviceFee: 1200000,
+        rebate: 750000
+      },
+      churnedCustomers: {
+        customerCount: 3,
+        estimatedProfitLoss: 390000,
+        estimatedServiceFeeLoss: 230000,
+        estimatedRebateLoss: 160000
+      }
+    },
+    departmentRanking: {
+      profitRanking: 4,
+      customerCountRanking: 4,
+      growthRanking: 4
     }
   }
 ]
@@ -1437,7 +1509,7 @@ export const platformProjectsTotal: PlatformProjectData = {
 export const departmentPlatformProjects: DepartmentPlatformData[] = [
   {
     departmentId: 'DEPT_001',
-    departmentName: '华东销售部',
+    departmentName: 'Q1季度',
     platformProjectData: {
       quarter: '2025-Q1',
       overview: {
@@ -1554,7 +1626,7 @@ export const platformProfitContributionTotal: PlatformProfitContributionData = {
 export const departmentPlatformProfitContribution: DepartmentPlatformProfitData[] = [
   {
     departmentId: 'DEPT_001',
-    departmentName: '华东销售部',
+    departmentName: 'Q1季度',
     profitContributionData: {
       quarter: '2025-Q1',
       allCustomers: {
@@ -1700,7 +1772,7 @@ export const customerQualityTotal: CustomerQualityData = {
 export const departmentCustomerQuality: DepartmentCustomerQualityData[] = [
   {
     departmentId: 'DEPT_001',
-    departmentName: '华东销售部',
+    departmentName: 'Q1季度',
     customerQualityData: {
       quarter: '2025-Q1',
       customerSegments: {
