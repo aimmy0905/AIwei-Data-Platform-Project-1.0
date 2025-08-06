@@ -87,54 +87,54 @@
         <table class="platform-table">
           <thead>
             <tr>
-              <th class="platform-header">平台名称</th>
-              <th class="platform-header">项目数量</th>
-              <th class="platform-header">活跃项目</th>
-              <th class="platform-header">新增项目</th>
-              <th class="platform-header">流失项目</th>
-              <th class="platform-header">项目返点</th>
-              <th class="platform-header">服务费</th>
-              <th class="platform-header">毛利</th>
-              <th class="platform-header">平台状态</th>
+              <th rowspan="2" class="time-header">年度</th>
+              <th rowspan="2" class="time-header">季度</th>
+              <th colspan="4" class="category-header all-platforms">所有平台项目数</th>
+              <th colspan="4" class="category-header new-customers">2025年新签客户数（新客户）</th>
+              <th colspan="4" class="category-header churned-customers">2025年流失客户数</th>
+            </tr>
+            <tr>
+              <!-- 所有平台项目数 -->
+              <th class="sub-header all-platforms">Google</th>
+              <th class="sub-header all-platforms">FB</th>
+              <th class="sub-header all-platforms">Criteo</th>
+              <th class="sub-header all-platforms">Bing</th>
+              <!-- 2025年新签客户数 -->
+              <th class="sub-header new-customers">Google</th>
+              <th class="sub-header new-customers">FB</th>
+              <th class="sub-header new-customers">Criteo</th>
+              <th class="sub-header new-customers">Bing</th>
+              <!-- 2025年流失客户数 -->
+              <th class="sub-header churned-customers">Google</th>
+              <th class="sub-header churned-customers">FB</th>
+              <th class="sub-header churned-customers">Criteo</th>
+              <th class="sub-header churned-customers">Bing</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="platform in platformData" :key="platform.platformName" class="platform-row">
-              <td class="platform-cell platform-name">
-                <div class="platform-name-container">
-                  <div class="platform-logo" :style="{ backgroundColor: platform.color }">
-                    {{ platform.platformName.charAt(0) }}
-                  </div>
-                  <span>{{ platform.platformName }}</span>
-                </div>
-              </td>
-              <td class="platform-cell">{{ platform.totalProjects }}</td>
-              <td class="platform-cell">{{ platform.activeProjects }}</td>
-              <td class="platform-cell new-projects">+{{ platform.newProjects }}</td>
-              <td class="platform-cell churned-projects">-{{ platform.churnedProjects }}</td>
-              <td class="platform-cell">¥{{ formatCurrency(platform.rebate) }}</td>
-              <td class="platform-cell">¥{{ formatCurrency(platform.serviceFee) }}</td>
-              <td class="platform-cell">¥{{ formatCurrency(platform.profit) }}</td>
-              <td class="platform-cell">
-                <span class="status-badge" :class="getStatusClass(platform.status)">
-                  {{ getStatusText(platform.status) }}
-                </span>
-              </td>
+            <tr v-for="timeData in timeBasedData" :key="`${timeData.year}-${timeData.quarter}`" class="data-row">
+              <td class="time-cell" v-if="timeData.isFirstOfYear" :rowspan="timeData.quarterCount">{{ timeData.year }}</td>
+              <td class="time-cell">{{ timeData.quarter }}</td>
+
+              <!-- 所有平台项目数 -->
+              <td class="data-cell all-platforms">{{ timeData.allProjects.google || '' }}</td>
+              <td class="data-cell all-platforms">{{ timeData.allProjects.fb || '' }}</td>
+              <td class="data-cell all-platforms">{{ timeData.allProjects.criteo || '' }}</td>
+              <td class="data-cell all-platforms">{{ timeData.allProjects.bing || '' }}</td>
+
+              <!-- 2025年新签客户数 -->
+              <td class="data-cell new-customers">{{ timeData.newCustomers.google || '' }}</td>
+              <td class="data-cell new-customers">{{ timeData.newCustomers.fb || '' }}</td>
+              <td class="data-cell new-customers">{{ timeData.newCustomers.criteo || '' }}</td>
+              <td class="data-cell new-customers">{{ timeData.newCustomers.bing || '' }}</td>
+
+              <!-- 2025年流失客户数 -->
+              <td class="data-cell churned-customers">{{ timeData.churnedCustomers.google || '' }}</td>
+              <td class="data-cell churned-customers">{{ timeData.churnedCustomers.fb || '' }}</td>
+              <td class="data-cell churned-customers">{{ timeData.churnedCustomers.criteo || '' }}</td>
+              <td class="data-cell churned-customers">{{ timeData.churnedCustomers.bing || '' }}</td>
             </tr>
           </tbody>
-          <tfoot>
-            <tr class="summary-row">
-              <td class="summary-cell">总计</td>
-              <td class="summary-cell">{{ totalSummary.totalProjects }}</td>
-              <td class="summary-cell">{{ totalSummary.activeProjects }}</td>
-              <td class="summary-cell new-projects">+{{ totalSummary.newProjects }}</td>
-              <td class="summary-cell churned-projects">-{{ totalSummary.churnedProjects }}</td>
-              <td class="summary-cell">¥{{ formatCurrency(totalSummary.rebate) }}</td>
-              <td class="summary-cell">¥{{ formatCurrency(totalSummary.serviceFee) }}</td>
-              <td class="summary-cell">¥{{ formatCurrency(totalSummary.profit) }}</td>
-              <td class="summary-cell">-</td>
-            </tr>
-          </tfoot>
         </table>
       </div>
     </div>
@@ -145,17 +145,29 @@
 import { ref, computed, onMounted } from 'vue'
 import { ChevronLeft, ChevronRight, Briefcase, Percent, DollarSign, TrendingUp } from 'lucide-vue-next'
 
-interface PlatformData {
-  platformName: string
-  totalProjects: number
-  activeProjects: number
-  newProjects: number
-  churnedProjects: number
-  rebate: number
-  serviceFee: number
-  profit: number
-  status: 'active' | 'warning' | 'inactive'
-  color: string
+interface TimeBasedData {
+  year: string
+  quarter: string
+  isFirstOfYear: boolean
+  quarterCount: number
+  allProjects: {
+    google: number
+    fb: number
+    criteo: number
+    bing: number
+  }
+  newCustomers: {
+    google: number
+    fb: number
+    criteo: number
+    bing: number
+  }
+  churnedCustomers: {
+    google: number
+    fb: number
+    criteo: number
+    bing: number
+  }
 }
 
 interface PlatformStats {
@@ -191,104 +203,68 @@ const isNextDisabled = computed(() => {
   return currentQuarter.value.includes('Q4')
 })
 
-// 模拟平台数据
-const platformData = ref<PlatformData[]>([
+// 时间维度的平台数据
+const timeBasedData = ref<TimeBasedData[]>([
   {
-    platformName: 'Google Ads',
-    totalProjects: 45,
-    activeProjects: 38,
-    newProjects: 8,
-    churnedProjects: 3,
-    rebate: 285000,
-    serviceFee: 450000,
-    profit: 165000,
-    status: 'active',
-    color: '#4285f4'
+    year: '2025年',
+    quarter: '2025年',
+    isFirstOfYear: true,
+    quarterCount: 5,
+    allProjects: { google: 180, fb: 145, criteo: 68, bing: 52 },
+    newCustomers: { google: 42, fb: 35, criteo: 18, bing: 15 },
+    churnedCustomers: { google: 8, fb: 12, criteo: 5, bing: 3 }
   },
   {
-    platformName: 'Facebook Ads',
-    totalProjects: 32,
-    activeProjects: 28,
-    newProjects: 5,
-    churnedProjects: 2,
-    rebate: 195000,
-    serviceFee: 320000,
-    profit: 125000,
-    status: 'active',
-    color: '#1877f2'
+    year: '2025年',
+    quarter: 'Q1季度',
+    isFirstOfYear: false,
+    quarterCount: 1,
+    allProjects: { google: 45, fb: 38, criteo: 18, bing: 12 },
+    newCustomers: { google: 12, fb: 10, criteo: 5, bing: 4 },
+    churnedCustomers: { google: 2, fb: 3, criteo: 1, bing: 1 }
   },
   {
-    platformName: 'Bing Ads',
-    totalProjects: 18,
-    activeProjects: 15,
-    newProjects: 3,
-    churnedProjects: 1,
-    rebate: 95000,
-    serviceFee: 180000,
-    profit: 85000,
-    status: 'warning',
-    color: '#00809d'
+    year: '2025年',
+    quarter: 'Q2季度',
+    isFirstOfYear: false,
+    quarterCount: 1,
+    allProjects: { google: 48, fb: 36, criteo: 16, bing: 14 },
+    newCustomers: { google: 10, fb: 8, criteo: 4, bing: 3 },
+    churnedCustomers: { google: 1, fb: 2, criteo: 1, bing: 0 }
   },
   {
-    platformName: 'Criteo',
-    totalProjects: 12,
-    activeProjects: 10,
-    newProjects: 2,
-    churnedProjects: 0,
-    rebate: 65000,
-    serviceFee: 120000,
-    profit: 55000,
-    status: 'active',
-    color: '#ff6900'
+    year: '2025年',
+    quarter: 'Q3季度',
+    isFirstOfYear: false,
+    quarterCount: 1,
+    allProjects: { google: 42, fb: 35, criteo: 17, bing: 13 },
+    newCustomers: { google: 11, fb: 9, criteo: 5, bing: 4 },
+    churnedCustomers: { google: 3, fb: 4, criteo: 2, bing: 1 }
   },
   {
-    platformName: 'Amazon Ads',
-    totalProjects: 8,
-    activeProjects: 6,
-    newProjects: 1,
-    churnedProjects: 2,
-    rebate: 35000,
-    serviceFee: 80000,
-    profit: 45000,
-    status: 'warning',
-    color: '#ff9900'
+    year: '2025年',
+    quarter: 'Q4季度',
+    isFirstOfYear: false,
+    quarterCount: 1,
+    allProjects: { google: 45, fb: 36, criteo: 17, bing: 13 },
+    newCustomers: { google: 9, fb: 8, criteo: 4, bing: 4 },
+    churnedCustomers: { google: 2, fb: 3, criteo: 1, bing: 1 }
   }
 ])
 
 // 统计数据
 const platformStats = computed<PlatformStats>(() => {
-  return platformData.value.reduce((acc, platform) => ({
-    totalProjects: acc.totalProjects + platform.totalProjects,
-    totalRebate: acc.totalRebate + platform.rebate,
-    totalServiceFee: acc.totalServiceFee + platform.serviceFee,
-    totalProfit: acc.totalProfit + platform.profit
-  }), {
-    totalProjects: 0,
-    totalRebate: 0,
-    totalServiceFee: 0,
-    totalProfit: 0
-  })
-})
+  // 基于实际数据计算统计值
+  const yearlyData = timeBasedData.value[0] // 2025年总计行
+  const totalProjects = yearlyData.allProjects.google + yearlyData.allProjects.fb +
+                       yearlyData.allProjects.criteo + yearlyData.allProjects.bing
 
-// 汇总数据
-const totalSummary = computed(() => {
-  return platformData.value.reduce((acc, platform) => ({
-    totalProjects: acc.totalProjects + platform.totalProjects,
-    activeProjects: acc.activeProjects + platform.activeProjects,
-    newProjects: acc.newProjects + platform.newProjects,
-    churnedProjects: acc.churnedProjects + platform.churnedProjects,
-    rebate: acc.rebate + platform.rebate,
-    serviceFee: acc.serviceFee + platform.serviceFee,
-    profit: acc.profit + platform.profit
-  }), {
-    totalProjects: 0,
-    activeProjects: 0,
-    newProjects: 0,
-    churnedProjects: 0,
-    rebate: 0,
-    serviceFee: 0,
-    profit: 0
-  })
+  return {
+    totalProjects: totalProjects, // 445 项目
+    totalRebate: 675000,  // 67.5万返点
+    totalServiceFee: 1150000, // 115万服务费
+    totalProfit: 475000   // 47.5万毛利
+  }
 })
 
 // 事件处理
@@ -319,31 +295,7 @@ const formatCurrency = (amount: number) => {
   return amount.toLocaleString()
 }
 
-const getStatusClass = (status: string) => {
-  switch (status) {
-    case 'active':
-      return 'status-active'
-    case 'warning':
-      return 'status-warning'
-    case 'inactive':
-      return 'status-inactive'
-    default:
-      return 'status-active'
-  }
-}
 
-const getStatusText = (status: string) => {
-  switch (status) {
-    case 'active':
-      return '正常'
-    case 'warning':
-      return '注意'
-    case 'inactive':
-      return '停用'
-    default:
-      return '正常'
-  }
-}
 </script>
 
 <style scoped>
@@ -524,16 +476,16 @@ const getStatusText = (status: string) => {
 .platform-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
-  min-width: 1000px;
+  font-size: 13px;
+  min-width: 1400px;
 }
 
 .platform-table th {
   background: #fafafa;
   border: 1px solid #f0f0f0;
-  padding: 12px 16px;
+  padding: 12px 8px;
   text-align: center;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: #595959;
   white-space: nowrap;
@@ -541,95 +493,105 @@ const getStatusText = (status: string) => {
 
 .platform-table td {
   border: 1px solid #f0f0f0;
-  padding: 12px 16px;
+  padding: 12px 8px;
   text-align: center;
   font-size: 13px;
   vertical-align: middle;
   color: #595959;
 }
 
-.platform-header {
+.time-header {
   background: #f0f2f5 !important;
   color: #262626 !important;
   font-weight: 600;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  min-width: 80px;
+  text-align: center;
+  vertical-align: middle;
 }
 
-.platform-name {
-  text-align: left !important;
-}
-
-.platform-name-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.platform-logo {
-  width: 24px;
-  height: 24px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 12px;
+.category-header.all-platforms {
+  background: #e6f7ff !important;
+  color: #1890ff !important;
   font-weight: 600;
+  font-size: 12px;
+  text-align: center;
 }
 
-.new-projects {
+.category-header.new-customers {
+  background: #f6ffed !important;
   color: #52c41a !important;
   font-weight: 600;
+  font-size: 12px;
+  text-align: center;
 }
 
-.churned-projects {
+.category-header.churned-customers {
+  background: #fff2f0 !important;
   color: #ff4d4f !important;
   font-weight: 600;
+  font-size: 12px;
+  text-align: center;
 }
 
-.status-badge {
-  padding: 4px 8px;
-  border-radius: 4px;
+.sub-header.all-platforms {
+  background: #e6f7ff !important;
+  color: #1890ff !important;
+  font-weight: 600;
   font-size: 12px;
+  white-space: nowrap;
+}
+
+.sub-header.new-customers {
+  background: #f6ffed !important;
+  color: #52c41a !important;
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.sub-header.churned-customers {
+  background: #fff2f0 !important;
+  color: #ff4d4f !important;
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.time-cell {
+  background: #f0f2f5 !important;
+  color: #262626 !important;
+  font-weight: 600;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  text-align: center !important;
+  min-width: 80px;
+}
+
+.data-cell.all-platforms {
+  background: #f0f8ff !important;
+  color: #1890ff !important;
   font-weight: 500;
+  text-align: center;
+  min-width: 80px;
 }
 
-.status-active {
-  background: #f6ffed;
-  color: #52c41a;
-  border: 1px solid #b7eb8f;
-}
-
-.status-warning {
-  background: #fff7e6;
-  color: #faad14;
-  border: 1px solid #ffd666;
-}
-
-.status-inactive {
-  background: #fff2f0;
-  color: #ff4d4f;
-  border: 1px solid #ffb3b3;
-}
-
-/* 汇总行样式 */
-.summary-row {
-  background: #f0f2f5 !important;
-}
-
-.summary-cell {
-  background: #f0f2f5 !important;
-  color: #262626 !important;
-  font-weight: 600;
-  border-top: 2px solid #d9d9d9 !important;
-}
-
-.summary-cell.new-projects {
+.data-cell.new-customers {
+  background: #f6ffed !important;
   color: #52c41a !important;
-  font-weight: 600;
+  font-weight: 500;
+  text-align: center;
+  min-width: 80px;
 }
 
-.summary-cell.churned-projects {
+.data-cell.churned-customers {
+  background: #fff2f0 !important;
   color: #ff4d4f !important;
-  font-weight: 600;
+  font-weight: 500;
+  text-align: center;
+  min-width: 80px;
 }
 </style>

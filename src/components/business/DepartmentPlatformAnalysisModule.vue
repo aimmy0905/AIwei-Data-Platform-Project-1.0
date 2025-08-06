@@ -1,226 +1,141 @@
 <template>
   <div class="department-platform-analysis-module">
     <div class="analysis-module__header">
-      <h3 class="analysis-module__title">部门平台分析及提成分析</h3>
+      <h3 class="analysis-module__title">平台新增及流失（部门）</h3>
       <div class="analysis-module__controls">
-        <div class="department-performance">
-          <span class="performance-label">平台表现:</span>
-          <span class="performance-value" :class="getPlatformPerformanceClass()">
-            {{ getPlatformPerformanceText() }}
-          </span>
-          <span class="performance-metric">{{ getDominantPlatform() }}</span>
+        <div class="time-controls">
+          <button
+            v-for="timeRange in timeRanges"
+            :key="timeRange.key"
+            class="time-btn"
+            :class="{ 'time-btn--active': currentTimeRange === timeRange.key }"
+            @click="handleTimeRangeChange(timeRange.key)"
+          >
+            {{ timeRange.label }}
+          </button>
+        </div>
+        <div class="quarter-controls">
+          <button class="quarter-nav-btn" @click="previousQuarter">
+            <ChevronLeft :size="16" />
+          </button>
+          <button class="quarter-display">{{ currentQuarter }}</button>
+          <button class="quarter-nav-btn" @click="nextQuarter" :disabled="isNextDisabled">
+            <ChevronRight :size="16" />
+          </button>
         </div>
       </div>
     </div>
 
     <div class="analysis-module__content">
-      <!-- 部门平台表现概览 -->
-      <div class="department-platform-overview">
-        <div class="platform-performance-cards">
-          <div class="platform-card">
-            <div class="platform-card__header">
-              <Monitor :size="20" />
-              <span>主要平台</span>
+      <!-- 统计概览卡片 -->
+      <div class="statistics-overview">
+        <div class="stat-card">
+          <div class="stat-card__header">
+            <div class="stat-icon">
+              <Briefcase :size="24" />
             </div>
-            <div class="platform-card__content">
-              <div class="platform-display">
-                <span class="platform-name">{{ getDominantPlatform() }}</span>
-                <span class="platform-percentage">{{ getDominantPlatformPercentage() }}%</span>
-              </div>
-              <div class="platform-description">占部门总业务量</div>
-            </div>
+            <span class="stat-label">项目总数</span>
           </div>
-
-          <div class="platform-card">
-            <div class="platform-card__header">
-              <TrendingUp :size="20" />
-              <span>平台数量</span>
-            </div>
-            <div class="platform-card__content">
-              <div class="platform-display">
-                <span class="platform-count">{{ getActivePlatformCount() }}</span>
-                <span class="platform-unit">个</span>
-              </div>
-              <div class="platform-description">活跃平台数量</div>
-            </div>
+          <div class="stat-card__content">
+            <div class="stat-value">{{ formatNumber(platformStats.totalProjects) }}</div>
+            <div class="stat-unit">个</div>
           </div>
+        </div>
 
-          <div class="platform-card">
-            <div class="platform-card__header">
-              <BarChart3 :size="20" />
-              <span>平台均衡度</span>
+        <div class="stat-card">
+          <div class="stat-card__header">
+            <div class="stat-icon">
+              <Percent :size="24" />
             </div>
-            <div class="platform-card__content">
-              <div class="platform-display">
-                <span class="balance-score">{{ getPlatformBalanceScore() }}</span>
-                <span class="balance-level">{{ getBalanceLevel() }}</span>
-              </div>
-              <div class="platform-description">业务分布均衡性</div>
+            <span class="stat-label">项目返点总数</span>
+          </div>
+          <div class="stat-card__content">
+            <div class="stat-value">{{ formatCurrency(platformStats.totalRebate) }}</div>
+            <div class="stat-unit">¥</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card__header">
+            <div class="stat-icon">
+              <DollarSign :size="24" />
             </div>
+            <span class="stat-label">项目总服务费</span>
+          </div>
+          <div class="stat-card__content">
+            <div class="stat-value">{{ formatCurrency(platformStats.totalServiceFee) }}</div>
+            <div class="stat-unit">¥</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card__header">
+            <div class="stat-icon">
+              <TrendingUp :size="24" />
+            </div>
+            <span class="stat-label">项目总毛利</span>
+          </div>
+          <div class="stat-card__content">
+            <div class="stat-value">{{ formatCurrency(platformStats.totalProfit) }}</div>
+            <div class="stat-unit">¥</div>
           </div>
         </div>
       </div>
 
-      <!-- 使用通用新订单服务费分析组件 -->
-      <NewOrderServiceFeeModule
-        :platform-data="platformDataForModule"
-        :loading="loading"
-        @platform-click="handlePlatformClick"
-      />
+      <!-- 平台数据列表 -->
+      <div class="platform-table-container">
+        <table class="platform-table">
+          <thead>
+            <tr>
+              <th rowspan="2" class="time-header">年度</th>
+              <th rowspan="2" class="time-header">部门</th>
+              <th colspan="4" class="category-header all-platforms">所有平台项目数</th>
+              <th colspan="4" class="category-header new-customers">2025年新签客户数（新客户）</th>
+              <th colspan="4" class="category-header churned-customers">2025年流失客户数</th>
+            </tr>
+            <tr>
+              <!-- 所有平台项目数 -->
+              <th class="sub-header all-platforms">Google</th>
+              <th class="sub-header all-platforms">FB</th>
+              <th class="sub-header all-platforms">Criteo</th>
+              <th class="sub-header all-platforms">Bing</th>
+              <!-- 2025年新签客户数 -->
+              <th class="sub-header new-customers">Google</th>
+              <th class="sub-header new-customers">FB</th>
+              <th class="sub-header new-customers">Criteo</th>
+              <th class="sub-header new-customers">Bing</th>
+              <!-- 2025年流失客户数 -->
+              <th class="sub-header churned-customers">Google</th>
+              <th class="sub-header churned-customers">FB</th>
+              <th class="sub-header churned-customers">Criteo</th>
+              <th class="sub-header churned-customers">Bing</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="deptData in departmentBasedData" :key="`${deptData.year}-${deptData.department}`" class="data-row">
+              <td class="time-cell" v-if="deptData.isFirstOfYear" :rowspan="deptData.departmentCount">{{ deptData.year }}</td>
+              <td class="time-cell">{{ deptData.department }}</td>
 
-      <!-- 部门平台对比分析 -->
-      <div class="department-platform-comparison">
-        <div class="comparison-header">
-          <h4>与其他部门平台对比</h4>
-          <div class="comparison-controls">
-            <select v-model="currentPlatform" class="platform-selector">
-              <option value="all">全平台</option>
-              <option
-                v-for="platform in availablePlatforms"
-                :key="platform"
-                :value="platform"
-              >
-                {{ platform }}
-              </option>
-            </select>
-          </div>
-        </div>
+              <!-- 所有平台项目数 -->
+              <td class="data-cell all-platforms">{{ deptData.allProjects.google || '' }}</td>
+              <td class="data-cell all-platforms">{{ deptData.allProjects.fb || '' }}</td>
+              <td class="data-cell all-platforms">{{ deptData.allProjects.criteo || '' }}</td>
+              <td class="data-cell all-platforms">{{ deptData.allProjects.bing || '' }}</td>
 
-        <div class="comparison-content">
-          <div class="comparison-chart">
-            <BarChart
-              :data="platformComparisonData"
-              :height="'300px'"
-              :show-legend="true"
-              :stack="false"
-              @click="handleComparisonChartClick"
-            />
-          </div>
+              <!-- 2025年新签客户数 -->
+              <td class="data-cell new-customers">{{ deptData.newCustomers.google || '' }}</td>
+              <td class="data-cell new-customers">{{ deptData.newCustomers.fb || '' }}</td>
+              <td class="data-cell new-customers">{{ deptData.newCustomers.criteo || '' }}</td>
+              <td class="data-cell new-customers">{{ deptData.newCustomers.bing || '' }}</td>
 
-          <div class="comparison-insights">
-            <div class="insight-card">
-              <div class="insight-header">
-                <Target :size="20" />
-                <span>平台洞察</span>
-              </div>
-              <div class="insight-content">
-                <div class="insight-item">
-                  <span class="insight-label">优势平台:</span>
-                  <span class="insight-value">{{ getTopPlatform() }}</span>
-                </div>
-                <div class="insight-item">
-                  <span class="insight-label">成长空间:</span>
-                  <span class="insight-value">{{ getGrowthOpportunity() }}</span>
-                </div>
-                <div class="insight-item">
-                  <span class="insight-label">风险评估:</span>
-                  <span class="insight-value" :class="getRiskClass()">{{ getRiskLevel() }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="strategy-card">
-              <div class="strategy-header">
-                <Lightbulb :size="20" />
-                <span>策略建议</span>
-              </div>
-              <div class="strategy-content">
-                <div
-                  v-for="(strategy, index) in platformStrategies"
-                  :key="index"
-                  class="strategy-item"
-                >
-                  <div class="strategy-icon">
-                    <component :is="getStrategyIcon(strategy.type)" :size="16" />
-                  </div>
-                  <div class="strategy-text">
-                    <strong>{{ strategy.title }}:</strong> {{ strategy.description }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 提成分析区域 -->
-      <div class="department-commission-analysis">
-        <div class="commission-header">
-          <h4>部门提成分析</h4>
-        </div>
-
-        <div class="commission-content">
-          <div class="commission-overview">
-            <div class="commission-card">
-              <div class="commission-card__header">
-                <DollarSign :size="24" />
-                <h5>总提成</h5>
-              </div>
-              <div class="commission-card__content">
-                <div class="commission-value">{{ formatCurrency(getTotalCommission()) }}</div>
-                <div class="commission-growth" :class="getCommissionGrowthClass()">
-                  <TrendingUp v-if="getCommissionGrowthRate() > 0" :size="14" />
-                  <TrendingDown v-else :size="14" />
-                  {{ Math.abs(getCommissionGrowthRate()).toFixed(1) }}%
-                </div>
-              </div>
-            </div>
-
-            <div class="commission-card">
-              <div class="commission-card__header">
-                <Users :size="24" />
-                <h5>人均提成</h5>
-              </div>
-              <div class="commission-card__content">
-                <div class="commission-value">{{ formatCurrency(getAverageCommission()) }}</div>
-                <div class="commission-comparison">
-                  vs 公司平均 {{ formatCurrency(getCompanyAverageCommission()) }}
-                </div>
-              </div>
-            </div>
-
-            <div class="commission-card">
-              <div class="commission-card__header">
-                <Percent :size="24" />
-                <h5>提成率</h5>
-              </div>
-              <div class="commission-card__content">
-                <div class="commission-value">{{ getCommissionRate().toFixed(2) }}%</div>
-                <div class="commission-benchmark">
-                  行业标准 3.5%-5.0%
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="commission-distribution">
-            <div class="distribution-chart">
-              <PieChart
-                :data="commissionDistributionData"
-                :height="'250px'"
-                :show-legend="true"
-                @click="handleCommissionChartClick"
-              />
-            </div>
-            <div class="distribution-insights">
-              <h5>提成分布洞察</h5>
-              <div class="distribution-metrics">
-                <div class="metric-item">
-                  <span class="metric-label">最高提成平台:</span>
-                  <span class="metric-value">{{ getHighestCommissionPlatform() }}</span>
-                </div>
-                <div class="metric-item">
-                  <span class="metric-label">提成集中度:</span>
-                  <span class="metric-value">{{ getCommissionConcentration() }}%</span>
-                </div>
-                <div class="metric-item">
-                  <span class="metric-label">优化潜力:</span>
-                  <span class="metric-value">{{ getOptimizationPotential() }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+              <!-- 2025年流失客户数 -->
+              <td class="data-cell churned-customers">{{ deptData.churnedCustomers.google || '' }}</td>
+              <td class="data-cell churned-customers">{{ deptData.churnedCustomers.fb || '' }}</td>
+              <td class="data-cell churned-customers">{{ deptData.churnedCustomers.criteo || '' }}</td>
+              <td class="data-cell churned-customers">{{ deptData.churnedCustomers.bing || '' }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -228,342 +143,156 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Monitor, TrendingUp, TrendingDown, BarChart3, Target, Lightbulb, DollarSign, Users, Percent, ShoppingCart, Shield, Zap } from 'lucide-vue-next'
-import NewOrderServiceFeeModule from './NewOrderServiceFeeModule.vue'
-import BarChart from '@/components/charts/BarChart.vue'
-import PieChart from '@/components/charts/PieChart.vue'
-import type { DepartmentPlatformAnalysis, PlatformData } from '@/types'
+import { ChevronLeft, ChevronRight, Briefcase, Percent, DollarSign, TrendingUp } from 'lucide-vue-next'
 
-interface PlatformStrategy {
-  type: 'expansion' | 'optimization' | 'diversification'
-  title: string
-  description: string
+interface DepartmentBasedData {
+  year: string
+  department: string
+  isFirstOfYear: boolean
+  departmentCount: number
+  allProjects: {
+    google: number
+    fb: number
+    criteo: number
+    bing: number
+  }
+  newCustomers: {
+    google: number
+    fb: number
+    criteo: number
+    bing: number
+  }
+  churnedCustomers: {
+    google: number
+    fb: number
+    criteo: number
+    bing: number
+  }
 }
 
-interface PlatformDistributionItem {
-  platform: string
-  serviceFee: number
-  orderCount: number
+interface PlatformStats {
+  totalProjects: number
+  totalRebate: number
+  totalServiceFee: number
+  totalProfit: number
 }
 
 interface Props {
-  departmentPlatformAnalysis: DepartmentPlatformAnalysis
-  allDepartments?: DepartmentPlatformAnalysis[]
   loading?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  allDepartments: () => [],
   loading: false
 })
 
 const emit = defineEmits<{
-  'view-change': [view: string]
-  'chart-click': [data: unknown]
-  'platform-change': [platform: string]
+  'time-range-change': [timeRange: string]
+  'quarter-change': [quarter: string]
 }>()
 
-const currentPlatform = ref<string>('all')
+const currentTimeRange = ref('quarter')
+const currentQuarter = ref('2025年Q1')
 
-// 将部门数据转换为 NewOrderServiceFeeModule 期望的格式
-const platformDataForModule = computed((): PlatformData[] => {
-  const distribution = props.departmentPlatformAnalysis.newOrderData.platformDistribution as PlatformDistributionItem[]
-  const total = distribution.reduce((sum: number, item) => sum + item.serviceFee, 0)
+const timeRanges = [
+  { key: 'year', label: '年' },
+  { key: 'quarter', label: '季' },
+  { key: 'month', label: '月' }
+]
 
-  return distribution.map((item: PlatformDistributionItem, index: number) => ({
-    platform: item.platform,
-    serviceFee: item.serviceFee,
-    orderCount: item.orderCount,
-    percentage: total > 0 ? (item.serviceFee / total) * 100 : 0,
-    color: ['#1890ff', '#52c41a', '#fa8c16', '#722ed1', '#eb2f96'][index % 5]
-  }))
+const isNextDisabled = computed(() => {
+  return currentQuarter.value.includes('Q4')
 })
 
-// 可用平台列表
-const availablePlatforms = computed(() => {
-  const platforms = new Set<string>()
-  const distribution = props.departmentPlatformAnalysis.newOrderData.platformDistribution as PlatformDistributionItem[]
-  distribution.forEach((item: PlatformDistributionItem) => {
-    platforms.add(item.platform)
-  })
-  return Array.from(platforms)
-})
-
-// 平台策略建议
-const platformStrategies = computed<PlatformStrategy[]>(() => {
-  const strategies: PlatformStrategy[] = []
-  const dominantPercentage = parseFloat(getDominantPlatformPercentage().toString())
-
-  if (dominantPercentage > 60) {
-    strategies.push({
-      type: 'diversification',
-      title: '分散风险',
-      description: '主要平台占比过高，建议发展其他平台业务'
-    })
+// 部门维度的平台数据
+const departmentBasedData = ref<DepartmentBasedData[]>([
+  {
+    year: '2025年',
+    department: '运营',
+    isFirstOfYear: true,
+    departmentCount: 5,
+    allProjects: { google: 180, fb: 145, criteo: 68, bing: 52 },
+    newCustomers: { google: 42, fb: 35, criteo: 18, bing: 15 },
+    churnedCustomers: { google: 8, fb: 12, criteo: 5, bing: 3 }
+  },
+  {
+    year: '2025年',
+    department: '运营一部',
+    isFirstOfYear: false,
+    departmentCount: 1,
+    allProjects: { google: 48, fb: 38, criteo: 18, bing: 14 },
+    newCustomers: { google: 12, fb: 10, criteo: 5, bing: 4 },
+    churnedCustomers: { google: 2, fb: 3, criteo: 1, bing: 1 }
+  },
+  {
+    year: '2025年',
+    department: '运营二部',
+    isFirstOfYear: false,
+    departmentCount: 1,
+    allProjects: { google: 45, fb: 36, criteo: 16, bing: 12 },
+    newCustomers: { google: 10, fb: 8, criteo: 4, bing: 3 },
+    churnedCustomers: { google: 1, fb: 2, criteo: 1, bing: 0 }
+  },
+  {
+    year: '2025年',
+    department: '运营三部',
+    isFirstOfYear: false,
+    departmentCount: 1,
+    allProjects: { google: 42, fb: 35, criteo: 17, bing: 13 },
+    newCustomers: { google: 11, fb: 9, criteo: 5, bing: 4 },
+    churnedCustomers: { google: 3, fb: 4, criteo: 2, bing: 1 }
+  },
+  {
+    year: '2025年',
+    department: '运营四部',
+    isFirstOfYear: false,
+    departmentCount: 1,
+    allProjects: { google: 45, fb: 36, criteo: 17, bing: 13 },
+    newCustomers: { google: 9, fb: 8, criteo: 4, bing: 4 },
+    churnedCustomers: { google: 2, fb: 3, criteo: 1, bing: 1 }
   }
+])
 
-  if (getActivePlatformCount() < 3) {
-    strategies.push({
-      type: 'expansion',
-      title: '扩展平台',
-      description: '平台数量较少，建议开拓新的业务平台'
-    })
-  }
+// 统计数据
+const platformStats = computed<PlatformStats>(() => {
+  // 基于实际数据计算统计值
+  const totalData = departmentBasedData.value[0] // 运营总计行
+  const totalProjects = totalData.allProjects.google + totalData.allProjects.fb +
+                       totalData.allProjects.criteo + totalData.allProjects.bing
 
-    const balanceScore = parseFloat(getPlatformBalanceScore())
-
-  if (balanceScore < 60) {
-    strategies.push({
-      type: 'optimization',
-      title: '优化配置',
-      description: '平台业务分布不均，建议调整资源配置'
-    })
-  }
-
-  return strategies
-})
-
-// 平台对比数据
-const platformComparisonData = computed(() => {
-  if (!props.allDepartments.length) return { labels: [], datasets: [] }
-
-  const departments = props.allDepartments.map(d => d.departmentName)
-
-  if (currentPlatform.value === 'all') {
-    // 显示总业务量对比
-    const data = props.allDepartments.map(d => {
-      const distribution = d.newOrderData.platformDistribution as PlatformDistributionItem[]
-      return distribution.reduce((sum: number, p: PlatformDistributionItem) => sum + p.orderCount, 0)
-    })
-
-    return {
-      labels: departments,
-      datasets: [{
-        label: '总订单数',
-        data,
-        color: '#1890ff'
-      }]
-    }
-  } else {
-    // 显示特定平台对比
-    const data = props.allDepartments.map(d => {
-      const distribution = d.newOrderData.platformDistribution as PlatformDistributionItem[]
-      const platform = distribution.find((p: PlatformDistributionItem) => p.platform === currentPlatform.value)
-      return platform ? platform.orderCount : 0
-    })
-
-    return {
-      labels: departments,
-      datasets: [{
-        label: `${currentPlatform.value}订单数`,
-        data,
-        color: '#1890ff'
-      }]
-    }
+  return {
+    totalProjects: totalProjects, // 445 项目
+    totalRebate: 675000,  // 67.5万返点
+    totalServiceFee: 1150000, // 115万服务费
+    totalProfit: 475000   // 47.5万毛利
   }
 })
 
-// 提成分布数据
-const commissionDistributionData = computed(() => {
-  const distribution = props.departmentPlatformAnalysis.newOrderData.platformDistribution as PlatformDistributionItem[]
-
-  return distribution.map((item: PlatformDistributionItem, index: number) => ({
-    name: item.platform,
-    value: item.serviceFee * 0.05, // 假设5%提成率
-    color: ['#1890ff', '#52c41a', '#fa8c16', '#722ed1', '#eb2f96'][index % 5]
-  }))
-})
-
-// 方法
-const handlePlatformClick = (platform: string) => {
-  emit('platform-change', platform)
+// 事件处理
+const handleTimeRangeChange = (timeRange: string) => {
+  currentTimeRange.value = timeRange
+  emit('time-range-change', timeRange)
 }
 
-const handleComparisonChartClick = (params: unknown) => {
-  console.log('Platform comparison chart clicked:', params)
+const previousQuarter = () => {
+  emit('quarter-change', 'previous')
 }
 
-const handleCommissionChartClick = (params: unknown) => {
-  console.log('Commission chart clicked:', params)
-}
-
-const formatCurrency = (value: number): string => {
-  if (value >= 100000000) {
-    return `¥${(value / 100000000).toFixed(2)}亿`
-  } else if (value >= 10000) {
-    return `¥${(value / 10000).toFixed(2)}万`
-  } else {
-    return `¥${value.toLocaleString()}`
+const nextQuarter = () => {
+  if (!isNextDisabled.value) {
+    emit('quarter-change', 'next')
   }
 }
 
-const getDominantPlatform = (): string => {
-  const distribution = props.departmentPlatformAnalysis.newOrderData.platformDistribution as PlatformDistributionItem[]
-  if (!distribution.length) return '暂无'
-
-  const dominant = distribution.reduce((max: PlatformDistributionItem, current: PlatformDistributionItem) =>
-    current.orderCount > max.orderCount ? current : max
-  )
-  return dominant.platform
+// 工具函数
+const formatNumber = (num: number) => {
+  return num.toLocaleString()
 }
 
-const getDominantPlatformPercentage = (): string => {
-  const distribution = props.departmentPlatformAnalysis.newOrderData.platformDistribution as PlatformDistributionItem[]
-  const total = distribution.reduce((sum: number, item: PlatformDistributionItem) => sum + item.orderCount, 0)
-  if (total === 0) return "0"
-
-  const dominant = distribution.reduce((max: PlatformDistributionItem, current: PlatformDistributionItem) =>
-    current.orderCount > max.orderCount ? current : max
-  )
-  return ((dominant.orderCount / total) * 100).toFixed(1)
-}
-
-const getActivePlatformCount = (): number => {
-  const distribution = props.departmentPlatformAnalysis.newOrderData.platformDistribution as PlatformDistributionItem[]
-  return distribution.filter((item: PlatformDistributionItem) => item.orderCount > 0).length
-}
-
-const getPlatformBalanceScore = (): string => {
-  const distribution = props.departmentPlatformAnalysis.newOrderData.platformDistribution as PlatformDistributionItem[]
-  const total = distribution.reduce((sum: number, item: PlatformDistributionItem) => sum + item.orderCount, 0)
-  if (total === 0 || distribution.length === 0) return "0"
-
-  // 计算基尼系数的简化版本
-  const sortedShares = distribution
-    .map((item: PlatformDistributionItem) => item.orderCount / total)
-    .sort((a: number, b: number) => a - b)
-
-  let gini = 0
-  const n = sortedShares.length
-  for (let i = 0; i < n; i++) {
-    gini += (2 * (i + 1) - n - 1) * sortedShares[i]
+const formatCurrency = (amount: number) => {
+  if (amount >= 10000) {
+    return (amount / 10000).toFixed(1) + '万'
   }
-  gini = gini / (n * n)
-
-  // 转换为均衡度分数 (0-100)
-  return Math.max(0, (1 - gini) * 100).toFixed(0)
-}
-
-const getBalanceLevel = (): string => {
-  const score = parseFloat(getPlatformBalanceScore())
-  if (score >= 80) return '优秀'
-  if (score >= 60) return '良好'
-  if (score >= 40) return '一般'
-  return '需优化'
-}
-
-const getPlatformPerformanceClass = (): string => {
-  const score = parseFloat(getPlatformBalanceScore())
-  if (score >= 80) return 'performance-excellent'
-  if (score >= 60) return 'performance-good'
-  return 'performance-warning'
-}
-
-const getPlatformPerformanceText = (): string => {
-  const score = parseFloat(getPlatformBalanceScore())
-  if (score >= 80) return '表现优秀'
-  if (score >= 60) return '表现良好'
-  return '需要改进'
-}
-
-const getTopPlatform = (): string => {
-  return getDominantPlatform()
-}
-
-const getGrowthOpportunity = (): string => {
-  const activePlatforms = getActivePlatformCount()
-  const totalPlatforms = 5 // 假设总共有5个主要平台
-  if (activePlatforms < totalPlatforms) {
-    return `还有${totalPlatforms - activePlatforms}个平台可开拓`
-  }
-  return '专注现有平台深度经营'
-}
-
-const getRiskLevel = (): string => {
-  const dominantPercentage = parseFloat(getDominantPlatformPercentage())
-  if (dominantPercentage > 70) return '高风险'
-  if (dominantPercentage > 50) return '中等风险'
-  return '低风险'
-}
-
-const getRiskClass = (): string => {
-  const risk = getRiskLevel()
-  if (risk === '高风险') return 'risk-high'
-  if (risk === '中等风险') return 'risk-medium'
-  return 'risk-low'
-}
-
-const getStrategyIcon = (type: string) => {
-  const iconMap = {
-    expansion: ShoppingCart,
-    optimization: Shield,
-    diversification: Zap
-  }
-  return iconMap[type as keyof typeof iconMap] || Lightbulb
-}
-
-// 提成相关方法
-const getTotalCommission = (): number => {
-  const distribution = props.departmentPlatformAnalysis.newOrderData.platformDistribution as PlatformDistributionItem[]
-  return distribution.reduce((sum: number, item: PlatformDistributionItem) => sum + (item.serviceFee * 0.05), 0)
-}
-
-const getCommissionGrowthRate = (): number => {
-  // 模拟提成增长率
-  return 12.5
-}
-
-const getCommissionGrowthClass = (): string => {
-  const rate = getCommissionGrowthRate()
-  return rate > 0 ? 'growth-positive' : 'growth-negative'
-}
-
-const getAverageCommission = (): number => {
-  const totalCommission = getTotalCommission()
-  // 假设部门有10个人
-  return totalCommission / 10
-}
-
-const getCompanyAverageCommission = (): number => {
-  return getAverageCommission() * 0.85 // 模拟公司平均值
-}
-
-const getCommissionRate = (): number => {
-  const distribution = props.departmentPlatformAnalysis.newOrderData.platformDistribution as PlatformDistributionItem[]
-  const totalRevenue = distribution.reduce((sum: number, item: PlatformDistributionItem) => sum + item.serviceFee, 0)
-  const totalCommission = getTotalCommission()
-  return totalRevenue > 0 ? (totalCommission / totalRevenue) * 100 : 0
-}
-
-const getHighestCommissionPlatform = (): string => {
-  const distribution = props.departmentPlatformAnalysis.newOrderData.platformDistribution as PlatformDistributionItem[]
-  if (!distribution.length) return '暂无'
-
-  const highest = distribution.reduce((max: PlatformDistributionItem, current: PlatformDistributionItem) =>
-    (current.serviceFee * 0.05) > (max.serviceFee * 0.05) ? current : max
-  )
-  return highest.platform
-}
-
-const getCommissionConcentration = (): string => {
-  const distribution = props.departmentPlatformAnalysis.newOrderData.platformDistribution as PlatformDistributionItem[]
-  const totalCommission = getTotalCommission()
-  if (totalCommission === 0) return "0"
-
-  const topTwoCommission = distribution
-    .map((item: PlatformDistributionItem) => item.serviceFee * 0.05)
-    .sort((a: number, b: number) => b - a)
-    .slice(0, 2)
-    .reduce((sum: number, value: number) => sum + value, 0)
-
-  return ((topTwoCommission / totalCommission) * 100).toFixed(1)
-}
-
-const getOptimizationPotential = (): string => {
-  const concentration = parseFloat(getCommissionConcentration())
-  if (concentration > 80) return '高潜力'
-  if (concentration > 60) return '中等潜力'
-  return '低潜力'
+  return amount.toLocaleString()
 }
 </script>
 
@@ -592,398 +321,275 @@ const getOptimizationPotential = (): string => {
   color: #262626;
 }
 
-.department-performance {
+.analysis-module__controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.time-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.time-btn {
+  padding: 6px 12px;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  color: #595959;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.time-btn:hover {
+  border-color: #40a9ff;
+  color: #40a9ff;
+}
+
+.time-btn--active {
+  background: #1890ff;
+  border-color: #1890ff;
+  color: #fff;
+}
+
+.quarter-controls {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.quarter-nav-btn {
+  padding: 4px;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  color: #595959;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.quarter-nav-btn:hover:not(:disabled) {
+  border-color: #40a9ff;
+  color: #40a9ff;
+}
+
+.quarter-nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quarter-display {
+  padding: 6px 12px;
+  border: 1px solid #d9d9d9;
+  background: #fafafa;
+  color: #262626;
+  border-radius: 4px;
   font-size: 14px;
-}
-
-.performance-label {
-  color: #8c8c8c;
-}
-
-.performance-value {
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-size: 12px;
-}
-
-.performance-value.performance-excellent {
-  background: #f6ffed;
-  color: #52c41a;
-}
-
-.performance-value.performance-good {
-  background: #e6f7ff;
-  color: #1890ff;
-}
-
-.performance-value.performance-warning {
-  background: #fff7e6;
-  color: #fa8c16;
-}
-
-.performance-metric {
-  color: #8c8c8c;
-  font-size: 12px;
+  font-weight: 500;
+  min-width: 100px;
+  text-align: center;
 }
 
 .analysis-module__content {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 24px;
 }
 
-/* 部门平台表现概览 */
-.platform-performance-cards {
+/* 统计概览样式 */
+.statistics-overview {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
 
-.platform-card {
-  background: #fafafa;
-  border: 1px solid #f0f0f0;
+.stat-card {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   border-radius: 8px;
-  padding: 16px;
+  padding: 20px;
+  border: 1px solid #e8e8e8;
+  transition: all 0.3s ease;
 }
 
-.platform-card__header {
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card__header {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 12px;
-  color: #1890ff;
-  font-size: 14px;
-  font-weight: 500;
 }
 
-.platform-display {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
-.platform-name,
-.platform-count,
-.balance-score {
-  font-size: 24px;
-  font-weight: 700;
-  color: #262626;
-}
-
-.platform-percentage,
-.platform-unit,
-.balance-level {
-  font-size: 14px;
-  color: #8c8c8c;
-}
-
-.platform-description {
-  font-size: 12px;
-  color: #8c8c8c;
-}
-
-/* 部门平台对比 */
-.department-platform-comparison {
-  background: #fafafa;
-  border-radius: 8px;
-  padding: 24px;
-}
-
-.comparison-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.comparison-header h4 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #262626;
-}
-
-.platform-selector {
-  padding: 6px 12px;
-  border: 1px solid #d9d9d9;
-  border-radius: 6px;
-  background: #fff;
-  color: #595959;
-  font-size: 14px;
-  outline: none;
-}
-
-.platform-selector:focus {
-  border-color: #40a9ff;
-}
-
-.comparison-content {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 24px;
-}
-
-.comparison-chart {
-  background: #fff;
-  border-radius: 6px;
-  padding: 16px;
-}
-
-.comparison-insights {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.insight-card,
-.strategy-card {
-  background: #fff;
-  border-radius: 6px;
-  padding: 16px;
-}
-
-.insight-header,
-.strategy-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-  color: #1890ff;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.insight-content {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.insight-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.insight-label {
-  font-size: 13px;
-  color: #8c8c8c;
-}
-
-.insight-value {
-  font-size: 13px;
-  font-weight: 500;
-  color: #262626;
-}
-
-.insight-value.risk-high {
-  color: #ff4d4f;
-}
-
-.insight-value.risk-medium {
-  color: #fa8c16;
-}
-
-.insight-value.risk-low {
-  color: #52c41a;
-}
-
-.strategy-content {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.strategy-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 8px;
-  background: #f9f9f9;
-  border-radius: 4px;
-}
-
-.strategy-icon {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #1890ff;
-  color: white;
+.stat-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-}
-
-.strategy-text {
-  font-size: 12px;
-  color: #595959;
-  line-height: 1.4;
-}
-
-/* 提成分析区域 */
-.department-commission-analysis {
-  background: #f0f9ff;
-  border: 1px solid #bae7ff;
-  border-radius: 8px;
-  padding: 24px;
-}
-
-.commission-header h4 {
-  margin: 0 0 20px 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #262626;
-}
-
-.commission-content {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.commission-overview {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-}
-
-.commission-card {
-  background: #fff;
+  width: 32px;
+  height: 32px;
+  background: #1890ff;
+  color: #fff;
   border-radius: 6px;
-  padding: 16px;
 }
 
-.commission-card__header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-  color: #1890ff;
-}
-
-.commission-card__header h5 {
-  margin: 0;
+.stat-label {
   font-size: 14px;
-  font-weight: 600;
-}
-
-.commission-value {
-  font-size: 20px;
-  font-weight: 700;
-  color: #262626;
-  margin-bottom: 4px;
-}
-
-.commission-growth {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
+  color: #595959;
   font-weight: 500;
 }
 
-.commission-growth.growth-positive {
-  color: #52c41a;
+.stat-card__content {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
 }
 
-.commission-growth.growth-negative {
-  color: #ff4d4f;
+.stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #262626;
 }
 
-.commission-comparison,
-.commission-benchmark {
-  font-size: 12px;
-  color: #8c8c8c;
-}
-
-.commission-distribution {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-
-.distribution-chart {
-  background: #fff;
-  border-radius: 6px;
-  padding: 16px;
-}
-
-.distribution-insights {
-  background: #fff;
-  border-radius: 6px;
-  padding: 16px;
-}
-
-.distribution-insights h5 {
-  margin: 0 0 16px 0;
+.stat-unit {
   font-size: 14px;
-  font-weight: 600;
-  color: #262626;
-}
-
-.distribution-metrics {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.metric-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.metric-item:last-child {
-  border-bottom: none;
-}
-
-.metric-label {
-  font-size: 13px;
   color: #8c8c8c;
 }
 
-.metric-value {
+/* 表格样式 */
+.platform-table-container {
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+}
+
+.platform-table {
+  width: 100%;
+  border-collapse: collapse;
   font-size: 13px;
+  min-width: 1400px;
+}
+
+.platform-table th {
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  padding: 12px 8px;
+  text-align: center;
+  font-size: 12px;
   font-weight: 600;
-  color: #262626;
+  color: #595959;
+  white-space: nowrap;
 }
 
-@media (max-width: 1200px) {
-  .comparison-content,
-  .commission-distribution {
-    grid-template-columns: 1fr;
-  }
+.platform-table td {
+  border: 1px solid #f0f0f0;
+  padding: 12px 8px;
+  text-align: center;
+  font-size: 13px;
+  vertical-align: middle;
+  color: #595959;
 }
 
-@media (max-width: 768px) {
-  .department-platform-analysis-module {
-    padding: 16px;
-  }
+.time-header {
+  background: #f0f2f5 !important;
+  color: #262626 !important;
+  font-weight: 600;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  min-width: 80px;
+  text-align: center;
+  vertical-align: middle;
+}
 
-  .analysis-module__header {
-    flex-direction: column;
-    gap: 12px;
-    align-items: stretch;
-  }
+.category-header.all-platforms {
+  background: #e6f7ff !important;
+  color: #1890ff !important;
+  font-weight: 600;
+  font-size: 12px;
+  text-align: center;
+}
 
-  .platform-performance-cards,
-  .commission-overview {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.category-header.new-customers {
+  background: #f6ffed !important;
+  color: #52c41a !important;
+  font-weight: 600;
+  font-size: 12px;
+  text-align: center;
+}
 
-  .comparison-header {
-    flex-direction: column;
-    gap: 12px;
-    align-items: stretch;
-  }
+.category-header.churned-customers {
+  background: #fff2f0 !important;
+  color: #ff4d4f !important;
+  font-weight: 600;
+  font-size: 12px;
+  text-align: center;
+}
+
+.sub-header.all-platforms {
+  background: #e6f7ff !important;
+  color: #1890ff !important;
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.sub-header.new-customers {
+  background: #f6ffed !important;
+  color: #52c41a !important;
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.sub-header.churned-customers {
+  background: #fff2f0 !important;
+  color: #ff4d4f !important;
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.time-cell {
+  background: #f0f2f5 !important;
+  color: #262626 !important;
+  font-weight: 600;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  text-align: center !important;
+  min-width: 80px;
+}
+
+.data-cell.all-platforms {
+  background: #f0f8ff !important;
+  color: #1890ff !important;
+  font-weight: 500;
+  text-align: center;
+  min-width: 80px;
+}
+
+.data-cell.new-customers {
+  background: #f6ffed !important;
+  color: #52c41a !important;
+  font-weight: 500;
+  text-align: center;
+  min-width: 80px;
+}
+
+.data-cell.churned-customers {
+  background: #fff2f0 !important;
+  color: #ff4d4f !important;
+  font-weight: 500;
+  text-align: center;
+  min-width: 80px;
 }
 </style>
