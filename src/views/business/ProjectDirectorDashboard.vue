@@ -72,6 +72,20 @@
         @quarter-change="handleQuarterChange"
       />
 
+      <!-- 平台毛利贡献分析（总计）模块 -->
+      <PlatformProfitContributionModule
+        :loading="loading"
+        @time-range-change="handleTimeRangeChange"
+        @quarter-change="handleQuarterChange"
+      />
+
+      <!-- 平台毛利贡献分析（部门）模块 -->
+      <DepartmentProfitContributionModule
+        :loading="loading"
+        @time-range-change="handleTimeRangeChange"
+        @quarter-change="handleQuarterChange"
+      />
+
     </div>
   </div>
 </template>
@@ -86,6 +100,8 @@ import CustomerAnalysisModule from '@/components/business/CustomerAnalysisModule
 import DepartmentCustomerAnalysisListModule from '@/components/business/DepartmentCustomerAnalysisListModule.vue'
 import PlatformAnalysisModule from '@/components/business/PlatformAnalysisModule.vue'
 import DepartmentPlatformAnalysisModule from '@/components/business/DepartmentPlatformAnalysisModule.vue'
+import PlatformProfitContributionModule from '@/components/business/PlatformProfitContributionModule.vue'
+import DepartmentProfitContributionModule from '@/components/business/DepartmentProfitContributionModule.vue'
 import type {
   BusinessRole,
   OperationTargetData,

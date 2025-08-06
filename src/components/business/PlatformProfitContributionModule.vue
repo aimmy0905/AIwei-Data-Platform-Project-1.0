@@ -1,7 +1,7 @@
 <template>
-  <div class="department-profit-contribution-module">
+  <div class="platform-profit-contribution-module">
     <div class="analysis-module__header">
-      <h3 class="analysis-module__title">平台毛利贡献分析（部门）</h3>
+      <h3 class="analysis-module__title">平台毛利贡献分析（总计）</h3>
       <div class="analysis-module__controls">
         <div class="time-controls">
           <button
@@ -27,42 +27,13 @@
     </div>
 
     <div class="analysis-module__content">
-      <!-- 统计概览卡片 -->
-      <div class="statistics-overview">
-        <div class="stat-card">
-          <div class="stat-card__header">
-            <div class="stat-icon">
-              <TrendingUp :size="24" />
-            </div>
-            <span class="stat-label">年度平台毛利贡献总额</span>
-          </div>
-          <div class="stat-card__content">
-            <div class="stat-value">{{ formatCurrency(yearlyProfitTotal) }}</div>
-            <div class="stat-unit">万元</div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-card__header">
-            <div class="stat-icon">
-              <BarChart3 :size="24" />
-            </div>
-            <span class="stat-label">季度平台毛利贡献总额</span>
-          </div>
-          <div class="stat-card__content">
-            <div class="stat-value">{{ formatCurrency(quarterlyProfitTotal) }}</div>
-            <div class="stat-unit">万元</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 部门毛利贡献数据列表 -->
+      <!-- 平台毛利贡献数据列表 -->
       <div class="platform-table-container">
         <table class="platform-table">
           <thead>
             <tr>
               <th rowspan="2" class="time-header">年度</th>
-              <th rowspan="2" class="time-header">部门</th>
+              <th rowspan="2" class="time-header">季度</th>
               <th colspan="4" class="category-header profit-contribution">平台毛利贡献（万元）</th>
               <th colspan="4" class="category-header profit-percentage">毛利贡献占比（%）</th>
               <th colspan="4" class="category-header growth-rate">同比增长率（%）</th>
@@ -86,34 +57,34 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="deptData in departmentProfitData" :key="`${deptData.year}-${deptData.department}`" class="data-row">
-              <td class="time-cell" v-if="deptData.isFirstOfYear" :rowspan="deptData.departmentCount">{{ deptData.year }}</td>
-              <td class="time-cell">{{ deptData.department }}</td>
+            <tr v-for="quarterData in profitContributionData" :key="`${quarterData.year}-${quarterData.quarter}`" class="data-row">
+              <td class="time-cell" v-if="quarterData.isFirstOfYear" :rowspan="quarterData.quarterCount">{{ quarterData.year }}</td>
+              <td class="time-cell">{{ quarterData.quarter }}</td>
 
               <!-- 平台毛利贡献 -->
-              <td class="data-cell profit-contribution">{{ formatCurrency(deptData.profitContribution.google) }}</td>
-              <td class="data-cell profit-contribution">{{ formatCurrency(deptData.profitContribution.fb) }}</td>
-              <td class="data-cell profit-contribution">{{ formatCurrency(deptData.profitContribution.criteo) }}</td>
-              <td class="data-cell profit-contribution">{{ formatCurrency(deptData.profitContribution.bing) }}</td>
+              <td class="data-cell profit-contribution">{{ formatCurrency(quarterData.profitContribution.google) }}</td>
+              <td class="data-cell profit-contribution">{{ formatCurrency(quarterData.profitContribution.fb) }}</td>
+              <td class="data-cell profit-contribution">{{ formatCurrency(quarterData.profitContribution.criteo) }}</td>
+              <td class="data-cell profit-contribution">{{ formatCurrency(quarterData.profitContribution.bing) }}</td>
 
               <!-- 毛利贡献占比 -->
-              <td class="data-cell profit-percentage">{{ formatPercentage(deptData.profitPercentage.google) }}%</td>
-              <td class="data-cell profit-percentage">{{ formatPercentage(deptData.profitPercentage.fb) }}%</td>
-              <td class="data-cell profit-percentage">{{ formatPercentage(deptData.profitPercentage.criteo) }}%</td>
-              <td class="data-cell profit-percentage">{{ formatPercentage(deptData.profitPercentage.bing) }}%</td>
+              <td class="data-cell profit-percentage">{{ formatPercentage(quarterData.profitPercentage.google) }}%</td>
+              <td class="data-cell profit-percentage">{{ formatPercentage(quarterData.profitPercentage.fb) }}%</td>
+              <td class="data-cell profit-percentage">{{ formatPercentage(quarterData.profitPercentage.criteo) }}%</td>
+              <td class="data-cell profit-percentage">{{ formatPercentage(quarterData.profitPercentage.bing) }}%</td>
 
               <!-- 同比增长率 -->
-              <td class="data-cell growth-rate" :class="getGrowthClass(deptData.growthRate.google)">
-                {{ formatGrowthRate(deptData.growthRate.google) }}%
+              <td class="data-cell growth-rate" :class="getGrowthClass(quarterData.growthRate.google)">
+                {{ formatGrowthRate(quarterData.growthRate.google) }}%
               </td>
-              <td class="data-cell growth-rate" :class="getGrowthClass(deptData.growthRate.fb)">
-                {{ formatGrowthRate(deptData.growthRate.fb) }}%
+              <td class="data-cell growth-rate" :class="getGrowthClass(quarterData.growthRate.fb)">
+                {{ formatGrowthRate(quarterData.growthRate.fb) }}%
               </td>
-              <td class="data-cell growth-rate" :class="getGrowthClass(deptData.growthRate.criteo)">
-                {{ formatGrowthRate(deptData.growthRate.criteo) }}%
+              <td class="data-cell growth-rate" :class="getGrowthClass(quarterData.growthRate.criteo)">
+                {{ formatGrowthRate(quarterData.growthRate.criteo) }}%
               </td>
-              <td class="data-cell growth-rate" :class="getGrowthClass(deptData.growthRate.bing)">
-                {{ formatGrowthRate(deptData.growthRate.bing) }}%
+              <td class="data-cell growth-rate" :class="getGrowthClass(quarterData.growthRate.bing)">
+                {{ formatGrowthRate(quarterData.growthRate.bing) }}%
               </td>
             </tr>
           </tbody>
@@ -125,13 +96,13 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { ChevronLeft, ChevronRight, TrendingUp, BarChart3 } from 'lucide-vue-next'
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 
-interface DepartmentProfitData {
+interface PlatformProfitData {
   year: string
-  department: string
+  quarter: string
   isFirstOfYear: boolean
-  departmentCount: number
+  quarterCount: number
   profitContribution: {
     google: number
     fb: number
@@ -178,74 +149,54 @@ const isNextDisabled = computed(() => {
   return currentQuarter.value.includes('Q4')
 })
 
-// 部门毛利贡献数据
-const departmentProfitData = ref<DepartmentProfitData[]>([
+// 平台毛利贡献数据
+const profitContributionData = ref<PlatformProfitData[]>([
   {
     year: '2025年',
-    department: '运营',
+    quarter: '2025年',
     isFirstOfYear: true,
-    departmentCount: 5,
+    quarterCount: 5,
     profitContribution: { google: 808.1, fb: 638.7, criteo: 395.5, bing: 264.2 },
     profitPercentage: { google: 38.3, fb: 30.3, criteo: 18.8, bing: 12.5 },
     growthRate: { google: 16.2, fb: 13.4, criteo: 9.3, bing: 6.3 }
   },
   {
     year: '2025年',
-    department: '运营一部',
+    quarter: 'Q1季度',
     isFirstOfYear: false,
-    departmentCount: 1,
+    quarterCount: 1,
     profitContribution: { google: 185.6, fb: 142.8, criteo: 89.3, bing: 57.8 },
     profitPercentage: { google: 39.1, fb: 30.1, criteo: 18.8, bing: 12.2 },
     growthRate: { google: 15.2, fb: 12.8, criteo: 8.9, bing: 6.3 }
   },
   {
     year: '2025年',
-    department: '运营二部',
+    quarter: 'Q2季度',
     isFirstOfYear: false,
-    departmentCount: 1,
+    quarterCount: 1,
     profitContribution: { google: 198.5, fb: 155.2, criteo: 95.1, bing: 62.8 },
     profitPercentage: { google: 38.6, fb: 30.4, criteo: 18.6, bing: 12.3 },
     growthRate: { google: 18.5, fb: 15.2, criteo: 11.3, bing: 8.7 }
   },
   {
     year: '2025年',
-    department: '运营三部',
+    quarter: 'Q3季度',
     isFirstOfYear: false,
-    departmentCount: 1,
+    quarterCount: 1,
     profitContribution: { google: 205.2, fb: 165.8, criteo: 102.9, bing: 68.5 },
     profitPercentage: { google: 37.9, fb: 30.6, criteo: 19.0, bing: 12.7 },
     growthRate: { google: 16.8, fb: 13.9, criteo: 9.2, bing: 5.8 }
   },
   {
     year: '2025年',
-    department: '运营四部',
+    quarter: 'Q4季度',
     isFirstOfYear: false,
-    departmentCount: 1,
+    quarterCount: 1,
     profitContribution: { google: 218.8, fb: 174.9, criteo: 108.2, bing: 75.1 },
     profitPercentage: { google: 37.6, fb: 30.1, criteo: 18.6, bing: 12.9 },
     growthRate: { google: 14.2, fb: 11.5, criteo: 7.8, bing: 4.2 }
   }
 ])
-
-// 计算统计数据
-const yearlyProfitTotal = computed(() => {
-  const totalRow = departmentProfitData.value.find(item => item.department === '运营')
-  if (!totalRow) return 0
-  return totalRow.profitContribution.google + 
-         totalRow.profitContribution.fb + 
-         totalRow.profitContribution.criteo + 
-         totalRow.profitContribution.bing
-})
-
-const quarterlyProfitTotal = computed(() => {
-  // 当前季度总额 (这里用Q1的数据作为示例)
-  const q1Row = departmentProfitData.value.find(item => item.department === '运营一部')
-  if (!q1Row) return 0
-  return q1Row.profitContribution.google + 
-         q1Row.profitContribution.fb + 
-         q1Row.profitContribution.criteo + 
-         q1Row.profitContribution.bing
-})
 
 // 事件处理
 const handleTimeRangeChange = (timeRange: string) => {
@@ -284,7 +235,7 @@ const getGrowthClass = (rate: number) => {
 </script>
 
 <style scoped>
-.department-profit-contribution-module {
+.platform-profit-contribution-module {
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
