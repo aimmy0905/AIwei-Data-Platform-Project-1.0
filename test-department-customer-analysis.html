@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>部门客户分析测试页面</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .test-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #262626;
+        }
+        .test-content {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #595959;
+        }
+        .success {
+            color: #52c41a;
+            font-weight: 500;
+        }
+        .info {
+            background: #e6f4ff;
+            border: 1px solid #91caff;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 20px 0;
+        }
+        .table-structure {
+            background: #fafafa;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 class="test-title">部门客户分析模块实现完成</h1>
+        
+        <div class="test-content">
+            <p class="success">✅ 已成功实现用户要求的表格结构</p>
+            
+            <div class="info">
+                <strong>📋 实现的功能：</strong>
+                <ul>
+                    <li>完全按照截图重新设计了表格结构</li>
+                    <li>实现了三层表头结构：主分类 → 子分类 → 季度详情</li>
+                    <li>添加了部门列和季度列的固定定位</li>
+                    <li>每个数据类别下都有Q1、Q2、Q3三个季度的详细数据</li>
+                    <li>保持了与运营目标模块一致的UI风格</li>
+                </ul>
+            </div>
+
+            <div class="table-structure">表格结构：
+部门 | 季度 | 所有客户数据 (12列) | 2025新客户 (12列) | 2025年新增客户 (12列) | 2025年流失客户 (12列)
+     |      | 活跃客户数 | 总毛利 | 服务费 | 返点 | ... (每个分类下都有Q1/Q2/Q3三个季度)
+     |      | Q1|Q2|Q3 | Q1|Q2|Q3 | Q1|Q2|Q3 | Q1|Q2|Q3 |
+-----|------|----------|--------|--------|--------|
+Q1季度|  -  |   数据   |  数据  |  数据  |  数据  |
+Q2季度|  -  |   数据   |  数据  |  数据  |  数据  |
+Q3季度|  -  |   数据   |  数据  |  数据  |  数据  |
+Q4季度|  -  |   数据   |  数据  |  数据  |  数据  |</div>
+
+            <div class="info">
+                <strong>🎯 访问地址：</strong><br>
+                <a href="http://localhost:5173/business/project-director" target="_blank">http://localhost:5173/business/project-director</a>
+            </div>
+
+            <p><strong>📝 说明：</strong></p>
+            <ul>
+                <li>表格现在有48列数据（4个主分类 × 4个子分类 × 3个季度）</li>
+                <li>部门列显示Q1季度、Q2季度、Q3季度、Q4季度</li>
+                <li>季度列统一显示"-"</li>
+                <li>每个数据点都按季度分解显示</li>
+                <li>保持了颜色编码和数据格式化</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

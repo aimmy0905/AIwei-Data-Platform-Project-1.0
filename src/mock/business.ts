@@ -21,6 +21,7 @@ import type {
   MetricCardProps,
   Quarter,
   TargetComparison,
+  AnnualQuarterlyTargets,
   PlatformData,
   CustomerProfitData,
   ProfitSummaryData,
@@ -160,6 +161,57 @@ export const targetComparisonData: TargetComparison[] = [
     unit: '单'
   }
 ]
+
+// 年度季度目标数据
+export const annualQuarterlyTargets: AnnualQuarterlyTargets = {
+  year: 2025,
+  yearlyTarget: {
+    serviceFeeTarget: 12000000,  // 年度服务费目标 1200万
+    serviceFeeActual: 2850000,   // 年度服务费完成 285万
+    serviceFeeCompletion: 23.8,  // 年度完成率 23.8%
+    newOrderTarget: 720,         // 年度新单目标 720单
+    newOrderActual: 156,         // 年度新单完成 156单
+    newOrderCompletion: 21.7     // 年度新单完成率 21.7%
+  },
+  quarters: [
+    {
+      quarter: 'Q1',
+      serviceFeeTarget: 3000000,    // Q1服务费目标 300万
+      serviceFeeActual: 2850000,    // Q1服务费完成 285万
+      serviceFeeCompletion: 95.0,   // Q1服务费完成率 95%
+      newOrderTarget: 180,          // Q1新单目标 180单
+      newOrderActual: 156,          // Q1新单完成 156单
+      newOrderCompletion: 86.7      // Q1新单完成率 86.7%
+    },
+    {
+      quarter: 'Q2',
+      serviceFeeTarget: 3000000,    // Q2服务费目标 300万
+      serviceFeeActual: 0,          // Q2服务费完成 0万 (未开始)
+      serviceFeeCompletion: 0,      // Q2服务费完成率 0%
+      newOrderTarget: 180,          // Q2新单目标 180单
+      newOrderActual: 0,            // Q2新单完成 0单
+      newOrderCompletion: 0         // Q2新单完成率 0%
+    },
+    {
+      quarter: 'Q3',
+      serviceFeeTarget: 3000000,    // Q3服务费目标 300万
+      serviceFeeActual: 0,          // Q3服务费完成 0万
+      serviceFeeCompletion: 0,      // Q3服务费完成率 0%
+      newOrderTarget: 180,          // Q3新单目标 180单
+      newOrderActual: 0,            // Q3新单完成 0单
+      newOrderCompletion: 0         // Q3新单完成率 0%
+    },
+    {
+      quarter: 'Q4',
+      serviceFeeTarget: 3000000,    // Q4服务费目标 300万
+      serviceFeeActual: 0,          // Q4服务费完成 0万
+      serviceFeeCompletion: 0,      // Q4服务费完成率 0%
+      newOrderTarget: 180,          // Q4新单目标 180单
+      newOrderActual: 0,            // Q4新单完成 0单
+      newOrderCompletion: 0         // Q4新单完成率 0%
+    }
+  ]
+}
 
 // 平台分布数据
 export const platformDistributionData: PlatformData[] = [
@@ -1176,7 +1228,7 @@ export const operationTargets: OperationTargetData[] = [
 export const departmentTargets: DepartmentTargetData[] = [
   {
     departmentId: 'DEPT_001',
-    departmentName: '华东销售部',
+    departmentName: 'Q1季度',
     targets: {
       totalProfitTarget: 15000000,
       serviceFeeTarget: 9000000,
@@ -1198,7 +1250,7 @@ export const departmentTargets: DepartmentTargetData[] = [
   },
   {
     departmentId: 'DEPT_002',
-    departmentName: '华南销售部',
+    departmentName: 'Q2季度',
     targets: {
       totalProfitTarget: 12000000,
       serviceFeeTarget: 7200000,
@@ -1275,7 +1327,7 @@ export const customerAnalysisTotal: CustomerAnalysisData = {
 export const departmentCustomerAnalysis: DepartmentCustomerAnalysis[] = [
   {
     departmentId: 'DEPT_001',
-    departmentName: '华东销售部',
+    departmentName: 'Q1季度',
     customerData: {
       quarter: '2025-Q1',
       allCustomers: {
@@ -1311,7 +1363,7 @@ export const departmentCustomerAnalysis: DepartmentCustomerAnalysis[] = [
   },
   {
     departmentId: 'DEPT_002',
-    departmentName: '华南销售部',
+    departmentName: 'Q2季度',
     customerData: {
       quarter: '2025-Q1',
       allCustomers: {
@@ -1343,6 +1395,78 @@ export const departmentCustomerAnalysis: DepartmentCustomerAnalysis[] = [
       profitRanking: 1,
       customerCountRanking: 3,
       growthRanking: 1
+    }
+  },
+  {
+    departmentId: 'DEPT_003',
+    departmentName: 'Q3季度',
+    customerData: {
+      quarter: '2025-Q1',
+      allCustomers: {
+        activeCustomerCount: 65,
+        totalProfit: 9800000,
+        serviceFee: 5900000,
+        rebate: 3900000
+      },
+      oldCustomers: {
+        activeCustomerCount: 48,
+        totalProfit: 7200000,
+        serviceFee: 4300000,
+        rebate: 2900000
+      },
+      newCustomers: {
+        activeCustomerCount: 17,
+        totalProfit: 2600000,
+        serviceFee: 1600000,
+        rebate: 1000000
+      },
+      churnedCustomers: {
+        customerCount: 4,
+        estimatedProfitLoss: 520000,
+        estimatedServiceFeeLoss: 310000,
+        estimatedRebateLoss: 210000
+      }
+    },
+    departmentRanking: {
+      profitRanking: 3,
+      customerCountRanking: 2,
+      growthRanking: 3
+    }
+  },
+  {
+    departmentId: 'DEPT_004',
+    departmentName: 'Q4季度',
+    customerData: {
+      quarter: '2025-Q1',
+      allCustomers: {
+        activeCustomerCount: 52,
+        totalProfit: 7800000,
+        serviceFee: 4700000,
+        rebate: 3100000
+      },
+      oldCustomers: {
+        activeCustomerCount: 39,
+        totalProfit: 5850000,
+        serviceFee: 3500000,
+        rebate: 2350000
+      },
+      newCustomers: {
+        activeCustomerCount: 13,
+        totalProfit: 1950000,
+        serviceFee: 1200000,
+        rebate: 750000
+      },
+      churnedCustomers: {
+        customerCount: 3,
+        estimatedProfitLoss: 390000,
+        estimatedServiceFeeLoss: 230000,
+        estimatedRebateLoss: 160000
+      }
+    },
+    departmentRanking: {
+      profitRanking: 4,
+      customerCountRanking: 4,
+      growthRanking: 4
     }
   }
 ]
@@ -1385,7 +1509,7 @@ export const platformProjectsTotal: PlatformProjectData = {
 export const departmentPlatformProjects: DepartmentPlatformData[] = [
   {
     departmentId: 'DEPT_001',
-    departmentName: '华东销售部',
+    departmentName: 'Q1季度',
     platformProjectData: {
       quarter: '2025-Q1',
       overview: {
@@ -1502,7 +1626,7 @@ export const platformProfitContributionTotal: PlatformProfitContributionData = {
 export const departmentPlatformProfitContribution: DepartmentPlatformProfitData[] = [
   {
     departmentId: 'DEPT_001',
-    departmentName: '华东销售部',
+    departmentName: 'Q1季度',
     profitContributionData: {
       quarter: '2025-Q1',
       allCustomers: {
@@ -1648,7 +1772,7 @@ export const customerQualityTotal: CustomerQualityData = {
 export const departmentCustomerQuality: DepartmentCustomerQualityData[] = [
   {
     departmentId: 'DEPT_001',
-    departmentName: '华东销售部',
+    departmentName: 'Q1季度',
     customerQualityData: {
       quarter: '2025-Q1',
       customerSegments: {
@@ -2512,6 +2636,9 @@ export const businessAPI = {
   // 获取目标完成对比
   getTargetComparison: () => Promise.resolve(targetComparisonData),
 
+  // 获取年度季度目标数据
+  getAnnualQuarterlyTargets: () => Promise.resolve(annualQuarterlyTargets),
+
   // 获取平台分布数据
   getPlatformDistribution: () => Promise.resolve(platformDistributionData),
 
@@ -2697,7 +2824,73 @@ export const businessAPI = {
   getBingOptimizerMetrics: () => Promise.resolve({...googleOptimizerMetrics, platform: 'bing'}),
 
   // 获取Bing账户余额数据
-  getBingAccountBalance: () => Promise.resolve(googleAccountBalance)
+  getBingAccountBalance: () => Promise.resolve(googleAccountBalance),
+
+  // ============ 平台分析 API 函数 ============
+
+  // 获取平台分析数据
+  getPlatformAnalysisData: () => Promise.resolve([
+    {
+      platformName: 'Google Ads',
+      totalProjects: 45,
+      activeProjects: 38,
+      newProjects: 8,
+      churnedProjects: 3,
+      rebate: 285000,
+      serviceFee: 450000,
+      profit: 165000,
+      status: 'active',
+      color: '#4285f4'
+    },
+    {
+      platformName: 'Facebook Ads',
+      totalProjects: 32,
+      activeProjects: 28,
+      newProjects: 5,
+      churnedProjects: 2,
+      rebate: 195000,
+      serviceFee: 320000,
+      profit: 125000,
+      status: 'active',
+      color: '#1877f2'
+    },
+    {
+      platformName: 'Bing Ads',
+      totalProjects: 18,
+      activeProjects: 15,
+      newProjects: 3,
+      churnedProjects: 1,
+      rebate: 95000,
+      serviceFee: 180000,
+      profit: 85000,
+      status: 'warning',
+      color: '#00809d'
+    },
+    {
+      platformName: 'Criteo',
+      totalProjects: 12,
+      activeProjects: 10,
+      newProjects: 2,
+      churnedProjects: 0,
+      rebate: 65000,
+      serviceFee: 120000,
+      profit: 55000,
+      status: 'active',
+      color: '#ff6900'
+    },
+    {
+      platformName: 'Amazon Ads',
+      totalProjects: 8,
+      activeProjects: 6,
+      newProjects: 1,
+      churnedProjects: 2,
+      rebate: 35000,
+      serviceFee: 80000,
+      profit: 45000,
+      status: 'warning',
+      color: '#ff9900'
+    }
+  ])
 }
 
 export default businessAPI

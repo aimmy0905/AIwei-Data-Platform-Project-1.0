@@ -170,12 +170,6 @@ onMounted(async () => {
         console.log('Auto expanding projects menu')
         menuStore.toggleSubmenu('projects')
       }
-    } else if (currentPath.startsWith('/performance/')) {
-      // 展开业绩管理菜单
-      if (!menuStore.isMenuOpen('performance-management')) {
-        console.log('Auto expanding performance-management menu')
-        menuStore.toggleSubmenu('performance-management')
-      }
     } else if (currentPath.startsWith('/settings/')) {
       // 展开系统设置菜单
       if (!menuStore.isMenuOpen('settings')) {

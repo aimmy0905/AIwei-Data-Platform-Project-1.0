@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 绩效详情功能完成</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .success-container {
+            max-width: 1100px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .success-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 40px;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .success-title {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .success-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .success-content {
+            padding: 40px;
+        }
+
+        .feature-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: #4f46e5;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.15);
+        }
+
+        .feature-card h3 {
+            color: #1e293b;
+            margin-bottom: 16px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-card .icon {
+            font-size: 1.5rem;
+        }
+
+        .demo-modal {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            margin: 16px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .demo-modal-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .demo-modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .demo-close-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            background: #f3f4f6;
+            border: none;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .demo-modal-body {
+            padding: 20px;
+        }
+
+        .demo-employee-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .demo-employee-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .demo-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .demo-employee-details h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 2px;
+        }
+
+        .demo-employee-details p {
+            font-size: 12px;
+            color: #64748b;
+            margin: 1px 0;
+        }
+
+        .demo-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .demo-stat-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .demo-stat-label {
+            color: #64748b;
+        }
+
+        .demo-stat-value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .demo-total-score {
+            font-size: 18px;
+            font-weight: 800;
+            color: #4f46e5;
+        }
+
+        .demo-grade {
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: #10b981;
+            color: white;
+            font-weight: 700;
+            font-size: 10px;
+        }
+
+        .demo-score-breakdown {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .demo-breakdown-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .demo-score-item {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .demo-score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .demo-score-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .demo-score-weight {
+            font-size: 10px;
+            color: #64748b;
+            background: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 8px;
+        }
+
+        .demo-score-value {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .demo-score-number {
+            font-size: 14px;
+            font-weight: 700;
+            color: #4f46e5;
+            min-width: 40px;
+        }
+
+        .demo-score-bar {
+            flex: 1;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .demo-score-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border-radius: 3px;
+        }
+
+        .steps-section {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .steps-title {
+            color: #1e293b;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            text-align: center;
+        }
+
+        .steps-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .steps-list li {
+            padding: 15px 0;
+            padding-left: 40px;
+            position: relative;
+            line-height: 1.6;
+            color: #4b5563;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .steps-list li:last-child {
+            border-bottom: none;
+        }
+
+        .steps-list li:before {
+            content: counter(step-counter);
+            counter-increment: step-counter;
+            position: absolute;
+            left: 0;
+            top: 15px;
+            background: #4f46e5;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .steps-list {
+            counter-reset: step-counter;
+        }
+
+        .test-buttons {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .test-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 15px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .test-btn--primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+        }
+
+        .test-btn--primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+        }
+
+        .test-btn--secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .test-btn--secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .highlight-box h4 {
+            color: #166534;
+            margin-bottom: 10px;
+        }
+
+        .highlight-box p {
+            color: #166534;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .feature-showcase {
+                grid-template-columns: 1fr;
+            }
+            
+            .demo-employee-summary {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-header">
+            <div class="success-icon">📊</div>
+            <h1 class="success-title">绩效详情功能完成！</h1>
+            <p class="success-subtitle">点击"查看详情"按钮即可显示完整的绩效得分明细</p>
+        </div>
+
+        <div class="success-content">
+            <div class="feature-showcase">
+                <div class="feature-card">
+                    <h3><span class="icon">👤</span>员工信息展示</h3>
+                    <p style="color: #64748b; margin-bottom: 16px;">详细展示员工基本信息和绩效概览</p>
+                    
+                    <div class="demo-modal">
+                        <div class="demo-modal-header">
+                            <span class="demo-modal-title">员工信息区域</span>
+                        </div>
+                        <div class="demo-modal-body">
+                            <div class="demo-employee-summary">
+                                <div class="demo-employee-info">
+                                    <div class="demo-avatar">李</div>
+                                    <div class="demo-employee-details">
+                                        <h4>李明</h4>
+                                        <p>优化师</p>
+                                        <p>运营部</p>
+                                    </div>
+                                </div>
+                                <div class="demo-stats">
+                                    <div class="demo-stat-item">
+                                        <span class="demo-stat-label">考核周期</span>
+                                        <span class="demo-stat-value">2024年1月</span>
+                                    </div>
+                                    <div class="demo-stat-item">
+                                        <span class="demo-stat-label">综合得分</span>
+                                        <span class="demo-stat-value demo-total-score">84.9</span>
+                                    </div>
+                                    <div class="demo-stat-item">
+                                        <span class="demo-stat-label">等级</span>
+                                        <span class="demo-grade">A</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <h3><span class="icon">📈</span>得分明细分析</h3>
+                    <p style="color: #64748b; margin-bottom: 16px;">详细展示各项得分和权重分布</p>
+                    
+                    <div class="demo-modal">
+                        <div class="demo-modal-header">
+                            <span class="demo-modal-title">得分明细区域</span>
+                        </div>
+                        <div class="demo-modal-body">
+                            <div class="demo-score-breakdown">
+                                <div class="demo-breakdown-title">得分明细</div>
+                                
+                                <div class="demo-score-item">
+                                    <div class="demo-score-header">
+                                        <span class="demo-score-name">数据得分</span>
+                                        <span class="demo-score-weight">(权重: 40%)</span>
+                                    </div>
+                                    <div class="demo-score-value">
+                                        <span class="demo-score-number">81.0</span>
+                                        <div class="demo-score-bar">
+                                            <div class="demo-score-fill" style="width: 81%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="demo-score-item">
+                                    <div class="demo-score-header">
+                                        <span class="demo-score-name">客户评价</span>
+                                        <span class="demo-score-weight">(权重: 30%)</span>
+                                    </div>
+                                    <div class="demo-score-value">
+                                        <span class="demo-score-number">87.0</span>
+                                        <div class="demo-score-bar">
+                                            <div class="demo-score-fill" style="width: 87%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="demo-score-item">
+                                    <div class="demo-score-header">
+                                        <span class="demo-score-name">职能方案</span>
+                                        <span class="demo-score-weight">(权重: 30%)</span>
+                                    </div>
+                                    <div class="demo-score-value">
+                                        <span class="demo-score-number">87.0</span>
+                                        <div class="demo-score-bar">
+                                            <div class="demo-score-fill" style="width: 87%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="steps-section">
+                <h3 class="steps-title">🛠️ 功能实现步骤</h3>
+                <ol class="steps-list">
+                    <li>添加了绩效详情模态框的状态管理（showDetailsModal、selectedRecord）</li>
+                    <li>实现了viewDetails函数，点击时打开模态框并传递员工数据</li>
+                    <li>创建了完整的模态框UI，包括员工信息展示和得分明细</li>
+                    <li>添加了响应式设计，支持不同部门的得分项目显示</li>
+                    <li>实现了可视化的得分条形图和权重说明</li>
+                    <li>添加了等级说明和关闭功能</li>
+                </ol>
+            </div>
+
+            <div class="highlight-box">
+                <h4>🎯 功能特点</h4>
+                <p>
+                    <strong>智能适配：</strong>根据员工所属部门（运营/销售）自动显示对应的得分项目<br>
+                    <strong>可视化展示：</strong>使用进度条直观展示各项得分情况<br>
+                    <strong>详细信息：</strong>包含权重说明、等级描述等完整信息<br>
+                    <strong>响应式设计：</strong>适配桌面和移动设备<br>
+                    <strong>用户友好：</strong>清晰的视觉层次和直观的操作体验
+                </p>
+            </div>
+
+            <div class="test-buttons">
+                <a href="http://localhost:5174/departments/performance" class="test-btn test-btn--primary">
+                    📊 测试绩效详情功能
+                </a>
+                
+                <a href="http://localhost:5174/dashboard" class="test-btn test-btn--secondary">
+                    🏠 返回首页
+                </a>
+            </div>
+
+            <div style="margin-top: 30px; padding: 20px; background: #f0fdf4; border-radius: 12px; text-align: left;">
+                <h4 style="color: #166534; margin-bottom: 10px;">✅ 测试指南</h4>
+                <p style="color: #166534; line-height: 1.6;">
+                    现在请访问绩效管理页面，测试新功能：<br>
+                    • 👁️ 点击任意员工行的"查看详情"按钮<br>
+                    • 📊 查看弹出的绩效详情模态框<br>
+                    • 📈 观察得分明细的可视化展示<br>
+                    • 🔄 在运营部门和销售部门间切换测试<br>
+                    • ❌ 点击X按钮或背景关闭模态框
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 添加动画效果
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.feature-card');
+            
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(30px)';
+                    card.style.transition = 'all 0.6s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 200);
+            });
+        });
+    </script>
+</body>
+</html>

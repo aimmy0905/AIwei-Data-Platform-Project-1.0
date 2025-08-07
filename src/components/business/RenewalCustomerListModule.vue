@@ -1,256 +1,339 @@
 <template>
-  <div class="renewal-customer-list-module">
-    <div class="renewal-customer-list-module__header">
-      <h3 class="renewal-customer-list-module__title">续费客户名单</h3>
-      <div class="header-controls">
-        <div class="status-filter">
+  <div class="renewal-customer-list-module analysis-module">
+    <!-- 模块头部 -->
+    <div class="analysis-module__header">
+      <h3 class="analysis-module__title">续费客户名单</h3>
+      <div class="analysis-module__controls">
+        <!-- 时间筛选按钮 -->
+        <div class="time-controls">
           <button
-            v-for="status in statusOptions"
-            :key="status.value"
-            class="status-filter-btn"
-            :class="{ 'status-filter-btn--active': currentStatus === status.value }"
-            @click="currentStatus = status.value"
+            v-for="option in timeOptions"
+            :key="option.value"
+            :class="['time-btn', { 'time-btn--active': selectedTimeRange === option.value }]"
+            @click="handleTimeRangeChange(option.value)"
           >
-            {{ status.label }}
-            <span class="count-badge">{{ getStatusCount(status.value) }}</span>
+            {{ option.label }}
+          </button>
+        </div>
+
+        <!-- 季度导航 -->
+        <div class="quarter-controls">
+          <button
+            class="quarter-nav-btn"
+            :disabled="isPrevDisabled"
+            @click="handlePrevQuarter"
+          >
+            <ChevronLeft :size="16" />
+          </button>
+          <div class="quarter-display">{{ currentQuarter }}</div>
+          <button
+            class="quarter-nav-btn"
+            :disabled="isNextDisabled"
+            @click="handleNextQuarter"
+          >
+            <ChevronRight :size="16" />
           </button>
         </div>
       </div>
     </div>
 
-    <div class="renewal-customer-list-module__content">
+    <!-- 加载状态 -->
+    <div v-if="loading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>正在加载续费客户数据...</p>
+    </div>
+
+    <!-- 内容区域 -->
+    <div v-else class="analysis-module__content">
       <!-- 统计概览 -->
-      <div class="renewal-stats">
+      <div class="statistics-overview">
         <div class="stat-card">
-          <div class="stat-card__value">{{ totalCustomers }}</div>
-          <div class="stat-card__label">待续费客户</div>
+          <div class="stat-card__icon">
+            <Users :size="24" />
+          </div>
+          <div class="stat-card__content">
+            <div class="stat-card__label">续费客户总数</div>
+            <div class="stat-card__value">{{ totalRenewalCustomers }} 个</div>
+          </div>
         </div>
+
         <div class="stat-card">
-          <div class="stat-card__value">{{ formatCurrency(totalRenewalValue) }}</div>
-          <div class="stat-card__label">预估续费金额</div>
+          <div class="stat-card__icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="stat-card__content">
+            <div class="stat-card__label">续费总金额</div>
+            <div class="stat-card__value">{{ formatCurrency(totalRenewalAmount) }} 万元</div>
+          </div>
         </div>
+
         <div class="stat-card">
-          <div class="stat-card__value">{{ averageRenewalProbability.toFixed(1) }}%</div>
-          <div class="stat-card__label">平均续费概率</div>
+          <div class="stat-card__icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="stat-card__content">
+            <div class="stat-card__label">续费率</div>
+            <div class="stat-card__value">{{ renewalRate }}%</div>
+          </div>
         </div>
+
         <div class="stat-card">
-          <div class="stat-card__value">{{ highPriorityCount }}</div>
-          <div class="stat-card__label">高优先级客户</div>
+          <div class="stat-card__icon">
+            <Calendar :size="24" />
+          </div>
+          <div class="stat-card__content">
+            <div class="stat-card__label">平均续费周期</div>
+            <div class="stat-card__value">{{ averageRenewalCycle }} 个月</div>
+          </div>
         </div>
       </div>
 
-      <!-- 客户列表 -->
-      <div class="customer-list">
-        <div class="customer-list__header">
-          <div class="col-name">客户名称</div>
-          <div class="col-end-date">合同到期</div>
-          <div class="col-status">续费状态</div>
-          <div class="col-revenue">去年收入</div>
-          <div class="col-renewal-value">预估续费额</div>
-          <div class="col-probability">续费概率</div>
-          <div class="col-sales">负责销售</div>
-          <div class="col-priority">优先级</div>
-          <div class="col-actions">操作</div>
-        </div>
+      <!-- 续费客户列表 -->
+      <div class="renewal-table-container">
+        <table class="renewal-table">
+          <thead>
+            <tr>
+              <th class="department-header">优化部门</th>
+              <th class="customer-header">客户名称</th>
+              <th class="metric-header">销售</th>
+              <th class="metric-header">合作项目</th>
+              <th class="metric-header">合作时间</th>
+              <th class="metric-header">合作年份</th>
+              <th class="metric-header">上一次合作周期</th>
+              <th class="metric-header">服务到期时间</th>
+              <th class="metric-header">上一次续费项目</th>
+              <th class="metric-header">上一次续费金额</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template v-for="(group, groupIndex) in groupedRenewalData" :key="groupIndex">
+              <tr
+                v-for="(customer, customerIndex) in group.customers"
+                :key="customer.customerId"
+                class="data-row"
+              >
+                <!-- 优化部门合并单元格 -->
+                <td v-if="customerIndex === 0"
+                    :rowspan="group.customers.length"
+                    class="department-cell">
+                  {{ group.department }}
+                </td>
 
-        <div class="customer-list__body">
-          <div 
-            v-for="customer in filteredCustomers"
-            :key="customer.id"
-            class="customer-item"
-            :class="getPriorityClass(customer.priority)"
-          >
-            <div class="col-name">
-              <div class="customer-info">
-                <span class="customer-name">{{ customer.customerName }}</span>
-                <span class="days-left">{{ getDaysLeft(customer.contractEndDate) }}天后到期</span>
-              </div>
-            </div>
-            <div class="col-end-date">
-              <span class="end-date" :class="getEndDateClass(customer.contractEndDate)">
-                {{ formatDate(customer.contractEndDate) }}
-              </span>
-            </div>
-            <div class="col-status">
-              <div class="status-badge" :class="getStatusBadgeClass(customer.renewalStatus)">
-                {{ getStatusText(customer.renewalStatus) }}
-              </div>
-            </div>
-            <div class="col-revenue">
-              <span class="revenue-value">{{ formatCurrency(customer.lastYearRevenue) }}</span>
-            </div>
-            <div class="col-renewal-value">
-              <span class="renewal-value">{{ formatCurrency(customer.estimatedRenewalValue) }}</span>
-            </div>
-            <div class="col-probability">
-              <div class="probability-display">
-                <div class="probability-bar">
-                  <div 
-                    class="probability-fill"
-                    :class="getProbabilityClass(customer.renewalProbability)"
-                    :style="{ width: `${customer.renewalProbability}%` }"
-                  ></div>
-                </div>
-                <span class="probability-text">{{ customer.renewalProbability }}%</span>
-              </div>
-            </div>
-            <div class="col-sales">
-              <span class="sales-person">{{ customer.salesPerson }}</span>
-            </div>
-            <div class="col-priority">
-              <div class="priority-badge" :class="getPriorityBadgeClass(customer.priority)">
-                {{ getPriorityText(customer.priority) }}
-              </div>
-            </div>
-            <div class="col-actions">
-              <button class="action-btn primary" @click="followUp(customer)">
-                跟进
-              </button>
-              <button class="action-btn secondary" @click="viewDetails(customer)">
-                详情
-              </button>
-            </div>
-          </div>
-        </div>
+                <td class="customer-name">{{ customer.customerName }}</td>
+                <td class="metric-value">{{ customer.salesPerson }}</td>
+                <td class="metric-value">{{ customer.cooperationProject }}</td>
+                <td class="metric-value">{{ customer.cooperationTime }}</td>
+                <td class="metric-value">{{ customer.cooperationYear }}</td>
+                <td class="metric-value">{{ customer.lastCooperationCycle }}</td>
+                <td class="metric-value">{{ customer.serviceExpiryTime }}</td>
+                <td class="metric-value">{{ customer.lastRenewalProject }}</td>
+                <td class="metric-value amount">{{ formatCurrency(customer.lastRenewalAmount) }}</td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import type { RenewalCustomerData } from '@/types'
+import { ref, computed, defineProps, defineEmits } from 'vue'
+import { ChevronLeft, ChevronRight, Users, DollarSign, TrendingUp, Calendar } from 'lucide-vue-next'
 
-interface Props {
-  renewalCustomers: RenewalCustomerData[]
-  loading?: boolean
+// 接口定义
+interface RenewalCustomerData {
+  customerId: string
+  customerName: string
+  salesPerson: string
+  optimizationDepartment: string
+  cooperationProject: string
+  cooperationTime: string
+  cooperationYear: string
+  lastCooperationCycle: string
+  serviceExpiryTime: string
+  lastRenewalProject: string
+  lastRenewalAmount: number
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  loading: false
-})
-
-const emit = defineEmits<{
-  followUp: [customer: RenewalCustomerData]
-  viewDetails: [customer: RenewalCustomerData]
+// Props 和 Emits
+const props = defineProps<{
+  loading?: boolean
 }>()
 
-const currentStatus = ref<string>('all')
+const emits = defineEmits<{
+  'time-range-change': [value: string]
+  'quarter-change': [value: string]
+}>()
 
-const statusOptions = [
-  { value: 'all', label: '全部' },
-  { value: 'pending', label: '待联系' },
-  { value: 'contacted', label: '已联系' },
-  { value: 'negotiating', label: '商谈中' },
-  { value: 'confirmed', label: '已确认' },
-  { value: 'declined', label: '已拒绝' }
+// 响应式数据
+const selectedTimeRange = ref('quarter')
+const currentQuarter = ref('2025年Q1')
+
+const timeOptions = [
+  { label: '年', value: 'year' },
+  { label: '季', value: 'quarter' },
+  { label: '月', value: 'month' }
 ]
 
-const filteredCustomers = computed(() => {
-  if (currentStatus.value === 'all') {
-    return props.renewalCustomers
+// 模拟续费客户数据
+const renewalCustomerData = ref<RenewalCustomerData[]>([
+  {
+    customerId: '1',
+    customerName: '华为技术有限公司',
+    salesPerson: '张三',
+    optimizationDepartment: 'Google优化部',
+    cooperationProject: 'Google Ads推广',
+    cooperationTime: '2023-03-15',
+    cooperationYear: '2023年',
+    lastCooperationCycle: '12个月',
+    serviceExpiryTime: '2025-03-15',
+    lastRenewalProject: 'Google Ads续费',
+    lastRenewalAmount: 520.0
+  },
+  {
+    customerId: '2',
+    customerName: '腾讯科技(深圳)有限公司',
+    salesPerson: '李四',
+    optimizationDepartment: 'Meta优化部',
+    cooperationProject: 'Facebook广告投放',
+    cooperationTime: '2023-01-10',
+    cooperationYear: '2023年',
+    lastCooperationCycle: '12个月',
+    serviceExpiryTime: '2025-01-10',
+    lastRenewalProject: 'Facebook Ads续费',
+    lastRenewalAmount: 450.0
+  },
+  {
+    customerId: '3',
+    customerName: '阿里巴巴(中国)有限公司',
+    salesPerson: '王五',
+    optimizationDepartment: 'Criteo优化部',
+    cooperationProject: 'Criteo电商推广',
+    cooperationTime: '2023-06-01',
+    cooperationYear: '2023年',
+    lastCooperationCycle: '6个月',
+    serviceExpiryTime: '2025-06-01',
+    lastRenewalProject: 'Criteo续费',
+    lastRenewalAmount: 400.0
+  },
+  {
+    customerId: '4',
+    customerName: '百度在线网络技术(北京)有限公司',
+    salesPerson: '赵六',
+    optimizationDepartment: 'Bing优化部',
+    cooperationProject: 'Bing Ads推广',
+    cooperationTime: '2023-05-20',
+    cooperationYear: '2023年',
+    lastCooperationCycle: '12个月',
+    serviceExpiryTime: '2025-05-20',
+    lastRenewalProject: 'Bing Ads续费',
+    lastRenewalAmount: 380.0
+  },
+  {
+    customerId: '5',
+    customerName: '京东科技信息技术有限公司',
+    salesPerson: '孙七',
+    optimizationDepartment: 'Google优化部',
+    cooperationProject: 'Google购物广告',
+    cooperationTime: '2023-08-10',
+    cooperationYear: '2023年',
+    lastCooperationCycle: '6个月',
+    serviceExpiryTime: '2025-08-10',
+    lastRenewalProject: 'Google Shopping续费',
+    lastRenewalAmount: 300.0
+  },
+  {
+    customerId: '6',
+    customerName: '小米科技有限责任公司',
+    salesPerson: '周八',
+    optimizationDepartment: 'Meta优化部',
+    cooperationProject: 'Instagram推广',
+    cooperationTime: '2023-04-25',
+    cooperationYear: '2023年',
+    lastCooperationCycle: '12个月',
+    serviceExpiryTime: '2025-04-25',
+    lastRenewalProject: 'Instagram Ads续费',
+    lastRenewalAmount: 260.0
   }
-  return props.renewalCustomers.filter(customer => customer.renewalStatus === currentStatus.value)
+])
+
+// 计算属性
+const totalRenewalCustomers = computed(() => {
+  return renewalCustomerData.value.length
 })
 
-const totalCustomers = computed(() => props.renewalCustomers.length)
-
-const totalRenewalValue = computed(() => {
-  return props.renewalCustomers.reduce((sum, customer) => sum + customer.estimatedRenewalValue, 0)
+const totalRenewalAmount = computed(() => {
+  return renewalCustomerData.value.reduce((sum, customer) => sum + customer.lastRenewalAmount, 0)
 })
 
-const averageRenewalProbability = computed(() => {
-  if (props.renewalCustomers.length === 0) return 0
-  const totalProbability = props.renewalCustomers.reduce((sum, customer) => sum + customer.renewalProbability, 0)
-  return totalProbability / props.renewalCustomers.length
+const renewalRate = computed(() => {
+  // 简化计算，假设75%的续费率
+  return '75.0'
 })
 
-const highPriorityCount = computed(() => {
-  return props.renewalCustomers.filter(customer => customer.priority === 'high').length
+const averageRenewalCycle = computed(() => {
+  // 基于合作周期计算平均值
+  const cycles = renewalCustomerData.value.map(c => parseInt(c.lastCooperationCycle))
+  const totalCycles = cycles.reduce((sum, cycle) => sum + cycle, 0)
+  return totalRenewalCustomers.value > 0 ? (totalCycles / totalRenewalCustomers.value).toFixed(1) : '0.0'
 })
 
-const getStatusCount = (status: string) => {
-  if (status === 'all') return props.renewalCustomers.length
-  return props.renewalCustomers.filter(customer => customer.renewalStatus === status).length
-}
+// 按优化部门分组数据
+const groupedRenewalData = computed(() => {
+  const groups = new Map()
 
-const formatCurrency = (value: number): string => {
-  if (value >= 100000000) {
-    return `¥${(value / 100000000).toFixed(2)}亿`
-  } else if (value >= 10000) {
-    return `¥${(value / 10000).toFixed(2)}万`
-  } else {
-    return `¥${value.toLocaleString()}`
-  }
-}
-
-const formatDate = (dateString: string): string => {
-  return new Date(dateString).toLocaleDateString('zh-CN', { 
-    month: '2-digit', 
-    day: '2-digit' 
+  renewalCustomerData.value.forEach(customer => {
+    const department = customer.optimizationDepartment
+    if (!groups.has(department)) {
+      groups.set(department, {
+        department,
+        customers: []
+      })
+    }
+    groups.get(department).customers.push(customer)
   })
+
+  return Array.from(groups.values())
+})
+
+const isPrevDisabled = computed(() => {
+  return currentQuarter.value === '2025年Q1'
+})
+
+const isNextDisabled = computed(() => {
+  return currentQuarter.value === '2025年Q4'
+})
+
+// 方法
+const handleTimeRangeChange = (value: string) => {
+  selectedTimeRange.value = value
+  emits('time-range-change', value)
 }
 
-const getDaysLeft = (endDate: string): number => {
-  const today = new Date()
-  const end = new Date(endDate)
-  const diffTime = end.getTime() - today.getTime()
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  return Math.max(0, diffDays)
-}
-
-const getEndDateClass = (endDate: string) => {
-  const daysLeft = getDaysLeft(endDate)
-  if (daysLeft <= 7) return 'urgent'
-  if (daysLeft <= 30) return 'warning'
-  return 'normal'
-}
-
-const getPriorityClass = (priority: string) => {
-  return `priority-${priority}`
-}
-
-const getStatusBadgeClass = (status: string) => {
-  return `status-${status}`
-}
-
-const getStatusText = (status: string) => {
-  const statusMap = {
-    pending: '待联系',
-    contacted: '已联系',
-    negotiating: '商谈中',
-    confirmed: '已确认',
-    declined: '已拒绝'
+const handlePrevQuarter = () => {
+  const quarters = ['2025年Q1', '2025年Q2', '2025年Q3', '2025年Q4']
+  const currentIndex = quarters.indexOf(currentQuarter.value)
+  if (currentIndex > 0) {
+    currentQuarter.value = quarters[currentIndex - 1]
+    emits('quarter-change', currentQuarter.value)
   }
-  return statusMap[status as keyof typeof statusMap] || status
 }
 
-const getProbabilityClass = (probability: number) => {
-  if (probability >= 80) return 'probability-high'
-  if (probability >= 50) return 'probability-medium'
-  return 'probability-low'
-}
-
-const getPriorityBadgeClass = (priority: string) => {
-  return `priority-badge-${priority}`
-}
-
-const getPriorityText = (priority: string) => {
-  const priorityMap = {
-    high: '高',
-    medium: '中',
-    low: '低'
+const handleNextQuarter = () => {
+  const quarters = ['2025年Q1', '2025年Q2', '2025年Q3', '2025年Q4']
+  const currentIndex = quarters.indexOf(currentQuarter.value)
+  if (currentIndex < quarters.length - 1) {
+    currentQuarter.value = quarters[currentIndex + 1]
+    emits('quarter-change', currentQuarter.value)
   }
-  return priorityMap[priority as keyof typeof priorityMap] || priority
 }
 
-const followUp = (customer: RenewalCustomerData) => {
-  emit('followUp', customer)
+const formatCurrency = (value: number) => {
+  return value.toFixed(1)
 }
 
-const viewDetails = (customer: RenewalCustomerData) => {
-  emit('viewDetails', customer)
-}
+
 </script>
 
 <style scoped>
@@ -262,7 +345,7 @@ const viewDetails = (customer: RenewalCustomerData) => {
   margin-bottom: 24px;
 }
 
-.renewal-customer-list-module__header {
+.analysis-module__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -271,59 +354,113 @@ const viewDetails = (customer: RenewalCustomerData) => {
   border-bottom: 1px solid #f0f0f0;
 }
 
-.renewal-customer-list-module__title {
+.analysis-module__title {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
   color: #262626;
 }
 
-.status-filter {
-  display: flex;
-  gap: 4px;
-}
-
-.status-filter-btn {
+.analysis-module__controls {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 16px;
+}
+
+.time-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.time-btn {
   padding: 6px 12px;
-  background: #fff;
   border: 1px solid #d9d9d9;
-  border-radius: 6px;
+  background: #fff;
   color: #595959;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
   transition: all 0.2s;
 }
 
-.status-filter-btn:hover {
+.time-btn:hover {
   border-color: #40a9ff;
   color: #40a9ff;
 }
 
-.status-filter-btn--active {
+.time-btn--active {
   background: #1890ff;
   border-color: #1890ff;
   color: #fff;
 }
 
-.count-badge {
-  background: rgba(255, 255, 255, 0.2);
-  color: inherit;
-  padding: 1px 6px;
-  border-radius: 10px;
-  font-size: 11px;
-  min-width: 16px;
+.quarter-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quarter-nav-btn {
+  padding: 4px;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  color: #595959;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quarter-nav-btn:hover:not(:disabled) {
+  border-color: #40a9ff;
+  color: #40a9ff;
+}
+
+.quarter-nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quarter-display {
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 80px;
   text-align: center;
+  color: #262626;
 }
 
-.status-filter-btn:not(.status-filter-btn--active) .count-badge {
-  background: #f0f0f0;
-  color: #8c8c8c;
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
 }
 
-.renewal-stats {
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f0f0f0;
+  border-top: 3px solid #1890ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.analysis-module__content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.statistics-overview {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
@@ -331,287 +468,149 @@ const viewDetails = (customer: RenewalCustomerData) => {
 }
 
 .stat-card {
-  background: #fafafa;
-  border: 1px solid #f0f0f0;
-  border-radius: 8px;
+  display: flex;
+  align-items: center;
   padding: 20px;
-  text-align: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+  transition: all 0.3s ease;
 }
 
-.stat-card__value {
-  font-size: 24px;
-  font-weight: 700;
-  color: #262626;
-  margin-bottom: 8px;
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card__icon {
+  margin-right: 12px;
+  color: #fff;
+  background: #1890ff;
+  padding: 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-card__content {
+  flex: 1;
 }
 
 .stat-card__label {
-  font-size: 14px;
-  color: #8c8c8c;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+  font-weight: 500;
 }
 
-.customer-list {
-  border: 1px solid #f0f0f0;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.customer-list__header {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr 0.8fr 1.2fr;
-  background: #fafafa;
-  padding: 16px 12px;
-  font-size: 14px;
+.stat-card__value {
+  font-size: 20px;
   font-weight: 600;
-  color: #8c8c8c;
-  border-bottom: 1px solid #f0f0f0;
+  color: #262626;
 }
 
-.customer-list__body {
+.renewal-table-container {
+  overflow-x: auto;
   background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
 }
 
-.customer-item {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr 0.8fr 1.2fr;
-  padding: 16px 12px;
-  border-bottom: 1px solid #f5f5f5;
-  align-items: center;
-  transition: background-color 0.2s;
+.renewal-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1200px;
 }
 
-.customer-item:hover {
+.renewal-table th {
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  padding: 12px 8px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #595959;
+  white-space: nowrap;
+}
+
+.renewal-table td {
+  border: 1px solid #f0f0f0;
+  padding: 12px 8px;
+  text-align: center;
+  font-size: 13px;
+  vertical-align: middle;
+  color: #595959;
+}
+
+.department-header {
+  background: #f0f2f5 !important;
+  color: #262626 !important;
+  font-weight: 600;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  min-width: 120px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.customer-header {
+  background: #f0f2f5 !important;
+  color: #262626 !important;
+  font-weight: 600;
+  min-width: 180px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.metric-header {
+  background: #f0f2f5 !important;
+  color: #262626 !important;
+  font-weight: 600;
+  min-width: 100px;
+}
+
+.data-row:nth-child(even) {
   background: #fafafa;
 }
 
-.customer-item:last-child {
-  border-bottom: none;
+.data-row:hover {
+  background: #e6f7ff;
 }
 
-.customer-item.priority-high {
-  border-left: 4px solid #ff4d4f;
-}
-
-.customer-item.priority-medium {
-  border-left: 4px solid #faad14;
-}
-
-.customer-item.priority-low {
-  border-left: 4px solid #52c41a;
-}
-
-.customer-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.department-cell {
+  text-align: center !important;
+  font-weight: 600;
+  color: #262626 !important;
+  background: #f0f2f5 !important;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  min-width: 120px;
+  vertical-align: middle;
+  border-right: 2px solid #d9d9d9;
 }
 
 .customer-name {
-  font-weight: 600;
-  color: #262626;
-  font-size: 14px;
-}
-
-.days-left {
-  font-size: 12px;
-  color: #8c8c8c;
-}
-
-.end-date.urgent {
-  color: #ff4d4f;
-  font-weight: 600;
-}
-
-.end-date.warning {
-  color: #faad14;
-  font-weight: 600;
-}
-
-.end-date.normal {
-  color: #8c8c8c;
-}
-
-.status-badge {
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
+  text-align: left !important;
   font-weight: 500;
-  text-align: center;
-}
-
-.status-badge.status-pending {
-  background: #fff2f0;
-  color: #ff4d4f;
-}
-
-.status-badge.status-contacted {
-  background: #e6f7ff;
-  color: #1890ff;
-}
-
-.status-badge.status-negotiating {
-  background: #fff7e6;
-  color: #fa8c16;
-}
-
-.status-badge.status-confirmed {
-  background: #f6ffed;
-  color: #52c41a;
-}
-
-.status-badge.status-declined {
-  background: #f5f5f5;
-  color: #8c8c8c;
-}
-
-.revenue-value,
-.renewal-value {
-  font-weight: 600;
-  color: #262626;
-  font-size: 13px;
-}
-
-.probability-display {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.probability-bar {
-  flex: 1;
-  height: 6px;
-  background: #f5f5f5;
-  border-radius: 3px;
+  color: #262626 !important;
+  max-width: 180px;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.probability-fill {
-  height: 100%;
-  transition: width 0.3s ease;
+.metric-value {
+  font-weight: 500;
+  color: #595959;
 }
 
-.probability-fill.probability-high {
-  background: #52c41a;
-}
-
-.probability-fill.probability-medium {
-  background: #faad14;
-}
-
-.probability-fill.probability-low {
-  background: #ff4d4f;
-}
-
-.probability-text {
-  font-size: 12px;
+.metric-value.amount {
+  color: #1890ff;
   font-weight: 600;
-  color: #595959;
-  min-width: 30px;
 }
 
-.sales-person {
-  font-size: 13px;
-  color: #595959;
-}
 
-.priority-badge {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 600;
-  margin: 0 auto;
-}
-
-.priority-badge-high {
-  background: #ff4d4f;
-  color: #fff;
-}
-
-.priority-badge-medium {
-  background: #faad14;
-  color: #fff;
-}
-
-.priority-badge-low {
-  background: #52c41a;
-  color: #fff;
-}
-
-.col-actions {
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-}
-
-.action-btn {
-  padding: 4px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  transition: all 0.2s;
-}
-
-.action-btn.primary {
-  background: #1890ff;
-  border: 1px solid #1890ff;
-  color: #fff;
-}
-
-.action-btn.primary:hover {
-  background: #40a9ff;
-  border-color: #40a9ff;
-}
-
-.action-btn.secondary {
-  background: #fff;
-  border: 1px solid #d9d9d9;
-  color: #595959;
-}
-
-.action-btn.secondary:hover {
-  border-color: #40a9ff;
-  color: #40a9ff;
-}
-
-@media (max-width: 1400px) {
-  .customer-list__header,
-  .customer-item {
-    grid-template-columns: 1.8fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 0.6fr 1fr;
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 768px) {
-  .renewal-customer-list-module {
-    padding: 16px;
-  }
-
-  .renewal-customer-list-module__header {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-  }
-
-  .status-filter {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .renewal-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .customer-list {
-    overflow-x: auto;
-  }
-
-  .customer-list__header,
-  .customer-item {
-    min-width: 1000px;
-  }
-}
 </style>

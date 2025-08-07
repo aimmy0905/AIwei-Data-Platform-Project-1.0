@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>绩效管理系统重构测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #1f2937;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #4f46e5;
+        }
+
+        .restructure-overview {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .restructure-overview h3 {
+            color: #92400e;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .restructure-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+        }
+
+        .restructure-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            background: #10b981;
+        }
+
+        .department-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .department-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .department-card:hover {
+            border-color: #4f46e5;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.15);
+        }
+
+        .department-card.operations {
+            border-color: #10b981;
+        }
+
+        .department-card.sales {
+            border-color: #3b82f6;
+        }
+
+        .department-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .department-card.operations h3 {
+            color: #10b981;
+        }
+
+        .department-card.sales h3 {
+            color: #3b82f6;
+        }
+
+        .position-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #4f46e5;
+        }
+
+        .position-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .assessment-structure {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .assessment-structure.operations {
+            background: #ecfdf5;
+            border-color: #10b981;
+        }
+
+        .assessment-structure.sales {
+            background: #eff6ff;
+            border-color: #3b82f6;
+        }
+
+        .weight-info {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 6px;
+            padding: 8px;
+            margin: 6px 0;
+            font-size: 0.85rem;
+        }
+
+        .key-differences {
+            background: #fef2f2;
+            border: 2px solid #ef4444;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .key-differences h3 {
+            color: #dc2626;
+            margin-bottom: 15px;
+        }
+
+        .difference-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        .difference-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            background: #ef4444;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .test-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+        }
+
+        .buttons-section {
+            text-align: center;
+            padding: 30px;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-badge.restructured {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-badge.new {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 2px solid #0ea5e9;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .highlight-box h4 {
+            color: #0c4a6e;
+            margin-bottom: 10px;
+        }
+
+        .highlight-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .highlight-list li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .highlight-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔄 绩效管理系统重构</h1>
+            <p>完全分离的运营部门和销售部门考核体系</p>
+        </div>
+
+        <div class="content">
+            <!-- 重构概览 -->
+            <div class="section">
+                <h2>📋 重构概览</h2>
+                <div class="restructure-overview">
+                    <h3>重构完成项目</h3>
+                    <div class="restructure-item">
+                        <div class="restructure-icon">✓</div>
+                        <span><strong>数据模型重构</strong> - 创建独立的运营部门和销售部门绩效记录结构</span>
+                        <span class="status-badge restructured">已重构</span>
+                    </div>
+                    <div class="restructure-item">
+                        <div class="restructure-icon">✓</div>
+                        <span><strong>考核指标分离</strong> - 分别配置两个部门的考核指标和权重</span>
+                        <span class="status-badge restructured">已重构</span>
+                    </div>
+                    <div class="restructure-item">
+                        <div class="restructure-icon">✓</div>
+                        <span><strong>评分系统重构</strong> - 区分职能方案（运营）和过程管理指标（销售）</span>
+                        <span class="status-badge restructured">已重构</span>
+                    </div>
+                    <div class="restructure-item">
+                        <div class="restructure-icon">✓</div>
+                        <span><strong>界面功能重构</strong> - 支持部门切换和不同的考核体系展示</span>
+                        <span class="status-badge new">新建</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 关键差异 -->
+            <div class="section">
+                <h2>🚨 关键差异说明</h2>
+                <div class="key-differences">
+                    <h3>重构前后的主要变化</h3>
+                    <div class="difference-item">
+                        <div class="difference-icon">!</div>
+                        <span><strong>术语纠正</strong>：将"智能方案"更正为"职能方案"（运营部门）和"过程管理指标"（销售部门）</span>
+                    </div>
+                    <div class="difference-item">
+                        <div class="difference-icon">!</div>
+                        <span><strong>部门完全分离</strong>：运营部门和销售部门使用完全不同的数据结构和考核逻辑</span>
+                    </div>
+                    <div class="difference-item">
+                        <div class="difference-icon">!</div>
+                        <span><strong>考核周期差异</strong>：运营部门项目经理季度考核，其他全部月度考核</span>
+                    </div>
+                    <div class="difference-item">
+                        <div class="difference-icon">!</div>
+                        <span><strong>评分维度不同</strong>：运营部门三维度（数据+客户+职能），销售部门两维度（月度提成+绩效底薪）</span>
+                    </div>
+                    <div class="difference-item">
+                        <div class="difference-icon">!</div>
+                        <span><strong>人工录入支持</strong>：销售部门支持客户拜访量等指标的人工录入</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 部门对比 -->
+            <div class="section">
+                <h2>🏢 部门考核体系对比</h2>
+                <div class="department-comparison">
+                    <!-- 运营部门 -->
+                    <div class="department-card operations">
+                        <h3>
+                            🏢 运营部门考核方案
+                        </h3>
+                        
+                        <div class="position-section">
+                            <div class="position-title">项目经理（季度考核）</div>
+                            <div class="weight-info">
+                                <strong>考核得分 = 数据指标(40%) + 客户评价(30%) + 职能方案(30%)</strong>
+                            </div>
+                            <div class="assessment-structure operations">
+                                <strong>数据指标：</strong>服务费目标(100%) + 返点目标(100%)
+                            </div>
+                            <div class="assessment-structure operations">
+                                <strong>客户评价：</strong>客户满意度评分
+                            </div>
+                            <div class="assessment-structure operations">
+                                <strong>职能方案（由项目总监评分）：</strong><br>
+                                • 团队成员管理 (20%)<br>
+                                • 团内客户评论 (20%)<br>
+                                • 知识沉淀及输出 (20%)<br>
+                                • 培养及输出新人 (20%)<br>
+                                • 跨部门协助合作 (20%)
+                            </div>
+                        </div>
+
+                        <div class="position-section">
+                            <div class="position-title">项目成员/优化师（月度考核）</div>
+                            <div class="weight-info">
+                                <strong>考核得分 = 数据指标(40%) + 客户评价(30%) + 职能方案(30%)</strong>
+                            </div>
+                            <div class="assessment-structure operations">
+                                <strong>数据指标：</strong>服务费目标(100%) + 返点目标(100%)
+                            </div>
+                            <div class="assessment-structure operations">
+                                <strong>客户评价：</strong>客户满意度评分
+                            </div>
+                            <div class="assessment-structure operations">
+                                <strong>职能方案（由项目经理评分）：</strong><br>
+                                • 客户服务能力 (20%)<br>
+                                • 专业工作质量 (20%)<br>
+                                • 沟通与协助 (20%)<br>
+                                • 工作积极性及执行力 (20%)<br>
+                                • 成长与贡献 (20%)
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 销售部门 -->
+                    <div class="department-card sales">
+                        <h3>
+                            💼 销售部门考核方案
+                        </h3>
+                        
+                        <div class="position-section">
+                            <div class="position-title">营销经理（月度考核）</div>
+                            <div class="weight-info">
+                                <strong>月度提成 = 数据评分(月度完成率) 100%</strong><br>
+                                <strong>绩效底薪奖金 = 数据评分+过程管理指标 100%</strong>
+                            </div>
+                            <div class="assessment-structure sales">
+                                <strong>月度提成：</strong>新单服务费目标 + 新单单量目标
+                            </div>
+                            <div class="assessment-structure sales">
+                                <strong>绩效底薪奖金（由销售总监评分）：</strong><br>
+                                • 个人新单服务费目标 (20%)<br>
+                                • 团队新单服务费目标 (20%)<br>
+                                • 团队续费服务费目标 (20%)<br>
+                                • 成员成长及均衡性 (10%)<br>
+                                • 销售流程与CRM规范 (5%)<br>
+                                • 策略制定与过程辅导 (10%)<br>
+                                • 团队客户拜访量目标 (15%) <strong style="color: #ef4444;">【人工录入】</strong>
+                            </div>
+                        </div>
+
+                        <div class="position-section">
+                            <div class="position-title">M1-M5营销顾问（月度考核）</div>
+                            <div class="weight-info">
+                                <strong>月度提成 = 数据评分(月度完成率) 100%</strong><br>
+                                <strong>绩效底薪奖金 = 数据评分+过程管理指标 100%</strong>
+                            </div>
+                            <div class="assessment-structure sales">
+                                <strong>月度提成：</strong>新单服务费目标 + 新单单量目标
+                            </div>
+                            <div class="assessment-structure sales">
+                                <strong>绩效底薪奖金（由营销经理评分）：</strong><br>
+                                • 新单服务费目标 (50%)<br>
+                                • 新单客户数目标 (30%)<br>
+                                • 月度客户续约金额/续约服务费目标 (20%)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 重构亮点 -->
+            <div class="section">
+                <h2>✨ 重构亮点</h2>
+                <div class="highlight-box">
+                    <h4>技术架构优势</h4>
+                    <ul class="highlight-list">
+                        <li>完全分离的数据模型，避免部门间数据混淆</li>
+                        <li>类型安全的TypeScript接口定义</li>
+                        <li>灵活的配置系统，支持不同部门的个性化需求</li>
+                        <li>模块化的组件设计，便于维护和扩展</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>业务功能完善</h4>
+                    <ul class="highlight-list">
+                        <li>支持人工录入客户拜访量等特殊指标</li>
+                        <li>部门切换功能，一个界面管理两套体系</li>
+                        <li>权限控制精确到部门和职级</li>
+                        <li>考核周期灵活配置（月度/季度）</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 测试按钮 -->
+            <div class="buttons-section">
+                <h2>🧪 系统测试</h2>
+                <p style="margin-bottom: 20px; color: #6b7280;">点击下方按钮测试重构后的绩效管理系统</p>
+                
+                <a href="/#/departments/performance-new" class="test-button">
+                    🎯 测试新绩效管理页面
+                </a>
+                
+                <a href="/performance-system-restructured-test.html" class="test-button">
+                    📊 查看重构说明
+                </a>
+                
+                <div style="margin-top: 20px; padding: 20px; background: #fef3c7; border-radius: 8px; text-align: left;">
+                    <h4 style="color: #92400e; margin-bottom: 10px;">测试要点：</h4>
+                    <ul style="color: #92400e; margin-left: 20px;">
+                        <li>验证运营部门和销售部门的完全分离</li>
+                        <li>测试部门切换功能和不同的考核体系</li>
+                        <li>检查职能方案和过程管理指标的区分</li>
+                        <li>验证人工录入功能（如客户拜访量）</li>
+                        <li>确认权限控制按部门正确工作</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 添加一些交互效果
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.department-card');
+            
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

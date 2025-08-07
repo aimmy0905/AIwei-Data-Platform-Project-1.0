@@ -99,12 +99,6 @@
               <tr v-for="employee in paginatedEmployees" :key="employee.id" class="employee-row">
                 <td>
                   <div class="employee-info">
-                    <div class="employee-avatar">
-                      <img v-if="employee.avatar" :src="employee.avatar" :alt="employee.name" />
-                      <div v-else class="avatar-placeholder">
-                        {{ employee.name.charAt(0) }}
-                      </div>
-                    </div>
                     <div class="employee-details">
                       <div class="employee-name">{{ employee.name }}</div>
                       <div class="employee-gender">{{ employee.gender === 'male' ? '男' : '女' }}</div>
@@ -125,32 +119,36 @@
                 <td>
                   <div class="action-buttons">
                     <button
-                      class="action-btn-small action-btn-small--info"
+                      class="action-btn-with-text action-btn-with-text--info"
                       @click="viewEmployee(employee)"
                       title="查看详情"
                     >
                       <Eye :size="14" />
+                      <span>查看</span>
                     </button>
                     <button
-                      class="action-btn-small action-btn-small--primary"
+                      class="action-btn-with-text action-btn-with-text--primary"
                       @click="editEmployee(employee)"
                       title="编辑"
                     >
                       <Edit :size="14" />
+                      <span>编辑</span>
                     </button>
                     <button
-                      class="action-btn-small action-btn-small--success"
+                      class="action-btn-with-text action-btn-with-text--success"
                       @click="viewPerformance(employee)"
                       title="绩效记录"
                     >
                       <Award :size="14" />
+                      <span>绩效</span>
                     </button>
                     <button
-                      class="action-btn-small action-btn-small--danger"
+                      class="action-btn-with-text action-btn-with-text--danger"
                       @click="deleteEmployee(employee)"
                       title="删除"
                     >
                       <Trash2 :size="14" />
+                      <span>删除</span>
                     </button>
                   </div>
                 </td>
@@ -188,7 +186,7 @@
 
     <!-- 新建/编辑员工弹窗 -->
     <div v-if="showEmployeeModal" class="modal-overlay" @click="closeEmployeeModal">
-      <div class="modal-container modal-container--large" @click.stop>
+      <div class="modal-container modal-container--wide" @click.stop>
         <div class="modal-header">
           <h3 class="modal-title">{{ isEditing ? '编辑员工' : '新建员工' }}</h3>
           <button class="modal-close" @click="closeEmployeeModal">
@@ -196,22 +194,15 @@
           </button>
         </div>
         <div class="modal-content">
-          <div class="employee-form-tabs">
-            <div class="tab-headers">
-              <button
-                v-for="(tab, index) in formTabs"
-                :key="tab.key"
-                class="tab-header"
-                :class="{ 'tab-header--active': activeTab === index }"
-                @click="activeTab = index"
-              >
-                {{ tab.label }}
-              </button>
-            </div>
+          <form @submit.prevent="submitEmployee" class="employee-form-unified">
+            <div class="form-sections">
 
-            <form @submit.prevent="submitEmployee" class="employee-form">
-              <!-- 基本信息 Tab -->
-              <div v-show="activeTab === 0" class="tab-content">
+              <!-- 基本信息区域 -->
+              <div class="form-section">
+                <div class="form-section-header">
+                  <User :size="20" />
+                  <h4>基本信息</h4>
+                </div>
                 <div class="form-grid">
                   <div class="form-group">
                     <label class="form-label">姓名 *</label>
@@ -270,8 +261,13 @@
                 </div>
               </div>
 
-              <!-- 联系方式 Tab -->
-              <div v-show="activeTab === 1" class="tab-content">
+
+              <!-- 联系方式区域 -->
+              <div class="form-section">
+                <div class="form-section-header">
+                  <Phone :size="20" />
+                  <h4>联系方式</h4>
+                </div>
                 <div class="form-grid">
                   <div class="form-group">
                     <label class="form-label">手机号码 *</label>
@@ -347,8 +343,13 @@
                 </div>
               </div>
 
-              <!-- 工作信息 Tab -->
-              <div v-show="activeTab === 2" class="tab-content">
+
+              <!-- 工作信息区域 -->
+              <div class="form-section">
+                <div class="form-section-header">
+                  <Briefcase :size="20" />
+                  <h4>工作信息</h4>
+                </div>
                 <div class="form-grid">
                   <div class="form-group">
                     <label class="form-label">所属部门 *</label>
@@ -446,23 +447,258 @@
                 </div>
               </div>
 
-              <div class="form-actions">
-                <button type="button" class="btn btn--secondary" @click="prevTab" v-if="activeTab > 0">
-                  上一步
-                </button>
-                <button type="button" class="btn btn--secondary" @click="closeEmployeeModal">
-                  取消
-                </button>
-                <button type="button" class="btn btn--primary" @click="nextTab" v-if="activeTab < formTabs.length - 1">
-                  下一步
-                </button>
-                <button type="submit" class="btn btn--primary" v-if="activeTab === formTabs.length - 1" :disabled="!isFormValid">
-                  {{ isEditing ? '更新' : '完成' }}
-                </button>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn--secondary" @click="closeEmployeeModal">
+                <X :size="16" />
+                取消
+              </button>
+              <button type="submit" class="btn btn--primary" :disabled="!isFormValid">
+                <Save :size="16" />
+                {{ isEditing ? '更新员工' : '创建员工' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 员工详情查看模态框 -->
+    <div v-if="showViewModal && selectedEmployee" class="modal-overlay" @click="closeViewModal">
+      <div class="modal-container modal-container--wide" @click.stop>
+        <div class="modal-header employee-detail-simple-header">
+          <div class="header-title-section">
+            <h3 class="employee-detail-title">{{ selectedEmployee.name }}</h3>
+            <div class="employee-basic-meta">
+              <span class="employee-id-badge">工号: {{ selectedEmployee.employee_id }}</span>
+              <span class="status-badge" :class="getEmployeeStatusClass(selectedEmployee.status)">
+                {{ getEmployeeStatusText(selectedEmployee.status) }}
+              </span>
+            </div>
+          </div>
+          <button class="modal-close" @click="closeViewModal">
+            <X :size="20" />
+          </button>
+        </div>
+
+        <div class="modal-body employee-detail-unified-body">
+          <div class="employee-detail-sections">
+
+            <!-- 基本信息区域 -->
+            <div class="detail-section-group">
+              <div class="section-cards">
+                <div class="detail-card">
+                  <div class="detail-card-header">
+                    <User :size="20" />
+                    <h4>个人信息</h4>
+                  </div>
+                  <div class="detail-card-body">
+                    <div class="detail-row">
+                      <label>姓名</label>
+                      <span>{{ selectedEmployee.name }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <label>性别</label>
+                      <span>{{ selectedEmployee.gender === 'male' ? '男' : '女' }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <label>出生日期</label>
+                      <span>{{ selectedEmployee.birth_date || '未设置' }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <label>身份证号</label>
+                      <span>{{ selectedEmployee.id_card || '未设置' }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="detail-card">
+                  <div class="detail-card-header">
+                    <MapPin :size="20" />
+                    <h4>地址信息</h4>
+                  </div>
+                  <div class="detail-card-body">
+                    <div class="detail-row">
+                      <label>居住地址</label>
+                      <span>{{ selectedEmployee.address || '未设置' }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <label>工作地点</label>
+                      <span>{{ selectedEmployee.work_location || '未设置' }}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </form>
+            </div>
+
+            <!-- 工作信息区域 -->
+            <div class="detail-section-group">
+              <div class="section-cards">
+                <div class="detail-card">
+                  <div class="detail-card-header">
+                    <Briefcase :size="20" />
+                    <h4>职位信息</h4>
+                  </div>
+                  <div class="detail-card-body">
+                    <div class="detail-row">
+                      <label>所属部门</label>
+                      <span>{{ selectedEmployee.department_name }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <label>职务</label>
+                      <span>{{ selectedEmployee.position }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <label>直属上级</label>
+                      <span>{{ selectedEmployee.supervisor_name || '无' }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <label>员工状态</label>
+                      <span class="status-badge" :class="getEmployeeStatusClass(selectedEmployee.status)">
+                        {{ getEmployeeStatusText(selectedEmployee.status) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="detail-card">
+                  <div class="detail-card-header">
+                    <Calendar :size="20" />
+                    <h4>入职信息</h4>
+                  </div>
+                  <div class="detail-card-body">
+                    <div class="detail-row">
+                      <label>入职时间</label>
+                      <span>{{ formatDate(selectedEmployee.hire_date) }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <label>试用期</label>
+                      <span>{{ selectedEmployee.probation_months || 3 }}个月</span>
+                    </div>
+                    <div class="detail-row">
+                      <label>工作年限</label>
+                      <span>{{ calculateWorkYears(selectedEmployee.hire_date) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 联系方式区域 -->
+            <div class="detail-section-group">
+              <div class="section-cards">
+                <div class="detail-card">
+                  <div class="detail-card-header">
+                    <Phone :size="20" />
+                    <h4>联系方式</h4>
+                  </div>
+                  <div class="detail-card-body">
+                    <div class="detail-row">
+                      <label>手机号码</label>
+                      <span>{{ selectedEmployee.phone }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <label>邮箱地址</label>
+                      <span>{{ selectedEmployee.email }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <label>微信号</label>
+                      <span>{{ selectedEmployee.wechat || '未设置' }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <label>QQ号</label>
+                      <span>{{ selectedEmployee.qq || '未设置' }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="detail-card">
+                  <div class="detail-card-header">
+                    <AlertCircle :size="20" />
+                    <h4>紧急联系人</h4>
+                  </div>
+                  <div class="detail-card-body">
+                    <div class="detail-row">
+                      <label>联系人姓名</label>
+                      <span>{{ selectedEmployee.emergency_contact || '未设置' }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <label>联系人电话</label>
+                      <span>{{ selectedEmployee.emergency_phone || '未设置' }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
+
+        <div class="modal-footer employee-detail-footer">
+          <div class="footer-actions">
+            <button class="btn btn--secondary" @click="closeViewModal">
+              <X :size="16" />
+              关闭
+            </button>
+            <button class="btn btn--primary" @click="editEmployee(selectedEmployee)">
+              <Edit :size="16" />
+              编辑员工
+            </button>
+            <button class="btn btn--success" @click="viewPerformance(selectedEmployee)">
+              <Award :size="16" />
+              查看绩效
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 全部绩效记录模态框 -->
+    <AllPerformanceModal
+      :visible="showPerformanceModal"
+      :employee="selectedEmployee"
+      :department-type="getEmployeeDepartmentType(selectedEmployee)"
+      @close="closePerformanceModal"
+    />
+
+    <!-- 删除确认模态框 -->
+    <div v-if="showDeleteModal && selectedEmployee" class="modal-overlay" @click="closeDeleteModal">
+      <div class="modal-container modal-container--small" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">确认删除</h3>
+          <button class="modal-close" @click="closeDeleteModal">
+            <X :size="20" />
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="delete-confirmation">
+            <div class="delete-icon">
+              <AlertTriangle :size="48" />
+            </div>
+            <div class="delete-message">
+              <p>您确定要删除员工 <strong>{{ selectedEmployee.name }}</strong> 吗？</p>
+              <p class="delete-warning">此操作不可撤销，员工的所有相关数据将被永久删除。</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn--secondary" @click="closeDeleteModal" :disabled="isLoading">取消</button>
+          <button class="btn btn--danger" @click="confirmDelete" :disabled="isLoading">
+            <span v-if="isLoading">删除中...</span>
+            <span v-else>确认删除</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 消息提示 -->
+    <div v-if="message" class="message-toast" :class="`message-toast--${messageType}`">
+      <div class="message-content">
+        <CheckCircle v-if="messageType === 'success'" :size="20" />
+        <XCircle v-if="messageType === 'error'" :size="20" />
+        <Info v-if="messageType === 'info'" :size="20" />
+        <span>{{ message }}</span>
       </div>
     </div>
   </div>
@@ -479,10 +715,23 @@ import {
   Edit,
   Award,
   Trash2,
-  X
+  X,
+  TrendingUp,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Info,
+  User,
+  Briefcase,
+  Phone,
+  MapPin,
+  Calendar,
+  AlertCircle,
+  Save
 } from 'lucide-vue-next'
 import { allEmployees, mockDepartments, mockPositions } from '@/mock/departments'
-import type { Employee, Department } from '@/types/departments'
+import type { Employee, Department, DepartmentType } from '@/types/departments'
+import AllPerformanceModal from '@/components/performance/AllPerformanceModal.vue'
 
 // 响应式数据
 const currentPage = ref(1)
@@ -494,6 +743,17 @@ const showEmployeeModal = ref(false)
 const isEditing = ref(false)
 const activeTab = ref(0)
 
+// 新增的模态框状态
+const showViewModal = ref(false)
+const showPerformanceModal = ref(false)
+const showDeleteModal = ref(false)
+const selectedEmployee = ref<Employee | null>(null)
+const isLoading = ref(false)
+const message = ref('')
+const messageType = ref<'success' | 'error' | 'info'>('info')
+
+// 绩效相关数据（保留以备兼容性）
+
 // 筛选条件
 const filters = reactive({
   departmentId: '',
@@ -502,12 +762,7 @@ const filters = reactive({
   keyword: ''
 })
 
-// 表单标签页
-const formTabs = [
-  { key: 'basic', label: '基本信息' },
-  { key: 'contact', label: '联系方式' },
-  { key: 'work', label: '工作信息' }
-]
+
 
 // 员工表单
 const employeeForm = reactive({
@@ -654,17 +909,74 @@ const editEmployee = (employee: Employee) => {
 }
 
 const viewEmployee = (employee: Employee) => {
-  alert(`查看员工详情: ${employee.name}`)
+  selectedEmployee.value = employee
+  showViewModal.value = true
 }
 
 const viewPerformance = (employee: Employee) => {
-  alert(`查看绩效记录: ${employee.name}`)
+  selectedEmployee.value = employee
+  showPerformanceModal.value = true
 }
 
 const deleteEmployee = (employee: Employee) => {
-  if (confirm(`确定要删除员工"${employee.name}"吗？`)) {
-    employees.value = employees.value.filter(e => e.id !== employee.id)
-    alert('员工删除成功！')
+  selectedEmployee.value = employee
+  showDeleteModal.value = true
+}
+
+const confirmDelete = async () => {
+  if (!selectedEmployee.value) return
+
+  isLoading.value = true
+  try {
+    // 模拟API调用
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    employees.value = employees.value.filter(e => e.id !== selectedEmployee.value!.id)
+    showMessage('员工删除成功！', 'success')
+    showDeleteModal.value = false
+    selectedEmployee.value = null
+  } catch (error) {
+    showMessage('删除失败，请重试', 'error')
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const showMessage = (text: string, type: 'success' | 'error' | 'info') => {
+  message.value = text
+  messageType.value = type
+  setTimeout(() => {
+    message.value = ''
+  }, 3000)
+}
+
+const closeViewModal = () => {
+  showViewModal.value = false
+  selectedEmployee.value = null
+}
+
+const closePerformanceModal = () => {
+  showPerformanceModal.value = false
+  selectedEmployee.value = null
+}
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+  selectedEmployee.value = null
+}
+
+const calculateWorkYears = (hireDate: string) => {
+  const hire = new Date(hireDate)
+  const now = new Date()
+  const diffTime = Math.abs(now.getTime() - hire.getTime())
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  const years = Math.floor(diffDays / 365)
+  const months = Math.floor((diffDays % 365) / 30)
+
+  if (years > 0) {
+    return `${years}年${months}个月`
+  } else {
+    return `${months}个月`
   }
 }
 
@@ -749,7 +1061,6 @@ const submitEmployee = () => {
 const closeEmployeeModal = () => {
   showEmployeeModal.value = false
   resetForm()
-  activeTab.value = 0
 }
 
 const resetForm = () => {
@@ -778,17 +1089,7 @@ const resetForm = () => {
   })
 }
 
-const nextTab = () => {
-  if (activeTab.value < formTabs.length - 1) {
-    activeTab.value++
-  }
-}
 
-const prevTab = () => {
-  if (activeTab.value > 0) {
-    activeTab.value--
-  }
-}
 
 const exportData = () => {
   alert('导出功能开发中...')
@@ -821,6 +1122,27 @@ const getEmployeeStatusText = (status: string): string => {
   }
   return statusMap[status] || status
 }
+
+// 绩效相关方法（已迁移到AllPerformanceModal组件）
+
+// 获取员工部门类型
+const getEmployeeDepartmentType = (employee: Employee | null): DepartmentType => {
+  if (!employee) return 'operations'
+
+  const departmentName = employee.department_name || ''
+
+  // 根据部门名称判断类型
+  if (departmentName.includes('销售') || departmentName.includes('商务')) {
+    return 'sales'
+  } else if (departmentName.includes('运营') || departmentName.includes('优化')) {
+    return 'operations'
+  }
+
+  // 默认返回运营部门类型
+  return 'operations'
+}
+
+// 绩效记录数据已迁移到AllPerformanceModal组件中处理
 </script>
 
 <style scoped>
@@ -1028,6 +1350,13 @@ const getEmployeeStatusText = (status: string): string => {
   color: var(--color-text-primary);
 }
 
+/* 操作列特殊样式 */
+.employees-table th:last-child,
+.employees-table td:last-child {
+  width: 280px;
+  min-width: 280px;
+}
+
 .employee-row:hover {
   background: var(--color-background);
 }
@@ -1035,33 +1364,6 @@ const getEmployeeStatusText = (status: string): string => {
 .employee-info {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-.employee-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.employee-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  background: var(--color-primary);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 16px;
 }
 
 .employee-details {
@@ -1111,7 +1413,8 @@ const getEmployeeStatusText = (status: string): string => {
 
 .action-buttons {
   display: flex;
-  gap: 4px;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .action-btn-small {
@@ -1164,6 +1467,407 @@ const getEmployeeStatusText = (status: string): string => {
 .action-btn-small--danger:hover {
   background: #dc2626;
   color: white;
+}
+
+/* 带文字的操作按钮 */
+.action-btn-with-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.action-btn-with-text--info {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.action-btn-with-text--info:hover {
+  background: #3b82f6;
+  color: white;
+}
+
+.action-btn-with-text--primary {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
+
+.action-btn-with-text--primary:hover {
+  background: #16a34a;
+  color: white;
+}
+
+.action-btn-with-text--success {
+  background: rgba(168, 85, 247, 0.1);
+  color: #a855f7;
+}
+
+.action-btn-with-text--success:hover {
+  background: #a855f7;
+  color: white;
+}
+
+.action-btn-with-text--danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.action-btn-with-text--danger:hover {
+  background: #dc2626;
+  color: white;
+}
+
+/* 员工详情模态框样式 - 简化版 */
+.employee-detail-simple-header {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-title-section {
+  flex: 1;
+}
+
+.employee-detail-title {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.employee-basic-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.employee-id-badge {
+  background: var(--color-background);
+  color: var(--color-text-secondary);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--color-border);
+}
+
+.employee-detail-unified-body {
+  padding: 0;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.employee-detail-sections {
+  padding: 32px;
+}
+
+.detail-section-group {
+  margin-bottom: 40px;
+}
+
+.detail-section-group:last-child {
+  margin-bottom: 0;
+}
+
+.section-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 24px;
+}
+
+.detail-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.detail-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-color: var(--color-primary);
+}
+
+.detail-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 24px;
+  background: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.detail-card-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.detail-card-body {
+  padding: 20px 24px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.detail-row label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.detail-row span {
+  font-size: 15px;
+  color: var(--color-text-primary);
+  font-weight: 500;
+  text-align: right;
+  word-break: break-all;
+}
+
+.employee-detail-footer {
+  background: var(--color-background);
+  border-top: 1px solid var(--color-border);
+  padding: 16px 24px;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+/* 响应式优化 */
+@media (max-width: 768px) {
+  .section-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .employee-detail-unified-body {
+    max-height: 60vh;
+  }
+
+  .employee-detail-sections {
+    padding: 16px;
+  }
+
+  .detail-section-group {
+    margin-bottom: 24px;
+  }
+
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .detail-row span {
+    text-align: left;
+  }
+}
+
+/* 绩效模态框样式 */
+.modal-filters {
+  display: flex;
+  gap: 20px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-background);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.filter-select {
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 14px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.employee-summary {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.employee-summary h4 {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.employee-summary p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.performance-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.timeline-item {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.timeline-date {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.timeline-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.summary-score {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.summary-grade {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.grade-excellent {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
+
+.grade-good {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+}
+
+.grade-average {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.grade-poor {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.timeline-content {
+  padding: 20px;
+}
+
+.detailed-scores {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.score-category {
+  background: var(--color-background);
+  border-radius: 6px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+}
+
+.category-title {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.score-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  flex: 1;
+}
+
+.detail-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-right: 8px;
+}
+
+.detail-rate {
+  font-size: 12px;
+  color: var(--color-text-secondary);
 }
 
 /* 分页 */
@@ -1240,6 +1944,12 @@ const getEmployeeStatusText = (status: string): string => {
 .modal-container--large {
   width: 800px;
   max-width: 95vw;
+}
+
+.modal-container--wide {
+  width: 1200px;
+  max-width: 95vw;
+  min-width: 900px;
 }
 
 .modal-header {
@@ -1323,6 +2033,43 @@ const getEmployeeStatusText = (status: string): string => {
   flex-direction: column;
 }
 
+/* 统一表单样式 */
+.employee-form-unified {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.form-sections {
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+}
+
+.form-section {
+  margin-bottom: 40px;
+}
+
+.form-section:last-child {
+  margin-bottom: 0;
+}
+
+.form-section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.form-section-header h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
 .tab-content {
   flex: 1;
   margin-bottom: 24px;
@@ -1398,8 +2145,9 @@ const getEmployeeStatusText = (status: string): string => {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  padding-top: 20px;
+  padding: 20px 32px;
   border-top: 1px solid var(--color-border);
+  background: var(--color-background);
   margin-top: auto;
 }
 
@@ -1438,6 +2186,100 @@ const getEmployeeStatusText = (status: string): string => {
 .btn--secondary:hover {
   background: var(--color-background-hover);
   border-color: var(--color-primary);
+}
+
+.btn--danger {
+  background: #dc2626;
+  color: white;
+  border: 1px solid #dc2626;
+}
+
+.btn--danger:hover:not(:disabled) {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.btn--danger:disabled {
+  background: var(--color-border);
+  color: var(--color-text-secondary);
+  border-color: var(--color-border);
+  cursor: not-allowed;
+}
+
+/* 删除确认模态框样式 */
+.delete-confirmation {
+  text-align: center;
+  padding: 20px;
+}
+
+.delete-icon {
+  margin-bottom: 16px;
+  color: #f59e0b;
+}
+
+.delete-message p {
+  margin: 0 0 8px 0;
+  color: var(--color-text-primary);
+}
+
+.delete-warning {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+/* 消息提示样式 */
+.message-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideIn 0.3s ease-out;
+}
+
+.message-toast--success {
+  background: #10b981;
+  color: white;
+}
+
+.message-toast--error {
+  background: #ef4444;
+  color: white;
+}
+
+.message-toast--info {
+  background: #3b82f6;
+  color: white;
+}
+
+.message-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* 模态框尺寸变体 */
+.modal-container--small {
+  max-width: 400px;
+}
+
+.modal-container--medium {
+  max-width: 600px;
 }
 
 /* 响应式设计 */
@@ -1491,6 +2333,12 @@ const getEmployeeStatusText = (status: string): string => {
   .modal-container--large {
     width: 95vw;
     margin: 20px;
+  }
+
+  .modal-container--wide {
+    width: 95vw;
+    min-width: auto;
+    margin: 10px;
   }
 
   .tab-headers {

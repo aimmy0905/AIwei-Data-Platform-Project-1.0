@@ -13,6 +13,48 @@ export interface User {
 
 export type UserRole = 'superAdmin' | 'manager' | 'staff' | 'finance' | 'sales' | 'sales_director' | 'sales_manager' | 'sales_person' | 'project_director' | 'project_manager' | 'google_optimizer' | 'meta_optimizer' | 'criteo_optimizer' | 'bing_optimizer' | 'finance_director'
 
+// 角色管理相关类型
+export interface Role {
+  id: string
+  name: string
+  displayName: string
+  description: string
+  department: string
+  level: 'director' | 'manager' | 'staff' | 'admin'
+  permissions: string[]
+  createdAt: string
+  updatedAt: string
+  status: 'active' | 'disabled'
+}
+
+// 权限相关类型
+export interface Permission {
+  id: string
+  name: string
+  displayName: string
+  description: string
+  module: string
+  category: 'read' | 'write' | 'delete' | 'admin'
+  resource: string
+}
+
+// 权限模块
+export interface PermissionModule {
+  id: string
+  name: string
+  displayName: string
+  description: string
+  permissions: Permission[]
+}
+
+// 角色权限配置
+export interface RolePermissionConfig {
+  roleId: string
+  permissions: string[]
+  lastUpdated: string
+  updatedBy: string
+}
+
 export interface LoginForm {
   username: string
   password: string
@@ -2017,6 +2059,28 @@ export interface TargetComparison {
   unit: string                  // 单位
 }
 
+// 年度季度目标数据
+export interface AnnualQuarterlyTargets {
+  year: number                  // 年份
+  yearlyTarget: {
+    serviceFeeTarget: number    // 年度服务费目标
+    serviceFeeActual: number    // 年度服务费完成
+    serviceFeeCompletion: number // 年度服务费完成率
+    newOrderTarget: number      // 年度新单目标
+    newOrderActual: number      // 年度新单完成
+    newOrderCompletion: number  // 年度新单完成率
+  }
+  quarters: Array<{
+    quarter: string             // 季度标识 (Q1, Q2, Q3, Q4)
+    serviceFeeTarget: number    // 季度服务费目标
+    serviceFeeActual: number    // 季度服务费完成
+    serviceFeeCompletion: number // 季度服务费完成率
+    newOrderTarget: number      // 季度新单目标
+    newOrderActual: number      // 季度新单完成
+    newOrderCompletion: number  // 季度新单完成率
+  }>
+}
+
 // 平台数据
 export interface PlatformData {
   platform: string             // 平台名称
@@ -2218,8 +2282,8 @@ export interface RoleSwitcherProps {
   onRoleChange: (role: string) => void  // 角色切换回调
 }
 
-// 角色信息
-export interface Role {
+// 业务看板角色信息
+export interface BusinessRole {
   code: string                  // 角色代码
   name: string                  // 角色名称
   level: number                 // 权限级别

@@ -11,6 +11,7 @@ export * from './projects'
 export * from './departments'
 export * from './customer-reviews'
 export * from './influencer-data'
+export * from './roles'
 
 // Mock菜单数据
 import type { MenuItem, UserRole } from '@/types'

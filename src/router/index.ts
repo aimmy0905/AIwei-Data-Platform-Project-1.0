@@ -336,6 +336,24 @@ const router = createRouter({
       meta: { requiresAuth: true },
       children: [
         {
+          path: 'roles',
+          name: 'settings-roles',
+          component: () => import('@/views/settings/RoleManagementView.vue'),
+          meta: {
+            requiresAuth: true,
+            roles: ['superAdmin']
+          }
+        },
+        {
+          path: 'permissions',
+          name: 'settings-permissions',
+          component: () => import('@/views/settings/PermissionSettingsView.vue'),
+          meta: {
+            requiresAuth: true,
+            roles: ['superAdmin']
+          }
+        },
+        {
           path: 'theme',
           name: 'settings-theme',
           component: () => import('@/views/settings/ThemeView.vue')
