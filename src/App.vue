@@ -1,19 +1,8 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { StagewiseToolbar } from '@stagewise/toolbar-vue'
-import VuePlugin from '@stagewise-plugins/vue'
-
-// Only show toolbar in development mode
-const isDevelopment = import.meta.env.DEV
 </script>
 
 <template>
-  <StagewiseToolbar
-    v-if="isDevelopment"
-    :config="{
-      plugins: [VuePlugin]
-    }"
-  />
   <RouterView />
 </template>
 

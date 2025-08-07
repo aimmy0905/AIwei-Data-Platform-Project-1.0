@@ -1677,11 +1677,7 @@ const handleTimeRangeChange = (value: string) => {
   loadDashboardData()
 }
 
-const handleQuarterChange = (quarter: string) => {
-  currentQuarter.value = quarter
-  console.log('季度切换至:', quarter)
-  loadDashboardData()
-}
+
 
 // 目标总览相关方法
 const handleTimePeriodChange = (event: Event) => {
