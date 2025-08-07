@@ -36,6 +36,15 @@ importers:
         specifier: ^4.5.1
         version: 4.5.1(vue@3.5.17(typescript@5.8.3))
     devDependencies:
+      '@stagewise-plugins/vue':
+        specifier: 0.5.0
+        version: 0.5.0(@stagewise/toolbar@0.5.0)
+      '@stagewise/toolbar':
+        specifier: 0.5.0
+        version: 0.5.0
+      '@stagewise/toolbar-vue':
+        specifier: 0.5.0
+        version: 0.5.0(vue@3.5.17(typescript@5.8.3))
       '@tsconfig/node22':
         specifier: ^22.0.2
         version: 22.0.2
@@ -749,6 +758,21 @@ packages:
   '@sindresorhus/merge-streams@4.0.0':
     resolution: {integrity: sha512-tlqY9xq5ukxTUZBmoOp+m61cqwQD5pHJtFY3Mn8CA8ps6yghLH/Hw8UPdqg4OLmFW3IFlcXnQNmo/dh8HzXYIQ==}
     engines: {node: '>=18'}
+
+  '@stagewise-plugins/vue@0.5.0':
+    resolution: {integrity: sha512-lZa5STLJzGuQlzZdm71QgQusnQ7HRKPWR1pvodCcjctI24BlFGCy5VdiSIYm9GK7J0IfHkwprueAUfPpj6dytQ==}
+    deprecated: 'This package is deprecated and has been replaced by the stagewise CLI. Get started with the CLI here: https://stagewise.io/docs'
+    peerDependencies:
+      '@stagewise/toolbar': 0.5.0
+
+  '@stagewise/toolbar-vue@0.5.0':
+    resolution: {integrity: sha512-uz6dvG9viRfXetgsd9UyJh/KtlC8kDTNIut3W3sEu/I1UnYGG52oHdcU4d72C6xEStN85NxKNkbwSpVoybhyTg==}
+    peerDependencies:
+      vue: '>=3.0.0'
+
+  '@stagewise/toolbar@0.5.0':
+    resolution: {integrity: sha512-Z8299P7IkXaxy2dTpS4lKyPHMeQ9R3MEtE9CJr9iRAnM8s4Xbc0CRutwzViPF34k/dP83vRZXJFQmEG55YlIOg==}
+    deprecated: 'This package is deprecated and has been replaced by the stagewise CLI. Get started with the CLI here: https://stagewise.io/docs'
 
   '@swc/helpers@0.5.17':
     resolution: {integrity: sha512-5IKx/Y13RsYd+sauPb2x+U/xZikHjolzfuDgTAl/Tdf3Q8rslRvC19NKDLgAJQ6wsqADk10ntlv08nPFw/gO/A==}
@@ -3010,6 +3034,17 @@ snapshots:
   '@sec-ant/readable-stream@0.4.1': {}
 
   '@sindresorhus/merge-streams@4.0.0': {}
+
+  '@stagewise-plugins/vue@0.5.0(@stagewise/toolbar@0.5.0)':
+    dependencies:
+      '@stagewise/toolbar': 0.5.0
+
+  '@stagewise/toolbar-vue@0.5.0(vue@3.5.17(typescript@5.8.3))':
+    dependencies:
+      '@stagewise/toolbar': 0.5.0
+      vue: 3.5.17(typescript@5.8.3)
+
+  '@stagewise/toolbar@0.5.0': {}
 
   '@swc/helpers@0.5.17':
     dependencies:

@@ -1,8 +1,20 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
+import { StagewiseToolbar } from '@stagewise/toolbar-vue'
+import VuePlugin from '@stagewise-plugins/vue'
+
+// 只在开发环境显示 Stagewise 工具栏
+const isDevelopment = import.meta.env.DEV
 </script>
 
 <template>
+  <!-- Stagewise 工具栏 - 只在开发环境显示 -->
+  <StagewiseToolbar
+    v-if="isDevelopment"
+    :config="{
+      plugins: [VuePlugin]
+    }"
+  />
   <RouterView />
 </template>
 
