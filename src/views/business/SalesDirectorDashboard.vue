@@ -38,6 +38,61 @@
         />
       </div>
 
+                  <!-- 目标卡片 -->
+      <div v-if="annualQuarterlyTargets" class="target-cards-container">
+        <!-- 服务费目标卡片 -->
+        <div class="target-card service-fee-card">
+          <div class="card-icon">
+            <DollarSign :size="20" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">服务费目标</div>
+            <div class="card-period">{{ selectedTimeRange === 'year' ? annualQuarterlyTargets.year + '年度' : currentQuarter }}</div>
+            <div class="card-value">{{ formatCurrency(getCurrentTargetData().serviceFeeTarget) }}</div>
+            <div class="card-subtitle">
+              已完成: {{ formatCurrency(getCurrentTargetData().serviceFeeActual) }}
+              <span class="completion-rate" :class="getCompletionClass(getCurrentTargetData().serviceFeeCompletion)">
+                {{ getCurrentTargetData().serviceFeeCompletion }}%
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 新单目标卡片 -->
+        <div class="target-card new-order-card">
+          <div class="card-icon">
+            <TrendingUp :size="20" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">新单目标</div>
+            <div class="card-period">{{ selectedTimeRange === 'year' ? annualQuarterlyTargets.year + '年度' : currentQuarter }}</div>
+            <div class="card-value">{{ getCurrentTargetData().newOrderTarget }}单</div>
+            <div class="card-subtitle">
+              已完成: {{ getCurrentTargetData().newOrderActual }}单
+              <span class="completion-rate" :class="getCompletionClass(getCurrentTargetData().newOrderCompletion)">
+                {{ getCurrentTargetData().newOrderCompletion }}%
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 综合完成率卡片 -->
+        <div class="target-card completion-rate-card">
+          <div class="card-icon">
+            <TrendingUp :size="20" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">综合完成率</div>
+            <div class="card-period">{{ selectedTimeRange === 'year' ? annualQuarterlyTargets.year + '年度' : currentQuarter }}</div>
+            <div class="card-value">{{ Math.round((getCurrentTargetData().serviceFeeCompletion + getCurrentTargetData().newOrderCompletion) / 2 * 10) / 10 }}%</div>
+            <div class="card-subtitle">
+              服务费: {{ getCurrentTargetData().serviceFeeCompletion }}%
+              <span class="separator">新单: {{ getCurrentTargetData().newOrderCompletion }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- 年度和季度目标表格 -->
       <div v-if="annualQuarterlyTargets" class="annual-quarterly-targets">
         <div class="targets-table-container">
@@ -97,6 +152,8 @@
       </div>
     </div>
 
+    
+
     <!-- 新单服务费及单量完成模块 -->
     <div class="dashboard-section">
       <div class="section-header">
@@ -108,6 +165,8 @@
           @quarter-change="handleQuarterChange"
         />
       </div>
+
+
 
       <div class="new-order-completion-table-container">
         <table class="new-order-completion-table">
@@ -201,9 +260,107 @@
           </tbody>
         </table>
       </div>
+
+      <!-- 饼状图统计 -->
+      <div class="pie-charts-container">
+                        <!-- 服务费占比饼图 -->
+        <div class="pie-chart-section">
+          <h4 class="chart-title">服务费占比分析</h4>
+          <div class="chart-content">
+                        <div class="pie-chart-wrapper">
+              <PieChart
+                :data="serviceFeeChartData"
+                :key="'service-fee-chart'"
+                :height="'200px'"
+                :show-legend="false"
+                :chart-id="'service-fee-pie-chart'"
+              />
+            </div>
+            <div class="chart-legend">
+              <div class="legend-item" v-for="item in serviceFeeChartData" :key="`sf-${item.name}`">
+                <span class="legend-color" :style="{ backgroundColor: item.color }"></span>
+                <span class="legend-text">{{ item.name }} ¥{{ item.value }}万 ({{ item.percentage }}%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 单量占比饼图 -->
+        <div class="pie-chart-section">
+          <h4 class="chart-title">单量占比分析</h4>
+          <div class="chart-content">
+                        <div class="pie-chart-wrapper">
+              <PieChart
+                :data="orderVolumeChartData"
+                :key="'order-volume-chart'"
+                :height="'200px'"
+                :show-legend="false"
+                :chart-id="'order-volume-pie-chart'"
+              />
+            </div>
+            <div class="chart-legend">
+              <div class="legend-item" v-for="item in orderVolumeChartData" :key="`ov-${item.name}`">
+                <span class="legend-color" :style="{ backgroundColor: item.color }"></span>
+                <span class="legend-text">{{ item.name }} {{ item.value }}单 ({{ item.percentage }}%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <!-- 总体数据统计卡片 -->
+    <div class="dashboard-section">
+      <div class="summary-cards-container">
+        <!-- 服务费目标卡片 -->
+        <div class="summary-card service-fee-summary">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">服务费目标</div>
+            <div class="card-period">{{ selectedTimeRange === 'year' ? annualQuarterlyTargets?.year + '年度' : currentQuarter }}</div>
+            <div class="card-value">{{ formatCurrency(getCurrentTargetData().serviceFeeTarget) }}</div>
+            <div class="card-completion">
+              已完成: {{ formatCurrency(getCurrentTargetData().serviceFeeActual) }}
+              <span class="completion-percentage">{{ getCurrentTargetData().serviceFeeCompletion }}%</span>
+            </div>
+          </div>
+        </div>
 
+        <!-- 新单目标卡片 -->
+        <div class="summary-card new-order-summary">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">新单目标</div>
+            <div class="card-period">{{ selectedTimeRange === 'year' ? annualQuarterlyTargets?.year + '年度' : currentQuarter }}</div>
+            <div class="card-value">{{ getCurrentTargetData().newOrderTarget }}单</div>
+            <div class="card-completion">
+              已完成: {{ getCurrentTargetData().newOrderActual }}单
+              <span class="completion-percentage">{{ getCurrentTargetData().newOrderCompletion }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 综合完成率卡片 -->
+        <div class="summary-card completion-summary">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">综合完成率</div>
+            <div class="card-period">{{ selectedTimeRange === 'year' ? annualQuarterlyTargets?.year + '年度' : currentQuarter }}</div>
+            <div class="card-value">{{ Math.round((getCurrentTargetData().serviceFeeCompletion + getCurrentTargetData().newOrderCompletion) / 2 * 10) / 10 }}%</div>
+            <div class="card-completion">
+              服务费: {{ getCurrentTargetData().serviceFeeCompletion }}%
+              <span class="separator">新单: {{ getCurrentTargetData().newOrderCompletion }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- 新签客户毛利完成模块 -->
     <div class="dashboard-section">
@@ -1662,6 +1819,122 @@ const isNextDisabled = computed(() => {
   return currentQuarter.value === '2025年Q4'
 })
 
+// 获取当前目标数据的方法
+const getCurrentTargetData = () => {
+  if (!annualQuarterlyTargets.value) {
+    return {
+      serviceFeeTarget: 0,
+      serviceFeeActual: 0,
+      serviceFeeCompletion: 0,
+      newOrderTarget: 0,
+      newOrderActual: 0,
+      newOrderCompletion: 0
+    }
+  }
+
+  if (selectedTimeRange.value === 'year') {
+    return annualQuarterlyTargets.value.yearlyTarget
+  } else {
+    // 根据当前季度获取对应的季度数据
+    const quarterData = annualQuarterlyTargets.value.quarters.find(q => q.quarter === currentQuarter.value.replace('2025年', ''))
+    return quarterData || annualQuarterlyTargets.value.yearlyTarget
+  }
+}
+
+// 平台数据统计方法
+const platformStats = {
+  Google: { serviceFee: 850, orderVolume: 45 },
+  Meta: { serviceFee: 720, orderVolume: 38 },
+  Criteo: { serviceFee: 560, orderVolume: 32 },
+  Bing: { serviceFee: 420, orderVolume: 25 },
+  Others: { serviceFee: 300, orderVolume: 16 }
+}
+
+const getTotalServiceFee = () => {
+  return Object.values(platformStats).reduce((total, platform) => total + platform.serviceFee, 0)
+}
+
+const getTotalOrderVolume = () => {
+  return Object.values(platformStats).reduce((total, platform) => total + platform.orderVolume, 0)
+}
+
+const getPlatformServiceFee = (platform: string) => {
+  return platformStats[platform]?.serviceFee || 0
+}
+
+const getPlatformOrderVolume = (platform: string) => {
+  return platformStats[platform]?.orderVolume || 0
+}
+
+// 饼图数据
+const serviceFeeChartData = computed(() => {
+  const total = getTotalServiceFee()
+  const colors = ['#1890ff', '#52c41a', '#ff4d4f', '#faad14', '#722ed1']
+  const platforms = ['Google', 'Meta', 'Criteo', 'Bing', 'Others']
+  const labels = ['Google', 'Meta', 'Criteo', 'Bing', '内容营销及其他']
+
+  return platforms.map((platform, index) => {
+    const value = getPlatformServiceFee(platform)
+    const percentage = ((value / total) * 100).toFixed(1)
+    return {
+      name: labels[index],
+      value: value,
+      percentage: percentage,
+      color: colors[index]
+    }
+  })
+})
+
+const orderVolumeChartData = computed(() => {
+  const total = getTotalOrderVolume()
+  const colors = ['#1890ff', '#52c41a', '#ff4d4f', '#faad14', '#722ed1']
+  const platforms = ['Google', 'Meta', 'Criteo', 'Bing', 'Others']
+  const labels = ['Google', 'Meta', 'Criteo', 'Bing', '内容营销及其他']
+
+  return platforms.map((platform, index) => {
+    const value = getPlatformOrderVolume(platform)
+    const percentage = ((value / total) * 100).toFixed(1)
+    return {
+      name: labels[index],
+      value: value,
+      percentage: percentage,
+      color: colors[index]
+    }
+  })
+})
+
+// 总体数据统计
+const totalStats = computed(() => {
+  const currentData = getCurrentTargetData()
+
+  return {
+    // 服务费目标
+    serviceFeeTarget: currentData.serviceFeeTarget || 30000000, // 3000万
+    serviceFeeTargetTrend: 15.2,
+
+    // 新单单量
+    newOrderVolume: currentData.newOrderActual || 156,
+    newOrderVolumeTarget: currentData.newOrderTarget || 180,
+    newOrderVolumeTrend: 12.8,
+
+    // 服务费
+    serviceFee: currentData.serviceFeeActual || 28500000, // 2850万
+    serviceFeeTrend: 8.5,
+
+    // 消费
+    consumption: 18600000, // 1860万
+    consumptionTrend: -3.2,
+
+    // 单点
+    singlePoint: 45,
+    singlePointTrend: 0,
+
+    // 毛利总计
+    grossProfit: 9840000, // 984万
+    grossProfitTrend: 18.7
+  }
+})
+
 // 方法
 const handleRoleChange = (role: string) => {
   currentRole.value = role
@@ -1964,6 +2237,402 @@ onMounted(async () => {
   border-radius: 8px;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 目标卡片样式 - 完全匹配截图设计 */
+.dashboard-section .target-cards-container {
+  display: flex !important;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.dashboard-section .target-card {
+  flex: 1;
+  background: #f8fbff !important;
+  border: none !important;
+  border-radius: 16px !important;
+  padding: 24px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+}
+
+.dashboard-section .target-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08) !important;
+}
+
+.dashboard-section .target-card .card-icon {
+  width: 48px !important;
+  height: 48px !important;
+  background: #1890ff !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: white !important;
+  margin-bottom: 16px !important;
+}
+
+.dashboard-section .target-card .card-content {
+  position: relative !important;
+}
+
+.dashboard-section .target-card .card-title {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #262626 !important;
+  margin: 0 0 4px 0 !important;
+}
+
+.dashboard-section .target-card .card-period {
+  font-size: 12px !important;
+  color: #8c8c8c !important;
+  margin: 0 0 16px 0 !important;
+}
+
+.dashboard-section .target-card .card-value {
+  font-size: 32px !important;
+  font-weight: 600 !important;
+  color: #262626 !important;
+  margin: 0 0 8px 0 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.5px !important;
+}
+
+.dashboard-section .target-card .card-subtitle {
+  font-size: 12px !important;
+  color: #8c8c8c !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+.dashboard-section .target-card .completion-rate {
+  font-weight: 600 !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  font-size: 11px !important;
+}
+
+.dashboard-section .target-card .completion-rate.excellent {
+  color: #52c41a !important;
+  background: rgba(82, 196, 26, 0.1) !important;
+}
+
+.dashboard-section .target-card .completion-rate.good {
+  color: #1890ff !important;
+  background: rgba(24, 144, 255, 0.1) !important;
+}
+
+.dashboard-section .target-card .completion-rate.average {
+  color: #faad14 !important;
+  background: rgba(250, 173, 20, 0.1) !important;
+}
+
+.dashboard-section .target-card .completion-rate.poor {
+  color: #ff4d4f !important;
+  background: rgba(255, 77, 79, 0.1) !important;
+}
+
+/* 服务费卡片特色样式 */
+.dashboard-section .service-fee-card {
+  background: linear-gradient(135deg, #e8f4fd 0%, #f0f9ff 100%) !important;
+}
+
+.dashboard-section .service-fee-card .card-icon {
+  background: #1890ff !important;
+}
+
+.dashboard-section .service-fee-card .completion-rate {
+  color: #1890ff !important;
+  background: rgba(24, 144, 255, 0.1) !important;
+}
+
+/* 新单卡片特色样式 */
+.dashboard-section .new-order-card {
+  background: linear-gradient(135deg, #f6ffed 0%, #fcfff8 100%) !important;
+}
+
+.dashboard-section .new-order-card .card-icon {
+  background: #52c41a !important;
+}
+
+.dashboard-section .new-order-card .completion-rate {
+  color: #52c41a !important;
+  background: rgba(82, 196, 26, 0.1) !important;
+}
+
+/* 综合完成率卡片特色样式 */
+.dashboard-section .completion-rate-card {
+  background: linear-gradient(135deg, #fff7e6 0%, #fffcf5 100%) !important;
+}
+
+.dashboard-section .completion-rate-card .card-icon {
+  background: #faad14 !important;
+}
+
+.dashboard-section .completion-rate-card .separator {
+  color: #8c8c8c !important;
+  margin-left: 8px !important;
+}
+
+/* 饼状图样式 */
+.dashboard-section .pie-charts-container {
+  display: flex !important;
+  gap: 24px !important;
+  margin-top: 20px !important;
+  justify-content: space-around !important;
+  flex-wrap: wrap !important;
+}
+
+.dashboard-section .pie-chart-section {
+  background: #fff !important;
+  padding: 20px !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  flex: 1 !important;
+  min-width: 400px !important;
+}
+
+.dashboard-section .chart-title {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #262626 !important;
+  margin: 0 0 16px 0 !important;
+  text-align: center !important;
+}
+
+.dashboard-section .chart-content {
+  display: flex !important;
+  align-items: center !important;
+  gap: 24px !important;
+}
+
+.dashboard-section .pie-chart-wrapper {
+  flex-shrink: 0 !important;
+  width: 200px !important;
+  height: 200px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 总结卡片容器 */
+.summary-cards-container {
+  display: flex !important;
+  gap: 24px !important;
+  margin: 24px 0 !important;
+  justify-content: space-between !important;
+}
+
+.summary-card {
+  flex: 1 !important;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+  border-radius: 16px !important;
+  padding: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.3s ease !important;
+  border: 1px solid rgba(24, 144, 255, 0.1) !important;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+.summary-card.service-fee-summary {
+  background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%) !important;
+  border-color: rgba(24, 144, 255, 0.2) !important;
+}
+
+.summary-card.service-fee-summary .card-icon {
+  background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%) !important;
+}
+
+.summary-card.new-order-summary {
+  background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%) !important;
+  border-color: rgba(82, 196, 26, 0.2) !important;
+}
+
+.summary-card.new-order-summary .card-icon {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%) !important;
+}
+
+.summary-card.completion-summary {
+  background: linear-gradient(135deg, #fff7e6 0%, #ffd591 100%) !important;
+  border-color: rgba(250, 173, 20, 0.2) !important;
+}
+
+.summary-card.completion-summary .card-icon {
+  background: linear-gradient(135deg, #faad14 0%, #ffc53d 100%) !important;
+}
+
+.summary-card .card-icon {
+  width: 64px !important;
+  height: 64px !important;
+  border-radius: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: white !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.summary-card .card-content {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.summary-card .card-title {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #262626 !important;
+  margin: 0 0 4px 0 !important;
+  line-height: 1.4 !important;
+}
+
+.summary-card .card-period {
+  font-size: 12px !important;
+  color: #8c8c8c !important;
+  margin: 0 0 8px 0 !important;
+  line-height: 1.4 !important;
+}
+
+.summary-card .card-value {
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  color: #262626 !important;
+  margin: 0 0 8px 0 !important;
+  line-height: 1.2 !important;
+}
+
+.summary-card .card-completion {
+  font-size: 14px !important;
+  color: #595959 !important;
+  line-height: 1.4 !important;
+}
+
+.summary-card .completion-percentage {
+  color: #1890ff !important;
+  font-weight: 600 !important;
+  margin-left: 8px !important;
+}
+
+.summary-card .separator {
+  margin-left: 16px !important;
+}
+
+.dashboard-section .chart-legend {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  flex: 1 !important;
+  justify-content: center !important;
+}
+
+.dashboard-section .legend-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  font-size: 13px !important;
+  padding: 4px 0 !important;
+}
+
+.dashboard-section .legend-color {
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 50% !important;
+  flex-shrink: 0 !important;
+}
+
+.dashboard-section .legend-text {
+  color: #262626 !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+}
+
+
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .dashboard-section .target-cards-container {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .dashboard-section .target-card {
+    padding: 20px !important;
+  }
+
+  .summary-cards-container {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .summary-card {
+    padding: 20px !important;
+  }
+
+  .summary-card .card-icon {
+    width: 56px !important;
+    height: 56px !important;
+  }
+
+  .summary-card .card-value {
+    font-size: 28px !important;
+  }
+
+  .dashboard-section .target-card .card-value {
+    font-size: 28px !important;
+  }
+
+  .dashboard-section .target-card .card-icon {
+    width: 40px !important;
+    height: 40px !important;
+    top: 16px !important;
+    right: 16px !important;
+  }
+
+      .dashboard-section .pie-charts-container {
+    flex-direction: column !important;
+    gap: 24px !important;
+    align-items: center !important;
+  }
+
+      .dashboard-section .pie-chart-section {
+    min-width: auto !important;
+    padding: 16px !important;
+  }
+
+  .dashboard-section .chart-content {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .dashboard-section .chart-container {
+    width: 180px !important;
+    height: 180px !important;
+  }
+
+  .dashboard-section .chart-legend {
+    align-self: center !important;
+  }
+
+  .dashboard-section .legend-item {
+    font-size: 12px !important;
+    gap: 8px !important;
+  }
+
+  .dashboard-section .legend-color {
+    width: 12px !important;
+    height: 12px !important;
+  }
 }
 
 .section-header {
@@ -3980,4 +4649,6 @@ onMounted(async () => {
   color: #8c8c8c;
   margin: 0;
 }
+
+
 </style>

@@ -1,8 +1,9 @@
 <template>
-  <div class="pie-chart">
+  <div class="pie-chart" :id="chartId">
     <v-chart
       :option="chartOption"
       :style="{ height: height, width: '100%' }"
+      :init-options="{ renderer: 'canvas' }"
       autoresize
       @click="handleClick"
     />
@@ -43,19 +44,24 @@ interface Props {
   showLegend?: boolean
   donut?: boolean
   radius?: string | [string, string]
+  chartId?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   height: '400px',
   showLegend: true,
   donut: false,
-  radius: '70%'
+  radius: '70%',
+  chartId: () => `pie-chart-${Math.random().toString(36).substr(2, 9)}`
 })
 
 // 事件定义
 const emit = defineEmits<{
   click: [params: unknown]
 }>()
+
+// 生成唯一的图表ID
+const chartId = computed(() => props.chartId || `pie-chart-${Math.random().toString(36).substr(2, 9)}`)
 
 // 计算图表配置
 const chartOption = computed(() => {
