@@ -801,10 +801,16 @@
 
       <!-- 图表概览（注意：追加在数据列表下方，不替代列表） -->
       <div class="charts-compact-grid">
-        <PieChart :data="platformServiceFeeShare" :height="'220px'" :donut="true" title="各平台服务费占比" :show-legend="true" />
-        <PieChart :data="platformProfitShare" :height="'220px'" :donut="true" title="各平台毛利占比" :show-legend="true" />
+        <div class="chart-card">
+          <PieChart :data="platformServiceFeeShare" :height="'240px'" :donut="true" :radius="['38%', '62%']" :center="['35%', '50%']" title="服务费占比分析" :show-legend="true" legend-position="right" />
+        </div>
+        <div class="chart-card">
+          <PieChart :data="platformProfitShare" :height="'240px'" :donut="true" :radius="['38%', '62%']" :center="['35%', '50%']" title="单量占比分析" :show-legend="true" legend-position="right" />
+        </div>
       </div>
-      <BarChart :data="topCustomerCompare" :height="'260px'" :title="'客户Top10：服务费 vs 毛利'" :horizontal="true" :show-legend="true" />
+      <div class="chart-card">
+        <BarChart :data="topCustomerCompare" :height="'240px'" :title="'客户Top10：服务费 vs 毛利'" :horizontal="true" :show-legend="true" />
+      </div>
     </div>
 
     <!-- 年度流失客户模块 -->
@@ -4812,7 +4818,17 @@ onMounted(async () => {
 .charts-compact-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 12px;
-  margin-top: 16px;
+  gap: 20px;
+  margin-top: 24px;
+  margin-bottom: 20px;
+}
+
+.chart-card {
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 20px 20px 28px; /* 增加上下留白，避免与上下文案贴近 */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 16px;
 }
 </style>

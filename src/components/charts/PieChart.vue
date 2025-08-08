@@ -44,6 +44,8 @@ interface Props {
   showLegend?: boolean
   donut?: boolean
   radius?: string | [string, string]
+  center?: [string, string]
+  legendPosition?: 'bottom' | 'right'
   chartId?: string
 }
 
@@ -52,6 +54,8 @@ const props = withDefaults(defineProps<Props>(), {
   showLegend: true,
   donut: false,
   radius: '70%',
+  center: () => ['50%', '45%'],
+  legendPosition: 'bottom',
   chartId: () => `pie-chart-${Math.random().toString(36).substr(2, 9)}`
 })
 
@@ -66,6 +70,8 @@ const chartId = computed(() => props.chartId || `pie-chart-${Math.random().toStr
 // 计算图表配置
 const chartOption = computed(() => {
   const colors = currentColors.value
+
+  const total = props.data.reduce((sum, item) => sum + item.value, 0)
 
   return {
     title: props.title ? {
@@ -98,40 +104,59 @@ const chartOption = computed(() => {
       }
     },
 
-                        legend: props.showLegend ? {
-      orient: 'horizontal',
-      bottom: 15,
-      left: 'center',
-      itemWidth: 8,
-      itemHeight: 8,
-      itemGap: 20,
-      width: '95%',
-      formatter: (name: string) => {
-        const item = props.data.find(d => d.name === name)
-        if (!item) return name
-
-        const value = formatValue(item.value)
-        // 计算总值用于显示百分比
-        const total = props.data.reduce((sum, item) => sum + item.value, 0)
-        const percentage = ((item.value / total) * 100).toFixed(1)
-
-        // 缩短名称以适应水平布局
-        const shortName = name.length > 8 ? name.substring(0, 8) + '...' : name
-        return `${shortName} $${value} (${percentage}%)`
-      },
-      textStyle: {
-        color: colors.textPrimary,
-        fontSize: 10,
-        lineHeight: 16,
-        fontFamily: 'Arial, sans-serif'
-      }
-    } : { show: false },
+    legend: props.showLegend ? (
+      props.legendPosition === 'right'
+        ? {
+            orient: 'vertical',
+            right: 10,
+            top: 'middle',
+            align: 'left',
+            itemWidth: 10,
+            itemHeight: 10,
+            itemGap: 12,
+            formatter: (name: string) => {
+              const item = props.data.find(d => d.name === name)
+              if (!item) return name
+              const value = formatValue(item.value)
+              const percentage = total ? ((item.value / total) * 100).toFixed(1) : '0.0'
+              return `${name} ${value} (${percentage}%)`
+            },
+            textStyle: {
+              color: colors.textPrimary,
+              fontSize: 12,
+              lineHeight: 18
+            }
+          }
+        : {
+            orient: 'horizontal',
+            bottom: 18,
+            left: 'center',
+            itemWidth: 6,
+            itemHeight: 6,
+            itemGap: 12,
+            width: '95%',
+            formatter: (name: string) => {
+              const item = props.data.find(d => d.name === name)
+              if (!item) return name
+              const value = formatValue(item.value)
+              const percentage = total ? ((item.value / total) * 100).toFixed(1) : '0.0'
+              const shortName = name.length > 8 ? name.substring(0, 8) + '...' : name
+              return `${shortName} $${value} (${percentage}%)`
+            },
+            textStyle: {
+              color: colors.textPrimary,
+              fontSize: 10,
+              lineHeight: 14,
+              fontFamily: 'Arial, sans-serif'
+            }
+          }
+    ) : { show: false },
 
             series: [
       {
         type: 'pie',
-        radius: props.donut ? ['30%', '55%'] : '55%',
-        center: ['50%', '45%'],
+        radius: props.donut ? (Array.isArray(props.radius) ? props.radius : ['30%', '55%']) : (typeof props.radius === 'string' ? props.radius : '55%'),
+        center: props.center || (props.legendPosition === 'right' ? ['35%', '50%'] : ['50%', '45%']),
         data: props.data.map((item, index) => ({
           ...item,
           itemStyle: {
