@@ -1730,11 +1730,7 @@
             <div class="card-title">续费客户数量</div>
             <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
             <div class="card-value">{{ renewalStats.customerCount }}个</div>
-            <div class="card-completion">
-              <span>新客户续费: <span class="completion-percentage">{{ renewalStats.newCustomerCount }}个</span></span>
-              <span class="separator">|</span>
-              <span>老客户续费: <span class="completion-percentage">{{ renewalStats.oldCustomerCount }}个</span></span>
-            </div>
+
           </div>
         </div>
         <div class="summary-card renewal-amount-card">
@@ -1745,11 +1741,7 @@
             <div class="card-title">上次续费总额</div>
             <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
             <div class="card-value">{{ formatCurrency(renewalStats.totalAmount) }}</div>
-            <div class="card-completion">
-              <span>新客户: <span class="completion-percentage">{{ formatCurrency(renewalStats.newCustomerAmount) }}</span></span>
-              <span class="separator">|</span>
-              <span>老客户: <span class="completion-percentage">{{ formatCurrency(renewalStats.oldCustomerAmount) }}</span></span>
-            </div>
+
           </div>
         </div>
       </div>
