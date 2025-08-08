@@ -824,6 +824,49 @@
           @quarter-change="handleQuarterChange"
         />
       </div>
+
+      <!-- 流失分析卡片（统一为通用 summary-card 风格） -->
+      <div class="summary-cards-container churn-summary-cards">
+        <div class="summary-card churn-card churn-annual-card">
+          <div class="card-icon">
+            <TrendingDown :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">年度客户流失</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ churnAnnualCard.count }}个</div>
+            <div class="kv-row"><span class="kv-label">服务费损失：</span><span class="kv-value">{{ formatCurrency(churnAnnualCard.serviceFeeLoss) }}</span></div>
+            <div class="kv-row"><span class="kv-label">毛利损失：</span><span class="kv-value">{{ formatCurrency(churnAnnualCard.profitLoss) }}</span></div>
+          </div>
+        </div>
+
+        <div class="summary-card churn-card churn-new-card">
+          <div class="card-icon">
+            <TrendingDown :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">新客户流失</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ churnNewCard.count }}个</div>
+            <div class="kv-row"><span class="kv-label">服务费损失：</span><span class="kv-value">{{ formatCurrency(churnNewCard.serviceFeeLoss) }}</span></div>
+            <div class="kv-row"><span class="kv-label">毛利损失：</span><span class="kv-value">{{ formatCurrency(churnNewCard.profitLoss) }}</span></div>
+          </div>
+        </div>
+
+        <div class="summary-card churn-card churn-old-card">
+          <div class="card-icon">
+            <TrendingDown :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">老客户流失</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ churnOldCard.count }}个</div>
+            <div class="kv-row"><span class="kv-label">服务费损失：</span><span class="kv-value">{{ formatCurrency(churnOldCard.serviceFeeLoss) }}</span></div>
+            <div class="kv-row"><span class="kv-label">毛利损失：</span><span class="kv-value">{{ formatCurrency(churnOldCard.profitLoss) }}</span></div>
+          </div>
+        </div>
+      </div>
+
       <div class="annual-churn-table-container">
         <table class="annual-churn-table">
           <thead>
@@ -935,6 +978,8 @@
           </tbody>
         </table>
       </div>
+
+
     </div>
 
 
@@ -1750,7 +1795,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { DollarSign, TrendingUp } from 'lucide-vue-next'
+import { DollarSign, TrendingUp, TrendingDown } from 'lucide-vue-next'
 import RoleSwitcher from '@/components/business/RoleSwitcher.vue'
 import ModuleTimeFilter from '@/components/common/ModuleTimeFilter.vue'
 
@@ -2024,6 +2069,58 @@ const topCustomerCompare = computed(() => {
     ]
   }
 })
+
+// ========= 流失分析（数量/服务费损失/毛利损失，按季度） =========
+const uniqueQuarters = computed(() => {
+  const qs = churnAnalysis.value?.map(i => i.quarter) || []
+  return Array.from(new Set(qs))
+})
+
+const churnCountByQuarter = computed(() => ({
+  labels: uniqueQuarters.value,
+  datasets: [{
+    label: '流失客户数',
+    data: uniqueQuarters.value.map(q => (churnAnalysis.value || [])
+      .filter(i => i.quarter === q)
+      .reduce((s, i) => s + (i.customerCount || 0), 0))
+  }]
+}))
+
+const churnServiceFeeByQuarter = computed(() => ({
+  labels: uniqueQuarters.value,
+  datasets: [{
+    label: '损失服务费',
+    data: uniqueQuarters.value.map(q => (churnAnalysis.value || [])
+      .filter(i => i.quarter === q)
+      .reduce((s, i) => s + (i.estimatedServiceFeeLoss || 0), 0))
+  }]
+}))
+
+const churnProfitByQuarter = computed(() => ({
+  labels: uniqueQuarters.value,
+  datasets: [{
+    label: '损失毛利',
+    data: uniqueQuarters.value.map(q => (churnAnalysis.value || [])
+      .filter(i => i.quarter === q)
+      .reduce((s, i) => s + (i.estimatedProfitLoss || 0), 0))
+  }]
+}))
+
+// 流失卡片数据（年度/新客户/老客户）
+type ChurnCard = { count: number; serviceFeeLoss: number; profitLoss: number }
+
+const sumChurn = (filterFn: (i: any) => boolean): ChurnCard => {
+  const rows = (churnAnalysis.value || []).filter(filterFn)
+  return {
+    count: rows.reduce((s, i) => s + (i.customerCount || 0), 0),
+    serviceFeeLoss: rows.reduce((s, i) => s + (i.estimatedServiceFeeLoss || 0), 0),
+    profitLoss: rows.reduce((s, i) => s + (i.estimatedProfitLoss || 0), 0)
+  }
+}
+
+const churnAnnualCard = computed<ChurnCard>(() => sumChurn(() => true))
+const churnNewCard = computed<ChurnCard>(() => sumChurn(i => i.category === 'new_customer'))
+const churnOldCard = computed<ChurnCard>(() => sumChurn(i => i.category === 'old_customer'))
 
 // 总体数据统计
 const totalStats = computed(() => {
@@ -4426,18 +4523,9 @@ onMounted(async () => {
   border-left: 4px solid #52c41a;
 }
 
-.churn-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.churn-card-header h4 {
-  margin: 0;
-  font-size: 16px;
-  color: #262626;
-}
+/* 兼容旧的流失卡片样式（已不再使用，但保留以免样式抖动） */
+.churn-card-header { display: none; }
+.churn-card-header h4 { display: none; }
 
 .risk-badge {
   padding: 2px 8px;
@@ -4830,5 +4918,50 @@ onMounted(async () => {
   padding: 20px 20px 28px; /* 增加上下留白，避免与上下文案贴近 */
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   margin-bottom: 16px;
+}
+
+/* 新流失卡片容器，复用 summary-cards-container 的网格，仅微调外边距 */
+.churn-summary-cards { margin: 12px 0 8px !important; }
+
+/* 与截图一致的键值行样式 */
+.churn-card .kv-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  color: #595959;
+}
+.churn-card .kv-label { color: #8c8c8c; }
+.churn-card .kv-value { color: #262626; }
+
+/* icon 背景区分不同卡片（参考其他 summary-card 渐变色风格） */
+.churn-annual-card .card-icon {
+  background: linear-gradient(135deg, #ffccc7, #ffa39e) !important;
+}
+.churn-new-card .card-icon {
+  background: linear-gradient(135deg, #ffe58f, #ffd666) !important;
+}
+.churn-old-card .card-icon {
+  background: linear-gradient(135deg, #ffd6e7, #ffadd2) !important;
+}
+
+.churn-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.metric-label {
+  color: #8c8c8c;
+  font-size: 13px;
+}
+
+.metric-value {
+  color: #262626;
+  font-weight: 700;
 }
 </style>
