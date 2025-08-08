@@ -152,7 +152,7 @@
       </div>
     </div>
 
-    
+
 
     <!-- 新单服务费及单量完成模块 -->
     <div class="dashboard-section">
@@ -309,59 +309,6 @@
       </div>
     </div>
 
-    <!-- 总体数据统计卡片 -->
-    <div class="dashboard-section">
-      <div class="summary-cards-container">
-        <!-- 服务费目标卡片 -->
-        <div class="summary-card service-fee-summary">
-          <div class="card-icon">
-            <DollarSign :size="24" />
-          </div>
-          <div class="card-content">
-            <div class="card-title">服务费目标</div>
-            <div class="card-period">{{ selectedTimeRange === 'year' ? annualQuarterlyTargets?.year + '年度' : currentQuarter }}</div>
-            <div class="card-value">{{ formatCurrency(getCurrentTargetData().serviceFeeTarget) }}</div>
-            <div class="card-completion">
-              已完成: {{ formatCurrency(getCurrentTargetData().serviceFeeActual) }}
-              <span class="completion-percentage">{{ getCurrentTargetData().serviceFeeCompletion }}%</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 新单目标卡片 -->
-        <div class="summary-card new-order-summary">
-          <div class="card-icon">
-            <TrendingUp :size="24" />
-          </div>
-          <div class="card-content">
-            <div class="card-title">新单目标</div>
-            <div class="card-period">{{ selectedTimeRange === 'year' ? annualQuarterlyTargets?.year + '年度' : currentQuarter }}</div>
-            <div class="card-value">{{ getCurrentTargetData().newOrderTarget }}单</div>
-            <div class="card-completion">
-              已完成: {{ getCurrentTargetData().newOrderActual }}单
-              <span class="completion-percentage">{{ getCurrentTargetData().newOrderCompletion }}%</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 综合完成率卡片 -->
-        <div class="summary-card completion-summary">
-          <div class="card-icon">
-            <TrendingUp :size="24" />
-          </div>
-          <div class="card-content">
-            <div class="card-title">综合完成率</div>
-            <div class="card-period">{{ selectedTimeRange === 'year' ? annualQuarterlyTargets?.year + '年度' : currentQuarter }}</div>
-            <div class="card-value">{{ Math.round((getCurrentTargetData().serviceFeeCompletion + getCurrentTargetData().newOrderCompletion) / 2 * 10) / 10 }}%</div>
-            <div class="card-completion">
-              服务费: {{ getCurrentTargetData().serviceFeeCompletion }}%
-              <span class="separator">新单: {{ getCurrentTargetData().newOrderCompletion }}%</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- 新签客户毛利完成模块 -->
     <div class="dashboard-section">
       <div class="section-header">
@@ -373,6 +320,70 @@
           @quarter-change="handleQuarterChange"
         />
       </div>
+
+      <!-- 总体数据统计卡片 -->
+      <div class="summary-cards-container">
+        <div class="summary-card service-fee-summary">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">服务费目标</div>
+            <div class="card-value">{{ formatCurrency(totalStats.serviceFeeTarget) }}</div>
+          </div>
+        </div>
+
+        <div class="summary-card new-order-summary">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">新单单量</div>
+            <div class="card-value">{{ totalStats.newOrderVolume }}单</div>
+          </div>
+        </div>
+
+        <div class="summary-card service-fee-actual">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">服务费</div>
+            <div class="card-value">{{ formatCurrency(totalStats.serviceFee) }}</div>
+          </div>
+        </div>
+
+        <div class="summary-card consumption-summary">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">消费</div>
+            <div class="card-value">{{ formatCurrency(totalStats.consumption) }}</div>
+          </div>
+        </div>
+
+        <div class="summary-card single-point-summary">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">单点</div>
+            <div class="card-value">{{ totalStats.singlePoint }}个</div>
+          </div>
+        </div>
+
+        <div class="summary-card gross-profit-summary">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">毛利总计</div>
+            <div class="card-value">{{ formatCurrency(totalStats.grossProfit) }}</div>
+          </div>
+        </div>
+      </div>
+
       <div class="profit-analysis-table-container">
         <table class="profit-analysis-table">
           <thead>
@@ -566,6 +577,68 @@
           @quarter-change="handleQuarterChange"
         />
       </div>
+      <!-- 总体数据统计卡片（与“新签客户毛利完成”一致） -->
+      <div class="summary-cards-container">
+        <div class="summary-card service-fee-summary">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">服务费目标</div>
+            <div class="card-value">{{ formatCurrency(totalStats.serviceFeeTarget) }}</div>
+          </div>
+        </div>
+
+        <div class="summary-card new-order-summary">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">新单单量</div>
+            <div class="card-value">{{ totalStats.newOrderVolume }}单</div>
+          </div>
+        </div>
+
+        <div class="summary-card service-fee-actual">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">服务费</div>
+            <div class="card-value">{{ formatCurrency(totalStats.serviceFee) }}</div>
+          </div>
+        </div>
+
+        <div class="summary-card consumption-summary">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">消费</div>
+            <div class="card-value">{{ formatCurrency(totalStats.consumption) }}</div>
+          </div>
+        </div>
+
+        <div class="summary-card single-point-summary">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">单点</div>
+            <div class="card-value">{{ totalStats.singlePoint }}个</div>
+          </div>
+        </div>
+
+        <div class="summary-card gross-profit-summary">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">毛利总计</div>
+            <div class="card-value">{{ formatCurrency(totalStats.grossProfit) }}</div>
+          </div>
+        </div>
+      </div>
       <div class="customer-annual-profit-table-container">
         <table class="customer-annual-profit-table">
           <thead>
@@ -577,7 +650,6 @@
               <th colspan="4" class="consumption-group-header">消费</th>
               <th colspan="4" class="rebate-group-header">返点</th>
               <th colspan="4" class="profit-group-header">毛利</th>
-              <th rowspan="2" class="completion-rate-header">完成率</th>
             </tr>
             <tr>
               <th class="service-fee-header">Google</th>
@@ -626,7 +698,6 @@
               <td class="renewal-amount-cell">¥156.75万</td>
               <td class="renewal-amount-cell">¥65.31万</td>
               <td class="renewal-amount-cell">¥39.19万</td>
-              <td class="completion-rate-cell excellent">95.0%</td>
             </tr>
             <tr class="customer-row">
               <td rowspan="1" class="customer-name-cell">小米科技有限公司</td>
@@ -651,7 +722,6 @@
               <td class="renewal-amount-cell">¥123.75万</td>
               <td class="renewal-amount-cell">¥49.50万</td>
               <td class="renewal-amount-cell">¥30.94万</td>
-              <td class="completion-rate-cell good">90.0%</td>
             </tr>
             <tr class="customer-row">
               <td rowspan="1" class="customer-name-cell">OPPO广东移动通信有限公司</td>
@@ -676,7 +746,6 @@
               <td class="renewal-amount-cell">¥88.00万</td>
               <td class="renewal-amount-cell">¥33.00万</td>
               <td class="renewal-amount-cell">¥22.00万</td>
-              <td class="completion-rate-cell average">80.0%</td>
             </tr>
             <tr class="customer-row">
               <td rowspan="1" class="customer-name-cell">vivo通信科技有限公司</td>
@@ -701,7 +770,6 @@
               <td class="renewal-amount-cell">¥62.56万</td>
               <td class="renewal-amount-cell">¥22.34万</td>
               <td class="renewal-amount-cell">¥13.41万</td>
-              <td class="completion-rate-cell poor">65.0%</td>
             </tr>
             <tr class="customer-row">
               <td rowspan="1" class="customer-name-cell">一加科技（深圳）有限公司</td>
@@ -726,11 +794,17 @@
               <td class="renewal-amount-cell">¥71.84万</td>
               <td class="renewal-amount-cell">¥26.13万</td>
               <td class="renewal-amount-cell">¥15.68万</td>
-              <td class="completion-rate-cell excellent">95.0%</td>
             </tr>
           </tbody>
         </table>
       </div>
+
+      <!-- 图表概览（注意：追加在数据列表下方，不替代列表） -->
+      <div class="charts-compact-grid">
+        <PieChart :data="platformServiceFeeShare" :height="'220px'" :donut="true" title="各平台服务费占比" :show-legend="true" />
+        <PieChart :data="platformProfitShare" :height="'220px'" :donut="true" title="各平台毛利占比" :show-legend="true" />
+      </div>
+      <BarChart :data="topCustomerCompare" :height="'260px'" :title="'客户Top10：服务费 vs 毛利'" :horizontal="true" :show-legend="true" />
     </div>
 
     <!-- 年度流失客户模块 -->
@@ -1903,6 +1977,48 @@ const orderVolumeChartData = computed(() => {
   })
 })
 
+// 简洁图表用数据与聚合（追加在数据列表下方使用，不影响现有逻辑）
+const platformServiceFeeShare = computed(() => {
+  const platforms = ['Google', 'Meta', 'Criteo', 'Bing', 'Others']
+  return platforms.map((name) => ({ name, value: getPlatformServiceFee(name) }))
+})
+
+// 平台毛利占比（示例数据，若有真实接口可替换）
+const platformProfitStats: Record<string, number> = {
+  Google: 1567.5,
+  Meta: 1110.63,
+  Criteo: 418.0,
+  Bing: 235.13,
+  Others: 120.0
+}
+
+const platformProfitShare = computed(() => {
+  return Object.entries(platformProfitStats).map(([name, value]) => ({ name, value }))
+})
+
+// 客户Top10 对比（服务费 vs 毛利）- 使用表格中的示例客户数值做演示
+const topCustomerBase = [
+  { name: '华为技术有限公司', serviceFee: 171.0 + 114.0 + 47.5 + 28.5, profit: 235.13 + 156.75 + 65.31 + 39.19 },
+  { name: '小米科技有限公司', serviceFee: 135.0 + 90.0 + 36.0 + 22.5, profit: 185.63 + 123.75 + 49.5 + 30.94 },
+  { name: 'OPPO广东移动通信有限公司', serviceFee: 96.0 + 64.0 + 24.0 + 16.0, profit: 132.0 + 88.0 + 33.0 + 22.0 },
+  { name: 'vivo通信科技有限公司', serviceFee: 65.0 + 45.5 + 16.25 + 9.75, profit: 89.38 + 62.56 + 22.34 + 13.41 },
+  { name: '一加科技（深圳）有限公司', serviceFee: 76.0 + 52.25 + 19.0 + 11.4, profit: 104.5 + 71.84 + 26.13 + 15.68 }
+]
+
+const topCustomerCompare = computed(() => {
+  const sorted = [...topCustomerBase]
+    .sort((a, b) => b.profit + b.serviceFee - (a.profit + a.serviceFee))
+    .slice(0, 10)
+
+  return {
+    labels: sorted.map((i) => i.name),
+    datasets: [
+      { label: '服务费完成', data: sorted.map((i) => Number(i.serviceFee.toFixed(2))) },
+      { label: '毛利', data: sorted.map((i) => Number(i.profit.toFixed(2))) }
+    ]
+  }
+})
+
 // 总体数据统计
 const totalStats = computed(() => {
   const currentData = getCurrentTargetData()
@@ -2242,19 +2358,20 @@ onMounted(async () => {
 /* 目标卡片样式 - 完全匹配截图设计 */
 .dashboard-section .target-cards-container {
   display: flex !important;
-  gap: 20px;
-  margin-bottom: 24px;
+  gap: 12px !important;
+  margin-bottom: 16px !important;
 }
 
 .dashboard-section .target-card {
   flex: 1;
   background: #f8fbff !important;
   border: none !important;
-  border-radius: 16px !important;
-  padding: 24px !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
   position: relative !important;
   overflow: hidden !important;
   transition: all 0.3s ease !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06) !important;
 }
 
 .dashboard-section .target-card:hover {
@@ -2263,15 +2380,15 @@ onMounted(async () => {
 }
 
 .dashboard-section .target-card .card-icon {
-  width: 48px !important;
-  height: 48px !important;
+  width: 36px !important;
+  height: 36px !important;
   background: #1890ff !important;
   border-radius: 50% !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   color: white !important;
-  margin-bottom: 16px !important;
+  margin-bottom: 12px !important;
 }
 
 .dashboard-section .target-card .card-content {
@@ -2279,41 +2396,44 @@ onMounted(async () => {
 }
 
 .dashboard-section .target-card .card-title {
-  font-size: 14px !important;
+  font-size: 13px !important;
   font-weight: 500 !important;
   color: #262626 !important;
-  margin: 0 0 4px 0 !important;
+  margin: 0 0 2px 0 !important;
 }
 
 .dashboard-section .target-card .card-period {
-  font-size: 12px !important;
+  font-size: 11px !important;
   color: #8c8c8c !important;
-  margin: 0 0 16px 0 !important;
+  margin: 0 0 8px 0 !important;
 }
 
 .dashboard-section .target-card .card-value {
-  font-size: 32px !important;
+  font-size: 24px !important;
   font-weight: 600 !important;
   color: #262626 !important;
-  margin: 0 0 8px 0 !important;
-  line-height: 1.2 !important;
-  letter-spacing: -0.5px !important;
+  margin: 0 0 4px 0 !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.2px !important;
 }
 
 .dashboard-section .target-card .card-subtitle {
-  font-size: 12px !important;
+  font-size: 11px !important;
   color: #8c8c8c !important;
   display: flex !important;
   align-items: center !important;
-  gap: 8px !important;
+  gap: 6px !important;
   flex-wrap: wrap !important;
 }
 
 .dashboard-section .target-card .completion-rate {
   font-weight: 600 !important;
-  padding: 2px 6px !important;
-  border-radius: 4px !important;
-  font-size: 11px !important;
+  padding: 2px 8px !important;
+  border-radius: 12px !important;
+  font-size: 12px !important;
+  position: absolute !important;
+  right: 12px !important;
+  top: 12px !important;
 }
 
 .dashboard-section .target-card .completion-rate.excellent {
@@ -2342,7 +2462,7 @@ onMounted(async () => {
 }
 
 .dashboard-section .service-fee-card .card-icon {
-  background: #1890ff !important;
+  background: linear-gradient(135deg, #1890ff, #40a9ff) !important;
 }
 
 .dashboard-section .service-fee-card .completion-rate {
@@ -2356,7 +2476,7 @@ onMounted(async () => {
 }
 
 .dashboard-section .new-order-card .card-icon {
-  background: #52c41a !important;
+  background: linear-gradient(135deg, #52c41a, #73d13d) !important;
 }
 
 .dashboard-section .new-order-card .completion-rate {
@@ -2370,7 +2490,7 @@ onMounted(async () => {
 }
 
 .dashboard-section .completion-rate-card .card-icon {
-  background: #faad14 !important;
+  background: linear-gradient(135deg, #faad14, #ffc53d) !important;
 }
 
 .dashboard-section .completion-rate-card .separator {
@@ -2421,10 +2541,10 @@ onMounted(async () => {
 
 /* 总结卡片容器 */
 .summary-cards-container {
-  display: flex !important;
-  gap: 24px !important;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+  gap: 20px !important;
   margin: 24px 0 !important;
-  justify-content: space-between !important;
 }
 
 .summary-card {
@@ -2470,6 +2590,42 @@ onMounted(async () => {
 
 .summary-card.completion-summary .card-icon {
   background: linear-gradient(135deg, #faad14 0%, #ffc53d 100%) !important;
+}
+
+.summary-card.service-fee-actual {
+  background: linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%) !important;
+  border-color: rgba(114, 46, 209, 0.2) !important;
+}
+
+.summary-card.service-fee-actual .card-icon {
+  background: linear-gradient(135deg, #722ed1 0%, #9254de 100%) !important;
+}
+
+.summary-card.consumption-summary {
+  background: linear-gradient(135deg, #fff2e8 0%, #ffd8bf 100%) !important;
+  border-color: rgba(250, 140, 22, 0.2) !important;
+}
+
+.summary-card.consumption-summary .card-icon {
+  background: linear-gradient(135deg, #fa8c16 0%, #ffa940 100%) !important;
+}
+
+.summary-card.single-point-summary {
+  background: linear-gradient(135deg, #e6fffb 0%, #b5f5ec 100%) !important;
+  border-color: rgba(19, 194, 194, 0.2) !important;
+}
+
+.summary-card.single-point-summary .card-icon {
+  background: linear-gradient(135deg, #13c2c2 0%, #36cfc9 100%) !important;
+}
+
+.summary-card.gross-profit-summary {
+  background: linear-gradient(135deg, #fff0f6 0%, #ffd6e7 100%) !important;
+  border-color: rgba(235, 47, 150, 0.2) !important;
+}
+
+.summary-card.gross-profit-summary .card-icon {
+  background: linear-gradient(135deg, #eb2f96 0%, #f759ab 100%) !important;
 }
 
 .summary-card .card-icon {
@@ -2674,19 +2830,19 @@ onMounted(async () => {
 
 .target-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 24px;
-  margin-top: 20px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+  margin-bottom: 20px;
 }
 
 .target-card {
   background: #fff;
   border: 1px solid #f0f0f0;
   border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
 }
 
 .target-card:hover {
@@ -2697,13 +2853,13 @@ onMounted(async () => {
 .target-card-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .target-card-icon {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -2725,13 +2881,13 @@ onMounted(async () => {
 
 .target-card-title h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: #262626;
 }
 
 .target-period {
-  margin: 4px 0 0 0;
+  margin: 0;
   font-size: 12px;
   color: #8c8c8c;
 }
@@ -2739,36 +2895,36 @@ onMounted(async () => {
 .target-card-content {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .target-value {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 700;
   color: #262626;
-  line-height: 1;
+  line-height: 1.1;
 }
 
 .overall-rate {
-  font-size: 32px;
+  font-size: 26px;
 }
 
 .completion-info {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .completion-value {
   font-size: 14px;
-  color: #595959;
+  color: #8c8c8c;
 }
 
 .completion-rate {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
-  padding: 4px 8px;
+  padding: 2px 6px;
   border-radius: 4px;
 }
 
@@ -4651,4 +4807,12 @@ onMounted(async () => {
 }
 
 
+</style>
+<style scoped>
+.charts-compact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
 </style>
