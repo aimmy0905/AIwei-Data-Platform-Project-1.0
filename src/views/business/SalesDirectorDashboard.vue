@@ -368,7 +368,7 @@
             <TrendingUp :size="24" />
           </div>
           <div class="card-content">
-            <div class="card-title">单点</div>
+            <div class="card-title">返点</div>
             <div class="card-value">{{ totalStats.singlePoint }}个</div>
           </div>
         </div>
@@ -624,7 +624,7 @@
             <TrendingUp :size="24" />
           </div>
           <div class="card-content">
-            <div class="card-title">单点</div>
+            <div class="card-title">返点</div>
             <div class="card-value">{{ totalStats.singlePoint }}个</div>
           </div>
         </div>
@@ -835,8 +835,11 @@
             <div class="card-title">年度客户流失</div>
             <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
             <div class="card-value">{{ churnAnnualCard.count }}个</div>
-            <div class="kv-row"><span class="kv-label">服务费损失：</span><span class="kv-value">{{ formatCurrency(churnAnnualCard.serviceFeeLoss) }}</span></div>
-            <div class="kv-row"><span class="kv-label">毛利损失：</span><span class="kv-value">{{ formatCurrency(churnAnnualCard.profitLoss) }}</span></div>
+            <div class="card-completion">
+              <span>服务费损失 <span class="completion-percentage">{{ formatCurrency(churnAnnualCard.serviceFeeLoss) }}</span></span>
+              <span class="separator">|</span>
+              <span>毛利损失 <span class="completion-percentage">{{ formatCurrency(churnAnnualCard.profitLoss) }}</span></span>
+            </div>
           </div>
         </div>
 
@@ -848,8 +851,11 @@
             <div class="card-title">新客户流失</div>
             <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
             <div class="card-value">{{ churnNewCard.count }}个</div>
-            <div class="kv-row"><span class="kv-label">服务费损失：</span><span class="kv-value">{{ formatCurrency(churnNewCard.serviceFeeLoss) }}</span></div>
-            <div class="kv-row"><span class="kv-label">毛利损失：</span><span class="kv-value">{{ formatCurrency(churnNewCard.profitLoss) }}</span></div>
+            <div class="card-completion">
+              <span>服务费损失 <span class="completion-percentage">{{ formatCurrency(churnNewCard.serviceFeeLoss) }}</span></span>
+              <span class="separator">|</span>
+              <span>毛利损失 <span class="completion-percentage">{{ formatCurrency(churnNewCard.profitLoss) }}</span></span>
+            </div>
           </div>
         </div>
 
@@ -861,8 +867,11 @@
             <div class="card-title">老客户流失</div>
             <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
             <div class="card-value">{{ churnOldCard.count }}个</div>
-            <div class="kv-row"><span class="kv-label">服务费损失：</span><span class="kv-value">{{ formatCurrency(churnOldCard.serviceFeeLoss) }}</span></div>
-            <div class="kv-row"><span class="kv-label">毛利损失：</span><span class="kv-value">{{ formatCurrency(churnOldCard.profitLoss) }}</span></div>
+            <div class="card-completion">
+              <span>服务费损失 <span class="completion-percentage">{{ formatCurrency(churnOldCard.serviceFeeLoss) }}</span></span>
+              <span class="separator">|</span>
+              <span>毛利损失 <span class="completion-percentage">{{ formatCurrency(churnOldCard.profitLoss) }}</span></span>
+            </div>
           </div>
         </div>
       </div>
@@ -1411,6 +1420,92 @@
           @quarter-change="handleQuarterChange"
         />
       </div>
+
+      <!-- 客户毛利明细统计卡片 -->
+      <div class="summary-cards-container">
+        <div class="summary-card customer-count-card">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">客户数量</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ customerDetailStats.totalCustomers }}个</div>
+            <div class="card-completion">
+              <span>新客户: <span class="completion-percentage">{{ customerDetailStats.newCustomers }}个</span></span>
+              <span class="separator">|</span>
+              <span>老客户: <span class="completion-percentage">{{ customerDetailStats.oldCustomers }}个</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card profit-total-card">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">毛利合计</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ formatCurrency(customerDetailStats.totalProfit) }}</div>
+            <div class="card-completion">
+              <span>新客户: <span class="completion-percentage">{{ formatCurrency(customerDetailStats.newCustomerProfit) }}</span></span>
+              <span class="separator">|</span>
+              <span>老客户: <span class="completion-percentage">{{ formatCurrency(customerDetailStats.oldCustomerProfit) }}</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card service-fee-total-card">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">服务费合计</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ formatCurrency(customerDetailStats.totalServiceFee) }}</div>
+            <div class="card-completion">
+              <span>新客户: <span class="completion-percentage">{{ formatCurrency(customerDetailStats.newCustomerServiceFee) }}</span></span>
+              <span class="separator">|</span>
+              <span>老客户: <span class="completion-percentage">{{ formatCurrency(customerDetailStats.oldCustomerServiceFee) }}</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card rebate-total-card">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">返点合计</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ formatCurrency(customerDetailStats.totalRebate) }}</div>
+            <div class="card-completion">
+              <span>新客户: <span class="completion-percentage">{{ formatCurrency(customerDetailStats.newCustomerRebate) }}</span></span>
+              <span class="separator">|</span>
+              <span>老客户: <span class="completion-percentage">{{ formatCurrency(customerDetailStats.oldCustomerRebate) }}</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card consumption-total-card">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">消费合计</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ formatCurrency(customerDetailStats.totalConsumption) }}</div>
+            <div class="card-completion">
+              <span>新客户: <span class="completion-percentage">{{ formatCurrency(customerDetailStats.newCustomerConsumption) }}</span></span>
+              <span class="separator">|</span>
+              <span>老客户: <span class="completion-percentage">{{ formatCurrency(customerDetailStats.oldCustomerConsumption) }}</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
       <div class="table-scroll-hint">
         <span>← 表格可左右滑动查看更多列 →</span>
       </div>
@@ -1624,6 +1719,41 @@
           @quarter-change="handleQuarterChange"
         />
       </div>
+
+      <!-- 续费统计卡片 -->
+      <div class="summary-cards-container">
+        <div class="summary-card renewal-count-card">
+          <div class="card-icon">
+            <RefreshCw :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">续费客户数量</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ renewalStats.customerCount }}个</div>
+            <div class="card-completion">
+              <span>新客户续费: <span class="completion-percentage">{{ renewalStats.newCustomerCount }}个</span></span>
+              <span class="separator">|</span>
+              <span>老客户续费: <span class="completion-percentage">{{ renewalStats.oldCustomerCount }}个</span></span>
+            </div>
+          </div>
+        </div>
+        <div class="summary-card renewal-amount-card">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">上次续费总额</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ formatCurrency(renewalStats.totalAmount) }}</div>
+            <div class="card-completion">
+              <span>新客户: <span class="completion-percentage">{{ formatCurrency(renewalStats.newCustomerAmount) }}</span></span>
+              <span class="separator">|</span>
+              <span>老客户: <span class="completion-percentage">{{ formatCurrency(renewalStats.oldCustomerAmount) }}</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="table-scroll-hint">
         <span>← 表格可左右滑动查看更多列 →</span>
       </div>
@@ -1795,7 +1925,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { DollarSign, TrendingUp, TrendingDown } from 'lucide-vue-next'
+import { DollarSign, TrendingUp, TrendingDown, RefreshCw } from 'lucide-vue-next'
 import RoleSwitcher from '@/components/business/RoleSwitcher.vue'
 import ModuleTimeFilter from '@/components/common/ModuleTimeFilter.vue'
 
@@ -2122,6 +2252,59 @@ const churnAnnualCard = computed<ChurnCard>(() => sumChurn(() => true))
 const churnNewCard = computed<ChurnCard>(() => sumChurn(i => i.category === 'new_customer'))
 const churnOldCard = computed<ChurnCard>(() => sumChurn(i => i.category === 'old_customer'))
 
+// 客户毛利明细统计数据
+const customerDetailStats = computed(() => {
+  // 模拟数据，实际应从表格数据计算
+  return {
+    totalCustomers: 25,
+    newCustomers: 12,
+    oldCustomers: 13,
+    totalProfit: 98400000, // 9840万
+    newCustomerProfit: 42500000, // 4250万
+    oldCustomerProfit: 55900000, // 5590万
+    totalServiceFee: 24225000, // 2422.5万
+    newCustomerServiceFee: 10800000, // 1080万
+    oldCustomerServiceFee: 13425000, // 1342.5万
+    totalRebate: 9087600, // 908.76万
+    newCustomerRebate: 4250000, // 425万
+    oldCustomerRebate: 4837600, // 483.76万
+    totalConsumption: 181650000, // 18165万
+    newCustomerConsumption: 81000000, // 8100万
+    oldCustomerConsumption: 100650000, // 10065万
+  }
+})
+
+// 续费统计数据
+const renewalStats = computed(() => {
+  // 模拟数据，实际应从续费客户表格数据计算
+  return {
+    customerCount: 18, // 续费客户总数
+    newCustomerCount: 8, // 新客户续费数
+    oldCustomerCount: 10, // 老客户续费数
+    totalAmount: 45600000, // 上次续费总额 4560万
+    newCustomerAmount: 19800000, // 新客户续费金额 1980万
+    oldCustomerAmount: 25800000, // 老客户续费金额 2580万
+  }
+})
+
+// 客户类型分布图表数据
+const customerTypeDistribution = computed(() => [
+  { name: '新客户', value: customerDetailStats.value.newCustomers },
+  { name: '老客户', value: customerDetailStats.value.oldCustomers }
+])
+
+// 毛利占比分布图表数据
+const profitDistributionByCustomerType = computed(() => [
+  { name: '新客户毛利', value: customerDetailStats.value.newCustomerProfit / 10000 }, // 转换为万元
+  { name: '老客户毛利', value: customerDetailStats.value.oldCustomerProfit / 10000 }
+])
+
+// 服务费占比分布图表数据
+const serviceFeeDistributionByCustomerType = computed(() => [
+  { name: '新客户服务费', value: customerDetailStats.value.newCustomerServiceFee / 10000 }, // 转换为万元
+  { name: '老客户服务费', value: customerDetailStats.value.oldCustomerServiceFee / 10000 }
+])
+
 // 总体数据统计
 const totalStats = computed(() => {
   const currentData = getCurrentTargetData()
@@ -2144,7 +2327,7 @@ const totalStats = computed(() => {
     consumption: 18600000, // 1860万
     consumptionTrend: -3.2,
 
-    // 单点
+    // 返点
     singlePoint: 45,
     singlePointTrend: 0,
 
@@ -2645,22 +2828,35 @@ onMounted(async () => {
 /* 总结卡片容器 */
 .summary-cards-container {
   display: grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
-  gap: 20px !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  gap: 12px !important;
   margin: 24px 0 !important;
+}
+
+/* 响应式：确保在小屏幕时有合理的最小宽度 */
+@media (max-width: 768px) {
+  .summary-cards-container {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
+  }
+}
+@media (max-width: 480px) {
+  .summary-cards-container {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 .summary-card {
   flex: 1 !important;
   background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
-  border-radius: 16px !important;
-  padding: 24px !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
   display: flex !important;
   align-items: center !important;
-  gap: 16px !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  gap: 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
   transition: all 0.3s ease !important;
   border: 1px solid rgba(24, 144, 255, 0.1) !important;
+  min-height: 100px !important;
 }
 
 .summary-card:hover {
@@ -2732,9 +2928,9 @@ onMounted(async () => {
 }
 
 .summary-card .card-icon {
-  width: 64px !important;
-  height: 64px !important;
-  border-radius: 16px !important;
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 12px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -2749,7 +2945,7 @@ onMounted(async () => {
 }
 
 .summary-card .card-title {
-  font-size: 16px !important;
+  font-size: 14px !important;
   font-weight: 600 !important;
   color: #262626 !important;
   margin: 0 0 4px 0 !important;
@@ -2757,34 +2953,38 @@ onMounted(async () => {
 }
 
 .summary-card .card-period {
-  font-size: 12px !important;
+  font-size: 11px !important;
   color: #8c8c8c !important;
-  margin: 0 0 8px 0 !important;
+  margin: 0 0 6px 0 !important;
   line-height: 1.4 !important;
 }
 
 .summary-card .card-value {
-  font-size: 32px !important;
+  font-size: 20px !important;
   font-weight: 700 !important;
   color: #262626 !important;
-  margin: 0 0 8px 0 !important;
+  margin: 0 0 6px 0 !important;
   line-height: 1.2 !important;
 }
 
 .summary-card .card-completion {
-  font-size: 14px !important;
+  font-size: 11px !important;
   color: #595959 !important;
-  line-height: 1.4 !important;
+  line-height: 1.3 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 .summary-card .completion-percentage {
   color: #1890ff !important;
   font-weight: 600 !important;
-  margin-left: 8px !important;
+  margin-left: 4px !important;
 }
 
 .summary-card .separator {
-  margin-left: 16px !important;
+  margin: 0 8px !important;
+  color: #d9d9d9 !important;
 }
 
 .dashboard-section .chart-legend {
@@ -4934,15 +5134,87 @@ onMounted(async () => {
 .churn-card .kv-label { color: #8c8c8c; }
 .churn-card .kv-value { color: #262626; }
 
-/* icon 背景区分不同卡片（参考其他 summary-card 渐变色风格） */
+/* 流失卡片背景和图标样式匹配截图 */
+.churn-annual-card {
+  background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%) !important;
+  border-color: rgba(82, 196, 26, 0.2) !important;
+}
 .churn-annual-card .card-icon {
-  background: linear-gradient(135deg, #ffccc7, #ffa39e) !important;
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%) !important;
+}
+
+.churn-new-card {
+  background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%) !important;
+  border-color: rgba(24, 144, 255, 0.2) !important;
 }
 .churn-new-card .card-icon {
-  background: linear-gradient(135deg, #ffe58f, #ffd666) !important;
+  background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%) !important;
+}
+
+.churn-old-card {
+  background: linear-gradient(135deg, #fff0f6 0%, #ffd6e7 100%) !important;
+  border-color: rgba(235, 47, 150, 0.2) !important;
 }
 .churn-old-card .card-icon {
-  background: linear-gradient(135deg, #ffd6e7, #ffadd2) !important;
+  background: linear-gradient(135deg, #eb2f96 0%, #f759ab 100%) !important;
+}
+
+/* 客户毛利明细卡片样式 */
+.customer-count-card {
+  background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%) !important;
+  border-color: rgba(82, 196, 26, 0.2) !important;
+}
+.customer-count-card .card-icon {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%) !important;
+}
+
+.profit-total-card {
+  background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%) !important;
+  border-color: rgba(82, 196, 26, 0.2) !important;
+}
+.profit-total-card .card-icon {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%) !important;
+}
+
+.service-fee-total-card {
+  background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%) !important;
+  border-color: rgba(24, 144, 255, 0.2) !important;
+}
+.service-fee-total-card .card-icon {
+  background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%) !important;
+}
+
+.rebate-total-card {
+  background: linear-gradient(135deg, #fff0f6 0%, #ffd6e7 100%) !important;
+  border-color: rgba(235, 47, 150, 0.2) !important;
+}
+.rebate-total-card .card-icon {
+  background: linear-gradient(135deg, #eb2f96 0%, #f759ab 100%) !important;
+}
+
+.consumption-total-card {
+  background: linear-gradient(135deg, #fff7e6 0%, #ffd591 100%) !important;
+  border-color: rgba(250, 173, 20, 0.2) !important;
+}
+.consumption-total-card .card-icon {
+  background: linear-gradient(135deg, #faad14 0%, #ffc53d 100%) !important;
+}
+
+/* 续费统计卡片样式 */
+.renewal-count-card {
+  background: linear-gradient(135deg, #f6ffed 0%, #b7eb8f 100%) !important;
+  border-color: rgba(82, 196, 26, 0.2) !important;
+}
+.renewal-count-card .card-icon {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%) !important;
+}
+
+.renewal-amount-card {
+  background: linear-gradient(135deg, #e6f7ff 0%, #91d5ff 100%) !important;
+  border-color: rgba(24, 144, 255, 0.2) !important;
+}
+.renewal-amount-card .card-icon {
+  background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%) !important;
 }
 
 .churn-metric {
