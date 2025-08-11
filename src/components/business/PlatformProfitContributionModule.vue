@@ -34,8 +34,8 @@
           <div class="chart-header">
             <h4 class="chart-title">客户数量占比</h4>
             <div class="chart-tabs">
-              <button 
-                v-for="tab in chartTabs" 
+              <button
+                v-for="tab in chartTabs"
                 :key="tab.key"
                 class="chart-tab"
                 :class="{ 'chart-tab--active': activeTab === tab.key }"
@@ -47,8 +47,8 @@
           </div>
           <div class="chart-content">
             <div class="pie-chart-container">
-              <PieChart 
-                :data="pieChartData" 
+              <PieChart
+                :data="pieChartData"
                 :options="pieChartOptions"
                 style="height: 300px;"
               />
@@ -63,8 +63,8 @@
           </div>
           <div class="chart-content">
             <div class="bar-chart-container">
-              <BarChart 
-                :data="barChartData" 
+              <BarChart
+                :data="barChartData"
                 :options="barChartOptions"
                 style="height: 300px;"
               />
