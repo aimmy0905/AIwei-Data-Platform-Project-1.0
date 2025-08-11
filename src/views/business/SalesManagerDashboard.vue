@@ -95,7 +95,7 @@
               <thead>
                 <tr>
                   <th rowspan="2">年度</th>
-                  <th rowspan="2">季度</th>
+                  <th rowspan="2">销售人员</th>
                   <th colspan="2" class="target-group-header">目标</th>
                   <th colspan="2" class="completion-group-header">完成</th>
                   <th colspan="2" class="comparison-group-header">完成对比</th>
@@ -128,18 +128,18 @@
                   <td class="baseline-cell">{{ annualQuarterlyTargets.yearlyTarget.serviceFeeCompletion }}%</td>
                   <td class="baseline-cell">{{ annualQuarterlyTargets.yearlyTarget.newOrderCompletion }}%</td>
                 </tr>
-                <!-- 季度行 -->
-                <tr v-for="quarter in annualQuarterlyTargets.quarters" :key="quarter.quarter" class="quarterly-row">
-                  <td>{{ quarter.quarter }}季度</td>
-                  <td class="target-cell">{{ formatCurrency(quarter.serviceFeeTarget) }}</td>
-                  <td class="target-cell">{{ quarter.newOrderTarget }}单</td>
-                  <td class="completion-cell">{{ formatCurrency(quarter.serviceFeeActual) }}</td>
-                  <td class="completion-cell">{{ quarter.newOrderActual }}单</td>
-                  <td class="comparison-cell" :class="getCompletionClass(quarter.serviceFeeCompletion)">{{ quarter.serviceFeeCompletion }}%</td>
-                  <td class="comparison-cell" :class="getCompletionClass(quarter.newOrderCompletion)">{{ quarter.newOrderCompletion }}%</td>
-                  <td class="baseline-cell">{{ quarter.serviceFeeCompletion }}%</td>
-                  <td class="baseline-cell">{{ quarter.serviceFeeCompletion }}%</td>
-                  <td class="baseline-cell">{{ quarter.newOrderCompletion }}%</td>
+                <!-- 销售人员行 -->
+                <tr v-for="salesperson in salesPersonnelData" :key="salesperson.name" class="quarterly-row">
+                  <td>{{ salesperson.name }}</td>
+                  <td class="target-cell">{{ formatCurrency(salesperson.serviceFeeTarget) }}</td>
+                  <td class="target-cell">{{ salesperson.newOrderTarget }}单</td>
+                  <td class="completion-cell">{{ formatCurrency(salesperson.serviceFeeActual) }}</td>
+                  <td class="completion-cell">{{ salesperson.newOrderActual }}单</td>
+                  <td class="comparison-cell" :class="getCompletionClass(salesperson.serviceFeeCompletion)">{{ salesperson.serviceFeeCompletion }}%</td>
+                  <td class="comparison-cell" :class="getCompletionClass(salesperson.newOrderCompletion)">{{ salesperson.newOrderCompletion }}%</td>
+                  <td class="baseline-cell">{{ salesperson.serviceFeeCompletion }}%</td>
+                  <td class="baseline-cell">{{ salesperson.serviceFeeCompletion }}%</td>
+                  <td class="baseline-cell">{{ salesperson.newOrderCompletion }}%</td>
                 </tr>
               </tbody>
             </table>
@@ -227,7 +227,7 @@
             <thead>
               <tr>
                 <th rowspan="2">年度</th>
-                <th rowspan="2">季度</th>
+                <th rowspan="2">销售人员</th>
                 <th colspan="4" class="service-fee-group-header">服务费目标</th>
                 <th colspan="4" class="order-count-group-header">新单单量</th>
                 <th colspan="4" class="service-fee-actual-group-header">服务费</th>
@@ -292,7 +292,7 @@
                 <td class="renewal-amount-cell">¥235.13万</td>
               </tr>
               <tr class="quarter-row">
-                <td>Q1季度</td>
+                <td>销售1</td>
                 <td class="service-fee-cell">¥280.00万</td>
                 <td class="service-fee-cell">¥195.00万</td>
                 <td class="service-fee-cell">¥75.00万</td>
@@ -319,7 +319,7 @@
                 <td class="renewal-amount-cell">¥54.86万</td>
               </tr>
               <tr class="quarter-row">
-                <td>Q2季度</td>
+                <td>销售2</td>
                 <td class="service-fee-cell">¥320.00万</td>
                 <td class="service-fee-cell">¥225.00万</td>
                 <td class="service-fee-cell">¥85.00万</td>
@@ -346,7 +346,7 @@
                 <td class="renewal-amount-cell">¥62.70万</td>
               </tr>
               <tr class="quarter-row">
-                <td>Q3季度</td>
+                <td>销售3</td>
                 <td class="service-fee-cell">¥350.00万</td>
                 <td class="service-fee-cell">¥245.00万</td>
                 <td class="service-fee-cell">¥95.00万</td>
@@ -373,7 +373,7 @@
                 <td class="renewal-amount-cell">¥69.04万</td>
               </tr>
               <tr class="quarter-row">
-                <td>Q4季度</td>
+                <td>销售4</td>
                 <td class="service-fee-cell">¥250.00万</td>
                 <td class="service-fee-cell">¥185.00万</td>
                 <td class="service-fee-cell">¥65.00万</td>
@@ -484,7 +484,7 @@
             <thead>
               <tr>
                 <th rowspan="2">客户名称</th>
-                <th rowspan="2">年度</th>
+                <th rowspan="2">销售人员</th>
                 <th colspan="4" class="service-fee-group-header">服务费目标</th>
                 <th colspan="4" class="service-fee-actual-group-header">服务费完成</th>
                 <th colspan="4" class="consumption-group-header">消费</th>
@@ -517,7 +517,7 @@
             <tbody>
               <tr class="customer-row">
                 <td rowspan="1" class="customer-name-cell">华为技术有限公司</td>
-                <td>2025年</td>
+                <td>销售1</td>
                 <td class="service-fee-cell">¥180.00万</td>
                 <td class="service-fee-cell">¥120.00万</td>
                 <td class="service-fee-cell">¥50.00万</td>
@@ -541,7 +541,7 @@
               </tr>
               <tr class="customer-row">
                 <td rowspan="1" class="customer-name-cell">小米科技有限公司</td>
-                <td>2025年</td>
+                <td>销售2</td>
                 <td class="service-fee-cell">¥150.00万</td>
                 <td class="service-fee-cell">¥100.00万</td>
                 <td class="service-fee-cell">¥40.00万</td>
@@ -565,7 +565,7 @@
               </tr>
               <tr class="customer-row">
                 <td rowspan="1" class="customer-name-cell">OPPO广东移动通信有限公司</td>
-                <td>2025年</td>
+                <td>销售3</td>
                 <td class="service-fee-cell">¥120.00万</td>
                 <td class="service-fee-cell">¥80.00万</td>
                 <td class="service-fee-cell">¥30.00万</td>
@@ -1154,6 +1154,14 @@ const currentQuarter = ref('2025年Q1')
 
 // 数据状态
 const annualQuarterlyTargets = ref<AnnualQuarterlyTargets>()
+
+// 销售人员数据
+const salesPersonnelData = ref([
+  { name: '销售1', serviceFeeTarget: 6000000, serviceFeeActual: 5700000, serviceFeeCompletion: 95.0, newOrderTarget: 36, newOrderActual: 31, newOrderCompletion: 86.1 },
+  { name: '销售2', serviceFeeTarget: 5500000, serviceFeeActual: 5225000, serviceFeeCompletion: 95.0, newOrderTarget: 33, newOrderActual: 28, newOrderCompletion: 84.8 },
+  { name: '销售3', serviceFeeTarget: 5000000, serviceFeeActual: 4750000, serviceFeeCompletion: 95.0, newOrderTarget: 30, newOrderActual: 26, newOrderCompletion: 86.7 },
+  { name: '销售4', serviceFeeTarget: 4500000, serviceFeeActual: 4275000, serviceFeeCompletion: 95.0, newOrderTarget: 27, newOrderActual: 23, newOrderCompletion: 85.2 }
+])
 
 // 时间周期选择
 const selectedTimePeriod = ref('2025')

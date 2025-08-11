@@ -27,6 +27,52 @@
     </div>
 
     <div class="analysis-module__content">
+      <!-- 图表区域 -->
+      <div class="charts-container">
+        <!-- 客户数量占比饼状图 -->
+        <div class="chart-section">
+          <div class="chart-header">
+            <h4 class="chart-title">客户数量占比</h4>
+            <div class="chart-tabs">
+              <button 
+                v-for="tab in chartTabs" 
+                :key="tab.key"
+                class="chart-tab"
+                :class="{ 'chart-tab--active': activeTab === tab.key }"
+                @click="activeTab = tab.key"
+              >
+                {{ tab.label }}
+              </button>
+            </div>
+          </div>
+          <div class="chart-content">
+            <div class="pie-chart-container">
+              <PieChart 
+                :data="pieChartData" 
+                :options="pieChartOptions"
+                style="height: 300px;"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- 客户价值贡献对比柱状图 -->
+        <div class="chart-section">
+          <div class="chart-header">
+            <h4 class="chart-title">客户价值贡献对比</h4>
+          </div>
+          <div class="chart-content">
+            <div class="bar-chart-container">
+              <BarChart 
+                :data="barChartData" 
+                :options="barChartOptions"
+                style="height: 300px;"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- 平台毛利贡献数据列表 -->
       <div class="platform-table-container">
         <table class="platform-table">
@@ -97,6 +143,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import PieChart from '@/components/charts/PieChart.vue'
+import BarChart from '@/components/charts/BarChart.vue'
 
 interface PlatformProfitData {
   year: string
@@ -127,7 +175,7 @@ interface Props {
   loading?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   loading: false
 })
 
@@ -143,6 +191,16 @@ const timeRanges = [
   { key: 'year', label: '年' },
   { key: 'quarter', label: '季' },
   { key: 'month', label: '月' }
+]
+
+// 图表相关状态
+const activeTab = ref('客户数占比')
+
+const chartTabs = [
+  { key: '客户数占比', label: '客户数占比' },
+  { key: '毛利占比', label: '毛利占比' },
+  { key: '服务费占比', label: '服务费占比' },
+  { key: '返点占比', label: '返点占比' }
 ]
 
 const isNextDisabled = computed(() => {
@@ -197,6 +255,49 @@ const profitContributionData = ref<PlatformProfitData[]>([
     growthRate: { google: 14.2, fb: 11.5, criteo: 7.8, bing: 4.2 }
   }
 ])
+
+// 饼状图数据
+const pieChartData = computed(() => {
+  return [
+    { name: '老客户', value: 217, color: '#1890ff' },
+    { name: '新客户', value: 73, color: '#52c41a' },
+    { name: '流失客户', value: 20, color: '#ff4d4f' }
+  ]
+})
+
+const pieChartOptions = ref({
+  showLegend: true,
+  legendPosition: 'bottom'
+})
+
+// 柱状图数据
+const barChartData = computed(() => {
+  return {
+    labels: ['老客户', '新客户'],
+    datasets: [
+      {
+        label: '毛利 (万)',
+        data: [3300, 2500],
+        color: '#1890ff'
+      },
+      {
+        label: '服务费 (万)',
+        data: [2100, 1500],
+        color: '#52c41a'
+      },
+      {
+        label: '返点 (万)',
+        data: [1100, 800],
+        color: '#fa8c16'
+      }
+    ]
+  }
+})
+
+const barChartOptions = ref({
+  showLegend: true,
+  legendPosition: 'bottom'
+})
 
 // 事件处理
 const handleTimeRangeChange = (timeRange: string) => {
@@ -337,6 +438,84 @@ const getGrowthClass = (rate: number) => {
   display: flex;
   flex-direction: column;
   gap: 24px;
+}
+
+/* 图表容器样式 */
+.charts-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.chart-section {
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  padding: 20px;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.chart-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.chart-tabs {
+  display: flex;
+  gap: 4px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  padding: 2px;
+}
+
+.chart-tab {
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  color: #595959;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.chart-tab:hover {
+  color: #262626;
+}
+
+.chart-tab--active {
+  background: #fff;
+  color: #1890ff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.chart-content {
+  position: relative;
+}
+
+.pie-chart-container,
+.bar-chart-container {
+  height: 300px;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .charts-container {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 }
 
 /* 表格样式 */
