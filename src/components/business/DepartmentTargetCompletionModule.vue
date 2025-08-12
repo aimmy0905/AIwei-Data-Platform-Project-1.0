@@ -38,7 +38,7 @@
           </div>
           <div class="metric-content">
             <div class="metric-label">项目返点总数</div>
-            <div class="metric-value">{{ formatCurrency(totalDepartmentRebateAmount) }}<span class="metric-unit">￥</span></div>
+            <div class="metric-value">{{ formatCurrency(totalDepartmentRebateAmount) }}<span class="metric-unit">$</span></div>
           </div>
         </div>
 
@@ -54,7 +54,7 @@
           </div>
           <div class="metric-content">
             <div class="metric-label">项目总服务费</div>
-            <div class="metric-value">{{ formatCurrency(totalDepartmentServiceFeeAmount) }}<span class="metric-unit">￥</span></div>
+            <div class="metric-value">{{ formatCurrency(totalDepartmentServiceFeeAmount) }}<span class="metric-unit">$</span></div>
           </div>
         </div>
 
@@ -69,7 +69,7 @@
           </div>
           <div class="metric-content">
             <div class="metric-label">项目总毛利</div>
-            <div class="metric-value">{{ formatCurrency(totalDepartmentProfitAmount) }}<span class="metric-unit">￥</span></div>
+            <div class="metric-value">{{ formatCurrency(totalDepartmentProfitAmount) }}<span class="metric-unit">$</span></div>
           </div>
         </div>
       </div>
@@ -116,7 +116,7 @@
               <td class="difference-cell" :class="getDifferenceClass(operationsSummaryData.achievements.rebateActual - operationsSummaryData.targets.rebateTarget)">{{ formatCurrencyDifference(operationsSummaryData.achievements.rebateActual - operationsSummaryData.targets.rebateTarget) }}</td>
             </tr>
             <!-- 各部门行 -->
-            <tr v-for="department in departmentTargets" :key="department.departmentId" class="department-row">
+            <tr v-for="department in props.departmentTargets" :key="department.departmentId" class="department-row">
               <td class="department-cell">{{ department.departmentName }}</td>
               <td class="target-cell">{{ formatCurrency(department.targets.totalProfitTarget) }}</td>
               <td class="target-cell">{{ formatCurrency(department.targets.serviceFeeTarget) }}</td>
@@ -323,11 +323,11 @@ const handleChartClick = (params: { name?: string }) => {
 
 const formatCurrency = (value: number): string => {
   if (value >= 100000000) {
-    return `¥${(value / 100000000).toFixed(2)}亿`
+    return `$${(value / 100000000).toFixed(2)}亿`
   } else if (value >= 10000) {
-    return `¥${(value / 10000).toFixed(2)}万`
+    return `$${(value / 10000).toFixed(2)}万`
   } else {
-    return `¥${value.toLocaleString()}`
+    return `$${value.toLocaleString()}`
   }
 }
 

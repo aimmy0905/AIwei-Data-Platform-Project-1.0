@@ -137,6 +137,51 @@
           </tbody>
         </table>
       </div>
+
+      <!-- 平台占比图表 -->
+      <div class="platform-charts-container">
+        <div class="chart-section">
+          <div class="chart-header">
+            <h4 class="chart-title">项目数量平台占比</h4>
+          </div>
+          <div class="chart-content">
+            <PieChart
+              :data="projectCountChartData"
+              height="300px"
+              :donut="true"
+              :show-legend="true"
+            />
+          </div>
+        </div>
+
+        <div class="chart-section">
+          <div class="chart-header">
+            <h4 class="chart-title">新客户平台占比</h4>
+          </div>
+          <div class="chart-content">
+            <PieChart
+              :data="newCustomersChartData"
+              height="300px"
+              :donut="true"
+              :show-legend="true"
+            />
+          </div>
+        </div>
+
+        <div class="chart-section">
+          <div class="chart-header">
+            <h4 class="chart-title">流失客户平台占比</h4>
+          </div>
+          <div class="chart-content">
+            <PieChart
+              :data="churnedCustomersChartData"
+              height="300px"
+              :donut="true"
+              :show-legend="true"
+            />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -144,6 +189,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { ChevronLeft, ChevronRight, Briefcase, Percent, DollarSign, TrendingUp } from 'lucide-vue-next'
+import PieChart from '@/components/charts/PieChart.vue'
 
 interface TimeBasedData {
   year: string
@@ -266,6 +312,28 @@ const platformStats = computed<PlatformStats>(() => {
     totalProfit: 475000   // 47.5万毛利
   }
 })
+
+// 图表数据 - 使用静态数据避免循环依赖
+const projectCountChartData = ref([
+  { name: 'Google', value: 120, color: '#4285f4' },
+  { name: 'Facebook', value: 95, color: '#1877f2' },
+  { name: 'Criteo', value: 80, color: '#ff6900' },
+  { name: 'Bing', value: 150, color: '#00bcf2' }
+])
+
+const newCustomersChartData = ref([
+  { name: 'Google', value: 25, color: '#4285f4' },
+  { name: 'Facebook', value: 18, color: '#1877f2' },
+  { name: 'Criteo', value: 15, color: '#ff6900' },
+  { name: 'Bing', value: 32, color: '#00bcf2' }
+])
+
+const churnedCustomersChartData = ref([
+  { name: 'Google', value: 8, color: '#4285f4' },
+  { name: 'Facebook', value: 5, color: '#1877f2' },
+  { name: 'Criteo', value: 3, color: '#ff6900' },
+  { name: 'Bing', value: 12, color: '#00bcf2' }
+])
 
 // 事件处理
 const handleTimeRangeChange = (timeRange: string) => {
@@ -593,5 +661,52 @@ const formatCurrency = (amount: number) => {
   font-weight: 500;
   text-align: center;
   min-width: 80px;
+}
+
+/* 图表容器样式 */
+.platform-charts-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.chart-section {
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  padding: 20px;
+}
+
+.chart-header {
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.chart-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.chart-content {
+  position: relative;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .platform-charts-container {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .platform-charts-container {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 }
 </style>

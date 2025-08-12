@@ -35,15 +35,15 @@
             <span>活跃客户数量</span>
           </div>
           <div class="card-content">
-            <div class="card-value">{{ customerData.allCustomers.activeCustomers }}家</div>
+            <div class="card-value">{{ customerData.allCustomers.activeCustomerCount }}家</div>
             <div class="card-details">
               <div class="detail-item">
                 <span class="detail-label">新客户:</span>
-                <span class="detail-value">{{ customerData.newCustomers.activeCustomers }}家</span>
+                <span class="detail-value">{{ customerData.newCustomers.activeCustomerCount }}家</span>
               </div>
               <div class="detail-item">
-                <span class="detail-label">新增客户:</span>
-                <span class="detail-value">{{ customerData.addedCustomers.activeCustomers }}家</span>
+                <span class="detail-label">老客户:</span>
+                <span class="detail-value">{{ customerData.oldCustomers.activeCustomerCount }}家</span>
               </div>
             </div>
           </div>
@@ -62,8 +62,8 @@
                 <span class="detail-value">{{ formatCurrency(customerData.newCustomers.totalProfit) }}</span>
               </div>
               <div class="detail-item">
-                <span class="detail-label">新增客户:</span>
-                <span class="detail-value">{{ formatCurrency(customerData.addedCustomers.totalProfit) }}</span>
+                <span class="detail-label">老客户:</span>
+                <span class="detail-value">{{ formatCurrency(customerData.oldCustomers.totalProfit) }}</span>
               </div>
             </div>
           </div>
@@ -82,8 +82,8 @@
                 <span class="detail-value">{{ formatCurrency(customerData.newCustomers.serviceFee) }}</span>
               </div>
               <div class="detail-item">
-                <span class="detail-label">新增客户:</span>
-                <span class="detail-value">{{ formatCurrency(customerData.addedCustomers.serviceFee) }}</span>
+                <span class="detail-label">老客户:</span>
+                <span class="detail-value">{{ formatCurrency(customerData.oldCustomers.serviceFee) }}</span>
               </div>
             </div>
           </div>
@@ -102,8 +102,8 @@
                 <span class="detail-value">{{ formatCurrency(customerData.newCustomers.rebate) }}</span>
               </div>
               <div class="detail-item">
-                <span class="detail-label">新增客户:</span>
-                <span class="detail-value">{{ formatCurrency(customerData.addedCustomers.rebate) }}</span>
+                <span class="detail-label">老客户:</span>
+                <span class="detail-value">{{ formatCurrency(customerData.oldCustomers.rebate) }}</span>
               </div>
             </div>
           </div>
