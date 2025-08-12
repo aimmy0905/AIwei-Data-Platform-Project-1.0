@@ -416,16 +416,16 @@ const getDifferenceClass = (difference: number) => {
   .target-metrics-cards {
     grid-template-columns: 1fr;
   }
-  
+
   .metric-card {
     padding: 16px;
   }
-  
+
   .icon-container {
     width: 40px;
     height: 40px;
   }
-  
+
   .metric-value {
     font-size: 20px;
   }

@@ -27,52 +27,6 @@
     </div>
 
     <div class="analysis-module__content">
-      <!-- 图表区域 -->
-      <div class="charts-container">
-        <!-- 客户数量占比饼状图 -->
-        <div class="chart-section">
-          <div class="chart-header">
-            <h4 class="chart-title">客户数量占比</h4>
-            <div class="chart-tabs">
-              <button
-                v-for="tab in chartTabs"
-                :key="tab.key"
-                class="chart-tab"
-                :class="{ 'chart-tab--active': activeTab === tab.key }"
-                @click="activeTab = tab.key"
-              >
-                {{ tab.label }}
-              </button>
-            </div>
-          </div>
-          <div class="chart-content">
-            <div class="pie-chart-container">
-              <PieChart
-                :data="pieChartData"
-                :options="pieChartOptions"
-                style="height: 300px;"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- 客户价值贡献对比柱状图 -->
-        <div class="chart-section">
-          <div class="chart-header">
-            <h4 class="chart-title">客户价值贡献对比</h4>
-          </div>
-          <div class="chart-content">
-            <div class="bar-chart-container">
-              <BarChart
-                :data="barChartData"
-                :options="barChartOptions"
-                style="height: 300px;"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- 平台毛利贡献数据列表 -->
       <div class="platform-table-container">
         <table class="platform-table">
