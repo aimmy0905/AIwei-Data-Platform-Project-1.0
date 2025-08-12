@@ -113,8 +113,10 @@
             <div class="pie-chart-container">
               <PieChart
                 :data="pieChartData"
-                :options="pieChartOptions"
-                style="height: 300px;"
+                :height="'300px'"
+                :show-legend="true"
+                :legend-position="'bottom'"
+                @click="handlePieChartClick"
               />
             </div>
           </div>
@@ -129,8 +131,9 @@
             <div class="bar-chart-container">
               <BarChart
                 :data="barChartData"
-                :options="barChartOptions"
-                style="height: 300px;"
+                :height="'300px'"
+                :show-legend="true"
+                @click="handleBarChartClick"
               />
             </div>
           </div>
@@ -265,11 +268,6 @@ const pieChartData = computed(() => {
   ]
 })
 
-const pieChartOptions = ref({
-  showLegend: true,
-  legendPosition: 'bottom'
-})
-
 // 柱状图数据
 const barChartData = computed(() => {
   return {
@@ -294,11 +292,6 @@ const barChartData = computed(() => {
   }
 })
 
-const barChartOptions = ref({
-  showLegend: true,
-  legendPosition: 'bottom'
-})
-
 // 事件处理
 const handleTimeRangeChange = (timeRange: string) => {
   currentTimeRange.value = timeRange
@@ -313,6 +306,14 @@ const nextQuarter = () => {
   if (!isNextDisabled.value) {
     emit('quarter-change', 'next')
   }
+}
+
+const handlePieChartClick = (params: unknown) => {
+  console.log('Pie chart clicked:', params)
+}
+
+const handleBarChartClick = (params: unknown) => {
+  console.log('Bar chart clicked:', params)
 }
 
 // 工具函数
@@ -453,6 +454,8 @@ const getGrowthClass = (rate: number) => {
   border: 1px solid #f0f0f0;
   border-radius: 6px;
   padding: 20px;
+  overflow: hidden;
+  min-width: 0;
 }
 
 .chart-header {
@@ -503,11 +506,14 @@ const getGrowthClass = (rate: number) => {
 
 .chart-content {
   position: relative;
+  overflow: hidden;
 }
 
 .pie-chart-container,
 .bar-chart-container {
   height: 300px;
+  width: 100%;
+  overflow: hidden;
 }
 
 /* 响应式设计 */
