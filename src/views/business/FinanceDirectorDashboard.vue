@@ -73,25 +73,10 @@
       <div class="section-header">
         <h2 class="section-title">销售人员目标完成情况</h2>
         <div class="target-filter">
-          <select v-model="selectedTimePeriod" @change="handleTimePeriodChange" class="time-filter-select">
-            <option value="2025">2025年</option>
-            <option value="2025-Q1">2025年 Q1季度</option>
-            <option value="2025-Q2">2025年 Q2季度</option>
-            <option value="2025-Q3">2025年 Q3季度</option>
-            <option value="2025-Q4">2025年 Q4季度</option>
-            <option value="2025-01">2025年 1月</option>
-            <option value="2025-02">2025年 2月</option>
-            <option value="2025-03">2025年 3月</option>
-            <option value="2025-04">2025年 4月</option>
-            <option value="2025-05">2025年 5月</option>
-            <option value="2025-06">2025年 6月</option>
-            <option value="2025-07">2025年 7月</option>
-            <option value="2025-08">2025年 8月</option>
-            <option value="2025-09">2025年 9月</option>
-            <option value="2025-10">2025年 10月</option>
-            <option value="2025-11">2025年 11月</option>
-            <option value="2025-12">2025年 12月</option>
-          </select>
+          <TimeRangePicker
+            v-model="selectedTimeRange"
+            @change="handleTargetTimeRangeChange"
+          />
         </div>
       </div>
 
@@ -103,7 +88,7 @@
             </div>
             <div class="target-card-title">
               <h3>服务费目标</h3>
-              <p class="target-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</p>
+              <p class="target-period">{{ selectedTimeRange.label }}</p>
             </div>
           </div>
           <div class="target-card-content">
@@ -127,7 +112,7 @@
             </div>
             <div class="target-card-title">
               <h3>新单目标</h3>
-              <p class="target-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</p>
+              <p class="target-period">{{ selectedTimeRange.label }}</p>
             </div>
           </div>
           <div class="target-card-content">
@@ -151,7 +136,7 @@
             </div>
             <div class="target-card-title">
               <h3>综合完成率</h3>
-              <p class="target-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</p>
+              <p class="target-period">{{ selectedTimeRange.label }}</p>
             </div>
           </div>
           <div class="target-card-content">
@@ -274,25 +259,10 @@
       <div class="section-header">
         <h2 class="section-title">销售毛利完成</h2>
         <div class="profit-filter">
-          <select v-model="selectedProfitPeriod" @change="handleProfitPeriodChange" class="time-filter-select">
-            <option value="2025">2025年</option>
-            <option value="2025-Q1">2025年 Q1季度</option>
-            <option value="2025-Q2">2025年 Q2季度</option>
-            <option value="2025-Q3">2025年 Q3季度</option>
-            <option value="2025-Q4">2025年 Q4季度</option>
-            <option value="2025-01">2025年 1月</option>
-            <option value="2025-02">2025年 2月</option>
-            <option value="2025-03">2025年 3月</option>
-            <option value="2025-04">2025年 4月</option>
-            <option value="2025-05">2025年 5月</option>
-            <option value="2025-06">2025年 6月</option>
-            <option value="2025-07">2025年 7月</option>
-            <option value="2025-08">2025年 8月</option>
-            <option value="2025-09">2025年 9月</option>
-            <option value="2025-10">2025年 10月</option>
-            <option value="2025-11">2025年 11月</option>
-            <option value="2025-12">2025年 12月</option>
-          </select>
+          <TimeRangePicker
+            v-model="selectedProfitTimeRange"
+            @change="handleProfitTimeRangeChange"
+          />
         </div>
       </div>
 
@@ -304,7 +274,7 @@
             </div>
             <div class="profit-card-title">
               <h3>总毛利完成</h3>
-              <p class="profit-period">{{ getTimePeriodLabel(selectedProfitPeriod) }}</p>
+              <p class="profit-period">{{ selectedProfitTimeRange.label }}</p>
             </div>
           </div>
           <div class="profit-card-content">
@@ -329,7 +299,7 @@
             </div>
             <div class="profit-card-title">
               <h3>服务费合计</h3>
-              <p class="profit-period">{{ getTimePeriodLabel(selectedProfitPeriod) }}</p>
+              <p class="profit-period">{{ selectedProfitTimeRange.label }}</p>
             </div>
           </div>
           <div class="profit-card-content">
@@ -354,7 +324,7 @@
             </div>
             <div class="profit-card-title">
               <h3>返点合计</h3>
-              <p class="profit-period">{{ getTimePeriodLabel(selectedProfitPeriod) }}</p>
+              <p class="profit-period">{{ selectedProfitTimeRange.label }}</p>
             </div>
           </div>
           <div class="profit-card-content">
@@ -569,6 +539,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { TrendingUp, Shield, Percent, BarChart3, AlertTriangle, DollarSign } from 'lucide-vue-next'
 import RoleSwitcher from '@/components/business/RoleSwitcher.vue'
+import TimeRangePicker from '@/components/business/TimeRangePicker.vue'
 import MetricCard from '@/components/business/MetricCard.vue'
 import OperationTargetCompletionModule from '@/components/business/OperationTargetCompletionModule.vue'
 import DepartmentTargetCompletionModule from '@/components/business/DepartmentTargetCompletionModule.vue'
@@ -587,10 +558,21 @@ import { businessAPI } from '@/mock/business'
 // 状态
 const currentRole = ref('finance_director')
 const availableRoles = ref<BusinessRole[]>([])
-const selectedTimeRange = ref<TimeRange>()
+const selectedTimeRange = ref<TimeRange>({
+  type: 'quick',
+  startDate: new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0],
+  endDate: new Date().toISOString().split('T')[0],
+  period: 'quarterly',
+  label: '本年度'
+})
 const selectedSalesTimeRange = ref<TimeRange>()
-const selectedTimePeriod = ref('2025')
-const selectedProfitPeriod = ref('2025')
+const selectedProfitTimeRange = ref<TimeRange>({
+  type: 'quick',
+  startDate: new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0],
+  endDate: new Date().toISOString().split('T')[0],
+  period: 'quarterly',
+  label: '本年度'
+})
 const financialData = ref<FinancialAnalysisData | null>(null)
 const budgetExecution = ref<BudgetExecutionData[]>([])
 const riskAlerts = ref<FinancialRiskAlert[]>([])
@@ -812,9 +794,25 @@ const targetData: Record<string, TargetDataItem> = {
   '2025-12': { serviceFeeTarget: 2500000, serviceFeeActual: 2237500, serviceFeeCompletion: 89.5, newOrderTarget: 150, newOrderActual: 135, newOrderCompletion: 90.0, overallCompletion: 89.8 }
 }
 
+// 辅助函数：从TimeRange转换为期间字符串
+const timeRangeToPeriodKey = (timeRange: TimeRange): string => {
+  if (timeRange.period === 'yearly') {
+    return '2025'
+  } else if (timeRange.period === 'quarterly') {
+    // 从label中提取季度信息，如"2025年Q1" -> "2025-Q1"
+    const match = timeRange.label.match(/(\d{4})年Q(\d)/)
+    return match ? `${match[1]}-Q${match[2]}` : '2025-Q1'
+  } else {
+    // 从label中提取月份信息，如"2025年1月" -> "2025-01"
+    const match = timeRange.label.match(/(\d{4})年(\d{1,2})月/)
+    return match ? `${match[1]}-${match[2].padStart(2, '0')}` : '2025-01'
+  }
+}
+
 // 目标总览相关计算属性
 const currentTargetData = computed(() => {
-  return targetData[selectedTimePeriod.value] || targetData['2025']
+  const periodKey = timeRangeToPeriodKey(selectedTimeRange.value)
+  return targetData[periodKey] || targetData['2025']
 })
 
 // 毛利数据相关状态
@@ -852,7 +850,8 @@ const profitData: Record<string, ProfitDataItem> = {
 
 // 毛利数据相关计算属性
 const currentProfitData = computed(() => {
-  return profitData[selectedProfitPeriod.value] || profitData['2025']
+  const periodKey = timeRangeToPeriodKey(selectedProfitTimeRange.value)
+  return profitData[periodKey] || profitData['2025']
 })
 
 // 方法
@@ -870,10 +869,9 @@ const handleQuarterChange = (quarter: string) => {
   console.log('季度变更:', quarter)
 }
 
-const handleTimePeriodChange = (event: Event) => {
-  const target = event.target as HTMLSelectElement
-  selectedTimePeriod.value = target.value
-  console.log('时间周期切换至:', target.value)
+const handleTargetTimeRangeChange = (timeRange: TimeRange) => {
+  selectedTimeRange.value = timeRange
+  console.log('时间范围变更:', timeRange)
 }
 
 const getCompletionClass = (rate: number): string => {
@@ -903,10 +901,9 @@ const getRatioClass = (ratio: number): string => {
   return 'poor'
 }
 
-const handleProfitPeriodChange = (event: Event) => {
-  const target = event.target as HTMLSelectElement
-  selectedProfitPeriod.value = target.value
-  console.log('毛利时间周期切换至:', target.value)
+const handleProfitTimeRangeChange = (timeRange: TimeRange) => {
+  selectedProfitTimeRange.value = timeRange
+  console.log('毛利时间范围变更:', timeRange)
 }
 
 const getTimePeriodLabel = (period: string): string => {
