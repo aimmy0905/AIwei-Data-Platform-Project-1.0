@@ -79,8 +79,7 @@
         <table class="department-targets-table">
           <thead>
             <tr>
-              <th rowspan="2" class="year-header">年度</th>
-              <th rowspan="2" class="department-header">员工</th>
+              <th rowspan="2" class="department-header">部门</th>
               <th colspan="3" class="target-group-header">目标</th>
               <th colspan="3" class="completion-group-header">实际完成</th>
               <th colspan="3" class="rate-group-header">完成率</th>
@@ -103,8 +102,7 @@
           <tbody>
             <!-- 运营部门总计行 -->
             <tr v-if="operationsSummaryData" class="operations-summary-row">
-              <td class="year-cell" :rowspan="1 + props.departmentTargets.length">2025年</td>
-              <td class="operations-cell">合计</td>
+              <td class="department-cell">运营</td>
               <td class="target-cell">{{ formatCurrency(operationsSummaryData.targets.totalProfitTarget) }}</td>
               <td class="target-cell">{{ formatCurrency(operationsSummaryData.targets.serviceFeeTarget) }}</td>
               <td class="target-cell">{{ formatCurrency(operationsSummaryData.targets.rebateTarget) }}</td>
@@ -117,9 +115,9 @@
               <td class="difference-cell" :class="getDifferenceClass(operationsSummaryData.achievements.serviceFeeActual - operationsSummaryData.targets.serviceFeeTarget)">{{ formatCurrencyDifference(operationsSummaryData.achievements.serviceFeeActual - operationsSummaryData.targets.serviceFeeTarget) }}</td>
               <td class="difference-cell" :class="getDifferenceClass(operationsSummaryData.achievements.rebateActual - operationsSummaryData.targets.rebateTarget)">{{ formatCurrencyDifference(operationsSummaryData.achievements.rebateActual - operationsSummaryData.targets.rebateTarget) }}</td>
             </tr>
-            <!-- 各员工行 -->
+            <!-- 各部门行 -->
             <tr v-for="(department, index) in props.departmentTargets" :key="department.departmentId" class="department-row">
-              <td class="department-cell">{{ getEmployeeName(index) }}</td>
+              <td class="department-cell">{{ getDepartmentName(index) }}</td>
               <td class="target-cell">{{ formatCurrency(department.targets.totalProfitTarget) }}</td>
               <td class="target-cell">{{ formatCurrency(department.targets.serviceFeeTarget) }}</td>
               <td class="target-cell">{{ formatCurrency(department.targets.rebateTarget) }}</td>
@@ -254,7 +252,7 @@ const totalDepartmentProfitAmount = computed(() => {
 // 目标分配占比数据
 const targetDistributionData = computed(() => {
   return props.departmentTargets.map((dept, index) => ({
-    name: getEmployeeName(index),
+    name: getDepartmentName(index),
     value: currentChartType.value === 'profit'
       ? dept.targets.totalProfitTarget
       : currentChartType.value === 'serviceFee'
@@ -267,7 +265,7 @@ const targetDistributionData = computed(() => {
 // 完成情况占比数据
 const completionDistributionData = computed(() => {
   return props.departmentTargets.map((dept, index) => ({
-    name: getEmployeeName(index),
+    name: getDepartmentName(index),
     value: currentCompletionChartType.value === 'profit'
       ? dept.achievements.totalProfitActual
       : currentCompletionChartType.value === 'serviceFee'
@@ -329,13 +327,11 @@ const handleChartClick = (params: unknown) => {
 
 
 
-const getEmployeeName = (index: number): string => {
-  if (index === 0) return '员工1'
-  if (index === 1) return '员工2'
-  if (index === 2) return '员工3'
-  if (index === 3) return '员工4'
-  if (index === 4) return '员工5'
-  return `员工${index + 1}`
+const getDepartmentName = (index: number): string => {
+  if (index === 0) return '运营一部-燕琴'
+  if (index === 1) return '运营二部-李明'
+  if (index === 2) return '运营三部-张伟'
+  return `运营${index + 1}部`
 }
 
 const formatCurrency = (value: number): string => {
