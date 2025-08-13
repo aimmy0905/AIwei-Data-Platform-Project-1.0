@@ -29,44 +29,44 @@
       <h2 class="section-title">财务核心指标</h2>
       <div class="metrics-grid">
         <MetricCard
-          title="总收入"
-          :value="financialData.revenue.total"
+          title="总服务费"
+          :value="financialData.serviceFee.total"
           unit="¥"
           trend="up"
-          :trend-value="financialData.revenue.quarterlyGrowth"
+          :trend-value="financialData.serviceFee.quarterlyGrowth"
           trend-period="环比增长"
           color="#52c41a"
           icon="DollarSign"
         />
 
         <MetricCard
-          title="净利润"
-          :value="financialData.profit.net"
-          unit="¥"
+          title="总单量"
+          :value="financialData.orders.total"
+          unit="单"
           trend="up"
-          :trend-value="financialData.profit.quarterlyGrowth"
+          :trend-value="financialData.orders.quarterlyGrowth"
           trend-period="环比增长"
           color="#1890ff"
           icon="TrendingUp"
         />
 
         <MetricCard
-          title="毛利率"
-          :value="financialData.profit.margin"
-          unit="%"
-          trend="stable"
-          :trend-value="0.5"
+          title="总毛利"
+          :value="financialData.profit.gross"
+          unit="¥"
+          trend="up"
+          :trend-value="financialData.profit.quarterlyGrowth"
           trend-period="环比增长"
           color="#fa8c16"
           icon="Target"
         />
 
         <MetricCard
-          title="现金流"
-          :value="financialData.cashFlow.netCashFlow"
+          title="总返点"
+          :value="financialData.rebate.total"
           unit="¥"
           trend="up"
-          :trend-value="8.2"
+          :trend-value="financialData.rebate.quarterlyGrowth"
           trend-period="环比增长"
           color="#722ed1"
           icon="BarChart3"
@@ -74,39 +74,104 @@
       </div>
     </div>
 
-        <!-- 收入分析模块 -->
-    <div class="dashboard-section" v-if="financialData">
-      <h2 class="section-title">收入分析</h2>
-      <div class="revenue-analysis-grid">
-        <div class="revenue-summary-card">
-          <h3>部门收入贡献</h3>
-          <div class="revenue-list">
-            <div
-              v-for="dept in financialData.revenue.byDepartment"
-              :key="dept.department"
-              class="revenue-item"
-            >
-              <div class="revenue-item-name">{{ dept.department }}</div>
-              <div class="revenue-item-amount">{{ formatCurrency(dept.amount) }}</div>
-              <div class="revenue-item-percentage">{{ dept.percentage }}%</div>
+        <!-- 销售部门目标完成模块 -->
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2 class="section-title">销售部门目标完成</h2>
+        <TimeRangePicker
+          v-model="selectedSalesTimeRange"
+          @change="handleSalesTimeRangeChange"
+        />
+      </div>
+
+      <!-- 目标数据卡片 -->
+      <div class="target-cards-grid">
+        <div class="target-card">
+          <div class="card-header">
+            <div class="card-icon service-fee">💰</div>
+            <div class="card-info">
+              <div class="card-title">服务费目标</div>
+              <div class="card-value">{{ formatCurrency(8500000) }}</div>
             </div>
+          </div>
+          <div class="card-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 85%"></div>
+            </div>
+            <div class="progress-text">85% 完成</div>
           </div>
         </div>
 
-        <div class="revenue-summary-card">
-          <h3>平台收入贡献</h3>
-          <div class="revenue-list">
-            <div
-              v-for="platform in financialData.revenue.byPlatform"
-              :key="platform.platform"
-              class="revenue-item"
-            >
-              <div class="revenue-item-name">{{ platform.platform }}</div>
-              <div class="revenue-item-amount">{{ formatCurrency(platform.amount) }}</div>
-              <div class="revenue-item-percentage">{{ platform.percentage }}%</div>
+        <div class="target-card">
+          <div class="card-header">
+            <div class="card-icon new-orders">📋</div>
+            <div class="card-info">
+              <div class="card-title">新单目标</div>
+              <div class="card-value">120 单</div>
             </div>
           </div>
+          <div class="card-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 78%"></div>
+            </div>
+            <div class="progress-text">78% 完成</div>
+          </div>
         </div>
+
+        <div class="target-card">
+          <div class="card-header">
+            <div class="card-icon total">🎯</div>
+            <div class="card-info">
+              <div class="card-title">总体完成率</div>
+              <div class="card-value">81.5%</div>
+            </div>
+          </div>
+          <div class="card-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 81.5%"></div>
+            </div>
+            <div class="progress-text">超预期完成</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 数据列表 -->
+      <div class="sales-target-table-container">
+        <table class="sales-target-table">
+          <thead>
+            <tr>
+              <th>年度</th>
+              <th>销售</th>
+              <th colspan="2">目标</th>
+              <th colspan="2">完成</th>
+              <th colspan="3">完成比例</th>
+            </tr>
+            <tr class="sub-header">
+              <th></th>
+              <th></th>
+              <th>服务费目标</th>
+              <th>新单目标</th>
+              <th>服务费完成</th>
+              <th>单量完成</th>
+              <th>服务费完成比例</th>
+              <th>新单完成比例</th>
+              <th>完成总比例</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="record in salesTargetData" :key="record.year + record.salesperson">
+              <td class="year-cell">{{ record.year }}</td>
+              <td class="salesperson-cell">{{ record.salesperson }}</td>
+              <td class="target-cell">{{ formatCurrency(record.serviceFeeTarget) }}</td>
+              <td class="target-cell">{{ record.newOrderTarget }} 单</td>
+              <td class="completion-cell">{{ formatCurrency(record.serviceFeeCompletion) }}</td>
+              <td class="completion-cell">{{ record.orderCompletion }} 单</td>
+              <td class="ratio-cell" :class="getRatioClass(record.serviceFeeRatio)">{{ record.serviceFeeRatio }}%</td>
+              <td class="ratio-cell" :class="getRatioClass(record.newOrderRatio)">{{ record.newOrderRatio }}%</td>
+              <td class="total-ratio-cell" :class="getRatioClass(record.totalRatio)">{{ record.totalRatio }}%</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -260,9 +325,56 @@ import { businessAPI } from '@/mock/business'
 const currentRole = ref('finance_director')
 const availableRoles = ref<BusinessRole[]>([])
 const selectedTimeRange = ref<TimeRange>()
+const selectedSalesTimeRange = ref<TimeRange>()
 const financialData = ref<FinancialAnalysisData | null>(null)
 const budgetExecution = ref<BudgetExecutionData[]>([])
 const riskAlerts = ref<FinancialRiskAlert[]>([])
+const salesTargetData = ref([
+  {
+    year: '2025',
+    salesperson: '张三',
+    serviceFeeTarget: 2000000,
+    newOrderTarget: 30,
+    serviceFeeCompletion: 1700000,
+    orderCompletion: 26,
+    serviceFeeRatio: 85,
+    newOrderRatio: 87,
+    totalRatio: 86
+  },
+  {
+    year: '2025',
+    salesperson: '李四',
+    serviceFeeTarget: 1800000,
+    newOrderTarget: 25,
+    serviceFeeCompletion: 1440000,
+    orderCompletion: 19,
+    serviceFeeRatio: 80,
+    newOrderRatio: 76,
+    totalRatio: 78
+  },
+  {
+    year: '2025',
+    salesperson: '王五',
+    serviceFeeTarget: 2200000,
+    newOrderTarget: 35,
+    serviceFeeCompletion: 1980000,
+    orderCompletion: 32,
+    serviceFeeRatio: 90,
+    newOrderRatio: 91,
+    totalRatio: 91
+  },
+  {
+    year: '2025',
+    salesperson: '赵六',
+    serviceFeeTarget: 1600000,
+    newOrderTarget: 20,
+    serviceFeeCompletion: 1280000,
+    orderCompletion: 17,
+    serviceFeeRatio: 80,
+    newOrderRatio: 85,
+    totalRatio: 82
+  }
+])
 
 // 方法
 const handleRoleChange = (role: string) => {
@@ -273,6 +385,18 @@ const handleRoleChange = (role: string) => {
 const handleTimeRangeChange = (timeRange: TimeRange) => {
   selectedTimeRange.value = timeRange
   console.log('时间范围变更:', timeRange)
+}
+
+const handleSalesTimeRangeChange = (timeRange: TimeRange) => {
+  selectedSalesTimeRange.value = timeRange
+  console.log('销售时间范围变更:', timeRange)
+}
+
+const getRatioClass = (ratio: number): string => {
+  if (ratio >= 90) return 'excellent'
+  if (ratio >= 80) return 'good'
+  if (ratio >= 70) return 'fair'
+  return 'poor'
 }
 
 const formatCurrency = (value: number): string => {
@@ -380,6 +504,175 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.target-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.target-card {
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.card-icon.service-fee {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+}
+
+.card-icon.new-orders {
+  background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+}
+
+.card-icon.total {
+  background: linear-gradient(135deg, #722ed1 0%, #9254de 100%);
+}
+
+.card-info {
+  flex: 1;
+}
+
+.card-title {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin-bottom: 4px;
+}
+
+.card-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #262626;
+}
+
+.card-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 6px;
+  background: #f0f0f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #52c41a 0%, #73d13d 100%);
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: #8c8c8c;
+  white-space: nowrap;
+}
+
+.sales-target-table-container {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+.sales-target-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  border: 1px solid #f0f0f0;
+}
+
+.sales-target-table th,
+.sales-target-table td {
+  padding: 12px 8px;
+  text-align: center;
+  border-bottom: 1px solid #f0f0f0;
+  border-right: 1px solid #f0f0f0;
+}
+
+.sales-target-table th {
+  background: #fafafa;
+  font-weight: 600;
+  color: #262626;
+}
+
+.sales-target-table .sub-header th {
+  background: #f0f9ff;
+  font-size: 12px;
+  color: #595959;
+}
+
+.year-cell,
+.salesperson-cell {
+  text-align: left !important;
+  font-weight: 500;
+}
+
+.target-cell {
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.completion-cell {
+  color: #52c41a;
+  font-weight: 500;
+}
+
+.ratio-cell,
+.total-ratio-cell {
+  font-weight: 600;
+}
+
+.ratio-cell.excellent,
+.total-ratio-cell.excellent {
+  color: #52c41a;
+  background: #f6ffed;
+}
+
+.ratio-cell.good,
+.total-ratio-cell.good {
+  color: #1890ff;
+  background: #e6f7ff;
+}
+
+.ratio-cell.fair,
+.total-ratio-cell.fair {
+  color: #faad14;
+  background: #fff7e6;
+}
+
+.ratio-cell.poor,
+.total-ratio-cell.poor {
+  color: #ff4d4f;
+  background: #fff2f0;
 }
 
 .revenue-analysis-grid {
