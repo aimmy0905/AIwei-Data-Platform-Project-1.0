@@ -31,7 +31,8 @@
         <table class="analysis-table">
           <thead>
             <tr>
-              <th rowspan="2" class="dept-header">部门</th>
+              <th rowspan="2" class="year-header">年度</th>
+              <th rowspan="2" class="dept-header">员工</th>
               <th colspan="4" class="category-header all-customers">所有客户数据 (包括存量客户和新客户)</th>
               <th colspan="4" class="category-header new-customers">2025新客户 (新客户)</th>
               <th colspan="4" class="category-header added-customers">2025年新增客户</th>
@@ -62,6 +63,7 @@
           </thead>
           <tbody>
             <tr v-for="(dept, index) in displayDepartments" :key="dept.name" class="department-row">
+              <td v-if="index === 0" :rowspan="displayDepartments.length" class="year-cell">2025年</td>
               <td class="dept-cell">{{ dept.name }}</td>
               <!-- 所有客户数据 -->
               <td class="data-cell all-customers">{{ dept.data.allCustomers.activeCustomerCount }}</td>
@@ -175,7 +177,7 @@ const isNextDisabled = computed(() => {
 
 // 显示的部门数据
 const displayDepartments = computed(() => {
-  const departmentNames = ['运营', '运营一部', '运营二部', '运营三部', '运营四部']
+  const departmentNames = ['合计', '员工1', '员工2', '员工3', '员工4']
 
   return departmentNames.map((name, index) => {
     // 使用现有数据或创建默认数据
@@ -492,6 +494,15 @@ const getChartTitle = () => {
   color: #595959;
 }
 
+.year-header {
+  background: #f0f2f5 !important;
+  color: #262626 !important;
+  font-weight: 600;
+  width: 80px;
+  min-width: 80px;
+  text-align: center;
+}
+
 .dept-header {
   background: #f0f2f5 !important;
   color: #262626 !important;
@@ -566,6 +577,16 @@ const getChartTitle = () => {
   font-weight: 600;
   font-size: 12px;
   white-space: nowrap;
+}
+
+.year-cell {
+  background: #f0f2f5 !important;
+  color: #262626 !important;
+  font-weight: 600;
+  text-align: center;
+  width: 80px;
+  min-width: 80px;
+  vertical-align: middle;
 }
 
 .dept-cell {

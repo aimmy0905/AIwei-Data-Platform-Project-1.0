@@ -147,7 +147,7 @@
           </thead>
           <tbody v-if="showDepartments && departmentData">
             <tr v-for="(dept, index) in departmentData" :key="dept.departmentId">
-              <td v-if="index === 0" :rowspan="departmentData.length" class="year-cell">运营</td>
+              <td v-if="index === 0" :rowspan="departmentData.length + 1" class="year-cell">2025年</td>
               <td class="quarter-cell">{{ dept.departmentName }}</td>
               <!-- 所有客户数据 -->
               <td class="data-cell all-customers">{{ dept.customerData.allCustomers.activeCustomerCount }}家</td>
@@ -172,8 +172,7 @@
             </tr>
             <!-- 运营总计行 -->
             <tr class="yearly-summary-row">
-              <td class="year-cell yearly-total"></td>
-              <td class="quarter-cell yearly-total">运营总计</td>
+              <td class="quarter-cell yearly-total">2025年</td>
               <!-- 所有客户数据总计 -->
               <td class="data-cell all-customers yearly-total">{{ getTotalActiveCustomers('all') }}家</td>
               <td class="data-cell all-customers yearly-total">{{ formatCurrency(getTotalProfit('all')) }}</td>
