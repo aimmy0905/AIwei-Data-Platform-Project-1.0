@@ -96,6 +96,7 @@
               <th class="department-header">优化部门</th>
               <th class="customer-header">客户名称</th>
               <th class="metric-header">销售</th>
+              <th class="department-header">优化部门</th>
               <th class="metric-header">合作项目</th>
               <th class="metric-header">合作时间</th>
               <th class="metric-header">合作年份</th>
@@ -121,6 +122,7 @@
 
                 <td class="customer-name">{{ customer.customerName }}</td>
                 <td class="metric-value">{{ customer.salesPerson }}</td>
+                <td class="department-cell">{{ getDepartmentName(customerIndex) }}</td>
                 <td class="metric-value">{{ customer.cooperationProject }}</td>
                 <td class="metric-value">{{ customer.cooperationTime }}</td>
                 <td class="metric-value">{{ customer.cooperationYear }}</td>
@@ -327,6 +329,11 @@ const handleNextQuarter = () => {
     currentQuarter.value = quarters[currentIndex + 1]
     emits('quarter-change', currentQuarter.value)
   }
+}
+
+const getDepartmentName = (index: number): string => {
+  const departments = ['运营1部', '运营2部', '运营3部', '运营4部', '运营5部', '运营6部']
+  return departments[index % departments.length]
 }
 
 const formatCurrency = (value: number) => {

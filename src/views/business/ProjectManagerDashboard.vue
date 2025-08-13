@@ -114,6 +114,41 @@
         @quarter-change="handleQuarterChange"
       />
 
+      <!-- 服务客户模块 -->
+      <ServiceCustomerModule
+        :loading="loading"
+        @time-range-change="handleTimeRangeChange"
+        @quarter-change="handleQuarterChange"
+      />
+
+      <!-- 客户Google广告数据总览 -->
+      <CustomerGoogleAdsModule
+        :loading="loading"
+        @time-range-change="handleTimeRangeChange"
+        @quarter-change="handleQuarterChange"
+      />
+
+      <!-- 客户FB广告数据总览 -->
+      <CustomerFacebookAdsModule
+        :loading="loading"
+        @time-range-change="handleTimeRangeChange"
+        @quarter-change="handleQuarterChange"
+      />
+
+      <!-- 客户Criteo广告数据总览 -->
+      <CustomerCriteoAdsModule
+        :loading="loading"
+        @time-range-change="handleTimeRangeChange"
+        @quarter-change="handleQuarterChange"
+      />
+
+      <!-- 客户Bing广告数据总览 -->
+      <CustomerBingAdsModule
+        :loading="loading"
+        @time-range-change="handleTimeRangeChange"
+        @quarter-change="handleQuarterChange"
+      />
+
     </div>
   </div>
 </template>
@@ -134,6 +169,11 @@ import CustomerQualityAssessmentModule from '@/components/business/CustomerQuali
 import DepartmentCustomerQualityAssessmentModule from '@/components/business/DepartmentCustomerQualityAssessmentModule.vue'
 import CustomerContributionModule from '@/components/business/CustomerContributionModule.vue'
 import RenewalCustomerListModule from '@/components/business/RenewalCustomerListModule.vue'
+import ServiceCustomerModule from '@/components/business/ServiceCustomerModule.vue'
+import CustomerGoogleAdsModule from '@/components/business/CustomerGoogleAdsModule.vue'
+import CustomerFacebookAdsModule from '@/components/business/CustomerFacebookAdsModule.vue'
+import CustomerCriteoAdsModule from '@/components/business/CustomerCriteoAdsModule.vue'
+import CustomerBingAdsModule from '@/components/business/CustomerBingAdsModule.vue'
 import type {
   BusinessRole,
   OperationTargetData,

@@ -104,6 +104,7 @@
           <thead>
             <tr>
               <th rowspan="2" class="customer-header">客户名称 (从高到低)</th>
+              <th rowspan="2" class="optimizer-header">优化师列表</th>
               <th rowspan="2" class="metric-header">销售额</th>
               <th rowspan="2" class="metric-header">总毛利</th>
               <th rowspan="2" class="metric-header">总服务费</th>
@@ -138,6 +139,7 @@
               class="data-row"
             >
               <td class="customer-name">{{ customer.customerName }}</td>
+              <td class="optimizer-name">{{ getOptimizerName(index) }}</td>
               <td class="metric-value">{{ formatCurrency(customer.salesAmount) }}</td>
               <td class="metric-value">{{ formatCurrency(customer.totalProfit) }}</td>
               <td class="metric-value">{{ formatCurrency(customer.totalServiceFee) }}</td>
@@ -337,6 +339,10 @@ const handleNextQuarter = () => {
     currentQuarter.value = quarters[currentIndex + 1]
     emits('quarter-change', currentQuarter.value)
   }
+}
+
+const getOptimizerName = (index: number): string => {
+  return `优化师${index + 1}`
 }
 
 const formatCurrency = (value: number) => {
@@ -604,6 +610,24 @@ const formatCurrency = (value: number) => {
   max-width: 180px;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.optimizer-header {
+  background: #f0f2f5 !important;
+  color: #262626 !important;
+  font-weight: 600;
+  font-size: 12px;
+  text-align: center;
+  min-width: 100px;
+}
+
+.optimizer-name {
+  text-align: center !important;
+  font-weight: 500;
+  color: #262626 !important;
+  background: #f0f2f5 !important;
+  min-width: 100px;
   white-space: nowrap;
 }
 
