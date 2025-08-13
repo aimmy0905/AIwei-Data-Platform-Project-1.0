@@ -16,13 +16,7 @@
       </div>
     </div>
 
-    <!-- 时间选择器 -->
-    <div class="dashboard-time-selector">
-      <TimeRangePicker
-        v-model="selectedTimeRange"
-        @change="handleTimeRangeChange"
-      />
-    </div>
+
 
         <!-- 财务核心指标卡片区域 -->
     <div class="dashboard-section" v-if="financialData">
@@ -575,7 +569,6 @@
 import { ref, onMounted, computed } from 'vue'
 import { TrendingUp, Shield, Percent, BarChart3, AlertTriangle, DollarSign } from 'lucide-vue-next'
 import RoleSwitcher from '@/components/business/RoleSwitcher.vue'
-import TimeRangePicker from '@/components/business/TimeRangePicker.vue'
 import MetricCard from '@/components/business/MetricCard.vue'
 import OperationTargetCompletionModule from '@/components/business/OperationTargetCompletionModule.vue'
 import DepartmentTargetCompletionModule from '@/components/business/DepartmentTargetCompletionModule.vue'

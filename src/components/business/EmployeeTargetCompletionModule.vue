@@ -131,7 +131,6 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import PieChart from '@/components/charts/PieChart.vue'
 import TimeRangePicker from './TimeRangePicker.vue'
 import type { TimeRange } from '@/types'
 
@@ -162,7 +161,7 @@ interface Props {
   loading?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   employeeTargets: () => [],
   loading: false
 })
@@ -180,14 +179,7 @@ const selectedTimeRange = ref<TimeRange>({
   label: '本年度'
 })
 
-const currentChartType = ref<'profit' | 'serviceFee' | 'rebate'>('profit')
-const currentCompletionChartType = ref<'profit' | 'serviceFee' | 'rebate'>('profit')
 
-const chartTypes = [
-  { value: 'profit' as const, label: '毛利' },
-  { value: 'serviceFee' as const, label: '服务费' },
-  { value: 'rebate' as const, label: '返点' }
-]
 
 // Mock employee data - this would normally come from props or API
 const employeeData = ref<EmployeeTargetData[]>([
@@ -309,31 +301,7 @@ const totalEmployeeProfitAmount = computed(() => {
   return employeeData.value.reduce((sum, emp) => sum + emp.achievements.totalProfitActual, 0)
 })
 
-// 目标分配占比数据
-const targetDistributionData = computed(() => {
-  return employeeData.value.map((emp) => ({
-    name: emp.employeeName,
-    value: currentChartType.value === 'profit'
-      ? emp.targets.totalProfitTarget
-      : currentChartType.value === 'serviceFee'
-        ? emp.targets.serviceFeeTarget
-        : emp.targets.rebateTarget,
-    color: getEmployeeColor(emp.employeeId)
-  }))
-})
 
-// 完成情况占比数据
-const completionDistributionData = computed(() => {
-  return employeeData.value.map((emp) => ({
-    name: emp.employeeName,
-    value: currentCompletionChartType.value === 'profit'
-      ? emp.achievements.totalProfitActual
-      : currentCompletionChartType.value === 'serviceFee'
-        ? emp.achievements.serviceFeeActual
-        : emp.achievements.rebateActual,
-    color: getEmployeeColor(emp.employeeId)
-  }))
-})
 
 // 方法
 const handleTimeRangeChange = (timeRange: TimeRange) => {
@@ -341,15 +309,7 @@ const handleTimeRangeChange = (timeRange: TimeRange) => {
   emit('time-range-change', timeRange)
 }
 
-const handleChartClick = (params: unknown) => {
-  const clickParams = params as { name?: string }
-  if (clickParams && clickParams.name) {
-    const employee = employeeData.value.find(emp => emp.employeeName === clickParams.name)
-    if (employee) {
-      emit('employee-click', employee.employeeId)
-    }
-  }
-}
+
 
 const getDepartmentName = (departmentId: string): string => {
   const departmentNames: Record<string, string> = {
@@ -379,22 +339,9 @@ const formatCurrency = (value: number): string => {
   }
 }
 
-const formatCompletionChartTotal = () => {
-  const total = employeeData.value.reduce((sum, emp) => {
-    return sum + (currentCompletionChartType.value === 'profit'
-      ? emp.achievements.totalProfitActual
-      : currentCompletionChartType.value === 'serviceFee'
-        ? emp.achievements.serviceFeeActual
-        : emp.achievements.rebateActual)
-  }, 0)
-  return formatCurrency(total)
-}
 
-const getEmployeeColor = (employeeId: string) => {
-  const colors = ['#1890ff', '#52c41a', '#fa8c16', '#722ed1', '#13c2c2', '#eb2f96', '#f759ab', '#597ef7', '#36cfc9', '#73d13d', '#ffc53d', '#ff7a45']
-  const index = employeeData.value.findIndex(emp => emp.employeeId === employeeId)
-  return colors[index % colors.length]
-}
+
+
 
 const getCompletionClass = (rate: number) => {
   if (rate >= 100) return 'excellent'
@@ -419,6 +366,8 @@ const getDifferenceClass = (difference: number) => {
   if (difference < 0) return 'negative'
   return 'neutral'
 }
+
+
 </script>
 
 <style scoped>
@@ -444,6 +393,11 @@ const getDifferenceClass = (difference: number) => {
   font-size: 18px;
   font-weight: 600;
   color: #262626;
+}
+
+.target-completion-module__controls {
+  display: flex;
+  align-items: center;
 }
 
 .target-completion-module__content {
@@ -675,27 +629,18 @@ const getDifferenceClass = (difference: number) => {
 
 /* 数据单元格样式 */
 .department-cell {
-  background: #f0f2f5 !important;
-  color: #262626 !important;
+  background: linear-gradient(135deg, #e6f7ff 0%, #f0f8ff 100%) !important;
+  color: #1890ff !important;
   font-weight: 600;
   text-align: left !important;
   vertical-align: middle;
-  border-right: 3px solid #d9d9d9 !important;
+  border-right: 2px solid #bae6fd !important;
+  box-shadow: inset -2px 0 0 rgba(24, 144, 255, 0.1);
   position: relative;
 }
 
-.department-cell::after {
-  content: '';
-  position: absolute;
-  right: -3px;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: #1890ff;
-}
-
 .employee-cell {
-  background: #f8f8f8 !important;
+  background: #fafafa !important;
   color: #262626 !important;
   font-weight: 500;
   text-align: left !important;

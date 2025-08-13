@@ -384,6 +384,8 @@ const getDifferenceClass = (difference: number) => {
   if (difference < 0) return 'negative'
   return 'neutral'
 }
+
+
 </script>
 
 <style scoped>
@@ -409,6 +411,11 @@ const getDifferenceClass = (difference: number) => {
   font-size: 18px;
   font-weight: 600;
   color: #262626;
+}
+
+.target-completion-module__controls {
+  display: flex;
+  align-items: center;
 }
 
 .target-completion-module__content {
