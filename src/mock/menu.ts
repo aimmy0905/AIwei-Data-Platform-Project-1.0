@@ -261,13 +261,7 @@ export const mockMenuItems: MenuItem[] = [
         path: '/departments/performance',
         roles: ['superAdmin', 'manager']
       },
-      {
-        id: 'goals',
-        name: '目标设置',
-        icon: 'Target',
-        path: '/departments/goals',
-        roles: ['superAdmin', 'manager']
-      }
+
     ],
     roles: ['superAdmin', 'manager']
   },
@@ -340,13 +334,7 @@ export const mockMenuItems: MenuItem[] = [
         path: '/settings/permissions',
         roles: ['superAdmin']
       },
-      {
-        id: 'theme',
-        name: '主题设置',
-        icon: 'Palette',
-        path: '/settings/theme',
-        roles: ['superAdmin', 'manager', 'staff', 'finance', 'sales']
-      },
+
       {
         id: 'system',
         name: '系统配置',
