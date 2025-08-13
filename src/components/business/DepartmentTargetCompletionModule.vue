@@ -11,6 +11,69 @@
     </div>
 
     <div class="target-completion-module__content">
+      <!-- 目标情况卡片 -->
+      <div class="target-metrics-cards">
+        <div class="metric-card">
+          <div class="metric-icon">
+            <div class="icon-container projects-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
+                <path d="M7 8h10M7 12h6" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </div>
+          </div>
+          <div class="metric-content">
+            <div class="metric-label">项目总数</div>
+            <div class="metric-value">{{ totalDepartmentProjects }}<span class="metric-unit">↑</span></div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">
+            <div class="icon-container percentage-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M19 5L5 19M8.5 5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM18.5 19a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </div>
+          </div>
+          <div class="metric-content">
+            <div class="metric-label">项目返点总数</div>
+            <div class="metric-value">{{ formatCurrency(totalDepartmentRebateAmount) }}<span class="metric-unit">$</span></div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">
+            <div class="icon-container service-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 1v6m0 6v6" stroke="currentColor" stroke-width="2"/>
+                <path d="M21 12h-6m-6 0H3" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </div>
+          </div>
+          <div class="metric-content">
+            <div class="metric-label">项目总服务费</div>
+            <div class="metric-value">{{ formatCurrency(totalDepartmentServiceFeeAmount) }}<span class="metric-unit">$</span></div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon">
+            <div class="icon-container profit-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="2"/>
+                <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </div>
+          </div>
+          <div class="metric-content">
+            <div class="metric-label">项目总毛利</div>
+            <div class="metric-value">{{ formatCurrency(totalDepartmentProfitAmount) }}<span class="metric-unit">$</span></div>
+          </div>
+        </div>
+      </div>
+
       <!-- 部门目标完成表格 -->
       <div class="department-targets-table-container">
         <table class="department-targets-table">
@@ -39,7 +102,7 @@
           <tbody>
             <!-- 运营部门总计行 -->
             <tr v-if="operationsSummaryData" class="operations-summary-row">
-              <td class="operations-cell">运营部门</td>
+              <td class="department-cell">运营</td>
               <td class="target-cell">{{ formatCurrency(operationsSummaryData.targets.totalProfitTarget) }}</td>
               <td class="target-cell">{{ formatCurrency(operationsSummaryData.targets.serviceFeeTarget) }}</td>
               <td class="target-cell">{{ formatCurrency(operationsSummaryData.targets.rebateTarget) }}</td>
@@ -53,8 +116,8 @@
               <td class="difference-cell" :class="getDifferenceClass(operationsSummaryData.achievements.rebateActual - operationsSummaryData.targets.rebateTarget)">{{ formatCurrencyDifference(operationsSummaryData.achievements.rebateActual - operationsSummaryData.targets.rebateTarget) }}</td>
             </tr>
             <!-- 各部门行 -->
-            <tr v-for="department in departmentTargets" :key="department.departmentId" class="department-row">
-              <td class="department-cell">{{ department.departmentName }}</td>
+            <tr v-for="(department, index) in props.departmentTargets" :key="department.departmentId" class="department-row">
+              <td class="department-cell">{{ getDepartmentName(index) }}</td>
               <td class="target-cell">{{ formatCurrency(department.targets.totalProfitTarget) }}</td>
               <td class="target-cell">{{ formatCurrency(department.targets.serviceFeeTarget) }}</td>
               <td class="target-cell">{{ formatCurrency(department.targets.rebateTarget) }}</td>
@@ -171,10 +234,25 @@ const chartTypes = [
   { value: 'rebate' as const, label: '返点' }
 ]
 
+// 部门卡片数据计算
+const totalDepartmentProjects = computed(() => 445)
+
+const totalDepartmentRebateAmount = computed(() => {
+  return operationsSummaryData.value?.achievements.rebateActual || 675000
+})
+
+const totalDepartmentServiceFeeAmount = computed(() => {
+  return operationsSummaryData.value?.achievements.serviceFeeActual || 1150000
+})
+
+const totalDepartmentProfitAmount = computed(() => {
+  return operationsSummaryData.value?.achievements.totalProfitActual || 475000
+})
+
 // 目标分配占比数据
 const targetDistributionData = computed(() => {
-  return props.departmentTargets.map(dept => ({
-    name: dept.departmentName,
+  return props.departmentTargets.map((dept, index) => ({
+    name: getDepartmentName(index),
     value: currentChartType.value === 'profit'
       ? dept.targets.totalProfitTarget
       : currentChartType.value === 'serviceFee'
@@ -186,8 +264,8 @@ const targetDistributionData = computed(() => {
 
 // 完成情况占比数据
 const completionDistributionData = computed(() => {
-  return props.departmentTargets.map(dept => ({
-    name: dept.departmentName,
+  return props.departmentTargets.map((dept, index) => ({
+    name: getDepartmentName(index),
     value: currentCompletionChartType.value === 'profit'
       ? dept.achievements.totalProfitActual
       : currentCompletionChartType.value === 'serviceFee'
@@ -232,36 +310,38 @@ const handleTimeRangeChange = (timeRange: TimeRange) => {
   emit('time-range-change', timeRange)
 }
 
-const handleChartClick = (params: any) => {
-  if (params && params.name) {
-    const dept = props.departmentTargets.find(d => d.departmentName === params.name)
-    if (dept) {
-      emit('department-click', dept.departmentId)
+const handleChartClick = (params: unknown) => {
+  const clickParams = params as { name?: string }
+  if (clickParams && clickParams.name) {
+    // Find the department by employee name (e.g., "员工1" -> index 0)
+    const employeeMatch = clickParams.name.match(/员工(\d+)/)
+    if (employeeMatch) {
+      const employeeIndex = parseInt(employeeMatch[1]) - 1
+      const dept = props.departmentTargets[employeeIndex]
+      if (dept) {
+        emit('department-click', dept.departmentId)
+      }
     }
   }
 }
 
 
 
-const formatCurrency = (value: number): string => {
-  if (value >= 100000000) {
-    return `¥${(value / 100000000).toFixed(2)}亿`
-  } else if (value >= 10000) {
-    return `¥${(value / 10000).toFixed(2)}万`
-  } else {
-    return `¥${value.toLocaleString()}`
-  }
+const getDepartmentName = (index: number): string => {
+  if (index === 0) return '运营一部-燕琴'
+  if (index === 1) return '运营二部-李明'
+  if (index === 2) return '运营三部-张伟'
+  return `运营${index + 1}部`
 }
 
-const formatChartTotal = () => {
-  const total = props.departmentTargets.reduce((sum, dept) => {
-    return sum + (currentChartType.value === 'profit'
-      ? dept.targets.totalProfitTarget
-      : currentChartType.value === 'serviceFee'
-        ? dept.targets.serviceFeeTarget
-        : dept.targets.rebateTarget)
-  }, 0)
-  return formatCurrency(total)
+const formatCurrency = (value: number): string => {
+  if (value >= 100000000) {
+    return `$${(value / 100000000).toFixed(2)}亿`
+  } else if (value >= 10000) {
+    return `$${(value / 10000).toFixed(2)}万`
+  } else {
+    return `$${value.toLocaleString()}`
+  }
 }
 
 const formatCompletionChartTotal = () => {
@@ -273,32 +353,6 @@ const formatCompletionChartTotal = () => {
         : dept.achievements.rebateActual)
   }, 0)
   return formatCurrency(total)
-}
-
-const getGapClass = (gap: number) => {
-  return gap >= 0 ? 'value-positive' : 'value-negative'
-}
-
-const getRateClass = (rate: number) => {
-  if (rate >= 100) return 'rate-excellent'
-  if (rate >= 80) return 'rate-good'
-  if (rate >= 60) return 'rate-warning'
-  return 'rate-poor'
-}
-
-const getRankingClass = (rank: number) => {
-  if (rank === 1) return 'rank-first'
-  if (rank === 2) return 'rank-second'
-  if (rank === 3) return 'rank-third'
-  return 'rank-other'
-}
-
-const getDepartmentRanking = (department: DepartmentTargetData) => {
-  // 根据总毛利完成率排名
-  const sorted = [...props.departmentTargets].sort((a, b) =>
-    b.achievements.totalProfitRate - a.achievements.totalProfitRate
-  )
-  return sorted.findIndex(d => d.departmentId === department.departmentId) + 1
 }
 
 const getDepartmentColor = (departmentId: string) => {
@@ -330,6 +384,8 @@ const getDifferenceClass = (difference: number) => {
   if (difference < 0) return 'negative'
   return 'neutral'
 }
+
+
 </script>
 
 <style scoped>
@@ -357,10 +413,134 @@ const getDifferenceClass = (difference: number) => {
   color: #262626;
 }
 
+.target-completion-module__controls {
+  display: flex;
+  align-items: center;
+}
+
 .target-completion-module__content {
   display: flex;
   flex-direction: column;
   gap: 32px;
+}
+
+/* 目标情况卡片样式 */
+.target-metrics-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.metric-card {
+  background: linear-gradient(135deg, #e8f4fd 0%, #f0f8ff 100%);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid #e1f0fe;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(24, 144, 255, 0.12);
+}
+
+.metric-card:nth-child(1) {
+  background: linear-gradient(135deg, #e8f4fd 0%, #f0f8ff 100%);
+  border-color: #91d5ff;
+}
+
+.metric-card:nth-child(2) {
+  background: linear-gradient(135deg, #f6ffed 0%, #f9ffef 100%);
+  border-color: #b7eb8f;
+}
+
+.metric-card:nth-child(3) {
+  background: linear-gradient(135deg, #fff7e6 0%, #fffbf0 100%);
+  border-color: #ffd591;
+}
+
+.metric-card:nth-child(4) {
+  background: linear-gradient(135deg, #f9f0ff 0%, #faf5ff 100%);
+  border-color: #d3adf7;
+}
+
+.metric-icon {
+  flex-shrink: 0;
+}
+
+.icon-container {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.projects-icon {
+  background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+}
+
+.percentage-icon {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+}
+
+.service-icon {
+  background: linear-gradient(135deg, #fa8c16 0%, #ffa940 100%);
+}
+
+.profit-icon {
+  background: linear-gradient(135deg, #722ed1 0%, #9254de 100%);
+}
+
+.metric-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.metric-label {
+  font-size: 14px;
+  color: #595959;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.metric-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #262626;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.metric-unit {
+  font-size: 14px;
+  color: #52c41a;
+  font-weight: 600;
+}
+
+.metric-card:nth-child(1) .metric-unit {
+  color: #1890ff;
+}
+
+.metric-card:nth-child(2) .metric-unit {
+  color: #52c41a;
+}
+
+.metric-card:nth-child(3) .metric-unit {
+  color: #fa8c16;
+}
+
+.metric-card:nth-child(4) .metric-unit {
+  color: #722ed1;
 }
 
 /* 部门目标表格 */
@@ -401,6 +581,14 @@ const getDifferenceClass = (difference: number) => {
 }
 
 /* 表头样式 */
+.year-header {
+  background: #f0f2f5 !important;
+  color: #262626 !important;
+  font-weight: 600;
+  width: 80px;
+  min-width: 80px;
+}
+
 .department-header {
   background: #f0f2f5 !important;
   color: #262626 !important;
@@ -456,6 +644,15 @@ const getDifferenceClass = (difference: number) => {
 }
 
 /* 数据单元格样式 */
+.year-cell {
+  background: #f0f2f5 !important;
+  color: #262626 !important;
+  font-weight: 600;
+  text-align: center !important;
+  width: 80px;
+  min-width: 80px;
+}
+
 .department-cell {
   background: #f0f2f5 !important;
   color: #262626 !important;

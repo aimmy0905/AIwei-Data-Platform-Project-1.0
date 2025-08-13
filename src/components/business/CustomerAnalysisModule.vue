@@ -27,6 +27,89 @@
     </div>
 
     <div class="analysis-module__content">
+      <!-- 数据概览卡片 -->
+      <div class="summary-cards-container" v-if="customerData">
+        <div class="summary-card active-customers-card">
+          <div class="card-header">
+            <Users :size="20" />
+            <span>活跃客户数量</span>
+          </div>
+          <div class="card-content">
+            <div class="card-value">{{ customerData.allCustomers.activeCustomerCount }}家</div>
+            <div class="card-details">
+              <div class="detail-item">
+                <span class="detail-label">新客户:</span>
+                <span class="detail-value">{{ customerData.newCustomers.activeCustomerCount }}家</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">老客户:</span>
+                <span class="detail-value">{{ customerData.oldCustomers.activeCustomerCount }}家</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card profit-card">
+          <div class="card-header">
+            <TrendingUp :size="20" />
+            <span>总毛利</span>
+          </div>
+          <div class="card-content">
+            <div class="card-value">{{ formatCurrency(customerData.allCustomers.totalProfit) }}</div>
+            <div class="card-details">
+              <div class="detail-item">
+                <span class="detail-label">新客户:</span>
+                <span class="detail-value">{{ formatCurrency(customerData.newCustomers.totalProfit) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">老客户:</span>
+                <span class="detail-value">{{ formatCurrency(customerData.oldCustomers.totalProfit) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card service-fee-card">
+          <div class="card-header">
+            <DollarSign :size="20" />
+            <span>服务费</span>
+          </div>
+          <div class="card-content">
+            <div class="card-value">{{ formatCurrency(customerData.allCustomers.serviceFee) }}</div>
+            <div class="card-details">
+              <div class="detail-item">
+                <span class="detail-label">新客户:</span>
+                <span class="detail-value">{{ formatCurrency(customerData.newCustomers.serviceFee) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">老客户:</span>
+                <span class="detail-value">{{ formatCurrency(customerData.oldCustomers.serviceFee) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card rebate-card">
+          <div class="card-header">
+            <Percent :size="20" />
+            <span>返点费用</span>
+          </div>
+          <div class="card-content">
+            <div class="card-value">{{ formatCurrency(customerData.allCustomers.rebate) }}</div>
+            <div class="card-details">
+              <div class="detail-item">
+                <span class="detail-label">新客户:</span>
+                <span class="detail-value">{{ formatCurrency(customerData.newCustomers.rebate) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">老客户:</span>
+                <span class="detail-value">{{ formatCurrency(customerData.oldCustomers.rebate) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- 数据概览表格 -->
       <div class="overview-table-container">
         <table class="overview-table" v-if="customerData">
@@ -64,7 +147,7 @@
           </thead>
           <tbody v-if="showDepartments && departmentData">
             <tr v-for="(dept, index) in departmentData" :key="dept.departmentId">
-              <td v-if="index === 0" :rowspan="departmentData.length" class="year-cell">运营</td>
+              <td v-if="index === 0" :rowspan="departmentData.length + 1" class="year-cell">2025年</td>
               <td class="quarter-cell">{{ dept.departmentName }}</td>
               <!-- 所有客户数据 -->
               <td class="data-cell all-customers">{{ dept.customerData.allCustomers.activeCustomerCount }}家</td>
@@ -89,8 +172,7 @@
             </tr>
             <!-- 运营总计行 -->
             <tr class="yearly-summary-row">
-              <td class="year-cell yearly-total"></td>
-              <td class="quarter-cell yearly-total">运营总计</td>
+              <td class="quarter-cell yearly-total">2025年</td>
               <!-- 所有客户数据总计 -->
               <td class="data-cell all-customers yearly-total">{{ getTotalActiveCustomers('all') }}家</td>
               <td class="data-cell all-customers yearly-total">{{ formatCurrency(getTotalProfit('all')) }}</td>
@@ -288,7 +370,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Users, UserCheck, UserPlus, UserX, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { Users, UserCheck, UserPlus, UserX, ChevronLeft, ChevronRight, TrendingUp, DollarSign, Percent } from 'lucide-vue-next'
 import PieChart from '@/components/charts/PieChart.vue'
 import BarChart from '@/components/charts/BarChart.vue'
 import type { CustomerAnalysisData, DepartmentCustomerAnalysis } from '@/types'
@@ -585,6 +667,105 @@ watch(currentView, (view) => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 24px;
   margin-bottom: 24px;
+}
+
+/* 数据概览卡片 */
+.summary-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.summary-card {
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.summary-card .card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: #1890ff;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.summary-card .card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summary-card .card-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #262626;
+  line-height: 1.2;
+}
+
+.summary-card .card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summary-card .detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.summary-card .detail-label {
+  color: #8c8c8c;
+}
+
+.summary-card .detail-value {
+  font-weight: 500;
+  color: #262626;
+}
+
+/* 卡片特色样式 */
+.active-customers-card .card-header {
+  color: #52c41a;
+}
+
+.active-customers-card .card-value {
+  color: #52c41a;
+}
+
+.profit-card .card-header {
+  color: #1890ff;
+}
+
+.profit-card .card-value {
+  color: #1890ff;
+}
+
+.service-fee-card .card-header {
+  color: #722ed1;
+}
+
+.service-fee-card .card-value {
+  color: #722ed1;
+}
+
+.rebate-card .card-header {
+  color: #fa8c16;
+}
+
+.rebate-card .card-value {
+  color: #fa8c16;
 }
 
 .analysis-module__header {

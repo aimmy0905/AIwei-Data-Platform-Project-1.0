@@ -38,6 +38,61 @@
         />
       </div>
 
+                  <!-- 目标卡片 -->
+      <div v-if="annualQuarterlyTargets" class="target-cards-container">
+        <!-- 服务费目标卡片 -->
+        <div class="target-card service-fee-card">
+          <div class="card-icon">
+            <DollarSign :size="20" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">服务费目标</div>
+            <div class="card-period">{{ selectedTimeRange === 'year' ? annualQuarterlyTargets.year + '年度' : currentQuarter }}</div>
+            <div class="card-value">{{ formatCurrency(getCurrentTargetData().serviceFeeTarget) }}</div>
+            <div class="card-subtitle">
+              已完成: {{ formatCurrency(getCurrentTargetData().serviceFeeActual) }}
+              <span class="completion-rate" :class="getCompletionClass(getCurrentTargetData().serviceFeeCompletion)">
+                {{ getCurrentTargetData().serviceFeeCompletion }}%
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 新单目标卡片 -->
+        <div class="target-card new-order-card">
+          <div class="card-icon">
+            <TrendingUp :size="20" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">新单目标</div>
+            <div class="card-period">{{ selectedTimeRange === 'year' ? annualQuarterlyTargets.year + '年度' : currentQuarter }}</div>
+            <div class="card-value">{{ getCurrentTargetData().newOrderTarget }}单</div>
+            <div class="card-subtitle">
+              已完成: {{ getCurrentTargetData().newOrderActual }}单
+              <span class="completion-rate" :class="getCompletionClass(getCurrentTargetData().newOrderCompletion)">
+                {{ getCurrentTargetData().newOrderCompletion }}%
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 综合完成率卡片 -->
+        <div class="target-card completion-rate-card">
+          <div class="card-icon">
+            <TrendingUp :size="20" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">综合完成率</div>
+            <div class="card-period">{{ selectedTimeRange === 'year' ? annualQuarterlyTargets.year + '年度' : currentQuarter }}</div>
+            <div class="card-value">{{ Math.round((getCurrentTargetData().serviceFeeCompletion + getCurrentTargetData().newOrderCompletion) / 2 * 10) / 10 }}%</div>
+            <div class="card-subtitle">
+              服务费: {{ getCurrentTargetData().serviceFeeCompletion }}%
+              <span class="separator">新单: {{ getCurrentTargetData().newOrderCompletion }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- 年度和季度目标表格 -->
       <div v-if="annualQuarterlyTargets" class="annual-quarterly-targets">
         <div class="targets-table-container">
@@ -97,6 +152,8 @@
       </div>
     </div>
 
+
+
     <!-- 新单服务费及单量完成模块 -->
     <div class="dashboard-section">
       <div class="section-header">
@@ -108,6 +165,8 @@
           @quarter-change="handleQuarterChange"
         />
       </div>
+
+
 
       <div class="new-order-completion-table-container">
         <table class="new-order-completion-table">
@@ -201,9 +260,54 @@
           </tbody>
         </table>
       </div>
+
+      <!-- 饼状图统计 -->
+      <div class="pie-charts-container">
+                        <!-- 服务费占比饼图 -->
+        <div class="pie-chart-section">
+          <h4 class="chart-title">服务费占比分析</h4>
+          <div class="chart-content">
+                        <div class="pie-chart-wrapper">
+              <PieChart
+                :data="serviceFeeChartData"
+                :key="'service-fee-chart'"
+                :height="'200px'"
+                :show-legend="false"
+                :chart-id="'service-fee-pie-chart'"
+              />
+            </div>
+            <div class="chart-legend">
+              <div class="legend-item" v-for="item in serviceFeeChartData" :key="`sf-${item.name}`">
+                <span class="legend-color" :style="{ backgroundColor: item.color }"></span>
+                <span class="legend-text">{{ item.name }} ¥{{ item.value }}万 ({{ item.percentage }}%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 单量占比饼图 -->
+        <div class="pie-chart-section">
+          <h4 class="chart-title">单量占比分析</h4>
+          <div class="chart-content">
+                        <div class="pie-chart-wrapper">
+              <PieChart
+                :data="orderVolumeChartData"
+                :key="'order-volume-chart'"
+                :height="'200px'"
+                :show-legend="false"
+                :chart-id="'order-volume-pie-chart'"
+              />
+            </div>
+            <div class="chart-legend">
+              <div class="legend-item" v-for="item in orderVolumeChartData" :key="`ov-${item.name}`">
+                <span class="legend-color" :style="{ backgroundColor: item.color }"></span>
+                <span class="legend-text">{{ item.name }} {{ item.value }}单 ({{ item.percentage }}%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-
-
 
     <!-- 新签客户毛利完成模块 -->
     <div class="dashboard-section">
@@ -216,6 +320,70 @@
           @quarter-change="handleQuarterChange"
         />
       </div>
+
+      <!-- 总体数据统计卡片 -->
+      <div class="summary-cards-container">
+        <div class="summary-card service-fee-summary">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">服务费目标</div>
+            <div class="card-value">{{ formatCurrency(totalStats.serviceFeeTarget) }}</div>
+          </div>
+        </div>
+
+        <div class="summary-card new-order-summary">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">新单单量</div>
+            <div class="card-value">{{ totalStats.newOrderVolume }}单</div>
+          </div>
+        </div>
+
+        <div class="summary-card service-fee-actual">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">服务费</div>
+            <div class="card-value">{{ formatCurrency(totalStats.serviceFee) }}</div>
+          </div>
+        </div>
+
+        <div class="summary-card consumption-summary">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">消费</div>
+            <div class="card-value">{{ formatCurrency(totalStats.consumption) }}</div>
+          </div>
+        </div>
+
+        <div class="summary-card single-point-summary">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">返点</div>
+            <div class="card-value">{{ totalStats.singlePoint }}个</div>
+          </div>
+        </div>
+
+        <div class="summary-card gross-profit-summary">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">毛利总计</div>
+            <div class="card-value">{{ formatCurrency(totalStats.grossProfit) }}</div>
+          </div>
+        </div>
+      </div>
+
       <div class="profit-analysis-table-container">
         <table class="profit-analysis-table">
           <thead>
@@ -409,6 +577,68 @@
           @quarter-change="handleQuarterChange"
         />
       </div>
+      <!-- 总体数据统计卡片（与“新签客户毛利完成”一致） -->
+      <div class="summary-cards-container">
+        <div class="summary-card service-fee-summary">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">服务费目标</div>
+            <div class="card-value">{{ formatCurrency(totalStats.serviceFeeTarget) }}</div>
+          </div>
+        </div>
+
+        <div class="summary-card new-order-summary">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">新单单量</div>
+            <div class="card-value">{{ totalStats.newOrderVolume }}单</div>
+          </div>
+        </div>
+
+        <div class="summary-card service-fee-actual">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">服务费</div>
+            <div class="card-value">{{ formatCurrency(totalStats.serviceFee) }}</div>
+          </div>
+        </div>
+
+        <div class="summary-card consumption-summary">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">消费</div>
+            <div class="card-value">{{ formatCurrency(totalStats.consumption) }}</div>
+          </div>
+        </div>
+
+        <div class="summary-card single-point-summary">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">返点</div>
+            <div class="card-value">{{ totalStats.singlePoint }}个</div>
+          </div>
+        </div>
+
+        <div class="summary-card gross-profit-summary">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">毛利总计</div>
+            <div class="card-value">{{ formatCurrency(totalStats.grossProfit) }}</div>
+          </div>
+        </div>
+      </div>
       <div class="customer-annual-profit-table-container">
         <table class="customer-annual-profit-table">
           <thead>
@@ -420,7 +650,6 @@
               <th colspan="4" class="consumption-group-header">消费</th>
               <th colspan="4" class="rebate-group-header">返点</th>
               <th colspan="4" class="profit-group-header">毛利</th>
-              <th rowspan="2" class="completion-rate-header">完成率</th>
             </tr>
             <tr>
               <th class="service-fee-header">Google</th>
@@ -469,7 +698,6 @@
               <td class="renewal-amount-cell">¥156.75万</td>
               <td class="renewal-amount-cell">¥65.31万</td>
               <td class="renewal-amount-cell">¥39.19万</td>
-              <td class="completion-rate-cell excellent">95.0%</td>
             </tr>
             <tr class="customer-row">
               <td rowspan="1" class="customer-name-cell">小米科技有限公司</td>
@@ -494,7 +722,6 @@
               <td class="renewal-amount-cell">¥123.75万</td>
               <td class="renewal-amount-cell">¥49.50万</td>
               <td class="renewal-amount-cell">¥30.94万</td>
-              <td class="completion-rate-cell good">90.0%</td>
             </tr>
             <tr class="customer-row">
               <td rowspan="1" class="customer-name-cell">OPPO广东移动通信有限公司</td>
@@ -519,7 +746,6 @@
               <td class="renewal-amount-cell">¥88.00万</td>
               <td class="renewal-amount-cell">¥33.00万</td>
               <td class="renewal-amount-cell">¥22.00万</td>
-              <td class="completion-rate-cell average">80.0%</td>
             </tr>
             <tr class="customer-row">
               <td rowspan="1" class="customer-name-cell">vivo通信科技有限公司</td>
@@ -544,7 +770,6 @@
               <td class="renewal-amount-cell">¥62.56万</td>
               <td class="renewal-amount-cell">¥22.34万</td>
               <td class="renewal-amount-cell">¥13.41万</td>
-              <td class="completion-rate-cell poor">65.0%</td>
             </tr>
             <tr class="customer-row">
               <td rowspan="1" class="customer-name-cell">一加科技（深圳）有限公司</td>
@@ -569,10 +794,22 @@
               <td class="renewal-amount-cell">¥71.84万</td>
               <td class="renewal-amount-cell">¥26.13万</td>
               <td class="renewal-amount-cell">¥15.68万</td>
-              <td class="completion-rate-cell excellent">95.0%</td>
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- 图表概览（注意：追加在数据列表下方，不替代列表） -->
+      <div class="charts-compact-grid">
+        <div class="chart-card">
+          <PieChart :data="platformServiceFeeShare" :height="'240px'" :donut="true" :radius="['38%', '62%']" :center="['35%', '50%']" title="服务费占比分析" :show-legend="true" legend-position="right" />
+        </div>
+        <div class="chart-card">
+          <PieChart :data="platformProfitShare" :height="'240px'" :donut="true" :radius="['38%', '62%']" :center="['35%', '50%']" title="单量占比分析" :show-legend="true" legend-position="right" />
+        </div>
+      </div>
+      <div class="chart-card">
+        <BarChart :data="topCustomerCompare" :height="'240px'" :title="'客户Top10：服务费 vs 毛利'" :horizontal="true" :show-legend="true" />
       </div>
     </div>
 
@@ -587,6 +824,58 @@
           @quarter-change="handleQuarterChange"
         />
       </div>
+
+      <!-- 流失分析卡片（统一为通用 summary-card 风格） -->
+      <div class="summary-cards-container churn-summary-cards">
+        <div class="summary-card churn-card churn-annual-card">
+          <div class="card-icon">
+            <TrendingDown :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">年度客户流失</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ churnAnnualCard.count }}个</div>
+            <div class="card-completion">
+              <span>服务费损失 <span class="completion-percentage">{{ formatCurrency(churnAnnualCard.serviceFeeLoss) }}</span></span>
+              <span class="separator">|</span>
+              <span>毛利损失 <span class="completion-percentage">{{ formatCurrency(churnAnnualCard.profitLoss) }}</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card churn-card churn-new-card">
+          <div class="card-icon">
+            <TrendingDown :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">新客户流失</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ churnNewCard.count }}个</div>
+            <div class="card-completion">
+              <span>服务费损失 <span class="completion-percentage">{{ formatCurrency(churnNewCard.serviceFeeLoss) }}</span></span>
+              <span class="separator">|</span>
+              <span>毛利损失 <span class="completion-percentage">{{ formatCurrency(churnNewCard.profitLoss) }}</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card churn-card churn-old-card">
+          <div class="card-icon">
+            <TrendingDown :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">老客户流失</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ churnOldCard.count }}个</div>
+            <div class="card-completion">
+              <span>服务费损失 <span class="completion-percentage">{{ formatCurrency(churnOldCard.serviceFeeLoss) }}</span></span>
+              <span class="separator">|</span>
+              <span>毛利损失 <span class="completion-percentage">{{ formatCurrency(churnOldCard.profitLoss) }}</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="annual-churn-table-container">
         <table class="annual-churn-table">
           <thead>
@@ -698,6 +987,8 @@
           </tbody>
         </table>
       </div>
+
+
     </div>
 
 
@@ -1129,6 +1420,92 @@
           @quarter-change="handleQuarterChange"
         />
       </div>
+
+      <!-- 客户毛利明细统计卡片 -->
+      <div class="summary-cards-container">
+        <div class="summary-card customer-count-card">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">客户数量</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ customerDetailStats.totalCustomers }}个</div>
+            <div class="card-completion">
+              <span>新客户: <span class="completion-percentage">{{ customerDetailStats.newCustomers }}个</span></span>
+              <span class="separator">|</span>
+              <span>老客户: <span class="completion-percentage">{{ customerDetailStats.oldCustomers }}个</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card profit-total-card">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">毛利合计</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ formatCurrency(customerDetailStats.totalProfit) }}</div>
+            <div class="card-completion">
+              <span>新客户: <span class="completion-percentage">{{ formatCurrency(customerDetailStats.newCustomerProfit) }}</span></span>
+              <span class="separator">|</span>
+              <span>老客户: <span class="completion-percentage">{{ formatCurrency(customerDetailStats.oldCustomerProfit) }}</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card service-fee-total-card">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">服务费合计</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ formatCurrency(customerDetailStats.totalServiceFee) }}</div>
+            <div class="card-completion">
+              <span>新客户: <span class="completion-percentage">{{ formatCurrency(customerDetailStats.newCustomerServiceFee) }}</span></span>
+              <span class="separator">|</span>
+              <span>老客户: <span class="completion-percentage">{{ formatCurrency(customerDetailStats.oldCustomerServiceFee) }}</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card rebate-total-card">
+          <div class="card-icon">
+            <TrendingUp :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">返点合计</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ formatCurrency(customerDetailStats.totalRebate) }}</div>
+            <div class="card-completion">
+              <span>新客户: <span class="completion-percentage">{{ formatCurrency(customerDetailStats.newCustomerRebate) }}</span></span>
+              <span class="separator">|</span>
+              <span>老客户: <span class="completion-percentage">{{ formatCurrency(customerDetailStats.oldCustomerRebate) }}</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card consumption-total-card">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">消费合计</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ formatCurrency(customerDetailStats.totalConsumption) }}</div>
+            <div class="card-completion">
+              <span>新客户: <span class="completion-percentage">{{ formatCurrency(customerDetailStats.newCustomerConsumption) }}</span></span>
+              <span class="separator">|</span>
+              <span>老客户: <span class="completion-percentage">{{ formatCurrency(customerDetailStats.oldCustomerConsumption) }}</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
       <div class="table-scroll-hint">
         <span>← 表格可左右滑动查看更多列 →</span>
       </div>
@@ -1342,6 +1719,33 @@
           @quarter-change="handleQuarterChange"
         />
       </div>
+
+      <!-- 续费统计卡片 -->
+      <div class="summary-cards-container">
+        <div class="summary-card renewal-count-card">
+          <div class="card-icon">
+            <RefreshCw :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">续费客户数量</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ renewalStats.customerCount }}个</div>
+
+          </div>
+        </div>
+        <div class="summary-card renewal-amount-card">
+          <div class="card-icon">
+            <DollarSign :size="24" />
+          </div>
+          <div class="card-content">
+            <div class="card-title">上次续费总额</div>
+            <div class="card-period">{{ getTimePeriodLabel(selectedTimePeriod) }}</div>
+            <div class="card-value">{{ formatCurrency(renewalStats.totalAmount) }}</div>
+
+          </div>
+        </div>
+      </div>
+
       <div class="table-scroll-hint">
         <span>← 表格可左右滑动查看更多列 →</span>
       </div>
@@ -1513,7 +1917,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { DollarSign, TrendingUp } from 'lucide-vue-next'
+import { DollarSign, TrendingUp, TrendingDown, RefreshCw } from 'lucide-vue-next'
 import RoleSwitcher from '@/components/business/RoleSwitcher.vue'
 import ModuleTimeFilter from '@/components/common/ModuleTimeFilter.vue'
 
@@ -1660,6 +2064,269 @@ const isPrevDisabled = computed(() => {
 
 const isNextDisabled = computed(() => {
   return currentQuarter.value === '2025年Q4'
+})
+
+// 获取当前目标数据的方法
+const getCurrentTargetData = () => {
+  if (!annualQuarterlyTargets.value) {
+    return {
+      serviceFeeTarget: 0,
+      serviceFeeActual: 0,
+      serviceFeeCompletion: 0,
+      newOrderTarget: 0,
+      newOrderActual: 0,
+      newOrderCompletion: 0
+    }
+  }
+
+  if (selectedTimeRange.value === 'year') {
+    return annualQuarterlyTargets.value.yearlyTarget
+  } else {
+    // 根据当前季度获取对应的季度数据
+    const quarterData = annualQuarterlyTargets.value.quarters.find(q => q.quarter === currentQuarter.value.replace('2025年', ''))
+    return quarterData || annualQuarterlyTargets.value.yearlyTarget
+  }
+}
+
+// 平台数据统计方法
+const platformStats = {
+  Google: { serviceFee: 850, orderVolume: 45 },
+  Meta: { serviceFee: 720, orderVolume: 38 },
+  Criteo: { serviceFee: 560, orderVolume: 32 },
+  Bing: { serviceFee: 420, orderVolume: 25 },
+  Others: { serviceFee: 300, orderVolume: 16 }
+}
+
+const getTotalServiceFee = () => {
+  return Object.values(platformStats).reduce((total, platform) => total + platform.serviceFee, 0)
+}
+
+const getTotalOrderVolume = () => {
+  return Object.values(platformStats).reduce((total, platform) => total + platform.orderVolume, 0)
+}
+
+const getPlatformServiceFee = (platform: string) => {
+  return platformStats[platform]?.serviceFee || 0
+}
+
+const getPlatformOrderVolume = (platform: string) => {
+  return platformStats[platform]?.orderVolume || 0
+}
+
+// 饼图数据
+const serviceFeeChartData = computed(() => {
+  const total = getTotalServiceFee()
+  const colors = ['#1890ff', '#52c41a', '#ff4d4f', '#faad14', '#722ed1']
+  const platforms = ['Google', 'Meta', 'Criteo', 'Bing', 'Others']
+  const labels = ['Google', 'Meta', 'Criteo', 'Bing', '内容营销及其他']
+
+  return platforms.map((platform, index) => {
+    const value = getPlatformServiceFee(platform)
+    const percentage = ((value / total) * 100).toFixed(1)
+    return {
+      name: labels[index],
+      value: value,
+      percentage: percentage,
+      color: colors[index]
+    }
+  })
+})
+
+const orderVolumeChartData = computed(() => {
+  const total = getTotalOrderVolume()
+  const colors = ['#1890ff', '#52c41a', '#ff4d4f', '#faad14', '#722ed1']
+  const platforms = ['Google', 'Meta', 'Criteo', 'Bing', 'Others']
+  const labels = ['Google', 'Meta', 'Criteo', 'Bing', '内容营销及其他']
+
+  return platforms.map((platform, index) => {
+    const value = getPlatformOrderVolume(platform)
+    const percentage = ((value / total) * 100).toFixed(1)
+    return {
+      name: labels[index],
+      value: value,
+      percentage: percentage,
+      color: colors[index]
+    }
+  })
+})
+
+// 简洁图表用数据与聚合（追加在数据列表下方使用，不影响现有逻辑）
+const platformServiceFeeShare = computed(() => {
+  const platforms = ['Google', 'Meta', 'Criteo', 'Bing', 'Others']
+  return platforms.map((name) => ({ name, value: getPlatformServiceFee(name) }))
+})
+
+// 平台毛利占比（示例数据，若有真实接口可替换）
+const platformProfitStats: Record<string, number> = {
+  Google: 1567.5,
+  Meta: 1110.63,
+  Criteo: 418.0,
+  Bing: 235.13,
+  Others: 120.0
+}
+
+const platformProfitShare = computed(() => {
+  return Object.entries(platformProfitStats).map(([name, value]) => ({ name, value }))
+})
+
+// 客户Top10 对比（服务费 vs 毛利）- 使用表格中的示例客户数值做演示
+const topCustomerBase = [
+  { name: '华为技术有限公司', serviceFee: 171.0 + 114.0 + 47.5 + 28.5, profit: 235.13 + 156.75 + 65.31 + 39.19 },
+  { name: '小米科技有限公司', serviceFee: 135.0 + 90.0 + 36.0 + 22.5, profit: 185.63 + 123.75 + 49.5 + 30.94 },
+  { name: 'OPPO广东移动通信有限公司', serviceFee: 96.0 + 64.0 + 24.0 + 16.0, profit: 132.0 + 88.0 + 33.0 + 22.0 },
+  { name: 'vivo通信科技有限公司', serviceFee: 65.0 + 45.5 + 16.25 + 9.75, profit: 89.38 + 62.56 + 22.34 + 13.41 },
+  { name: '一加科技（深圳）有限公司', serviceFee: 76.0 + 52.25 + 19.0 + 11.4, profit: 104.5 + 71.84 + 26.13 + 15.68 }
+]
+
+const topCustomerCompare = computed(() => {
+  const sorted = [...topCustomerBase]
+    .sort((a, b) => b.profit + b.serviceFee - (a.profit + a.serviceFee))
+    .slice(0, 10)
+
+  return {
+    labels: sorted.map((i) => i.name),
+    datasets: [
+      { label: '服务费完成', data: sorted.map((i) => Number(i.serviceFee.toFixed(2))) },
+      { label: '毛利', data: sorted.map((i) => Number(i.profit.toFixed(2))) }
+    ]
+  }
+})
+
+// ========= 流失分析（数量/服务费损失/毛利损失，按季度） =========
+const uniqueQuarters = computed(() => {
+  const qs = churnAnalysis.value?.map(i => i.quarter) || []
+  return Array.from(new Set(qs))
+})
+
+const churnCountByQuarter = computed(() => ({
+  labels: uniqueQuarters.value,
+  datasets: [{
+    label: '流失客户数',
+    data: uniqueQuarters.value.map(q => (churnAnalysis.value || [])
+      .filter(i => i.quarter === q)
+      .reduce((s, i) => s + (i.customerCount || 0), 0))
+  }]
+}))
+
+const churnServiceFeeByQuarter = computed(() => ({
+  labels: uniqueQuarters.value,
+  datasets: [{
+    label: '损失服务费',
+    data: uniqueQuarters.value.map(q => (churnAnalysis.value || [])
+      .filter(i => i.quarter === q)
+      .reduce((s, i) => s + (i.estimatedServiceFeeLoss || 0), 0))
+  }]
+}))
+
+const churnProfitByQuarter = computed(() => ({
+  labels: uniqueQuarters.value,
+  datasets: [{
+    label: '损失毛利',
+    data: uniqueQuarters.value.map(q => (churnAnalysis.value || [])
+      .filter(i => i.quarter === q)
+      .reduce((s, i) => s + (i.estimatedProfitLoss || 0), 0))
+  }]
+}))
+
+// 流失卡片数据（年度/新客户/老客户）
+type ChurnCard = { count: number; serviceFeeLoss: number; profitLoss: number }
+
+const sumChurn = (filterFn: (i: any) => boolean): ChurnCard => {
+  const rows = (churnAnalysis.value || []).filter(filterFn)
+  return {
+    count: rows.reduce((s, i) => s + (i.customerCount || 0), 0),
+    serviceFeeLoss: rows.reduce((s, i) => s + (i.estimatedServiceFeeLoss || 0), 0),
+    profitLoss: rows.reduce((s, i) => s + (i.estimatedProfitLoss || 0), 0)
+  }
+}
+
+const churnAnnualCard = computed<ChurnCard>(() => sumChurn(() => true))
+const churnNewCard = computed<ChurnCard>(() => sumChurn(i => i.category === 'new_customer'))
+const churnOldCard = computed<ChurnCard>(() => sumChurn(i => i.category === 'old_customer'))
+
+// 客户毛利明细统计数据
+const customerDetailStats = computed(() => {
+  // 模拟数据，实际应从表格数据计算
+  return {
+    totalCustomers: 25,
+    newCustomers: 12,
+    oldCustomers: 13,
+    totalProfit: 98400000, // 9840万
+    newCustomerProfit: 42500000, // 4250万
+    oldCustomerProfit: 55900000, // 5590万
+    totalServiceFee: 24225000, // 2422.5万
+    newCustomerServiceFee: 10800000, // 1080万
+    oldCustomerServiceFee: 13425000, // 1342.5万
+    totalRebate: 9087600, // 908.76万
+    newCustomerRebate: 4250000, // 425万
+    oldCustomerRebate: 4837600, // 483.76万
+    totalConsumption: 181650000, // 18165万
+    newCustomerConsumption: 81000000, // 8100万
+    oldCustomerConsumption: 100650000, // 10065万
+  }
+})
+
+// 续费统计数据
+const renewalStats = computed(() => {
+  // 模拟数据，实际应从续费客户表格数据计算
+  return {
+    customerCount: 18, // 续费客户总数
+    newCustomerCount: 8, // 新客户续费数
+    oldCustomerCount: 10, // 老客户续费数
+    totalAmount: 45600000, // 上次续费总额 4560万
+    newCustomerAmount: 19800000, // 新客户续费金额 1980万
+    oldCustomerAmount: 25800000, // 老客户续费金额 2580万
+  }
+})
+
+// 客户类型分布图表数据
+const customerTypeDistribution = computed(() => [
+  { name: '新客户', value: customerDetailStats.value.newCustomers },
+  { name: '老客户', value: customerDetailStats.value.oldCustomers }
+])
+
+// 毛利占比分布图表数据
+const profitDistributionByCustomerType = computed(() => [
+  { name: '新客户毛利', value: customerDetailStats.value.newCustomerProfit / 10000 }, // 转换为万元
+  { name: '老客户毛利', value: customerDetailStats.value.oldCustomerProfit / 10000 }
+])
+
+// 服务费占比分布图表数据
+const serviceFeeDistributionByCustomerType = computed(() => [
+  { name: '新客户服务费', value: customerDetailStats.value.newCustomerServiceFee / 10000 }, // 转换为万元
+  { name: '老客户服务费', value: customerDetailStats.value.oldCustomerServiceFee / 10000 }
+])
+
+// 总体数据统计
+const totalStats = computed(() => {
+  const currentData = getCurrentTargetData()
+
+  return {
+    // 服务费目标
+    serviceFeeTarget: currentData.serviceFeeTarget || 30000000, // 3000万
+    serviceFeeTargetTrend: 15.2,
+
+    // 新单单量
+    newOrderVolume: currentData.newOrderActual || 156,
+    newOrderVolumeTarget: currentData.newOrderTarget || 180,
+    newOrderVolumeTrend: 12.8,
+
+    // 服务费
+    serviceFee: currentData.serviceFeeActual || 28500000, // 2850万
+    serviceFeeTrend: 8.5,
+
+    // 消费
+    consumption: 18600000, // 1860万
+    consumptionTrend: -3.2,
+
+    // 返点
+    singlePoint: 45,
+    singlePointTrend: 0,
+
+    // 毛利总计
+    grossProfit: 9840000, // 984万
+    grossProfitTrend: 18.7
+  }
 })
 
 // 方法
@@ -1966,6 +2633,459 @@ onMounted(async () => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* 目标卡片样式 - 完全匹配截图设计 */
+.dashboard-section .target-cards-container {
+  display: flex !important;
+  gap: 12px !important;
+  margin-bottom: 16px !important;
+}
+
+.dashboard-section .target-card {
+  flex: 1;
+  background: #f8fbff !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06) !important;
+}
+
+.dashboard-section .target-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08) !important;
+}
+
+.dashboard-section .target-card .card-icon {
+  width: 36px !important;
+  height: 36px !important;
+  background: #1890ff !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: white !important;
+  margin-bottom: 12px !important;
+}
+
+.dashboard-section .target-card .card-content {
+  position: relative !important;
+}
+
+.dashboard-section .target-card .card-title {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #262626 !important;
+  margin: 0 0 2px 0 !important;
+}
+
+.dashboard-section .target-card .card-period {
+  font-size: 11px !important;
+  color: #8c8c8c !important;
+  margin: 0 0 8px 0 !important;
+}
+
+.dashboard-section .target-card .card-value {
+  font-size: 24px !important;
+  font-weight: 600 !important;
+  color: #262626 !important;
+  margin: 0 0 4px 0 !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.2px !important;
+}
+
+.dashboard-section .target-card .card-subtitle {
+  font-size: 11px !important;
+  color: #8c8c8c !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex-wrap: wrap !important;
+}
+
+.dashboard-section .target-card .completion-rate {
+  font-weight: 600 !important;
+  padding: 2px 8px !important;
+  border-radius: 12px !important;
+  font-size: 12px !important;
+  position: absolute !important;
+  right: 12px !important;
+  top: 12px !important;
+}
+
+.dashboard-section .target-card .completion-rate.excellent {
+  color: #52c41a !important;
+  background: rgba(82, 196, 26, 0.1) !important;
+}
+
+.dashboard-section .target-card .completion-rate.good {
+  color: #1890ff !important;
+  background: rgba(24, 144, 255, 0.1) !important;
+}
+
+.dashboard-section .target-card .completion-rate.average {
+  color: #faad14 !important;
+  background: rgba(250, 173, 20, 0.1) !important;
+}
+
+.dashboard-section .target-card .completion-rate.poor {
+  color: #ff4d4f !important;
+  background: rgba(255, 77, 79, 0.1) !important;
+}
+
+/* 服务费卡片特色样式 */
+.dashboard-section .service-fee-card {
+  background: linear-gradient(135deg, #e8f4fd 0%, #f0f9ff 100%) !important;
+}
+
+.dashboard-section .service-fee-card .card-icon {
+  background: linear-gradient(135deg, #1890ff, #40a9ff) !important;
+}
+
+.dashboard-section .service-fee-card .completion-rate {
+  color: #1890ff !important;
+  background: rgba(24, 144, 255, 0.1) !important;
+}
+
+/* 新单卡片特色样式 */
+.dashboard-section .new-order-card {
+  background: linear-gradient(135deg, #f6ffed 0%, #fcfff8 100%) !important;
+}
+
+.dashboard-section .new-order-card .card-icon {
+  background: linear-gradient(135deg, #52c41a, #73d13d) !important;
+}
+
+.dashboard-section .new-order-card .completion-rate {
+  color: #52c41a !important;
+  background: rgba(82, 196, 26, 0.1) !important;
+}
+
+/* 综合完成率卡片特色样式 */
+.dashboard-section .completion-rate-card {
+  background: linear-gradient(135deg, #fff7e6 0%, #fffcf5 100%) !important;
+}
+
+.dashboard-section .completion-rate-card .card-icon {
+  background: linear-gradient(135deg, #faad14, #ffc53d) !important;
+}
+
+.dashboard-section .completion-rate-card .separator {
+  color: #8c8c8c !important;
+  margin-left: 8px !important;
+}
+
+/* 饼状图样式 */
+.dashboard-section .pie-charts-container {
+  display: flex !important;
+  gap: 24px !important;
+  margin-top: 20px !important;
+  justify-content: space-around !important;
+  flex-wrap: wrap !important;
+}
+
+.dashboard-section .pie-chart-section {
+  background: #fff !important;
+  padding: 20px !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  flex: 1 !important;
+  min-width: 400px !important;
+}
+
+.dashboard-section .chart-title {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #262626 !important;
+  margin: 0 0 16px 0 !important;
+  text-align: center !important;
+}
+
+.dashboard-section .chart-content {
+  display: flex !important;
+  align-items: center !important;
+  gap: 24px !important;
+}
+
+.dashboard-section .pie-chart-wrapper {
+  flex-shrink: 0 !important;
+  width: 200px !important;
+  height: 200px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 总结卡片容器 */
+.summary-cards-container {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  gap: 12px !important;
+  margin: 24px 0 !important;
+}
+
+/* 响应式：确保在小屏幕时有合理的最小宽度 */
+@media (max-width: 768px) {
+  .summary-cards-container {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
+  }
+}
+@media (max-width: 480px) {
+  .summary-cards-container {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.summary-card {
+  flex: 1 !important;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  transition: all 0.3s ease !important;
+  border: 1px solid rgba(24, 144, 255, 0.1) !important;
+  min-height: 100px !important;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+.summary-card.service-fee-summary {
+  background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%) !important;
+  border-color: rgba(24, 144, 255, 0.2) !important;
+}
+
+.summary-card.service-fee-summary .card-icon {
+  background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%) !important;
+}
+
+.summary-card.new-order-summary {
+  background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%) !important;
+  border-color: rgba(82, 196, 26, 0.2) !important;
+}
+
+.summary-card.new-order-summary .card-icon {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%) !important;
+}
+
+.summary-card.completion-summary {
+  background: linear-gradient(135deg, #fff7e6 0%, #ffd591 100%) !important;
+  border-color: rgba(250, 173, 20, 0.2) !important;
+}
+
+.summary-card.completion-summary .card-icon {
+  background: linear-gradient(135deg, #faad14 0%, #ffc53d 100%) !important;
+}
+
+.summary-card.service-fee-actual {
+  background: linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%) !important;
+  border-color: rgba(114, 46, 209, 0.2) !important;
+}
+
+.summary-card.service-fee-actual .card-icon {
+  background: linear-gradient(135deg, #722ed1 0%, #9254de 100%) !important;
+}
+
+.summary-card.consumption-summary {
+  background: linear-gradient(135deg, #fff2e8 0%, #ffd8bf 100%) !important;
+  border-color: rgba(250, 140, 22, 0.2) !important;
+}
+
+.summary-card.consumption-summary .card-icon {
+  background: linear-gradient(135deg, #fa8c16 0%, #ffa940 100%) !important;
+}
+
+.summary-card.single-point-summary {
+  background: linear-gradient(135deg, #e6fffb 0%, #b5f5ec 100%) !important;
+  border-color: rgba(19, 194, 194, 0.2) !important;
+}
+
+.summary-card.single-point-summary .card-icon {
+  background: linear-gradient(135deg, #13c2c2 0%, #36cfc9 100%) !important;
+}
+
+.summary-card.gross-profit-summary {
+  background: linear-gradient(135deg, #fff0f6 0%, #ffd6e7 100%) !important;
+  border-color: rgba(235, 47, 150, 0.2) !important;
+}
+
+.summary-card.gross-profit-summary .card-icon {
+  background: linear-gradient(135deg, #eb2f96 0%, #f759ab 100%) !important;
+}
+
+.summary-card .card-icon {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: white !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.summary-card .card-content {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.summary-card .card-title {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #262626 !important;
+  margin: 0 0 4px 0 !important;
+  line-height: 1.4 !important;
+}
+
+.summary-card .card-period {
+  font-size: 11px !important;
+  color: #8c8c8c !important;
+  margin: 0 0 6px 0 !important;
+  line-height: 1.4 !important;
+}
+
+.summary-card .card-value {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  color: #262626 !important;
+  margin: 0 0 6px 0 !important;
+  line-height: 1.2 !important;
+}
+
+.summary-card .card-completion {
+  font-size: 11px !important;
+  color: #595959 !important;
+  line-height: 1.3 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.summary-card .completion-percentage {
+  color: #1890ff !important;
+  font-weight: 600 !important;
+  margin-left: 4px !important;
+}
+
+.summary-card .separator {
+  margin: 0 8px !important;
+  color: #d9d9d9 !important;
+}
+
+.dashboard-section .chart-legend {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  flex: 1 !important;
+  justify-content: center !important;
+}
+
+.dashboard-section .legend-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  font-size: 13px !important;
+  padding: 4px 0 !important;
+}
+
+.dashboard-section .legend-color {
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 50% !important;
+  flex-shrink: 0 !important;
+}
+
+.dashboard-section .legend-text {
+  color: #262626 !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+}
+
+
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .dashboard-section .target-cards-container {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .dashboard-section .target-card {
+    padding: 20px !important;
+  }
+
+  .summary-cards-container {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .summary-card {
+    padding: 20px !important;
+  }
+
+  .summary-card .card-icon {
+    width: 56px !important;
+    height: 56px !important;
+  }
+
+  .summary-card .card-value {
+    font-size: 28px !important;
+  }
+
+  .dashboard-section .target-card .card-value {
+    font-size: 28px !important;
+  }
+
+  .dashboard-section .target-card .card-icon {
+    width: 40px !important;
+    height: 40px !important;
+    top: 16px !important;
+    right: 16px !important;
+  }
+
+      .dashboard-section .pie-charts-container {
+    flex-direction: column !important;
+    gap: 24px !important;
+    align-items: center !important;
+  }
+
+      .dashboard-section .pie-chart-section {
+    min-width: auto !important;
+    padding: 16px !important;
+  }
+
+  .dashboard-section .chart-content {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .dashboard-section .chart-container {
+    width: 180px !important;
+    height: 180px !important;
+  }
+
+  .dashboard-section .chart-legend {
+    align-self: center !important;
+  }
+
+  .dashboard-section .legend-item {
+    font-size: 12px !important;
+    gap: 8px !important;
+  }
+
+  .dashboard-section .legend-color {
+    width: 12px !important;
+    height: 12px !important;
+  }
+}
+
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -2005,19 +3125,19 @@ onMounted(async () => {
 
 .target-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 24px;
-  margin-top: 20px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+  margin-bottom: 20px;
 }
 
 .target-card {
   background: #fff;
   border: 1px solid #f0f0f0;
   border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
 }
 
 .target-card:hover {
@@ -2028,13 +3148,13 @@ onMounted(async () => {
 .target-card-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .target-card-icon {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -2056,13 +3176,13 @@ onMounted(async () => {
 
 .target-card-title h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: #262626;
 }
 
 .target-period {
-  margin: 4px 0 0 0;
+  margin: 0;
   font-size: 12px;
   color: #8c8c8c;
 }
@@ -2070,36 +3190,36 @@ onMounted(async () => {
 .target-card-content {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .target-value {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 700;
   color: #262626;
-  line-height: 1;
+  line-height: 1.1;
 }
 
 .overall-rate {
-  font-size: 32px;
+  font-size: 26px;
 }
 
 .completion-info {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .completion-value {
   font-size: 14px;
-  color: #595959;
+  color: #8c8c8c;
 }
 
 .completion-rate {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
-  padding: 4px 8px;
+  padding: 2px 6px;
   border-radius: 4px;
 }
 
@@ -3595,18 +4715,9 @@ onMounted(async () => {
   border-left: 4px solid #52c41a;
 }
 
-.churn-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.churn-card-header h4 {
-  margin: 0;
-  font-size: 16px;
-  color: #262626;
-}
+/* 兼容旧的流失卡片样式（已不再使用，但保留以免样式抖动） */
+.churn-card-header { display: none; }
+.churn-card-header h4 { display: none; }
 
 .risk-badge {
   padding: 2px 8px;
@@ -3979,5 +5090,142 @@ onMounted(async () => {
 .loading-container p {
   color: #8c8c8c;
   margin: 0;
+}
+
+
+</style>
+<style scoped>
+.charts-compact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+  margin-bottom: 20px;
+}
+
+.chart-card {
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 20px 20px 28px; /* 增加上下留白，避免与上下文案贴近 */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 16px;
+}
+
+/* 新流失卡片容器，复用 summary-cards-container 的网格，仅微调外边距 */
+.churn-summary-cards { margin: 12px 0 8px !important; }
+
+/* 与截图一致的键值行样式 */
+.churn-card .kv-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  color: #595959;
+}
+.churn-card .kv-label { color: #8c8c8c; }
+.churn-card .kv-value { color: #262626; }
+
+/* 流失卡片背景和图标样式匹配截图 */
+.churn-annual-card {
+  background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%) !important;
+  border-color: rgba(82, 196, 26, 0.2) !important;
+}
+.churn-annual-card .card-icon {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%) !important;
+}
+
+.churn-new-card {
+  background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%) !important;
+  border-color: rgba(24, 144, 255, 0.2) !important;
+}
+.churn-new-card .card-icon {
+  background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%) !important;
+}
+
+.churn-old-card {
+  background: linear-gradient(135deg, #fff0f6 0%, #ffd6e7 100%) !important;
+  border-color: rgba(235, 47, 150, 0.2) !important;
+}
+.churn-old-card .card-icon {
+  background: linear-gradient(135deg, #eb2f96 0%, #f759ab 100%) !important;
+}
+
+/* 客户毛利明细卡片样式 */
+.customer-count-card {
+  background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%) !important;
+  border-color: rgba(82, 196, 26, 0.2) !important;
+}
+.customer-count-card .card-icon {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%) !important;
+}
+
+.profit-total-card {
+  background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%) !important;
+  border-color: rgba(82, 196, 26, 0.2) !important;
+}
+.profit-total-card .card-icon {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%) !important;
+}
+
+.service-fee-total-card {
+  background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%) !important;
+  border-color: rgba(24, 144, 255, 0.2) !important;
+}
+.service-fee-total-card .card-icon {
+  background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%) !important;
+}
+
+.rebate-total-card {
+  background: linear-gradient(135deg, #fff0f6 0%, #ffd6e7 100%) !important;
+  border-color: rgba(235, 47, 150, 0.2) !important;
+}
+.rebate-total-card .card-icon {
+  background: linear-gradient(135deg, #eb2f96 0%, #f759ab 100%) !important;
+}
+
+.consumption-total-card {
+  background: linear-gradient(135deg, #fff7e6 0%, #ffd591 100%) !important;
+  border-color: rgba(250, 173, 20, 0.2) !important;
+}
+.consumption-total-card .card-icon {
+  background: linear-gradient(135deg, #faad14 0%, #ffc53d 100%) !important;
+}
+
+/* 续费统计卡片样式 */
+.renewal-count-card {
+  background: linear-gradient(135deg, #f6ffed 0%, #b7eb8f 100%) !important;
+  border-color: rgba(82, 196, 26, 0.2) !important;
+}
+.renewal-count-card .card-icon {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%) !important;
+}
+
+.renewal-amount-card {
+  background: linear-gradient(135deg, #e6f7ff 0%, #91d5ff 100%) !important;
+  border-color: rgba(24, 144, 255, 0.2) !important;
+}
+.renewal-amount-card .card-icon {
+  background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%) !important;
+}
+
+.churn-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.metric-label {
+  color: #8c8c8c;
+  font-size: 13px;
+}
+
+.metric-value {
+  color: #262626;
+  font-weight: 700;
 }
 </style>

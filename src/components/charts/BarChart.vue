@@ -1,8 +1,8 @@
 <template>
-  <div class="bar-chart">
-    <v-chart 
-      :option="chartOption" 
-      :style="{ height: height, width: '100%' }"
+  <div class="bar-chart" :style="{ height: height, minHeight: '200px' }">
+    <v-chart
+      :option="chartOption"
+      :style="{ height: '100%', width: '100%' }"
       autoresize
       @click="handleClick"
     />
@@ -35,7 +35,12 @@ use([
 
 // 属性定义
 interface Props {
-  data: {
+  data: Array<{
+    name: string
+    serviceFee?: number
+    profit?: number
+    [key: string]: any
+  }> | {
     labels: string[]
     datasets: {
       label: string
@@ -65,7 +70,41 @@ const emit = defineEmits<{
 // 计算图表配置
 const chartOption = computed(() => {
   const colors = currentColors.value
-  
+
+  // 处理数据格式 - 检查是否是数组格式（项目经理看板用的格式）
+  const isArrayFormat = Array.isArray(props.data)
+
+  let labels: string[] = []
+  let datasets: Array<{ label: string; data: number[]; color?: string }> = []
+
+  if (isArrayFormat) {
+    // 数组格式：[{name: '华为', serviceFee: 418.5, profit: 653.13}, ...]
+    const arrayData = props.data as Array<{name: string; serviceFee?: number; profit?: number; [key: string]: any}>
+    labels = arrayData.map(item => item.name)
+
+    // 创建服务费和毛利两个数据系列
+    const serviceFeeData = arrayData.map(item => item.serviceFee || 0)
+    const profitData = arrayData.map(item => item.profit || 0)
+
+    datasets = [
+      {
+        label: '服务费',
+        data: serviceFeeData,
+        color: colors.primary
+      },
+      {
+        label: '毛利',
+        data: profitData,
+        color: colors.success
+      }
+    ]
+  } else {
+    // 标准格式：{labels: [], datasets: []}
+    const standardData = props.data as {labels: string[]; datasets: Array<{label: string; data: number[]; color?: string}>}
+    labels = standardData.labels || []
+    datasets = standardData.datasets || []
+  }
+
   return {
     title: props.title ? {
       text: props.title,
@@ -75,7 +114,7 @@ const chartOption = computed(() => {
         fontWeight: 600
       }
     } : undefined,
-    
+
     tooltip: {
       trigger: 'axis',
       backgroundColor: colors.surface,
@@ -101,7 +140,7 @@ const chartOption = computed(() => {
         return tooltip
       }
     },
-    
+
     legend: props.showLegend ? {
       show: true,
       bottom: 0,
@@ -109,7 +148,7 @@ const chartOption = computed(() => {
         color: colors.textSecondary
       }
     } : { show: false },
-    
+
     grid: {
       top: props.title ? 60 : 20,
       left: props.horizontal ? 80 : 60,
@@ -117,10 +156,10 @@ const chartOption = computed(() => {
       bottom: props.showLegend ? 60 : 30,
       containLabel: true
     },
-    
+
     xAxis: {
       type: props.horizontal ? 'value' : 'category',
-      data: props.horizontal ? undefined : props.data.labels,
+      data: props.horizontal ? undefined : labels,
       axisLine: {
         lineStyle: {
           color: colors.border
@@ -139,10 +178,10 @@ const chartOption = computed(() => {
         }
       }
     },
-    
+
     yAxis: {
       type: props.horizontal ? 'category' : 'value',
-      data: props.horizontal ? props.data.labels : undefined,
+      data: props.horizontal ? labels : undefined,
       axisLine: {
         show: props.horizontal
       },
@@ -162,8 +201,8 @@ const chartOption = computed(() => {
         }
       }
     },
-    
-    series: props.data.datasets.map((dataset, index) => ({
+
+    series: datasets.map((dataset, index) => ({
       name: dataset.label,
       type: 'bar',
       data: dataset.data,
@@ -217,5 +256,11 @@ const handleClick = (params: unknown) => {
   width: 100%;
   background: var(--color-surface);
   border-radius: var(--border-radius-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.bar-chart > div {
+  min-height: 200px !important;
 }
 </style>
