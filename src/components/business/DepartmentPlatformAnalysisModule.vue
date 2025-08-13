@@ -88,7 +88,7 @@
           <thead>
             <tr>
               <th rowspan="2" class="time-header">年度</th>
-              <th rowspan="2" class="time-header">部门</th>
+              <th rowspan="2" class="time-header">员工</th>
               <th colspan="4" class="category-header all-platforms">所有平台项目数</th>
               <th colspan="4" class="category-header new-customers">2025年新签客户数（新客户）</th>
               <th colspan="4" class="category-header churned-customers">2025年流失客户数</th>
@@ -207,7 +207,7 @@ const isNextDisabled = computed(() => {
 const departmentBasedData = ref<DepartmentBasedData[]>([
   {
     year: '2025年',
-    department: '运营',
+    department: '合计',
     isFirstOfYear: true,
     departmentCount: 5,
     allProjects: { google: 180, fb: 145, criteo: 68, bing: 52 },
@@ -216,7 +216,7 @@ const departmentBasedData = ref<DepartmentBasedData[]>([
   },
   {
     year: '2025年',
-    department: '运营一部',
+    department: '员工1',
     isFirstOfYear: false,
     departmentCount: 1,
     allProjects: { google: 48, fb: 38, criteo: 18, bing: 14 },
@@ -225,7 +225,7 @@ const departmentBasedData = ref<DepartmentBasedData[]>([
   },
   {
     year: '2025年',
-    department: '运营二部',
+    department: '员工2',
     isFirstOfYear: false,
     departmentCount: 1,
     allProjects: { google: 45, fb: 36, criteo: 16, bing: 12 },
@@ -234,7 +234,7 @@ const departmentBasedData = ref<DepartmentBasedData[]>([
   },
   {
     year: '2025年',
-    department: '运营三部',
+    department: '员工3',
     isFirstOfYear: false,
     departmentCount: 1,
     allProjects: { google: 42, fb: 35, criteo: 17, bing: 13 },
@@ -243,7 +243,7 @@ const departmentBasedData = ref<DepartmentBasedData[]>([
   },
   {
     year: '2025年',
-    department: '运营四部',
+    department: '员工4',
     isFirstOfYear: false,
     departmentCount: 1,
     allProjects: { google: 45, fb: 36, criteo: 17, bing: 13 },

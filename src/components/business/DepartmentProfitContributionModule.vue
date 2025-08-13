@@ -62,7 +62,7 @@
           <thead>
             <tr>
               <th rowspan="2" class="time-header">年度</th>
-              <th rowspan="2" class="time-header">部门</th>
+              <th rowspan="2" class="time-header">员工</th>
               <th colspan="4" class="category-header profit-contribution">平台毛利贡献（万元）</th>
               <th colspan="4" class="category-header profit-percentage">毛利贡献占比（%）</th>
               <th colspan="4" class="category-header growth-rate">同比增长率（%）</th>
@@ -182,7 +182,7 @@ const isNextDisabled = computed(() => {
 const departmentProfitData = ref<DepartmentProfitData[]>([
   {
     year: '2025年',
-    department: '运营',
+    department: '合计',
     isFirstOfYear: true,
     departmentCount: 5,
     profitContribution: { google: 808.1, fb: 638.7, criteo: 395.5, bing: 264.2 },
@@ -191,7 +191,7 @@ const departmentProfitData = ref<DepartmentProfitData[]>([
   },
   {
     year: '2025年',
-    department: '运营一部',
+    department: '员工1',
     isFirstOfYear: false,
     departmentCount: 1,
     profitContribution: { google: 185.6, fb: 142.8, criteo: 89.3, bing: 57.8 },
@@ -200,7 +200,7 @@ const departmentProfitData = ref<DepartmentProfitData[]>([
   },
   {
     year: '2025年',
-    department: '运营二部',
+    department: '员工2',
     isFirstOfYear: false,
     departmentCount: 1,
     profitContribution: { google: 198.5, fb: 155.2, criteo: 95.1, bing: 62.8 },
@@ -209,7 +209,7 @@ const departmentProfitData = ref<DepartmentProfitData[]>([
   },
   {
     year: '2025年',
-    department: '运营三部',
+    department: '员工3',
     isFirstOfYear: false,
     departmentCount: 1,
     profitContribution: { google: 205.2, fb: 165.8, criteo: 102.9, bing: 68.5 },
@@ -218,7 +218,7 @@ const departmentProfitData = ref<DepartmentProfitData[]>([
   },
   {
     year: '2025年',
-    department: '运营四部',
+    department: '员工4',
     isFirstOfYear: false,
     departmentCount: 1,
     profitContribution: { google: 218.8, fb: 174.9, criteo: 108.2, bing: 75.1 },
@@ -229,7 +229,7 @@ const departmentProfitData = ref<DepartmentProfitData[]>([
 
 // 计算统计数据
 const yearlyProfitTotal = computed(() => {
-  const totalRow = departmentProfitData.value.find(item => item.department === '运营')
+  const totalRow = departmentProfitData.value.find(item => item.department === '合计')
   if (!totalRow) return 0
   return totalRow.profitContribution.google +
          totalRow.profitContribution.fb +
@@ -239,7 +239,7 @@ const yearlyProfitTotal = computed(() => {
 
 const quarterlyProfitTotal = computed(() => {
   // 当前季度总额 (这里用Q1的数据作为示例)
-  const q1Row = departmentProfitData.value.find(item => item.department === '运营一部')
+  const q1Row = departmentProfitData.value.find(item => item.department === '员工1')
   if (!q1Row) return 0
   return q1Row.profitContribution.google +
          q1Row.profitContribution.fb +
