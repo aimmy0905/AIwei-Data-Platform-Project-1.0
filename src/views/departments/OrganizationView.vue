@@ -49,14 +49,10 @@
               :key="department.id"
               :department="department"
               :level="0"
-              :employees="employees"
               @view="viewDepartment"
               @edit="editDepartment"
               @delete="deleteDepartment"
               @add-child="addChildDepartment"
-              @add-employee="addEmployeeToDepartment"
-              @edit-employee="editEmployeeInDepartment"
-              @remove-employee="removeEmployeeFromDepartment"
             />
           </div>
         </div>
@@ -265,348 +261,13 @@
               </div>
             </div>
 
-            <!-- 部门员工 -->
-            <div class="detail-section">
-              <div class="section-header">
-                <h4 class="section-title">部门员工 ({{ departmentEmployees.length }}人)</h4>
-                <button class="action-btn action-btn--primary" @click="() => addEmployeeToDepartment()">
-                  <Plus :size="16" />
-                  添加员工
-                </button>
-              </div>
-              <div v-if="departmentEmployees.length === 0" class="no-employees">
-                暂无员工数据
-              </div>
-              <div v-else class="employees-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>姓名</th>
-                      <th>工号</th>
-                      <th>职务</th>
-                      <th>联系方式</th>
-                      <th>入职时间</th>
-                      <th>状态</th>
-                      <th>操作</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="employee in departmentEmployees" :key="employee.id">
-                      <td>{{ employee.name }}</td>
-                      <td>{{ employee.employee_id }}</td>
-                      <td>{{ employee.position }}</td>
-                      <td>{{ employee.phone }}</td>
-                      <td>{{ formatDate(employee.hire_date) }}</td>
-                      <td>
-                        <span class="status-badge" :class="getEmployeeStatusClass(employee.status)">
-                          {{ getEmployeeStatusText(employee.status) }}
-                        </span>
-                      </td>
-                      <td>
-                        <div class="employee-actions">
-                          <button
-                            class="action-btn-small action-btn-small--primary"
-                            @click="editEmployeeInDepartment(employee)"
-                            title="编辑员工"
-                          >
-                            <Edit :size="14" />
-                          </button>
-                          <button
-                            class="action-btn-small action-btn-small--danger"
-                            @click="removeEmployeeFromDepartment(employee)"
-                            title="移除员工"
-                          >
-                            <Trash2 :size="14" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+
         </div>
-      </div>
-    </div>
-
-    <!-- 员工管理弹窗 -->
-    <div v-if="showEmployeeModal" class="modal-overlay" @click="closeEmployeeModal">
-      <div class="modal-container modal-container--wide" @click.stop>
-        <div class="modal-header">
-          <h3 class="modal-title">{{ isEditingEmployee ? '编辑员工' : '新建员工' }}</h3>
-          <button class="modal-close" @click="closeEmployeeModal">
-            <X :size="20" />
-          </button>
-        </div>
-        <div class="modal-content">
-          <form @submit.prevent="submitEmployee" class="employee-form-unified">
-            <div class="form-sections">
-
-              <!-- 基本信息区域 -->
-              <div class="form-section">
-                <div class="form-section-header">
-                  <User :size="20" />
-                  <h4>基本信息</h4>
                 </div>
-                <div class="form-grid">
-                  <div class="form-group">
-                    <label class="form-label">姓名 *</label>
-                    <input
-                      v-model="employeeForm.name"
-                      type="text"
-                      class="form-input"
-                      placeholder="请输入姓名"
-                      required
-                    />
+                  </div>
                   </div>
 
-                  <div class="form-group">
-                    <label class="form-label">工号 *</label>
-                    <input
-                      v-model="employeeForm.employee_id"
-                      type="text"
-                      class="form-input"
-                      placeholder="请输入工号"
-                      required
-                    />
-                  </div>
 
-                  <div class="form-group">
-                    <label class="form-label">性别</label>
-                    <div class="radio-group">
-                      <label class="radio-item">
-                        <input v-model="employeeForm.gender" type="radio" value="male" />
-                        <span class="radio-label">男</span>
-                      </label>
-                      <label class="radio-item">
-                        <input v-model="employeeForm.gender" type="radio" value="female" />
-                        <span class="radio-label">女</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">出生日期</label>
-                    <input
-                      v-model="employeeForm.birth_date"
-                      type="date"
-                      class="form-input"
-                    />
-                  </div>
-
-                  <div class="form-group form-group--full">
-                    <label class="form-label">身份证号</label>
-                    <input
-                      v-model="employeeForm.id_card"
-                      type="text"
-                      class="form-input"
-                      placeholder="请输入身份证号"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <!-- 联系方式区域 -->
-              <div class="form-section">
-                <div class="form-section-header">
-                  <Phone :size="20" />
-                  <h4>联系方式</h4>
-                </div>
-                <div class="form-grid">
-                  <div class="form-group">
-                    <label class="form-label">手机号码 *</label>
-                    <input
-                      v-model="employeeForm.phone"
-                      type="tel"
-                      class="form-input"
-                      placeholder="请输入手机号码"
-                      required
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">邮箱地址 *</label>
-                    <input
-                      v-model="employeeForm.email"
-                      type="email"
-                      class="form-input"
-                      placeholder="请输入邮箱地址"
-                      required
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">微信号</label>
-                    <input
-                      v-model="employeeForm.wechat"
-                      type="text"
-                      class="form-input"
-                      placeholder="请输入微信号"
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">QQ号</label>
-                    <input
-                      v-model="employeeForm.qq"
-                      type="text"
-                      class="form-input"
-                      placeholder="请输入QQ号"
-                    />
-                  </div>
-
-                  <div class="form-group form-group--full">
-                    <label class="form-label">联系地址</label>
-                    <textarea
-                      v-model="employeeForm.address"
-                      class="form-textarea"
-                      placeholder="请输入联系地址"
-                      rows="2"
-                    ></textarea>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">紧急联系人</label>
-                    <input
-                      v-model="employeeForm.emergency_contact"
-                      type="text"
-                      class="form-input"
-                      placeholder="请输入紧急联系人"
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">紧急联系电话</label>
-                    <input
-                      v-model="employeeForm.emergency_phone"
-                      type="tel"
-                      class="form-input"
-                      placeholder="请输入紧急联系电话"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <!-- 工作信息区域 -->
-              <div class="form-section">
-                <div class="form-section-header">
-                  <Briefcase :size="20" />
-                  <h4>工作信息</h4>
-                </div>
-                <div class="form-grid">
-                  <div class="form-group">
-                    <label class="form-label">所属部门 *</label>
-                    <select v-model="employeeForm.department_id" class="form-select" required>
-                      <option value="">请选择部门</option>
-                      <option v-for="dept in allDepartments" :key="dept.id" :value="dept.id">
-                        {{ dept.name }}
-                      </option>
-                    </select>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">职务 *</label>
-                    <select v-model="employeeForm.position" class="form-select" required>
-                      <option value="">请选择职务</option>
-                      <option v-for="position in positions" :key="position" :value="position">
-                        {{ position }}
-                      </option>
-                    </select>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">直属上级</label>
-                    <select v-model="employeeForm.supervisor_id" class="form-select">
-                      <option value="">请选择直属上级</option>
-                      <option
-                        v-for="emp in availableSupervisors"
-                        :key="emp.id"
-                        :value="emp.id"
-                      >
-                        {{ emp.name }} ({{ emp.position }})
-                      </option>
-                    </select>
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">入职日期 *</label>
-                    <input
-                      v-model="employeeForm.hire_date"
-                      type="date"
-                      class="form-input"
-                      required
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">试用期(月)</label>
-                    <input
-                      v-model.number="employeeForm.probation_months"
-                      type="number"
-                      class="form-input"
-                      placeholder="请输入试用期月数"
-                      min="0"
-                      max="12"
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">工作地点</label>
-                    <input
-                      v-model="employeeForm.work_location"
-                      type="text"
-                      class="form-input"
-                      placeholder="请输入工作地点"
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label class="form-label">状态</label>
-                    <div class="radio-group">
-                      <label class="radio-item">
-                        <input v-model="employeeForm.status" type="radio" value="active" />
-                        <span class="radio-label">在职</span>
-                      </label>
-                      <label class="radio-item">
-                        <input v-model="employeeForm.status" type="radio" value="probation" />
-                        <span class="radio-label">试用</span>
-                      </label>
-                      <label class="radio-item">
-                        <input v-model="employeeForm.status" type="radio" value="inactive" />
-                        <span class="radio-label">停用</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div class="form-group form-group--full">
-                    <label class="form-label">备注</label>
-                    <textarea
-                      v-model="employeeForm.remarks"
-                      class="form-textarea"
-                      placeholder="请输入备注信息"
-                      rows="3"
-                    ></textarea>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            <div class="form-actions">
-              <button type="button" class="btn btn--secondary" @click="closeEmployeeModal">
-                <X :size="16" />
-                取消
-              </button>
-              <button type="submit" class="btn btn--primary" :disabled="!isEmployeeFormValid">
-                <Save :size="16" />
-                {{ isEditingEmployee ? '更新员工' : '创建员工' }}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -619,11 +280,7 @@ import {
   Upload,
   Edit,
   Trash2,
-  X,
-  User,
-  Phone,
-  Briefcase,
-  Save
+  X
 } from 'lucide-vue-next'
 import { mockDepartments, allEmployees, buildDepartmentTree } from '@/mock/departments'
 import type { Department, Employee } from '@/types/departments'
@@ -635,30 +292,13 @@ const departments = ref<Department[]>([])
 const employees = ref<Employee[]>([])
 const showDepartmentModal = ref(false)
 const showDetailModal = ref(false)
-const showEmployeeModal = ref(false)
+
 const isEditing = ref(false)
-const isEditingEmployee = ref(false)
 
-// 职位选项
-const positions = [
-  '总经理',
-  '副总经理',
-  '部门经理',
-  '副经理',
-  '主管',
-  '高级专员',
-  '专员',
-  '助理',
-  '实习生'
-]
 
-// 可选上级员工
-const availableSupervisors = computed(() => {
-  return allEmployees.value.filter(emp =>
-    emp.id !== employeeForm.id &&
-    emp.status === 'active'
-  )
-})
+
+
+
 const selectedDepartment = ref<Department | null>(null)
 
 // 部门表单
@@ -673,30 +313,7 @@ const departmentForm = reactive({
   status: 'active' as 'active' | 'inactive'
 })
 
-// 员工表单
-const employeeForm = reactive({
-  id: 0,
-  name: '',
-  employee_id: '',
-  gender: 'male' as 'male' | 'female',
-  birth_date: '',
-  id_card: '',
-  phone: '',
-  email: '',
-  wechat: '',
-  qq: '',
-  address: '',
-  emergency_contact: '',
-  emergency_phone: '',
-  department_id: 0,
-  position: '',
-  supervisor_id: 0,
-  hire_date: '',
-  probation_months: 3,
-  work_location: '',
-  status: 'active' as 'active' | 'probation' | 'inactive' | 'resigned',
-  remarks: ''
-})
+
 
 // 计算属性
 const departmentTree = computed(() => {
@@ -746,25 +363,14 @@ const availableParentDepartments = computed(() => {
   return departments.value
 })
 
-const departmentEmployees = computed(() => {
-  if (!selectedDepartment.value) return []
-  return employees.value.filter(emp => emp.department_id === selectedDepartment.value!.id)
-})
+
 
 const isFormValid = computed(() => {
   return departmentForm.name.trim() !== '' &&
          departmentForm.code.trim() !== ''
 })
 
-const isEmployeeFormValid = computed(() => {
-  return employeeForm.name.trim() !== '' &&
-         employeeForm.employee_id.trim() !== '' &&
-         employeeForm.position.trim() !== '' &&
-         employeeForm.phone.trim() !== '' &&
-         employeeForm.email.trim() !== '' &&
-         employeeForm.hire_date.trim() !== '' &&
-         employeeForm.department_id > 0
-})
+
 
 // 生命周期
 onMounted(() => {
@@ -921,201 +527,21 @@ const formatDate = (dateString: string): string => {
   return new Date(dateString).toLocaleDateString('zh-CN')
 }
 
-const getEmployeeStatusClass = (status: string): string => {
-  const statusMap: Record<string, string> = {
-    active: 'status-badge--success',
-    probation: 'status-badge--warning',
-    inactive: 'status-badge--danger',
-    resigned: 'status-badge--secondary'
-  }
-  return statusMap[status] || 'status-badge--secondary'
-}
 
-const getEmployeeStatusText = (status: string): string => {
-  const statusMap: Record<string, string> = {
-    active: '在职',
-    probation: '试用',
-    inactive: '停用',
-    resigned: '离职'
-  }
-  return statusMap[status] || status
-}
 
-// 员工管理方法
-const addEmployeeToDepartment = (department?: Department) => {
-  // 如果传入了部门参数，使用传入的部门；否则使用当前选中的部门
-  const targetDepartment = department || selectedDepartment.value
-  if (!targetDepartment) return
 
-  // 设置当前操作的部门
-  selectedDepartment.value = targetDepartment
-  resetEmployeeForm()
-  // 设置默认部门
-  employeeForm.department_id = targetDepartment.id
-  isEditingEmployee.value = false
-  showEmployeeModal.value = true
-}
 
-const editEmployeeInDepartment = (employee: Employee) => {
-  Object.assign(employeeForm, {
-    id: employee.id,
-    name: employee.name,
-    employee_id: employee.employee_id,
-    gender: employee.gender,
-    birth_date: employee.birth_date || '',
-    id_card: employee.id_card || '',
-    phone: employee.phone,
-    email: employee.email,
-    wechat: employee.wechat || '',
-    qq: employee.qq || '',
-    address: employee.address || '',
-    emergency_contact: employee.emergency_contact || '',
-    emergency_phone: employee.emergency_phone || '',
-    department_id: employee.department_id,
-    position: employee.position,
-    supervisor_id: employee.supervisor_id || 0,
-    hire_date: employee.hire_date,
-    probation_months: employee.probation_months || 3,
-    work_location: employee.work_location || '',
-    status: employee.status,
-    remarks: employee.remarks || ''
-  })
-  isEditingEmployee.value = true
-  showEmployeeModal.value = true
-}
 
-const removeEmployeeFromDepartment = (employee: Employee) => {
-  if (confirm(`确定要从部门中移除员工"${employee.name}"吗？`)) {
-    employees.value = employees.value.filter(e => e.id !== employee.id)
-    // 更新部门员工数量
-    if (selectedDepartment.value) {
-      const deptIndex = departments.value.findIndex(d => d.id === selectedDepartment.value!.id)
-      if (deptIndex !== -1) {
-        departments.value[deptIndex].employee_count--
-      }
-    }
-    alert('员工移除成功！')
-  }
-}
 
-const submitEmployee = () => {
-  if (!isEmployeeFormValid.value || !selectedDepartment.value) return
 
-  if (isEditingEmployee.value) {
-    // 更新员工
-    const index = employees.value.findIndex(e => e.id === employeeForm.id)
-    if (index !== -1) {
-      // 获取部门和上级信息
-      const department = allDepartments.value.find(d => d.id === employeeForm.department_id)
-      const supervisor = availableSupervisors.value.find(s => s.id === employeeForm.supervisor_id)
 
-      employees.value[index] = {
-        ...employees.value[index],
-        name: employeeForm.name,
-        employee_id: employeeForm.employee_id,
-        gender: employeeForm.gender,
-        birth_date: employeeForm.birth_date,
-        id_card: employeeForm.id_card,
-        phone: employeeForm.phone,
-        email: employeeForm.email,
-        wechat: employeeForm.wechat,
-        qq: employeeForm.qq,
-        address: employeeForm.address,
-        emergency_contact: employeeForm.emergency_contact,
-        emergency_phone: employeeForm.emergency_phone,
-        department_id: employeeForm.department_id,
-        department_name: department?.name || '',
-        position: employeeForm.position,
-        supervisor_id: employeeForm.supervisor_id || undefined,
-        supervisor_name: supervisor?.name || undefined,
-        hire_date: employeeForm.hire_date,
-        probation_months: employeeForm.probation_months,
-        work_location: employeeForm.work_location,
-        status: employeeForm.status,
-        remarks: employeeForm.remarks,
-        updated_at: new Date().toISOString().split('T')[0]
-      }
-      alert('员工信息更新成功！')
-    }
-  } else {
-    // 添加员工
-    const newId = Math.max(...employees.value.map(e => e.id)) + 1
 
-    // 获取部门和上级信息
-    const department = allDepartments.value.find(d => d.id === employeeForm.department_id)
-    const supervisor = availableSupervisors.value.find(s => s.id === employeeForm.supervisor_id)
 
-    const newEmployee: Employee = {
-      id: newId,
-      name: employeeForm.name,
-      employee_id: employeeForm.employee_id,
-      gender: employeeForm.gender,
-      birth_date: employeeForm.birth_date,
-      id_card: employeeForm.id_card,
-      phone: employeeForm.phone,
-      email: employeeForm.email,
-      wechat: employeeForm.wechat,
-      qq: employeeForm.qq,
-      address: employeeForm.address,
-      emergency_contact: employeeForm.emergency_contact,
-      emergency_phone: employeeForm.emergency_phone,
-      department_id: employeeForm.department_id,
-      department_name: department?.name || '',
-      position: employeeForm.position,
-      supervisor_id: employeeForm.supervisor_id || undefined,
-      supervisor_name: supervisor?.name || undefined,
-      hire_date: employeeForm.hire_date,
-      probation_months: employeeForm.probation_months,
-      work_location: employeeForm.work_location,
-      status: employeeForm.status,
-      remarks: employeeForm.remarks,
-      created_at: new Date().toISOString().split('T')[0],
-      updated_at: new Date().toISOString().split('T')[0]
-    }
-    employees.value.push(newEmployee)
 
-    // 更新部门员工数量
-    const deptIndex = departments.value.findIndex(d => d.id === employeeForm.department_id)
-    if (deptIndex !== -1) {
-      departments.value[deptIndex].employee_count++
-    }
 
-    alert('员工创建成功！')
-  }
 
-  closeEmployeeModal()
-}
 
-const closeEmployeeModal = () => {
-  showEmployeeModal.value = false
-  resetEmployeeForm()
-}
 
-const resetEmployeeForm = () => {
-  Object.assign(employeeForm, {
-    id: 0,
-    name: '',
-    employee_id: '',
-    gender: 'male',
-    birth_date: '',
-    id_card: '',
-    phone: '',
-    email: '',
-    wechat: '',
-    qq: '',
-    address: '',
-    emergency_contact: '',
-    emergency_phone: '',
-    department_id: 0,
-    position: '',
-    supervisor_id: 0,
-    hire_date: '',
-    probation_months: 3,
-    work_location: '',
-    status: 'active',
-    remarks: ''
-  })
-}
 </script>
 
 <style scoped>
@@ -1584,121 +1010,9 @@ const resetEmployeeForm = () => {
   color: var(--color-text-secondary);
 }
 
-.no-employees {
-  text-align: center;
-  padding: 40px;
-  color: var(--color-text-secondary);
-  font-style: italic;
-}
 
-.employees-table {
-  overflow-x: auto;
-}
 
-.employees-table table {
-  width: 100%;
-  border-collapse: collapse;
-}
 
-.employees-table th,
-.employees-table td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid var(--color-border-light);
-}
-
-.employees-table th {
-  background: var(--color-background);
-  font-weight: 600;
-  color: var(--color-text-primary);
-  font-size: 14px;
-}
-
-.employees-table td {
-  font-size: 14px;
-  color: var(--color-text-primary);
-}
-
-.employee-actions {
-  display: flex;
-  gap: 4px;
-}
-
-.action-btn-small {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.action-btn-small--primary {
-  background: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
-}
-
-.action-btn-small--primary:hover {
-  background: #16a34a;
-  color: white;
-}
-
-.action-btn-small--danger {
-  background: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
-}
-
-.action-btn-small--danger:hover {
-  background: #dc2626;
-  color: white;
-}
-
-/* 员工表单样式 */
-.employee-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* 统一表单样式 */
-.employee-form-unified {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.form-sections {
-  flex: 1;
-  padding: 32px;
-  overflow-y: auto;
-}
-
-.form-section {
-  margin-bottom: 40px;
-}
-
-.form-section:last-child {
-  margin-bottom: 0;
-}
-
-.form-section-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid var(--color-border);
-}
-
-.form-section-header h4 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
 
 /* 响应式设计 */
 @media (max-width: 768px) {
@@ -1741,13 +1055,7 @@ const resetEmployeeForm = () => {
     grid-template-columns: 1fr;
   }
 
-  .form-sections {
-    padding: 20px;
-  }
 
-  .form-section {
-    margin-bottom: 30px;
-  }
 
   .form-actions {
     flex-direction: column-reverse;
