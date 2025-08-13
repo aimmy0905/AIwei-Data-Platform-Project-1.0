@@ -507,46 +507,15 @@
       @department-click="handleDepartmentClick"
     />
 
-    <!-- 预算执行分析模块 -->
-    <div class="dashboard-section">
-      <h2 class="section-title">预算执行分析</h2>
-      <div class="budget-execution-table-container">
-        <table class="budget-execution-table">
-          <thead>
-            <tr>
-              <th>部门</th>
-              <th>预算金额</th>
-              <th>实际支出</th>
-              <th>执行率</th>
-              <th>差异</th>
-              <th>剩余预算</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="budget in budgetExecution" :key="budget.department">
-              <td class="department-name">{{ budget.department }}</td>
-              <td>{{ formatCurrency(budget.budgetAmount) }}</td>
-              <td>{{ formatCurrency(budget.actualAmount) }}</td>
-              <td>
-                <div class="execution-rate" :class="getExecutionRateClass(budget.executionRate)">
-                  {{ budget.executionRate }}%
-                </div>
-              </td>
-              <td>
-                <div class="variance" :class="budget.variance >= 0 ? 'positive' : 'negative'">
-                  {{ budget.variance >= 0 ? '+' : '' }}{{ formatCurrency(budget.variance) }}
-                </div>
-              </td>
-              <td>
-                <div class="remaining" :class="budget.remainingBudget >= 0 ? 'positive' : 'negative'">
-                  {{ formatCurrency(budget.remainingBudget) }}
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <!-- 项目部员工目标完成情况模块 -->
+    <EmployeeTargetCompletionModule
+      :employee-targets="employeeTargetsData"
+      :loading="loading"
+      @time-range-change="handleTimeRangeChange"
+      @employee-click="handleEmployeeClick"
+    />
+
+
 
         <!-- 财务比率分析模块 -->
     <div class="dashboard-section" v-if="financialData">
@@ -598,43 +567,7 @@
       </div>
     </div>
 
-    <!-- 财务风险预警模块 -->
-    <div class="dashboard-section">
-      <h2 class="section-title">财务风险预警</h2>
-      <div class="risk-alerts-container">
-        <div
-          v-for="alert in riskAlerts"
-          :key="alert.id"
-          class="risk-alert-card"
-          :class="`risk-${alert.level}`"
-        >
-          <div class="alert-header">
-            <div class="alert-icon" :class="`alert-icon--${alert.level}`">
-              <AlertTriangle :size="20" />
-            </div>
-            <div class="alert-info">
-              <h4 class="alert-title">{{ alert.title }}</h4>
-              <p class="alert-description">{{ alert.description }}</p>
-            </div>
-            <div class="alert-level">
-              <span class="level-badge" :class="`level-${alert.level}`">
-                {{ getLevelText(alert.level) }}
-              </span>
-            </div>
-          </div>
 
-          <div class="alert-details">
-            <div class="alert-values">
-              <span class="current-value">当前值: {{ formatCurrency(alert.currentValue) }}</span>
-              <span class="threshold-value">阈值: {{ formatCurrency(alert.thresholdValue) }}</span>
-            </div>
-            <div class="alert-recommendation">
-              <strong>建议:</strong> {{ alert.recommendation }}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -646,6 +579,7 @@ import TimeRangePicker from '@/components/business/TimeRangePicker.vue'
 import MetricCard from '@/components/business/MetricCard.vue'
 import OperationTargetCompletionModule from '@/components/business/OperationTargetCompletionModule.vue'
 import DepartmentTargetCompletionModule from '@/components/business/DepartmentTargetCompletionModule.vue'
+import EmployeeTargetCompletionModule from '@/components/business/EmployeeTargetCompletionModule.vue'
 import type {
   TimeRange,
   BusinessRole,
@@ -804,6 +738,9 @@ const departmentTargetsData = ref<DepartmentTargetData[]>([
     }
   }
 ])
+
+const employeeTargetsData = ref([])
+
 const salesTargetData = ref([
   {
     year: '2025',
@@ -955,6 +892,10 @@ const getCompletionClass = (rate: number): string => {
 
 const handleDepartmentClick = (departmentId: string) => {
   console.log('部门点击:', departmentId)
+}
+
+const handleEmployeeClick = (employeeId: string) => {
+  console.log('员工点击:', employeeId)
 }
 
 const handleSalesTimeRangeChange = (timeRange: TimeRange) => {
